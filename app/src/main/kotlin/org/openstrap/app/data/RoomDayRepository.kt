@@ -64,7 +64,10 @@ class RoomDayRepository(
             val (skin, breath, pai) = extraParts
             val (raw, hr) = ah
             // Steps the strap logs while you're asleep are arm movement, not walking: they don't count.
-            val act = sleepPart.sleep?.let { s -> raw.map { m -> if (m.steps > 0 && m.timestamp >= s.start && m.timestamp < s.end) m.copy(steps = 0) else m } } ?: raw
+            val asleepSpans = listOfNotNull(sleepPart.sleep?.main) + sleepPart.sleep?.naps.orEmpty()
+            val act = if (asleepSpans.isEmpty()) raw else raw.map { m ->
+                if (m.steps > 0 && asleepSpans.any { m.timestamp >= it.start && m.timestamp < it.end }) m.copy(steps = 0) else m
+            }
             moreParts.copy(
                 isToday = isToday,
                 day = day,
