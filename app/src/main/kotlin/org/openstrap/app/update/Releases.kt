@@ -31,7 +31,8 @@ data class Release(
 
 /** OpenStrap's releases on GitHub: where they're read from, and which are newer than the one installed. */
 object Releases {
-    const val REPO = "sayed0am/openstrap"
+    // The redesign builds update from the fork they are published on.
+    const val REPO = "kioo20082008-spec/openstrap"
     const val API = "https://api.github.com/repos/$REPO/releases?per_page=30"
     const val PAGE = "https://github.com/$REPO/releases"
 

@@ -10,6 +10,9 @@ concurrency:
   group: apk-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-26.04
@@ -23,8 +26,17 @@ jobs:
       - name: Install Android SDK packages
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;36.0.0" > /dev/null
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug
+        run: ./gradlew :app:assembleDebug -PappVersion=3.0.${{ github.run_number }}
       - uses: actions/upload-artifact@v7
         with:
           name: openstrap-redesign-debug
           path: app/build/outputs/apk/debug/app-debug.apk
+      # Each build is a release, so the app finds it on this fork and updates itself.
+      - name: Publish as a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: 3.0.${{ github.run_number }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk "openstrap-$VERSION.apk"
+          gh release create "v$VERSION" "openstrap-$VERSION.apk" --target "$GITHUB_SHA" \
+            --title "OpenStrap $VERSION" --notes "Redesign build $VERSION."

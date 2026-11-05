@@ -108,7 +108,13 @@ class AppUpdater(
 
     /** Sets the daily check going, or stops it, as the switch says; each app start. */
     fun start() {
-        scope.launch { if (settings.updateAuto.first()) schedule(app) else cancel(app) }
+        scope.launch {
+            if (settings.updateAuto.first()) {
+                schedule(app)
+                // The redesign builds update themselves: a newer one is fetched and installed as the app opens.
+                autoUpdate()
+            } else cancel(app)
+        }
     }
 
     fun setAuto(on: Boolean) {
@@ -149,13 +155,20 @@ class AppUpdater(
         }
     }
 
-    /** The daily check: reads the list, then notifies about the newest release once, if it's newer than this one. */
-    suspend fun dailyCheck() {
+    /**
+     * The periodic check, and each app start: reads the list and, when there's a newer release, downloads and installs
+     * it straight away if Android lets OpenStrap install apps and no workout is recording; otherwise it notifies once.
+     */
+    suspend fun dailyCheck() = autoUpdate()
+
+    suspend fun autoUpdate() {
         if (!check()) return
         val newest = Releases.newer(_state.value.releases, installed).firstOrNull() ?: return
-        if (settings.updateNotified() == newest.tag) return
-        UpdateNotifier(app).available(newest)
-        settings.setUpdateNotified(newest.tag)
+        if (canInstall() && !recording()) install(newest)
+        else if (settings.updateNotified() != newest.tag) {
+            UpdateNotifier(app).available(newest)
+            settings.setUpdateNotified(newest.tag)
+        }
     }
 
     /** Android lets OpenStrap install apps; when it doesn't, [allowInstalls] opens the switch for it. */
@@ -357,10 +370,10 @@ class AppUpdater(
 
         /** Starts the daily check; a no-op when it's already scheduled. Runs only with a network. */
         fun schedule(context: Context) {
-            val request = PeriodicWorkRequestBuilder<UpdateWorker>(1, TimeUnit.DAYS)
+            val request = PeriodicWorkRequestBuilder<UpdateWorker>(3, TimeUnit.HOURS)
                 .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                 .build()
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(DAILY, ExistingPeriodicWorkPolicy.KEEP, request)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(DAILY, ExistingPeriodicWorkPolicy.UPDATE, request)
         }
 
         fun cancel(context: Context) {
