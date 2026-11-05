@@ -390,11 +390,8 @@ private fun TabHeader(t: Tab, h: HeaderHooks) {
     val title = if (t != Tab.Today) {
         t.label
     } else {
-        h.today.layout?.let { m ->
-            // During a workout the header is the sport under way, after one the sport just done.
-            val sport = if (m == Moment.During) h.running?.workout?.sportType else h.today.lastWorkout?.workout?.sportType
-            todayTitle(m, day.date, sport)
-        } ?: dayTitle(day.date)
+        // The redesign: "Today" (or the day's name) large, the date small above it.
+        dayTitle(day.date)
     }
     MomentHeader(
         title, day.date, h.chip, dayVm::previousDay, dayVm::nextDay, picker,

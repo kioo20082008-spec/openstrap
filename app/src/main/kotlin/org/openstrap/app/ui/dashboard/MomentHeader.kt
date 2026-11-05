@@ -43,6 +43,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import org.openstrap.app.ui.components.growClick
 import org.openstrap.app.ui.glow.GlowType
@@ -121,7 +122,7 @@ fun MomentHeader(
 private fun CentredRow(
     overhang: androidx.compose.ui.unit.Dp, start: @Composable () -> Unit, centre: @Composable () -> Unit, end: @Composable () -> Unit,
 ) {
-    Layout(listOf(start, centre, end), Modifier.fillMaxWidth().height(60.dp)) { (s, c, e), constraints ->
+    Layout(listOf(start, centre, end), Modifier.fillMaxWidth().height(72.dp)) { (s, c, e), constraints ->
         val loose = constraints.copy(minWidth = 0, minHeight = 0)
         val sp = s.first().measure(loose)
         val ep = e.first().measure(loose)
@@ -153,7 +154,7 @@ private fun DaySwitcher(
     val canNext by rememberUpdatedState(hasNext)
     val description = stringResource(R.string.day_header_day_description, title, dateLine(date))
     Row(
-        modifier.height(60.dp)
+        modifier.height(72.dp)
             .pointerInput(threshold) {
                 detectHorizontalDragGestures(
                     onDragStart = { dragging = true },
@@ -183,11 +184,11 @@ private fun DaySwitcher(
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
-                title, color = Color.White.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
+                dateLine(date), color = Color.White.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                dateLine(date), color = Color.White, style = GlowType.headerDate,
+                title, color = Color.White, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
         }
