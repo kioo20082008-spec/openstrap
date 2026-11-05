@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="you_firmware_title">النظام</string>
+    <string name="you_firmware_title">نظام السترب</string>
     <string name="you_firmware_this_strap">هذا السترب</string>
     <string name="you_firmware_unknown">غير معروف</string>
     <string name="you_firmware_hardware">العتاد</string>

@@ -34,7 +34,7 @@
     <string name="you_strap_row_health_alerts">تنبيهات صحية</string>
     <string name="you_strap_row_off_body">تذكير عند نزع السترب</string>
     <string name="you_strap_row_auto_detect">اكتشاف التمارين تلقائياً</string>
-    <string name="you_strap_row_firmware">النظام</string>
+    <string name="you_strap_row_firmware">نظام السترب</string>
     <string name="you_strap_check_for_updates">تحقق من التحديثات</string>
     <string name="you_strap_row_zepp">حساب Zepp</string>
     <string name="you_strap_signed_in">مسجّل الدخول</string>
