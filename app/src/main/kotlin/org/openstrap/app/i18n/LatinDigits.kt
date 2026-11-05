@@ -7,7 +7,7 @@ import java.util.Locale
 
 /** Arabic keeps Western digits (1, 2, 3), as the redesign does: every Arabic locale is given the Latin numbering system. */
 object LatinDigits {
-    private fun latin(l: Locale): Locale =
+    fun latin(l: Locale): Locale =
         if (l.language == "ar") Locale.Builder().setLocale(l).setUnicodeLocaleKeyword("nu", "latn").build() else l
 
     fun wrap(base: Context): Context {

@@ -52,8 +52,11 @@ interface Strings {
 class ResourceStrings(private val context: Context) : Strings {
     override fun get(id: Int): String = context.resources.getString(id)
 
-    override fun format(id: Int, vararg args: Any): String = context.resources.getString(id, *args)
+    // Formatted here rather than by Resources, so Arabic keeps Western digits ([LatinDigits]) in the app's own language.
+    private val locale get() = LatinDigits.latin(context.resources.configuration.locales[0])
+
+    override fun format(id: Int, vararg args: Any): String = String.format(locale, context.resources.getString(id), *args)
 
     override fun plural(id: Int, count: Int, vararg args: Any): String =
-        if (args.isEmpty()) context.resources.getQuantityString(id, count) else context.resources.getQuantityString(id, count, *args)
+        if (args.isEmpty()) context.resources.getQuantityString(id, count) else String.format(locale, context.resources.getQuantityString(id, count), *args)
 }
