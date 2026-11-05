@@ -75,8 +75,8 @@
     <string name="core_today_evening_one_hike">مشي جبلي</string>
     <string name="core_today_evening_one_row">تجديف</string>
     <string name="core_today_evening_one_workout">تمرين</string>
-    <plurals name="core_today_evening_workouts"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">⁨%d⁩ تمارين</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمارين</item><item quantity="other">⁨%d⁩ تمارين</item></plurals>
-    <plurals name="core_today_evening_steps"><item quantity="zero">⁨%1$s⁩ خطوة</item><item quantity="one">⁨%1$s⁩ خطوة</item><item quantity="two">⁨%1$s⁩ خطوة</item><item quantity="few">⁨%1$s⁩ خطوة</item><item quantity="many">⁨%1$s⁩ خطوة</item><item quantity="other">⁨%1$s⁩ خطوة</item></plurals>
+    <plurals name="core_today_evening_workouts"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">تمرينان</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمريناً</item><item quantity="other">⁨%d⁩ تمرين</item></plurals>
+    <plurals name="core_today_evening_steps"><item quantity="zero">⁨%1$s⁩ خطوة</item><item quantity="one">خطوة واحدة</item><item quantity="two">⁨%1$s⁩ خطوة</item><item quantity="few">⁨%1$s⁩ خطوة</item><item quantity="many">⁨%1$s⁩ خطوة</item><item quantity="other">⁨%1$s⁩ خطوة</item></plurals>
     <string name="core_today_evening_load_above">جهد أعلى من معدلك</string>
     <string name="core_today_evening_load_below">جهد أقل من معدلك</string>
     <string name="core_today_evening_load_usual">جهد قريب من معدلك</string>
@@ -88,9 +88,9 @@
     <string name="core_today_goal_well_short">بعيد عن هدف الخطوات</string>
     <string name="core_today_bedtime_in">موعد النوم بعد ⁨%1$s⁩</string>
     <string name="core_today_recovered">تعافيت</string>
-    <plurals name="core_today_recover_by"><item quantity="zero">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز الساعة ⁨%1$s⁩</item><item quantity="two">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="few">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="many">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="other">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item></plurals>
-    <plurals name="core_today_recover_tomorrow"><item quantity="zero">ساعات متبقية، جاهز غداً</item><item quantity="one">باقي ساعة، جاهز غداً</item><item quantity="two">ساعات متبقية، جاهز غداً</item><item quantity="few">ساعات متبقية، جاهز غداً</item><item quantity="many">ساعات متبقية، جاهز غداً</item><item quantity="other">ساعات متبقية، جاهز غداً</item></plurals>
-    <plurals name="core_today_recover_day"><item quantity="zero">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز ⁨%1$s⁩</item><item quantity="two">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="few">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="many">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="other">ساعات متبقية، جاهز ⁨%1$s⁩</item></plurals>
+    <plurals name="core_today_recover_by"><item quantity="zero">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز الساعة واحدة</item><item quantity="two">ساعتان متبقية، جاهز الساعة</item><item quantity="few">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="many">ساعة متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="other">ساعة متبقية، جاهز الساعة ⁨%1$s⁩</item></plurals>
+    <plurals name="core_today_recover_tomorrow"><item quantity="zero">ساعات متبقية، جاهز غداً</item><item quantity="one">باقي ساعة، جاهز غداً</item><item quantity="two">ساعتان متبقية، جاهز غداً</item><item quantity="few">ساعات متبقية، جاهز غداً</item><item quantity="many">ساعة متبقية، جاهز غداً</item><item quantity="other">ساعة متبقية، جاهز غداً</item></plurals>
+    <plurals name="core_today_recover_day"><item quantity="zero">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز ⁨%1$s⁩</item><item quantity="two">ساعتان متبقية، جاهز</item><item quantity="few">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="many">ساعة متبقية، جاهز ⁨%1$s⁩</item><item quantity="other">ساعة متبقية، جاهز ⁨%1$s⁩</item></plurals>
     <string name="core_today_recover_short_by">جاهز الساعة ⁨%1$s⁩</string>
     <string name="core_today_recover_short_tomorrow">جاهز غداً</string>
     <string name="core_today_recover_short_day">جاهز ⁨%1$s⁩</string>

@@ -242,10 +242,12 @@ internal fun TrimBar(
                 )
             }
         }
+        Ltr {
         Row(Modifier.fillMaxWidth()) {
             PageNote(clock(first))
             Spacer(Modifier.weight(1f))
             PageNote(clock(last))
+        }
         }
     }
 }

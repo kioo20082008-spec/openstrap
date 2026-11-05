@@ -49,4 +49,5 @@
     <string name="breathe_stop">إيقاف</string>
     <string name="breathe_again">مرة أخرى</string>
     <string name="dials_quick_breathe">جلسة تنفّس</string>
+    <plurals name="day_sleep_naps_count"><item quantity="zero">لا قيلولة</item><item quantity="one">قيلولة واحدة</item><item quantity="two">قيلولتان</item><item quantity="few">⁨%d⁩ قيلولات</item><item quantity="many">⁨%d⁩ قيلولة</item><item quantity="other">⁨%d⁩ قيلولة</item></plurals>
 </resources>

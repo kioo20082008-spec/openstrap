@@ -19,7 +19,7 @@
     <string name="workout_glance_figure_average_bpm">متوسط النبض</string>
     <string name="workout_glance_figure_effort">المجهود</string>
     <string name="workout_glance_effort_of_5">⁨%1$d⁩ من 5</string>
-    <plurals name="workout_glance_figure_sets_done"><item quantity="zero">مجموعات منجزة</item><item quantity="one">مجموعة منجزة</item><item quantity="two">مجموعات منجزة</item><item quantity="few">مجموعات منجزة</item><item quantity="many">مجموعات منجزة</item><item quantity="other">مجموعات منجزة</item></plurals>
+    <plurals name="workout_glance_figure_sets_done"><item quantity="zero">مجموعات منجزة</item><item quantity="one">مجموعة منجزة</item><item quantity="two">مجموعتان منجزة</item><item quantity="few">مجموعات منجزة</item><item quantity="many">مجموعة منجزة</item><item quantity="other">مجموعة منجزة</item></plurals>
     <string name="workout_glance_pause">إيقاف مؤقت</string>
     <string name="workout_glance_resume">استئناف</string>
     <string name="workout_glance_still_going">ما زلت مستمراً؟</string>

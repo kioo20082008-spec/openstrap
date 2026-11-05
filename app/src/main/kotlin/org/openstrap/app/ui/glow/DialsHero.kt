@@ -95,13 +95,13 @@ internal fun DialsHero(
                     drawCircle(Color(0xFFFFF3E2), 4.5.dp.toPx(), p)
                 }
             }
-            Row(Modifier.padding(top = 64.dp), verticalAlignment = Alignment.Top) {
+            Ltr { Row(Modifier.padding(top = 64.dp), verticalAlignment = Alignment.Top) {
                 Text(
                     recovery?.toString() ?: "–", color = AppPalette.Cream,
                     style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 112.sp, lineHeight = 112.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
                 )
                 if (recovery != null) Text("%", Modifier.padding(top = 18.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
-            }
+            } }
         }
         Text(labels.second, color = Muted, style = MaterialTheme.typography.labelLarge)
         Spacer(Modifier.height(4.dp))

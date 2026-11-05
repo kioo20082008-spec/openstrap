@@ -23,7 +23,7 @@
     <string name="day_card_activity">الخطوات</string>
     <string name="day_card_recovery">الاستشفاء</string>
     <string name="day_card_charge">الطاقة</string>
-    <string name="day_card_load">الجهد ووقت الاستشفاء</string>
+    <string name="day_card_load">الجهد ووقت التعافي</string>
     <string name="day_card_workout">التمرين</string>
     <string name="day_card_week">أسبوعك</string>
     <string name="day_card_habit_age">عمر عاداتك</string>
@@ -74,7 +74,7 @@
     <string name="day_ago_now">الآن</string>
     <string name="day_ago_minutes">قبل ⁨%1$d⁩ د</string>
     <string name="day_ago_hours">قبل ⁨%1$d⁩ س</string>
-    <plurals name="day_ago_days"><item quantity="zero">قبل ⁨%1$d⁩ أيام</item><item quantity="one">قبل يوم</item><item quantity="two">قبل ⁨%1$d⁩ أيام</item><item quantity="few">قبل ⁨%1$d⁩ أيام</item><item quantity="many">قبل ⁨%1$d⁩ أيام</item><item quantity="other">قبل ⁨%1$d⁩ أيام</item></plurals>
+    <plurals name="day_ago_days"><item quantity="zero">قبل ⁨%1$d⁩ أيام</item><item quantity="one">قبل يوم</item><item quantity="two">قبل يومان</item><item quantity="few">قبل ⁨%1$d⁩ أيام</item><item quantity="many">قبل ⁨%1$d⁩ يوماً</item><item quantity="other">قبل ⁨%1$d⁩ يوم</item></plurals>
     <string name="day_header_you">أنت</string>
     <string name="day_header_you_update">أنت، يوجد إصدار جديد</string>
     <string name="day_header_open_you">افتح صفحتك</string>
@@ -93,8 +93,8 @@
     <string name="day_rating_fair">مقبول</string>
     <string name="day_rating_low">منخفض</string>
     <string name="day_stress_counts_from_calm">يُحسب التوتر من ⁨%1$d⁩: أعلى بـ ⁨%2$d⁩ من مستوى هدوئك ⁨%3$d⁩ خلال آخر ⁨%4$s⁩.</string>
-    <plurals name="day_stress_last_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم</item><item quantity="two">⁨%1$d⁩ أيام</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ أيام</item><item quantity="other">⁨%1$d⁩ أيام</item></plurals>
+    <plurals name="day_stress_last_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم</item><item quantity="two">يومان</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ يوماً</item><item quantity="other">⁨%1$d⁩ يوم</item></plurals>
     <string name="day_stress_counts_for_now">يُحسب التوتر من ⁨%1$d⁩ مؤقتاً. بعد ⁨%2$s⁩ من اللبس يتكيّف مع مستوى هدوئك.</string>
-    <plurals name="day_stress_more_days"><item quantity="zero">⁨%1$d⁩ أيام إضافية</item><item quantity="one">يوم إضافي</item><item quantity="two">⁨%1$d⁩ أيام إضافية</item><item quantity="few">⁨%1$d⁩ أيام إضافية</item><item quantity="many">⁨%1$d⁩ أيام إضافية</item><item quantity="other">⁨%1$d⁩ أيام إضافية</item></plurals>
+    <plurals name="day_stress_more_days"><item quantity="zero">⁨%1$d⁩ أيام إضافية</item><item quantity="one">يوم إضافي</item><item quantity="two">يومان إضافية</item><item quantity="few">⁨%1$d⁩ أيام إضافية</item><item quantity="many">⁨%1$d⁩ يوماً إضافية</item><item quantity="other">⁨%1$d⁩ يوم إضافية</item></plurals>
     <string name="day_stress_counts_until">يُحسب التوتر من ⁨%1$d⁩ مؤقتاً، حتى تتوفر قراءات هدوء كافية لمعرفة مستواك.</string>
 </resources>

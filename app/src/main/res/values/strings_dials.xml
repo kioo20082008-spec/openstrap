@@ -49,4 +49,5 @@
     <string name="breathe_stop">Stop</string>
     <string name="breathe_again">Again</string>
     <string name="dials_quick_breathe">Breathe</string>
+    <plurals name="day_sleep_naps_count"><item quantity="one">%d nap</item><item quantity="other">%d naps</item></plurals>
 </resources>

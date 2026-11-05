@@ -379,7 +379,7 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
             // Clear of the strap on the right too, which sits centred and so lower as this grows.
             Column(Modifier.fillMaxWidth().padding(top = 128.dp, bottom = 5.dp, end = 112.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // The card's one dotted number (spec 2.3); the word after it sits on the digits' baseline in Body at 72%.
-                if (battery != null) HeroValue("$battery", stringResource(R.string.you_strap_battery_unit, "%"))
+                if (battery != null) HeroValue("$battery%", stringResource(R.string.you_firmware_battery))
                 if (sync is SyncState.Running) {
                     PageProgress()
                     Text(sync.step, style = GlowType.secondary, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))

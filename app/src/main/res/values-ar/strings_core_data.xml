@@ -2,7 +2,7 @@
 <resources>
     <string name="core_data_recovery_hrv">⁨%1$s⁩ م.ث، ⁨%2$s%%⁩ مقارنة بالمعتاد</string>
     <string name="core_data_recovery_resting_hr">⁨%1$s⁩ ن/د، ⁨%2$s⁩ مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_asleep">⁨%1$s⁩ نوم</string>
+    <string name="core_data_recovery_asleep">نوم ⁨%1$s⁩</string>
     <string name="core_data_recovery_no_debt">لا يوجد دَين نوم</string>
     <string name="core_data_recovery_debt">⁨%1$s⁩ دَين نوم</string>
     <string name="core_data_recovery_lowest_hr">أدنى نبض ⁨%1$s⁩ قبل الاستيقاظ</string>

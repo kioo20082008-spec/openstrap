@@ -71,7 +71,7 @@
     <string name="glow_today_workout_zone">أغلبه في المنطقة ⁨%1$d⁩</string>
     <string name="glow_today_week_title">أسبوعك</string>
     <string name="glow_today_week_steps_unit">خطوة يومياً</string>
-    <plurals name="glow_today_week_workouts"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">⁨%d⁩ تمارين</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمارين</item><item quantity="other">⁨%d⁩ تمارين</item></plurals>
+    <plurals name="glow_today_week_workouts"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">تمرينان</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمريناً</item><item quantity="other">⁨%d⁩ تمرين</item></plurals>
     <string name="glow_today_week_line">⁨%1$s⁩ نوم في الليلة، ⁨%2$s⁩</string>
     <string name="glow_today_week_steps_more">خطوات أكثر بـ ⁨%1$d%%⁩ من الأسبوع السابق.</string>
     <string name="glow_today_week_steps_fewer">خطوات أقل بـ ⁨%1$d%%⁩ من الأسبوع السابق.</string>

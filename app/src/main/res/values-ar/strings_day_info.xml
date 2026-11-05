@@ -12,29 +12,29 @@
     <string name="day_info_scale_habit_older">أكبر من عمرك</string>
     <string name="day_info_normal_waiting_nights">يظهر معدلك بعد ⁨%1$d⁩ ليالٍ من البيانات. لديك ⁨%2$d⁩ حتى الآن.</string>
     <string name="day_info_normal_waiting_days">يظهر معدلك بعد ⁨%1$d⁩ أيام من البيانات. لديك ⁨%2$d⁩ حتى الآن.</string>
-    <plurals name="day_info_normal_line_nights"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من ليلة ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item></plurals>
-    <plurals name="day_info_normal_line_days"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من يوم ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item></plurals>
+    <plurals name="day_info_normal_line_nights"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من ليلة ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ، من ليلتان.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليلة.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليلة.</item></plurals>
+    <plurals name="day_info_normal_line_days"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من يوم ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ، من يومان.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ يوماً.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ يوم.</item></plurals>
     <string name="day_info_here">أنت هنا.</string>
     <string name="day_info_heart_rate_name">النبض</string>
     <string name="day_info_heart_rate_meaning">سرعة نبض قلبك بالنبضة في الدقيقة (ن/د)، يقرؤها السترب طوال اليوم والليل.</string>
     <string name="day_info_heart_rate_how">يقرأ السترب نبضك بالضوء عبر الجلد، تقريباً مرة كل دقيقة، وأكثر أثناء التمرين أو عند تشغيل «مباشر». الشريط خلف خط اليوم هو نطاق راحتك: نبض الراحة المعتاد لك، مع التفاوت المعتاد، خلال آخر 30 يوماً.</string>
     <string name="day_info_heart_rate_moves">الحركة والتوتر والكافيين والحرارة ترفعه. الراحة والنوم يخفضانه.</string>
-    <string name="day_info_heart_rate_off">السترب الرخو أو اليدان الباردتان أو كثرة حركة الذراع قد تجعل القراءات تقفز. القراءات المباشرة أكثر تكراراً، فيبدو الخط أكثر ازدحاماً أثناء تشغيلها.</string>
+    <string name="day_info_heart_rate_off">السترب المرتخي أو اليدان الباردتان أو كثرة حركة الذراع قد تجعل القراءات تقفز. القراءات المباشرة أكثر تكراراً، فيبدو الخط أكثر ازدحاماً أثناء تشغيلها.</string>
     <string name="day_info_resting_hr_name">نبض الراحة</string>
     <string name="day_info_resting_hr_meaning">نبضك في أهدأ حالاته. الأقل عادةً يعني قلباً أكثر لياقة وراحة.</string>
     <string name="day_info_resting_hr_how">يحسبه السترب يومياً من أهدأ فترة لديك، عادةً أثناء النوم. معدلك هو منتصف آخر 30 يوماً، مع التفاوت المعتاد، بعد أن يكون لـ 7 منها قيمة.</string>
     <string name="day_info_resting_hr_moves">يرتفع بعد التمرين الشاق والوجبات المتأخرة والكحول وقلة النوم أو عندما يقاوم جسمك مرضاً، وينخفض مع تحسن لياقتك.</string>
     <string name="day_info_resting_hr_off">ليلة يكون فيها السترب رخواً أو منزوعاً تعطيه بيانات أقل. يوم مرتفع واحد يعني أقل من عدة أيام متتالية.</string>
     <string name="day_info_hrv_name">HRV</string>
-    <string name="day_info_hrv_meaning">تقلب نبض القلب، أي الفروق الصغيرة في الوقت بين النبضات. الأعلى من معدلك غالباً يعني أن جسمك مستشفٍ جيداً.</string>
+    <string name="day_info_hrv_meaning">تقلب نبض القلب، أي الفروق الصغيرة في الوقت بين النبضات. الأعلى من معدلك غالباً يعني أن جسمك تعافى جيداً.</string>
     <string name="day_info_hrv_how">يقيس السترب الوقت بين النبضات بالملّي ثانية (م.ث) وأنت ساكن، غالباً أثناء النوم، وقيمة اليوم هي متوسط قراءاته. تُقارن بمعدلك أنت: منتصف آخر 30 يوماً، مع التفاوت المعتاد.</string>
     <string name="day_info_hrv_moves">النوم الجيد والراحة يرفعانه. التوتر والتمرين الشاق والكحول تخفضه. قارنه بمعدلك أنت، لا بمعدل الآخرين.</string>
-    <string name="day_info_hrv_off">الحركة أثناء القراءة أو السترب الرخو أو الليلة القصيرة تترك قراءات نظيفة أقل. يتقلب HRV كثيراً من يوم لآخر، فعدة أيام متتالية تعني أكثر من يوم واحد.</string>
+    <string name="day_info_hrv_off">الحركة أثناء القراءة أو السترب المرتخي أو الليلة القصيرة تترك قراءات نظيفة أقل. يتقلب HRV كثيراً من يوم لآخر، فعدة أيام متتالية تعني أكثر من يوم واحد.</string>
     <string name="day_info_spo2_name">أكسجين الدم</string>
     <string name="day_info_spo2_meaning">نسبة سعة دمك التي تحمل الأكسجين. معظم الناس بين 95 و100%%.</string>
     <string name="day_info_spo2_how">يسلّط السترب ضوءاً أحمر وتحت أحمر عبر الجلد ويقارن ما يعود من كل منهما. قيمة اليوم هي متوسط قراءاته.</string>
     <string name="day_info_spo2_moves">الارتفاعات العالية وتوقف التنفس أثناء النوم قد تخفضه.</string>
-    <string name="day_info_spo2_off">السترب الرخو أو الجلد البارد أو الحركة أثناء القراءة قد تعطي قيماً منخفضة. هذه قراءة للعافية، لا قراءة طبية.</string>
+    <string name="day_info_spo2_off">السترب المرتخي أو الجلد البارد أو الحركة أثناء القراءة قد تعطي قيماً منخفضة. هذه قراءة للعافية، لا قراءة طبية.</string>
     <string name="day_info_stress_name">التوتر</string>
     <string name="day_info_stress_meaning">مستوى التوتر من السترب من 0 إلى 100. الأعلى يعني أن جسمك في حالة تأهب أكبر.</string>
     <string name="day_info_stress_how">يحسبه السترب من نبضك وتقلبه وأنت ساكن. تُستبعد القراءات أثناء التمرين وبعده مباشرة، لأن الرياضة ليست توتراً.</string>
@@ -44,7 +44,7 @@
     <string name="day_info_skin_temp_meaning">حرارة جلدك تحت السترب. المهم هو التغير عن معدلك، لا المستوى نفسه.</string>
     <string name="day_info_skin_temp_how">يقيسها السترب ملامساً لجلدك. المستوى يعتمد على الإحكام والغرفة، لذا يعرضها OpenStrap كتغير عن معدلك لآخر 30 يوماً.</string>
     <string name="day_info_skin_temp_moves">تتغير مع الكحول والغرفة الدافئة والتمرين الشاق والدورة الشهرية، أو عندما يقاوم جسمك مرضاً.</string>
-    <string name="day_info_skin_temp_off">السرير الدافئ أو اللحاف الثقيل أو السترب الرخو كلها تغيرها دون أن يتغير جسمك.</string>
+    <string name="day_info_skin_temp_off">السرير الدافئ أو اللحاف الثقيل أو السترب المرتخي كلها تغيرها دون أن يتغير جسمك.</string>
     <string name="day_info_breathing_name">معدل التنفس</string>
     <string name="day_info_breathing_meaning">عدد الأنفاس في الدقيقة أثناء النوم. يبقى ثابتاً جداً عند معظم الناس.</string>
     <string name="day_info_breathing_how">يقيسه السترب أثناء النوم، فهناك قيمة واحدة لكل ليلة، تُقارن بمعدلك لآخر 30 يوماً.</string>
@@ -78,13 +78,13 @@
     <string name="day_info_heart_points_meaning">نقاط للدقائق التي يرتفع فيها نبضك، والدقائق الأصعب تكسب أكثر، خلال آخر 7 أيام. استهدف ⁨%1$d⁩.</string>
     <string name="day_info_heart_points_how">نقاط القلب هي PAI من السترب، أي ذكاء النشاط الشخصي. يحسبها السترب بنفسه من مدى ارتفاع نبضك فوق الراحة، حسب عمرك وجنسك، ويعرضها OpenStrap كما تصل. نقاط كل يوم تُحتسب 7 أيام ثم تسقط، فالمجموع يغطي دائماً الأسبوع الأخير.</string>
     <string name="day_info_heart_points_moves">كل ما يقطع أنفاسك يضيف الأكثر. المشي السريع يضيف قليلاً. بضع جلسات شاقة أسبوعياً تبقي المجموع عند ⁨%1$d⁩ أو أكثر.</string>
-    <string name="day_info_heart_points_off">يتحدث المجموع عند مزامنة السترب، فقد يتأخر عن مجهود اليوم. السترب الرخو أثناء التمرين يفوّت ارتفاع النبض.</string>
+    <string name="day_info_heart_points_off">يتحدث المجموع عند مزامنة السترب، فقد يتأخر عن مجهود اليوم. السترب المرتخي أثناء التمرين يفوّت ارتفاع النبض.</string>
     <string name="day_info_active_minutes_meaning">دقائق الحركة السريعة أو الأشد خلال آخر 7 أيام، مقابل ⁨%1$d⁩ أسبوعياً التي تستهدفها الإرشادات الصحية.</string>
     <string name="day_info_active_minutes_how">الدقيقة بـ ⁨%1$d⁩ خطوة أو أكثر تُعد متوسطة، و⁨%2$d⁩ أو أكثر شديدة، ضمن سلسلة من ⁨%3$d⁩ دقائق على الأقل. المجهود بلا خطوات، كالدراجة أو التجديف، يُحتسب من النبض بعد ⁨%4$d⁩ دقائق متتالية عند ⁨%5$d%%⁩ من احتياطي نبضك أو أكثر، وشديد من ⁨%6$d%%⁩. الدقيقة الشديدة تُحتسب مرتين، كما في إرشادات منظمة الصحة العالمية 2020.</string>
     <string name="day_info_active_minutes_moves">المشي السريع لبضع دقائق أو أكثر، والدراجة والجري والرياضة كلها تُحتسب. التمشية والدفعات القصيرة لا تُحتسب.</string>
     <string name="day_info_active_minutes_off">لم تتحقق أي دراسة من عدّ خطوات السترب مقابل سرعة المشي، فالدقائق السريعة قرب الحد قد تُفوَّت أو تُحتسب خطأً. دفع عربة أو الإمساك بدرابزين يخفي الخطوات.</string>
     <string name="day_info_load_meaning">مدى عمل قلبك اليوم، من التمارين والحركة، مقارنة بيومك المعتاد.</string>
-    <string name="day_info_load_how">كل دقيقة تُحتسب حسب شدة عمل قلبك بين الراحة والأقصى، وفق دافع التدريب لـ Banister (TRIMP). كل دقائق التمرين تُحتسب. خارج التمارين تُحتسب دقائق الحركة فقط، عند 35%% من احتياطي نبضك أو أكثر، أو المشي السريع من 20%%. معتادك هو لياقتك، متوسط 42 يوماً لجهدك اليومي. «يتصاعد» و«مستقر» و«يتراجع» تقارن آخر 7 أيام به، و«مستقر» ضمن ربع في أي اتجاه. الإجهاد يضع اليوم على منحنى ثابت من 0 إلى 21، حيث ساعة عند 60%% من احتياطيك تساوي نحو 7.</string>
+    <string name="day_info_load_how">كل دقيقة تُحتسب حسب شدة عمل قلبك بين الراحة والأقصى، وفق دافع التدريب لـ Banister (TRIMP). كل دقائق التمرين تُحتسب. خارج التمارين تُحتسب دقائق الحركة فقط، عند 35%% من احتياطي نبضك أو أكثر، أو المشي السريع من 20%%. معتادك هو لياقتك، متوسط 42 يوماً لجهدك اليومي. «في ارتفاع» و«ثابت» و«في انخفاض» تقارن آخر 7 أيام به، و«ثابت» ضمن ربع في أي اتجاه. الإجهاد يضع اليوم على منحنى ثابت من 0 إلى 21، حيث ساعة عند 60%% من احتياطيك تساوي نحو 7.</string>
     <string name="day_info_load_moves">التمارين تضيف الأكثر، والأطول والأشد أكثر. يوم من المشي يضيف قليلاً. أيام الراحة تخفض توازن الأسبوع.</string>
     <string name="day_info_load_off">الأيام التي نُزع فيها السترب غالباً تُستبعد من معتادك. النبض الأقصى المنخفض يجعل كل دقيقة تُحتسب أكثر. التمارين تحمل أيضاً EPOC من السترب، مقياسه لما أخذه التمرين، بمقياس مختلف عن الجهد.</string>
     <string name="day_info_vo2max_meaning">أقصى أكسجين يستطيع جسمك استخدامه في المجهود الشاق، مقياس للياقة. الأعلى أكثر لياقة.</string>
@@ -114,7 +114,7 @@
     <string name="day_info_vo2_note_withheld">لا يوجد تقدير من ملفك بعد. ⁨%1$s⁩</string>
     <string name="day_info_calories_note_partial">يغطي ⁨%1$s⁩ من اللبس، فهو جزء من اليوم.</string>
     <string name="day_info_calories_note_unusual">هذا مجموع غير معتاد ليوم كامل. تحقق من ملفك وطريقة لبس السترب.</string>
-    <plurals name="day_info_calories_note_heart_rate"><item quantity="zero">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="one">دقيقة ⁨%1$d⁩ جاءت من النبض بدل الخطوات.</item><item quantity="two">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="few">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="many">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="other">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item></plurals>
+    <plurals name="day_info_calories_note_heart_rate"><item quantity="zero">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="one">دقيقة واحدة جاءت من النبض بدل الخطوات.</item><item quantity="two">دقيقتان جاءت من النبض بدل الخطوتان.</item><item quantity="few">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="many">⁨%1$d⁩ دقيقة جاءت من النبض بدل الخطوة.</item><item quantity="other">⁨%1$d⁩ دقيقة جاءت من النبض بدل الخطوة.</item></plurals>
     <string name="day_info_night_heart_rate">عند فتحه من الليلة يعرض نومك فقط: الخط من النوم حتى الاستيقاظ، والأدنى أثناء النوم، ومتوسط السترب لليلة. الشهر والسنة أيام كاملة.</string>
     <string name="day_info_night_spo2">عند فتحه من الليلة يعرض قراءات السترب أثناء النوم، منفصلة عن القراءات الفورية في النهار، مقابل لياليك السابقة.</string>
     <string name="day_info_night_breathing">عند فتحه من الليلة يعرض قراءات تلك الليلة، مقابل لياليك السابقة.</string>
@@ -123,7 +123,7 @@
     <string name="day_info_disturbances_meaning">انخفاضات أكسجين الدم أثناء نومك، يعدّها السترب، كعدد في الساعة. تقدير مبكر.</string>
     <string name="day_info_disturbances_how">يعدّ السترب كل انخفاض قصير في أكسجين الدم أثناء النوم، ويُقسم على ساعات النوم. معتادك هو منتصف لياليك السابقة، بعد أن يكون لديك ⁨%1$d⁩ منها. تبقى ثابتة نسبياً لكل شخص، فتُعرض مع نومك بدل احتسابها في الاستشفاء.</string>
     <string name="day_info_disturbances_moves">الكحول وانسداد الأنف والنوم على الظهر والارتفاعات قد ترفعها.</string>
-    <string name="day_info_disturbances_off">طريقة عدّ السترب لها غير مؤكدة بعد، فاعتبر الرقم تقديراً مبكراً. السترب الرخو قد يُقرأ كانخفاض. ⁨%1$s⁩ ليس اختباراً لانقطاع النفس أثناء النوم.</string>
+    <string name="day_info_disturbances_off">طريقة عدّ السترب لها غير مؤكدة بعد، فاعتبر الرقم تقديراً مبكراً. السترب المرتخي قد يُقرأ كانخفاض. ⁨%1$s⁩ ليس اختباراً لانقطاع النفس أثناء النوم.</string>
     <string name="day_info_habit_age_name">عمر عاداتك</string>
     <string name="day_info_habit_age_meaning">كم تجعل عاداتك جسمك يبدو عمراً، كنطاق من السنوات، يُحسب كل أحد.</string>
     <string name="day_info_habit_age_how">كل عادة تُقيَّم مقابل الشخص المعتاد بعمرك وجنسك: نبض الراحة، والخطوات، وانتظام النوم، ومدة النوم، وتمارين القوة، واللياقة (VO2 max، أقصى أكسجين يستخدمه جسمك في المجهود الشاق). الأفضل من المعتاد ينقص سنوات، والأسوأ يضيفها. يُقلَّص المجموع لأن العادات تتداخل، ويُحدّ بـ 5 سنوات في أي اتجاه. ينظر 6 أشهر للخلف، و3 للياقة.</string>
@@ -144,8 +144,8 @@
     <string name="day_info_sleep_note_need">حاجتك للنوم هنا ⁨%1$s⁩، من عمرك أو إعدادك.</string>
     <string name="day_info_recovery_note_strap">نتيجة السترب نفسه اليوم ⁨%1$d⁩. لا تحسب مدة النوم، فبعد ليلة قصيرة تقرأ أعلى من نتيجة OpenStrap. تُحفظ للمقارنة ولا تدخل في نتيجة OpenStrap أبداً.</string>
     <string name="day_info_recovery_note_capped">اليوم إشارة جسدية واحدة بعيدة عن معدلك، فالنتيجة محدودة.</string>
-    <string name="day_info_recovery_note_hrv">HRV البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب ⁨%1$d⁩ م.ث.</string>
+    <string name="day_info_recovery_note_hrv">‏HRV البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب ⁨%1$d⁩ م.ث.</string>
     <string name="day_info_recovery_note_resting_hr">نبض راحة البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب ⁨%1$d⁩ ن/د.</string>
-    <string name="day_info_recovery_note_week_thin">HRV الأسبوع يعتمد على ⁨%1$d⁩ من 7 ليالٍ، فهو أقل يقيناً من المعتاد.</string>
+    <string name="day_info_recovery_note_week_thin">‏HRV الأسبوع يعتمد على ⁨%1$d⁩ من 7 ليالٍ، فهو أقل يقيناً من المعتاد.</string>
     <string name="day_info_charge_note_estimated">نُزع السترب ليلاً، فبدأ اليوم من تقدير.</string>
 </resources>

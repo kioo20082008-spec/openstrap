@@ -82,6 +82,10 @@ object DayWords {
     /** A day for a chart or a short label, always dated: "Tue 21 Oct". */
     fun short(date: LocalDate, locale: Locale = Locale.getDefault()): String = date.format(Formatters.of(SHORT, locale))
 
+    /** A weekday in one or two letters, for a calendar header or a strip: "Tu"; in Arabic the narrow letter, "ث". */
+    fun weekdayTiny(date: java.time.DayOfWeek, locale: Locale = Locale.getDefault()): String =
+        if (locale.language == "ar") date.getDisplayName(TextStyle.NARROW, locale) else date.getDisplayName(TextStyle.SHORT, locale).take(2)
+
     /** A weekday's short name, for a week's strip of bars: "Tue". */
     fun weekdayShort(date: LocalDate, locale: Locale = Locale.getDefault()): String =
         date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)

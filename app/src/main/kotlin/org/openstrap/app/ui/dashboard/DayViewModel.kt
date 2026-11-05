@@ -337,7 +337,7 @@ class DayViewModel(
          * labels and the stages as spans.
          */
         internal fun toUiState(data: DayData): DayUiState {
-            val label = { d: LocalDate -> d.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2) }
+            val label = { d: LocalDate -> org.openstrap.app.presentation.DayWords.weekdayTiny(d.dayOfWeek) }
             fun List<DayValue>.trend() = map { TrendPoint(label(it.date), it.value) }
             fun List<SleepStage>.spans() = map { StageSpan(it.start, it.end, it.stage) }
             val sleep = data.sleep

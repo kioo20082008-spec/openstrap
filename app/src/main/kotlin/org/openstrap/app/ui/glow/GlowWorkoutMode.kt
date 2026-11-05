@@ -322,10 +322,12 @@ fun GlowAddWorkoutScreen(
         QuietPanel {
             GlowHeader(stringResource(R.string.glow_workout_add_when), trailing = Ranges.times(from, to))
             RangeChart(series, first, last, from, to, maxHr) { f, t -> from = f; to = t }
+            Ltr {
             Row(Modifier.fillMaxWidth()) {
                 PageNote(clock(first))
                 Spacer(Modifier.weight(1f))
                 PageNote(clock(last))
+            }
             }
             PageNote(stringResource(R.string.glow_workout_add_hint))
         }

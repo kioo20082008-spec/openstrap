@@ -14,7 +14,7 @@
     <string name="workout_live_figure_pace_km">الوتيرة /كم</string>
     <string name="workout_live_figure_climb">م صعود</string>
     <string name="workout_live_figure_rounds_done">الجولات المنجزة</string>
-    <plurals name="workout_live_figure_sets_done"><item quantity="zero">مجموعات منجزة</item><item quantity="one">مجموعة منجزة</item><item quantity="two">مجموعات منجزة</item><item quantity="few">مجموعات منجزة</item><item quantity="many">مجموعات منجزة</item><item quantity="other">مجموعات منجزة</item></plurals>
+    <plurals name="workout_live_figure_sets_done"><item quantity="zero">مجموعات منجزة</item><item quantity="one">مجموعة منجزة</item><item quantity="two">مجموعتان منجزة</item><item quantity="few">مجموعات منجزة</item><item quantity="many">مجموعة منجزة</item><item quantity="other">مجموعة منجزة</item></plurals>
     <string name="workout_live_figure_kg_lifted">كغ مرفوعة</string>
     <string name="workout_live_moving_time">وقت الحركة</string>
     <string name="workout_live_unit_bpm">ن/د</string>

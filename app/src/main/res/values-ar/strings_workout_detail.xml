@@ -69,7 +69,7 @@
     <string name="workout_detail_where_phone">حسبها OpenStrap من نبضك، على مقاييس السترب نفسها.</string>
     <string name="workout_detail_where_strap">من السترب، محسوبة أثناء التمرين.</string>
     <string name="workout_detail_strap_one">سجّل السترب هذا التمرين أيضاً. أرقامه: ⁨%1$s⁩.</string>
-    <plurals name="workout_detail_strap_many"><item quantity="zero">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="one">سجّله السترب كتمرين ⁨%d⁩ خاص به.</item><item quantity="two">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="few">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="many">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="other">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item></plurals>
+    <plurals name="workout_detail_strap_many"><item quantity="zero">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="one">سجّله السترب كتمرين واحد خاص به.</item><item quantity="two">سجّله السترب كـ تمرينان خاصة به.</item><item quantity="few">سجّله السترب كـ ⁨%d⁩ تمارين خاصة به.</item><item quantity="many">سجّله السترب كـ ⁨%d⁩ تمريناً خاصة به.</item><item quantity="other">سجّله السترب كـ ⁨%d⁩ تمرين خاصة به.</item></plurals>
     <string name="workout_detail_strap_from">من ⁨%1$s⁩: ⁨%2$s⁩.</string>
     <string name="workout_detail_strap_from_start">من بدايته: ⁨%1$s⁩.</string>
 </resources>

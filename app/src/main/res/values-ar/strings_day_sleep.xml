@@ -89,7 +89,7 @@
     <string name="day_sleep_deleted_none">لم يُحذف شيء خلال آخر 7 أيام.</string>
     <string name="day_sleep_deleted_name_nap">قيلولة، ⁨%1$s⁩</string>
     <string name="day_sleep_deleted_name_night">ليلة ⁨%1$s⁩</string>
-    <plurals name="day_sleep_deleted_line"><item quantity="zero">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="one">⁨%2$s⁩\nباقي يوم واحد</item><item quantity="two">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="few">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="many">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="other">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item></plurals>
+    <plurals name="day_sleep_deleted_line"><item quantity="zero">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="one">⁨%2$s⁩\nباقي يوم واحد</item><item quantity="two">\nباقي يومان</item><item quantity="few">⁨%2$s⁩\nباقي ⁨%1$d⁩ أيام</item><item quantity="many">⁨%2$s⁩\nباقي ⁨%1$d⁩ يوماً</item><item quantity="other">⁨%2$s⁩\nباقي ⁨%1$d⁩ يوم</item></plurals>
     <string name="day_sleep_still_nap">بقي النبض عند ⁨%1$d⁩ ن/د، كما عند الجلوس بهدوء. قد لا تكون قيلولة.</string>
     <plurals name="day_sleep_deleted_count"><item quantity="zero">⁨%1$d⁩ للاستعادة</item><item quantity="one">⁨%1$d⁩ للاستعادة</item><item quantity="two">⁨%1$d⁩ للاستعادة</item><item quantity="few">⁨%1$d⁩ للاستعادة</item><item quantity="many">⁨%1$d⁩ للاستعادة</item><item quantity="other">⁨%1$d⁩ للاستعادة</item></plurals>
     <string name="day_sleep_vital_no_sleep">لم يُسجَّل نوم</string>

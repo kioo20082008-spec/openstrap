@@ -35,12 +35,12 @@
     <string name="core_workout_rest_rule">تنتهي الراحة عند انتهاء الوقت.</string>
     <string name="core_workout_rest_rule_below">تنتهي الراحة عند انتهاء الوقت، أو عندما يبقى نبضك تحت ⁨%1$d⁩ ن/د.</string>
     <string name="core_workout_set_weight">⁨%1$d⁩ × ⁨%2$s⁩ كغ</string>
-    <plurals name="core_workout_set_reps"><item quantity="zero">⁨%1$d⁩ تكرارات</item><item quantity="one">تكرار ⁨%1$d⁩</item><item quantity="two">⁨%1$d⁩ تكرارات</item><item quantity="few">⁨%1$d⁩ تكرارات</item><item quantity="many">⁨%1$d⁩ تكرارات</item><item quantity="other">⁨%1$d⁩ تكرارات</item></plurals>
+    <plurals name="core_workout_set_reps"><item quantity="zero">⁨%1$d⁩ تكرارات</item><item quantity="one">تكرار واحد</item><item quantity="two">تكراران</item><item quantity="few">⁨%1$d⁩ تكرارات</item><item quantity="many">⁨%1$d⁩ تكراراً</item><item quantity="other">⁨%1$d⁩ تكرار</item></plurals>
     <string name="core_workout_set_peak">الذروة ⁨%1$d⁩</string>
     <string name="core_workout_list">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="core_workout_no_zone_paused">لا منطقة أثناء التوقف</string>
     <string name="core_workout_no_zone">لا منطقة بعد</string>
     <string name="core_workout_progress">⁨%1$s⁩ من ⁨%2$s⁩</string>
     <string name="core_workout_gps_finding">البحث عن GPS</string>
-    <string name="core_workout_gps">GPS ±⁨%1$d⁩ م</string>
+    <string name="core_workout_gps">‏GPS ⁨±%1$d⁩ م</string>
 </resources>

@@ -95,7 +95,7 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
             Row(Modifier.fillMaxWidth()) {
                 for (i in 0 until 7) {
                     Text(
-                        firstDay.plus(i.toLong()).getDisplayName(TextStyle.SHORT, Locale.getDefault()).take(2).uppercase(),
+                        org.openstrap.app.presentation.DayWords.weekdayTiny(firstDay.plus(i.toLong())).uppercase(),
                         Modifier.weight(1f).wrapContentWidth(Alignment.CenterHorizontally),
                         color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA),
                         style = GlowType.caption,

@@ -28,7 +28,7 @@
     <string name="workout_start_plan_kind_note">عدد مجموعات مع راحة بينها</string>
     <string name="workout_start_open_sets_note">مجموعات بلا عدد محدد. يهتز السترب عند انتهاء الراحة.</string>
     <string name="workout_start_strength_typing">عدد المجموعات، ثم الراحة بالثواني</string>
-    <plurals name="workout_start_sets"><item quantity="zero">⁨%d⁩ مجموعات</item><item quantity="one">مجموعة واحدة</item><item quantity="two">⁨%d⁩ مجموعات</item><item quantity="few">⁨%d⁩ مجموعات</item><item quantity="many">⁨%d⁩ مجموعات</item><item quantity="other">⁨%d⁩ مجموعات</item></plurals>
+    <plurals name="workout_start_sets"><item quantity="zero">⁨%d⁩ مجموعات</item><item quantity="one">مجموعة واحدة</item><item quantity="two">مجموعتان</item><item quantity="few">⁨%d⁩ مجموعات</item><item quantity="many">⁨%d⁩ مجموعة</item><item quantity="other">⁨%d⁩ مجموعة</item></plurals>
     <string name="workout_start_end_rest_early">أنهِ الراحة مبكراً</string>
     <string name="workout_start_end_rest_note">عندما ينزل نبضك تحت ⁨%1$d⁩ ن/د</string>
     <string name="workout_start_log_sets">سجّل التكرارات والوزن</string>
@@ -41,8 +41,8 @@
     <string name="workout_start_games_note_period_break">الجوال في الشنطة؟ لا مشكلة. يهتز السترب في نهاية كل فترة واستراحة.</string>
     <string name="workout_start_games_note_period">الجوال في الشنطة؟ لا مشكلة. يهتز السترب في نهاية كل فترة.</string>
     <string name="workout_start_gps_finding">البحث عن GPS</string>
-    <string name="workout_start_gps_finding_accuracy">البحث عن GPS، ±⁨%1$d⁩ م</string>
-    <string name="workout_start_gps_ready">GPS جاهز، ±⁨%1$d⁩ م</string>
+    <string name="workout_start_gps_finding_accuracy">البحث عن GPS، ⁨±%1$d⁩ م</string>
+    <string name="workout_start_gps_ready">‏GPS جاهز، ⁨±%1$d⁩ م</string>
     <string name="workout_start_seconds">⁨%1$d⁩ ث</string>
     <string name="workout_start_minutes">⁨%1$d⁩ د</string>
     <string name="workout_start_minutes_seconds">⁨%1$d⁩ د ⁨%2$d⁩ ث</string>

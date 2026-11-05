@@ -43,9 +43,9 @@
     <string name="glow_activity_minutes">دقيقة</string>
     <string name="glow_activity_minutes_on">دقيقة، ⁨%1$s⁩</string>
     <string name="glow_activity_needs_heart_day">يحتاج يوماً من قياس النبض</string>
-    <plurals name="glow_activity_load_average"><item quantity="zero">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="one">يومياً في المتوسط، آخر يوم</item><item quantity="two">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="few">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="many">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="other">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item></plurals>
-    <plurals name="glow_activity_in_last_days"><item quantity="zero">في آخر ⁨%d⁩ أيام</item><item quantity="one">في آخر يوم</item><item quantity="two">في آخر ⁨%d⁩ أيام</item><item quantity="few">في آخر ⁨%d⁩ أيام</item><item quantity="many">في آخر ⁨%d⁩ أيام</item><item quantity="other">في آخر ⁨%d⁩ أيام</item></plurals>
-    <plurals name="glow_activity_no_load"><item quantity="zero">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="one">لا يوجد جهد في آخر يوم بعد.</item><item quantity="two">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="few">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="many">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="other">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item></plurals>
+    <plurals name="glow_activity_load_average"><item quantity="zero">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="one">يومياً في المتوسط، آخر يوم</item><item quantity="two">يومياً في المتوسط، آخر يومان</item><item quantity="few">يومياً في المتوسط، آخر ⁨%d⁩ أيام</item><item quantity="many">يومياً في المتوسط، آخر ⁨%d⁩ يوماً</item><item quantity="other">يومياً في المتوسط، آخر ⁨%d⁩ يوم</item></plurals>
+    <plurals name="glow_activity_in_last_days"><item quantity="zero">في آخر ⁨%d⁩ أيام</item><item quantity="one">في آخر يوم</item><item quantity="two">في آخر يومان</item><item quantity="few">في آخر ⁨%d⁩ أيام</item><item quantity="many">في آخر ⁨%d⁩ يوماً</item><item quantity="other">في آخر ⁨%d⁩ يوم</item></plurals>
+    <plurals name="glow_activity_no_load"><item quantity="zero">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="one">لا يوجد جهد في آخر يوم بعد.</item><item quantity="two">لا يوجد جهد في آخر يومان بعد.</item><item quantity="few">لا يوجد جهد في آخر ⁨%d⁩ أيام بعد.</item><item quantity="many">لا يوجد جهد في آخر ⁨%d⁩ يوماً بعد.</item><item quantity="other">لا يوجد جهد في آخر ⁨%d⁩ يوم بعد.</item></plurals>
     <string name="glow_activity_from_workouts">من التمارين</string>
     <string name="glow_activity_moving_about">الحركة اليومية</string>
     <string name="glow_activity_strain">مقارنة بالمعتاد</string>
@@ -67,7 +67,7 @@
     <string name="glow_activity_recover_after_workout">بعد تمرين يقيّمه السترب</string>
     <string name="glow_activity_recovered">تعافيت</string>
     <string name="glow_activity_recovered_after">بعد ⁨%1$s⁩، ⁨%2$s⁩</string>
-    <plurals name="glow_activity_hours_to_go"><item quantity="zero">ساعات متبقية</item><item quantity="one">ساعة متبقية</item><item quantity="two">ساعات متبقية</item><item quantity="few">ساعات متبقية</item><item quantity="many">ساعات متبقية</item><item quantity="other">ساعات متبقية</item></plurals>
+    <plurals name="glow_activity_hours_to_go"><item quantity="zero">ساعات متبقية</item><item quantity="one">ساعة متبقية</item><item quantity="two">ساعتان متبقية</item><item quantity="few">ساعات متبقية</item><item quantity="many">ساعة متبقية</item><item quantity="other">ساعة متبقية</item></plurals>
     <string name="glow_activity_recent_workouts">تمارين حديثة</string>
     <string name="glow_activity_none">لا شيء</string>
     <string name="glow_activity_on_its_own">وحده، ⁨%1$s⁩، ⁨%2$s⁩</string>

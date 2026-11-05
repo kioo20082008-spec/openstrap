@@ -21,16 +21,16 @@
     <string name="you_row_sample_data_note">في نسخ التطوير فقط</string>
     <string name="you_section_your_data">بياناتك</string>
     <string name="you_section_help">المساعدة</string>
-    <plurals name="you_goals_and_bests_line"><item quantity="zero">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="one">تمرين واحد أسبوعياً، أرقامك القياسية والشارات</item><item quantity="two">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="few">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="many">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="other">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item></plurals>
+    <plurals name="you_goals_and_bests_line"><item quantity="zero">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="one">تمرين واحد أسبوعياً، أرقامك القياسية والشارات</item><item quantity="two">تمرينان أسبوعياً، أرقامك القياسية والشارات</item><item quantity="few">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="many">⁨%1$d⁩ تمريناً أسبوعياً، أرقامك القياسية والشارات</item><item quantity="other">⁨%1$d⁩ تمرين أسبوعياً، أرقامك القياسية والشارات</item></plurals>
     <plurals name="you_diagnostics_line"><item quantity="zero">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="one">سطر واحد، لبلاغات الأخطاء</item><item quantity="two">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="few">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="many">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="other">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item></plurals>
-    <string name="you_footer">OpenStrap ⁨%1$s⁩. كل بياناتك تبقى على هذا الجوال.</string>
+    <string name="you_footer">‏OpenStrap ⁨%1$s⁩. كل بياناتك تبقى على هذا الجوال.</string>
     <string name="you_goals_line">⁨%1$s⁩، ⁨%2$s⁩، ⁨%3$s⁩</string>
-    <plurals name="you_goals_steps"><item quantity="zero">⁨%1$s⁩ خطوة</item><item quantity="one">⁨%1$s⁩ خطوة</item><item quantity="two">⁨%1$s⁩ خطوة</item><item quantity="few">⁨%1$s⁩ خطوة</item><item quantity="many">⁨%1$s⁩ خطوة</item><item quantity="other">⁨%1$s⁩ خطوة</item></plurals>
+    <plurals name="you_goals_steps"><item quantity="zero">⁨%1$s⁩ خطوة</item><item quantity="one">خطوة واحدة</item><item quantity="two">⁨%1$s⁩ خطوة</item><item quantity="few">⁨%1$s⁩ خطوة</item><item quantity="many">⁨%1$s⁩ خطوة</item><item quantity="other">⁨%1$s⁩ خطوة</item></plurals>
     <string name="you_goals_active_kcal">⁨%1$s⁩ سعرة نشطة</string>
-    <plurals name="you_goals_active_hours"><item quantity="zero">⁨%1$d⁩ ساعات نشطة</item><item quantity="one">ساعة نشطة واحدة</item><item quantity="two">⁨%1$d⁩ ساعات نشطة</item><item quantity="few">⁨%1$d⁩ ساعات نشطة</item><item quantity="many">⁨%1$d⁩ ساعات نشطة</item><item quantity="other">⁨%1$d⁩ ساعات نشطة</item></plurals>
+    <plurals name="you_goals_active_hours"><item quantity="zero">⁨%1$d⁩ ساعات نشطة</item><item quantity="one">ساعة نشطة واحدة</item><item quantity="two">ساعتان نشطة</item><item quantity="few">⁨%1$d⁩ ساعات نشطة</item><item quantity="many">⁨%1$d⁩ ساعة نشطة</item><item quantity="other">⁨%1$d⁩ ساعة نشطة</item></plurals>
     <string name="you_sleep_goal_line">⁨%1$s⁩. حاجتك من النوم ⁨%2$s⁩</string>
     <string name="you_profile_empty">أضف العمر والجنس لحساب أدق للجهد والاستشفاء</string>
-    <plurals name="you_profile_age"><item quantity="zero">⁨%1$d⁩ سنة</item><item quantity="one">سنة ⁨%1$d⁩</item><item quantity="two">سنتان</item><item quantity="few">⁨%1$d⁩ سنوات</item><item quantity="many">⁨%1$d⁩ سنة</item><item quantity="other">⁨%1$d⁩ سنة</item></plurals>
+    <plurals name="you_profile_age"><item quantity="zero">⁨%1$d⁩ سنة</item><item quantity="one">سنة واحدة</item><item quantity="two">سنتان</item><item quantity="few">⁨%1$d⁩ سنوات</item><item quantity="many">⁨%1$d⁩ سنة</item><item quantity="other">⁨%1$d⁩ سنة</item></plurals>
     <string name="you_profile_summary_female">أنثى</string>
     <string name="you_profile_summary_male">ذكر</string>
     <string name="you_profile_title">ملفك الشخصي</string>
@@ -74,7 +74,7 @@
     <string name="you_goals_workouts_label">التمارين</string>
     <string name="you_goals_workouts_fewer">تمارين أقل أسبوعياً</string>
     <string name="you_goals_workouts_more">تمارين أكثر أسبوعياً</string>
-    <plurals name="you_goals_workouts_value"><item quantity="zero">⁨%1$d⁩ أسبوعياً</item><item quantity="one">⁨%1$d⁩ أسبوعياً</item><item quantity="two">⁨%1$d⁩ أسبوعياً</item><item quantity="few">⁨%1$d⁩ أسبوعياً</item><item quantity="many">⁨%1$d⁩ أسبوعياً</item><item quantity="other">⁨%1$d⁩ أسبوعياً</item></plurals>
+    <plurals name="you_goals_workouts_value"><item quantity="zero">⁨%1$d⁩ أسبوعياً</item><item quantity="one">أسبوع واحدياً</item><item quantity="two">⁨%1$d⁩ أسبوعياً</item><item quantity="few">⁨%1$d⁩ أسبوعياً</item><item quantity="many">⁨%1$d⁩ أسبوعياً</item><item quantity="other">⁨%1$d⁩ أسبوعياً</item></plurals>
     <string name="you_goals_workouts_note">تُحسب التمارين التي مدتها 10 دقائق أو أكثر، بحد أقصى تمرينان يومياً.</string>
     <string name="you_goals_calories_label">السعرات</string>
     <string name="you_goals_calories_lower">خفّض هدف السعرات</string>

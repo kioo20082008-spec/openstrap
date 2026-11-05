@@ -98,6 +98,8 @@ class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
         get() = androidx.work.Configuration.Builder().setWorkerFactory(org.openstrap.app.widget.WidgetWork).build()
 
     override fun onCreate() {
+        // Arabic keeps Western digits in widgets, workers and the strap service too, not only once the app is open.
+        java.util.Locale.setDefault(org.openstrap.app.i18n.LatinDigits.latin(java.util.Locale.getDefault()))
         super.onCreate()
         // The phone's 12 or 24 hour clock, before anything writes a time, and from then on as it changes.
         PhoneClock.follow(this)

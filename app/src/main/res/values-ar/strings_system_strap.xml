@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="system_connect_permission">OpenStrap غير مسموح له باستخدام البلوتوث. اسمح بـ «الأجهزة القريبة» في إعدادات التطبيق، ثم اضغط «اتصال».</string>
+    <string name="system_connect_permission">‏OpenStrap غير مسموح له باستخدام البلوتوث. اسمح بـ «الأجهزة القريبة» في إعدادات التطبيق، ثم اضغط «اتصال».</string>
     <string name="system_connect_bad_address">عنوان السترب المحفوظ غير صالح. انسَ السترب واربطه مرة أخرى.</string>
     <string name="system_connect_timeout">توقف السترب عن الاستجابة.</string>
     <string name="system_connect_link_dropped">انقطع اتصال البلوتوث بالسترب.</string>

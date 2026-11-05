@@ -58,9 +58,9 @@
     <string name="core_tab_sleep_score_great">نتيجة النوم: ممتازة</string>
     <string name="core_tab_no_strap_score">لا توجد نتيجة من السترب</string>
     <string name="core_tab_stage_total">⁨%1$s⁩ ⁨%2$s⁩</string>
-    <string name="core_tab_asleep">⁨%1$s⁩ نوم</string>
+    <string name="core_tab_asleep">نوم ⁨%1$s⁩</string>
     <string name="core_tab_slept_through">نوم متواصل</string>
-    <plurals name="core_tab_woke"><item quantity="zero">استيقظت ⁨%d⁩ مرات</item><item quantity="one">استيقظت مرة</item><item quantity="two">استيقظت ⁨%d⁩ مرات</item><item quantity="few">استيقظت ⁨%d⁩ مرات</item><item quantity="many">استيقظت ⁨%d⁩ مرات</item><item quantity="other">استيقظت ⁨%d⁩ مرات</item></plurals>
+    <plurals name="core_tab_woke"><item quantity="zero">استيقظت ⁨%d⁩ مرات</item><item quantity="one">استيقظت مرة</item><item quantity="two">استيقظت مرتان</item><item quantity="few">استيقظت ⁨%d⁩ مرات</item><item quantity="many">استيقظت ⁨%d⁩ مرة</item><item quantity="other">استيقظت ⁨%d⁩ مرة</item></plurals>
     <string name="core_tab_regularity_needs">يحتاج نحو 5 أيام من اللبس</string>
     <string name="core_tab_regularity_steady">مواعيد نوم ثابتة هذا الأسبوع</string>
     <string name="core_tab_regularity_moved">تغيّرت مواعيد نومك هذا الأسبوع</string>
@@ -91,7 +91,7 @@
     <string name="core_tab_last_7_days">آخر 7 أيام</string>
     <string name="core_tab_auto_detected">اكتُشف تلقائياً</string>
     <string name="core_tab_fact_average_bpm">المتوسط ⁨%1$d⁩ ن/د</string>
-    <plurals name="core_tab_fact_sets"><item quantity="zero">⁨%d⁩ مجموعات</item><item quantity="one">⁨%d⁩ مجموعة</item><item quantity="two">⁨%d⁩ مجموعات</item><item quantity="few">⁨%d⁩ مجموعات</item><item quantity="many">⁨%d⁩ مجموعات</item><item quantity="other">⁨%d⁩ مجموعات</item></plurals>
+    <plurals name="core_tab_fact_sets"><item quantity="zero">⁨%d⁩ مجموعات</item><item quantity="one">مجموعة واحدة</item><item quantity="two">مجموعتان</item><item quantity="few">⁨%d⁩ مجموعات</item><item quantity="many">⁨%d⁩ مجموعة</item><item quantity="other">⁨%d⁩ مجموعة</item></plurals>
     <string name="core_tab_fact_distance_pace">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="core_tab_workout_line">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="core_tab_habit_age_updated">حُدّث ⁨%1$s⁩</string>
@@ -99,8 +99,8 @@
     <string name="core_tab_age_for_now">عمرك حالياً</string>
     <string name="core_tab_age_for_now_waiting">عمرك حالياً. ⁨%1$s⁩</string>
     <string name="core_tab_habit_age_likely">غالباً من ⁨%1$d⁩ إلى ⁨%2$d⁩</string>
-    <plurals name="core_tab_habit_age_younger"><item quantity="zero">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="one">أصغر بسنة من الأسبوع الماضي</item><item quantity="two">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="few">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="many">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="other">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item></plurals>
-    <plurals name="core_tab_habit_age_older"><item quantity="zero">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="one">أكبر بسنة من الأسبوع الماضي</item><item quantity="two">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="few">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="many">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="other">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item></plurals>
+    <plurals name="core_tab_habit_age_younger"><item quantity="zero">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="one">أصغر بسنة من الأسبوع الماضي</item><item quantity="two">أصغر بـ سنتان من الأسبوع الماضي</item><item quantity="few">أصغر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="many">أصغر بـ ⁨%d⁩ سنة من الأسبوع الماضي</item><item quantity="other">أصغر بـ ⁨%d⁩ سنة من الأسبوع الماضي</item></plurals>
+    <plurals name="core_tab_habit_age_older"><item quantity="zero">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="one">أكبر بسنة من الأسبوع الماضي</item><item quantity="two">أكبر بـ سنتان من الأسبوع الماضي</item><item quantity="few">أكبر بـ ⁨%d⁩ سنوات من الأسبوع الماضي</item><item quantity="many">أكبر بـ ⁨%d⁩ سنة من الأسبوع الماضي</item><item quantity="other">أكبر بـ ⁨%d⁩ سنة من الأسبوع الماضي</item></plurals>
     <string name="core_tab_habit_age_same">مثل الأسبوع الماضي</string>
     <string name="core_tab_age_range">⁨%1$d⁩ إلى ⁨%2$d⁩</string>
     <string name="core_tab_your_age">أنت، ⁨%1$d⁩</string>

@@ -176,7 +176,7 @@ private fun ScaleLabels(start: String, middle: String, end: String, modifier: Mo
 @Composable
 internal fun BoxScope.ScaleLabel(text: String, at: Float, color: Color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA)) {
     // Centred on its point by aligning a share of the way across, as BiasAlignment does.
-    Text(text, color = color, style = GlowType.caption, modifier = Modifier.align(BiasAlignment((at * 2f - 1f).coerceIn(-1f, 1f), 0f)))
+    Text(text, color = color, style = GlowType.caption, modifier = Modifier.align(androidx.compose.ui.BiasAbsoluteAlignment((at * 2f - 1f).coerceIn(-1f, 1f), 0f)))
 }
 
 /**

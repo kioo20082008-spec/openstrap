@@ -134,12 +134,14 @@ internal fun PulseHero(
                 Icon(AppIcons.Heart, null, tint = Color(0xFFFFB59A), modifier = Modifier.size(30.dp).graphicsLayer { scaleX = beat; scaleY = beat })
             }
         }
+        Ltr {
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 shown.value.toInt().toString(), color = AppPalette.Cream,
                 style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 108.sp, lineHeight = 108.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
             )
             Text("%", Modifier.padding(bottom = 64.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
+        }
         }
         Text(word, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(6.dp))

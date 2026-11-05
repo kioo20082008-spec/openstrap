@@ -285,7 +285,7 @@ internal object SleepCopy {
     fun naps(count: Int, totalSeconds: Long, strings: Strings = Strings.app): String =
         if (count == 1) strings.format(R.string.day_sleep_naps_one, Units.duration(totalSeconds))
         else strings.format(
-            R.string.day_sleep_naps_many, DetailCopy.count(count, NAP).replaceFirstChar { it.uppercase() }, Units.duration(totalSeconds),
+            R.string.day_sleep_naps_many, strings.plural(R.plurals.day_sleep_naps_count, count, count).replaceFirstChar { it.uppercase() }, Units.duration(totalSeconds),
         )
 
     /** The unit [DetailCopy.count] spells the day's naps with ("two naps"). */

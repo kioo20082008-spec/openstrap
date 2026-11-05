@@ -314,6 +314,7 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
             stroke(readings.filter { it.first >= end }, Color.White)
         }
         Spacer(Modifier.height(6.dp))
+        Ltr {
         Row(Modifier.fillMaxWidth()) {
             Box(Modifier.weight(1f)) { PageNote(stringResource(R.string.glow_summary_drop_last_minute)) }
             Box(Modifier.weight(1f)) { PageNote(stringResource(R.string.glow_summary_drop_end)) }
@@ -321,6 +322,7 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
                 PageNote(stringResource(R.string.glow_summary_minutes, 1))
                 Box(Modifier.align(Alignment.CenterEnd)) { PageNote(stringResource(R.string.glow_summary_minutes, 2)) }
             }
+        }
         }
     }
 }

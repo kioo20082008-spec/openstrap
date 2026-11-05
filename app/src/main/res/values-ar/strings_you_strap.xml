@@ -2,7 +2,7 @@
 <resources>
     <string name="you_strap_state_charging">يشحن. تتوقف بيانات اللبس حتى تعيده.</string>
     <string name="you_strap_state_syncing">متصل. جارٍ المزامنة…</string>
-    <string name="you_strap_state_synced">متصل. زُومن ⁨%1$s⁩</string>
+    <string name="you_strap_state_synced">متصل. آخر مزامنة ⁨%1$s⁩</string>
     <string name="you_strap_state_not_synced">متصل. لم يُزامَن</string>
     <string name="you_strap_state_connected">متصل</string>
     <string name="you_strap_state_connecting">جارٍ الاتصال…</string>

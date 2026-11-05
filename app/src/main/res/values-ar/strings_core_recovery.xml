@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_recovery_quality_hrv">HRV هنا ⁨%1$d⁩ م.ث، ومن السترب ⁨%2$d⁩ م.ث</string>
+    <string name="core_recovery_quality_hrv">‏HRV هنا ⁨%1$d⁩ م.ث، ومن السترب ⁨%2$d⁩ م.ث</string>
     <string name="core_recovery_quality_rhr">نبض الراحة هنا ⁨%1$d⁩ ن/د، ومن السترب ⁨%2$d⁩ ن/د</string>
     <string name="core_recovery_cause_hard_day">يوم تمرين قوي</string>
     <string name="core_regularity_irregular">غير منتظم</string>

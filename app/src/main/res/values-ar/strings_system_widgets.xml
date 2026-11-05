@@ -5,7 +5,7 @@
     <string name="system_widget_status_low_battery">السترب ⁨%1$d%%⁩</string>
     <string name="system_widget_status_percent">⁨%1$d%%⁩</string>
     <string name="system_widget_status_syncing">جارٍ المزامنة…</string>
-    <string name="system_widget_status_synced">زُومن ⁨%1$s⁩</string>
+    <string name="system_widget_status_synced">آخر مزامنة ⁨%1$s⁩</string>
     <string name="system_widget_open">فتح</string>
     <string name="system_widget_this_week">هذا الأسبوع</string>
     <string name="system_widget_since">منذ ⁨%1$s⁩</string>
@@ -14,7 +14,7 @@
     <string name="system_widget_steps_to_go">باقي ⁨%1$s⁩</string>
     <string name="system_widget_steps_goal_met">تحقق الهدف</string>
     <string name="system_widget_steps_week">تحقق الهدف ⁨%1$d⁩ من ⁨%2$s⁩</string>
-    <plurals name="system_widget_steps_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم ⁨%1$d⁩</item><item quantity="two">⁨%1$d⁩ أيام</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ أيام</item><item quantity="other">⁨%1$d⁩ أيام</item></plurals>
+    <plurals name="system_widget_steps_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم واحد</item><item quantity="two">يومان</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ يوماً</item><item quantity="other">⁨%1$d⁩ يوم</item></plurals>
     <plurals name="system_widget_steps_description"><item quantity="zero">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item><item quantity="one">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item><item quantity="two">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item><item quantity="few">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item><item quantity="many">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item><item quantity="other">⁨%1$s⁩ خطوة اليوم، ⁨%2$s⁩</item></plurals>
     <string name="system_widget_steps_line_description">الخطوات حتى الآن اليوم، ⁨%1$s⁩</string>
     <string name="system_widget_steps_week_description">الخطوات كل يوم هذا الأسبوع</string>
@@ -38,13 +38,13 @@
     <string name="system_widget_start_all_sports">كل الرياضات</string>
     <string name="system_widget_start_all_sports_action">اختر رياضة</string>
     <string name="system_widget_start_short_title">ابدأ</string>
-    <plurals name="system_widget_start_week"><item quantity="zero">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="one">تمرين ⁨%1$d⁩، ⁨%2$s⁩</item><item quantity="two">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="few">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="many">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="other">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item></plurals>
+    <plurals name="system_widget_start_week"><item quantity="zero">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="one">تمرين ⁨%1$d⁩، ⁨%2$s⁩</item><item quantity="two">تمرينان،</item><item quantity="few">⁨%1$d⁩ تمارين، ⁨%2$s⁩</item><item quantity="many">⁨%1$d⁩ تمريناً، ⁨%2$s⁩</item><item quantity="other">⁨%1$d⁩ تمرين، ⁨%2$s⁩</item></plurals>
     <string name="system_widget_start_no_workouts">لا توجد تمارين بعد</string>
     <string name="system_widget_start_last">آخر ⁨%1$s⁩</string>
     <string name="system_widget_start_last_workout">آخر تمرين</string>
     <string name="system_widget_start_last_line">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="system_widget_start_none_yet">لا شيء بعد</string>
-    <plurals name="system_widget_start_sets"><item quantity="zero">⁨%1$d⁩ مجموعات</item><item quantity="one">مجموعة ⁨%1$d⁩</item><item quantity="two">⁨%1$d⁩ مجموعات</item><item quantity="few">⁨%1$d⁩ مجموعات</item><item quantity="many">⁨%1$d⁩ مجموعات</item><item quantity="other">⁨%1$d⁩ مجموعات</item></plurals>
+    <plurals name="system_widget_start_sets"><item quantity="zero">⁨%1$d⁩ مجموعات</item><item quantity="one">مجموعة واحدة</item><item quantity="two">مجموعتان</item><item quantity="few">⁨%1$d⁩ مجموعات</item><item quantity="many">⁨%1$d⁩ مجموعة</item><item quantity="other">⁨%1$d⁩ مجموعة</item></plurals>
     <string name="system_widget_recording">يسجّل</string>
     <string name="system_widget_paused">متوقف</string>
     <string name="system_widget_moment_energy_left">الطاقة المتبقية</string>
@@ -63,12 +63,12 @@
     <string name="system_widget_moment_min_since_your">د منذ ⁨%1$s⁩</string>
     <string name="system_widget_moment_min_since">د منذ</string>
     <string name="system_widget_moment_min">د</string>
-    <plurals name="system_widget_moment_minutes_since"><item quantity="zero">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="one">دقيقة ⁨%1$d⁩ منذ ⁨%2$s⁩</item><item quantity="two">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="few">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="many">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="other">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item></plurals>
+    <plurals name="system_widget_moment_minutes_since"><item quantity="zero">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="one">دقيقة ⁨%1$d⁩ منذ ⁨%2$s⁩</item><item quantity="two">دقيقتان منذ</item><item quantity="few">⁨%1$d⁩ دقائق منذ ⁨%2$s⁩</item><item quantity="many">⁨%1$d⁩ دقيقة منذ ⁨%2$s⁩</item><item quantity="other">⁨%1$d⁩ دقيقة منذ ⁨%2$s⁩</item></plurals>
     <string name="system_widget_moment_load_today">الجهد اليوم ⁨%1$d⁩</string>
     <string name="system_widget_moment_load">الجهد ⁨%1$d⁩</string>
     <string name="system_widget_moment_heart_since">النبض منذ ⁨%1$s⁩</string>
     <string name="system_widget_moment_min_to_bedtime">د على النوم</string>
-    <plurals name="system_widget_moment_minutes_to_bedtime"><item quantity="zero">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="one">دقيقة ⁨%1$d⁩ على موعد النوم</item><item quantity="two">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="few">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="many">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="other">⁨%1$d⁩ دقائق على موعد النوم</item></plurals>
+    <plurals name="system_widget_moment_minutes_to_bedtime"><item quantity="zero">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="one">دقيقة واحدة على موعد النوم</item><item quantity="two">دقيقتان على موعد النوم</item><item quantity="few">⁨%1$d⁩ دقائق على موعد النوم</item><item quantity="many">⁨%1$d⁩ دقيقة على موعد النوم</item><item quantity="other">⁨%1$d⁩ دقيقة على موعد النوم</item></plurals>
     <string name="system_widget_moment_bedtime">موعد النوم ⁨%1$s⁩</string>
     <string name="system_widget_moment_stages_description">مراحل نوم البارحة، ⁨%1$s⁩</string>
     <string name="system_widget_moment_energy_since">الطاقة منذ ⁨%1$s⁩</string>

@@ -305,11 +305,13 @@ private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
             style = GlowType.secondary, modifier = Modifier.padding(top = 10.dp),
         ) else {
             ZoneHeartLine(values, first, a.end, a.maxHeartRate, a.historyRanges, scrubbed, { scrubbed = it }, Modifier.padding(top = 16.dp))
+            Ltr {
             Row(Modifier.fillMaxWidth().padding(top = 6.dp)) {
                 PageNote(clock(first))
                 Spacer(Modifier.weight(1f))
                 val after = stringResource(R.string.glow_workout_heart_drop_after, clock(a.end))
                 PageNote(if (last > a.end + HeartStep) after else clock(a.end))
+            }
             }
             if (a.historyRanges.isNotEmpty()) Text(
                 stringResource(

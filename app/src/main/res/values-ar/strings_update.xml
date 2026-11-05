@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="update_summary_ready">OpenStrap ⁨%1$s⁩ جاهز للتثبيت</string>
+    <string name="update_summary_ready">‏OpenStrap ⁨%1$s⁩ جاهز للتثبيت</string>
     <string name="update_summary_checking">جارٍ التحقق…</string>
     <string name="update_summary_version">الإصدار ⁨%1$s⁩</string>
     <string name="update_summary_up_to_date">محدّث. تم التحقق ⁨%1$s⁩</string>

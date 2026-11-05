@@ -18,8 +18,8 @@
     <string name="core_detail_number_7">سبعة</string>
     <string name="core_detail_number_8">ثمانية</string>
     <string name="core_detail_number_9">تسعة</string>
-    <plurals name="core_detail_nights"><item quantity="zero">⁨%1$s⁩ ليالٍ</item><item quantity="one">ليلة ⁨%1$s⁩</item><item quantity="two">⁨%1$s⁩ ليالٍ</item><item quantity="few">⁨%1$s⁩ ليالٍ</item><item quantity="many">⁨%1$s⁩ ليالٍ</item><item quantity="other">⁨%1$s⁩ ليالٍ</item></plurals>
-    <plurals name="core_detail_days"><item quantity="zero">⁨%1$s⁩ أيام</item><item quantity="one">يوم ⁨%1$s⁩</item><item quantity="two">⁨%1$s⁩ أيام</item><item quantity="few">⁨%1$s⁩ أيام</item><item quantity="many">⁨%1$s⁩ أيام</item><item quantity="other">⁨%1$s⁩ أيام</item></plurals>
+    <plurals name="core_detail_nights"><item quantity="zero">⁨%1$s⁩ ليالٍ</item><item quantity="one">ليلة واحدة</item><item quantity="two">ليلتان</item><item quantity="few">⁨%1$s⁩ ليالٍ</item><item quantity="many">⁨%1$s⁩ ليلة</item><item quantity="other">⁨%1$s⁩ ليلة</item></plurals>
+    <plurals name="core_detail_days"><item quantity="zero">⁨%1$s⁩ أيام</item><item quantity="one">يوم واحد</item><item quantity="two">يومان</item><item quantity="few">⁨%1$s⁩ أيام</item><item quantity="many">⁨%1$s⁩ يوماً</item><item quantity="other">⁨%1$s⁩ يوم</item></plurals>
     <string name="core_detail_label_bpm_now">ن/د الآن</string>
     <string name="core_detail_label_bpm_latest">ن/د، الأحدث</string>
     <string name="core_detail_label_bpm_resting">ن/د في الراحة</string>

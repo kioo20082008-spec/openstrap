@@ -6,7 +6,7 @@
     <string name="glow_summary_unit_m">م</string>
     <string name="glow_summary_unit_avg_bpm">متوسط ن/د</string>
     <string name="glow_summary_unit_kg_lifted">كغ مرفوعة</string>
-    <plurals name="glow_summary_unit_sets"><item quantity="zero">مجموعات</item><item quantity="one">مجموعة</item><item quantity="two">مجموعات</item><item quantity="few">مجموعات</item><item quantity="many">مجموعات</item><item quantity="other">مجموعات</item></plurals>
+    <plurals name="glow_summary_unit_sets"><item quantity="zero">مجموعات</item><item quantity="one">مجموعة</item><item quantity="two">مجموعتان</item><item quantity="few">مجموعات</item><item quantity="many">مجموعة</item><item quantity="other">مجموعة</item></plurals>
     <string name="glow_summary_unit_reps_done">تكرارات منجزة</string>
     <string name="glow_summary_unit_rounds_done">جولات منجزة</string>
     <string name="glow_summary_unit_min_played">د لعب</string>
@@ -35,7 +35,7 @@
     <string name="glow_summary_rep_times_time">الوقت</string>
     <string name="glow_summary_peak_then_rest">الذروة ثم الراحة</string>
     <string name="glow_summary_round_down">انخفاض</string>
-    <plurals name="glow_summary_hard_efforts"><item quantity="zero">⁨%d⁩ مجهودات قوية</item><item quantity="one">مجهود قوي ⁨%d⁩</item><item quantity="two">⁨%d⁩ مجهودات قوية</item><item quantity="few">⁨%d⁩ مجهودات قوية</item><item quantity="many">⁨%d⁩ مجهودات قوية</item><item quantity="other">⁨%d⁩ مجهودات قوية</item></plurals>
+    <plurals name="glow_summary_hard_efforts"><item quantity="zero">⁨%d⁩ مجهودات قوية</item><item quantity="one">مجهود قوي ⁨%d⁩</item><item quantity="two">مجهودان قوية</item><item quantity="few">⁨%d⁩ مجهودات قوية</item><item quantity="many">⁨%d⁩ مجهوداً قوية</item><item quantity="other">⁨%d⁩ مجهود قوية</item></plurals>
     <string name="glow_summary_period_avg"> متوسط</string>
     <string name="glow_summary_route">المسار</string>
     <string name="glow_summary_climb">صعود ⁨%1$d⁩ م</string>
@@ -53,8 +53,8 @@
     <string name="glow_summary_vs_last">مقارنة بالمرة السابقة:</string>
     <string name="glow_summary_this_week">هذا الأسبوع</string>
     <string name="glow_summary_that_week">ذلك الأسبوع</string>
-    <plurals name="glow_summary_week_days_this"><item quantity="zero">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="one">يوم ⁨%d⁩ فيه تمرين هذا الأسبوع.</item><item quantity="two">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="many">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="other">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item></plurals>
-    <plurals name="glow_summary_week_days_that"><item quantity="zero">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="one">يوم ⁨%d⁩ فيه تمرين ذلك الأسبوع.</item><item quantity="two">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="many">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="other">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item></plurals>
+    <plurals name="glow_summary_week_days_this"><item quantity="zero">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="one">يوم واحد فيه تمرين هذا الأسبوع.</item><item quantity="two">يومان فيها تمرين هذا الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="many">⁨%d⁩ يوماً فيها تمرين هذا الأسبوع.</item><item quantity="other">⁨%d⁩ يوم فيها تمرين هذا الأسبوع.</item></plurals>
+    <plurals name="glow_summary_week_days_that"><item quantity="zero">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="one">يوم واحد فيه تمرين ذلك الأسبوع.</item><item quantity="two">يومان فيها تمرين ذلك الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="many">⁨%d⁩ يوماً فيها تمرين ذلك الأسبوع.</item><item quantity="other">⁨%d⁩ يوم فيها تمرين ذلك الأسبوع.</item></plurals>
     <string name="glow_summary_earned">المكتسب</string>
     <string name="glow_summary_drop_title">انخفاض النبض</string>
     <string name="glow_summary_drop_since">منذ ⁨%1$s⁩</string>

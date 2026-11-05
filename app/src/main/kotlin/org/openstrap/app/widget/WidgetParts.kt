@@ -578,7 +578,7 @@ internal fun WeekChart(bars: ImageProvider, description: String, letters: List<P
         Spacer(GlanceModifier.height(4.dp))
         // A letter a column, the gap as padding rather than a Spacer: Glance drops a row's children past ten.
         Row {
-            letters.forEachIndexed { i, (letter, lit) ->
+            (if (WidgetRtl) letters.reversed() else letters).forEachIndexed { i, (letter, lit) ->
                 val gap = if (i < letters.lastIndex) WeekBarsLook.GAP_DP else 0f
                 Box(GlanceModifier.width((column + gap).dp).padding(end = gap.dp), contentAlignment = Alignment.Center) {
                     Text(letter, style = (if (lit) WidgetType.captionShown else WidgetType.caption).copy(textAlign = TextAlign.Center), maxLines = 1)
