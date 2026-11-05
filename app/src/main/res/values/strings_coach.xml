@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coach_title">Your coach</string>
+    <string name="coach_live">Live</string>
+    <string name="coach_all_good">Nothing needs you right now. Your readings are within your normal.</string>
+    <string name="coach_breathe_action">Breathe</string>
+    <string name="coach_workout_action">Start a workout</string>
+    <string name="coach_list_join">, </string>
+    <string name="coach_illness_title">Your body may be fighting something</string>
+    <string name="coach_illness_body">Off from your normal together: %1$s. Keep today easy, drink well and sleep early.</string>
+    <string name="coach_heart_title">Heart rate %1$d bpm right now</string>
+    <string name="coach_heart_body">That\'s %1$d above your resting %2$d with no workout on. If you\'re sitting, two minutes of slow breathing brings it down.</string>
+    <string name="coach_stress_title">Stress %1$d and holding</string>
+    <string name="coach_stress_body">High for the last %1$d minutes. A short walk or a breathing session now helps more than later.</string>
+    <string name="coach_hrv_low_title">HRV %1$d ms, %2$d%% under your normal</string>
+    <string name="coach_hrv_low_sleep">You slept %1$s, %2$s short of your need. Go easy today and get to bed earlier tonight.</string>
+    <string name="coach_hrv_low_body">Your body is still recovering. Keep training light today.</string>
+    <string name="coach_hrv_high_title">HRV %1$d%% above your normal</string>
+    <string name="coach_hrv_high_body">Well recovered. A good day to push a little harder.</string>
+    <string name="coach_rhr_title">Resting heart rate %1$d, up %2$d</string>
+    <string name="coach_rhr_body">A late meal, heat, stress or a hard day can raise it. If it stays up tomorrow too, take a rest day.</string>
+    <string name="coach_load_high_title">This week\'s load %1$d%% over your fitness</string>
+    <string name="coach_load_high_body">You\'re building faster than your base. A light day keeps it from tipping into fatigue.</string>
+    <string name="coach_load_room_title">Room to train harder</string>
+    <string name="coach_load_room_body">Recovery is green and this week\'s load is under your fitness.</string>
+    <string name="coach_steps_title">%1$s steps so far, usually %2$s by now</string>
+    <string name="coach_steps_body">About %1$d minutes of walking catches you up.</string>
+    <string name="coach_bed_title">In bed by %1$s tonight</string>
+    <string name="coach_bed_debt">To wake at %1$s with %2$s of last nights\' debt paid back.</string>
+    <string name="coach_bed_body">For your full sleep before %1$s.</string>
+    <string name="coach_charge_title">Strap battery %1$d%%</string>
+    <string name="coach_charge_now">Charge it now, or tonight\'s sleep may not be recorded.</string>
+    <string name="coach_charge_good">Now is a good time to charge: you\'re not working out, and it\'s back on before bed at %1$s.</string>
+    <string name="coach_fitter_title">Resting heart rate down %1$d in weeks</string>
+    <string name="coach_fitter_body">Your fitness is improving. Keep the same rhythm.</string>
+</resources>

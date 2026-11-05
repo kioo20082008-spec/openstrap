@@ -445,7 +445,7 @@ private fun Hero(
             // The redesign: the same dials and plan at every moment of the day, unless Recovery failed to work out.
             HeroKind.Waking, HeroKind.Midday, HeroKind.NoSleep, HeroKind.Window, HeroKind.After, HeroKind.Evening ->
                 if (ctx.recoveryFailure != null) WakingHero(ctx, lightAngle, { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) }, onRetryRecovery, m)
-                else DialsToday(ctx, bedtime, onOpenScore, onOtherSport)
+                else DialsToday(ctx, bedtime, onOpenScore, onOtherSport, usualSteps, running != null)
             HeroKind.During -> (running ?: lastRunning.value)?.let { DuringHero(it, onOpenRunning, liveHero, m) }
         }
     }
@@ -453,7 +453,10 @@ private fun Hero(
 
 /** The dials and the day's plan ([DialsHero]), from what Today already knows. */
 @Composable
-private fun DialsToday(ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit, onOtherSport: () -> Unit) {
+private fun DialsToday(
+    ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit, onOtherSport: () -> Unit,
+    usualSteps: List<Float>?, recording: Boolean,
+) {
     val score = ctx.recoveryShown.value
     val goal = LocalGoals.current.steps
     val steps = ctx.state.steps
@@ -491,6 +494,7 @@ private fun DialsToday(ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org
             stringResource(R.string.dials_bed_note), false,
         ))
     }
+    Column {
     DialsHero(
         recovery = score, sleep = ctx.state.sleep?.score, strain = ctx.rec?.strain,
         labels = Triple(stringResource(R.string.dials_sleep), stringResource(R.string.dials_recovery), stringResource(R.string.dials_load)),
@@ -500,6 +504,19 @@ private fun DialsToday(ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org
         onRecovery = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) },
         onLoad = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Load) },
     )
+    // The coach, read afresh with every reading: live heart rate, the stress minutes, steps, the battery.
+    val (battery, charging) = LocalStrapBattery.current
+    val tips = org.openstrap.app.presentation.Coach.tips(
+        org.openstrap.app.presentation.Coach.Input(
+            now = ctx.now, zone = ctx.zone, isToday = ctx.isToday, readiness = ctx.rec?.readiness, loadTrend = ctx.rec?.loadTrend,
+            sleepNeed = ctx.rec?.sleepNeed, steps = steps, usualSteps = usualSteps, stepGoal = goal, stress = ctx.state.stress,
+            restingHr = ctx.state.restingHeartRate, liveHr = ctx.live, recording = recording, usualBedtime = bedtime,
+            wake = ctx.state.sleep?.end?.let { java.time.Instant.ofEpochSecond(it).atZone(ctx.zone).toLocalTime() },
+            restingTrend = ctx.state.restingTrend.mapNotNull { it.value }, battery = battery, charging = charging,
+        ),
+    )
+    CoachCard(tips, live = ctx.live != null, onWorkout = onOtherSport)
+    }
 }
 
 private enum class HeroKind { Pair, Stuck, Waking, NoSleep, Midday, Window, After, Evening, During }

@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -151,5 +153,69 @@ private fun Tick(done: Boolean) {
             }
             drawPath(p, AppPalette.Navy, style = Stroke(2.6.dp.toPx(), cap = StrokeCap.Round))
         } else drawCircle(Color(0xFF6B7591), r - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
+    }
+}
+
+/** What the coach card can open: a breathing session, and Start a workout. Provided by the activity. */
+val LocalOpenBreathe = androidx.compose.runtime.staticCompositionLocalOf<() -> Unit> { {} }
+
+/** The strap's battery and whether it's charging, for the coach's charging tip. */
+val LocalStrapBattery = androidx.compose.runtime.compositionLocalOf<Pair<Int?, Boolean>> { null to false }
+
+/**
+ * The coach ([org.openstrap.app.presentation.Coach]): the one or two things your readings say right now, each with
+ * the numbers behind it, rewritten as the readings change. Live while heart rate streams from the strap.
+ */
+@Composable
+internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, live: Boolean, onWorkout: () -> Unit) {
+    val breathe = LocalOpenBreathe.current
+    val shape = RoundedCornerShape(26.dp)
+    Column(Modifier.fillMaxWidth().padding(top = 14.dp).clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(horizontal = 20.dp, vertical = 16.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_title), Modifier.weight(1f), color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+            if (live) {
+                val blink = androidx.compose.animation.core.rememberInfiniteTransition(label = "live")
+                val a by blink.animateFloat(1f, 0.25f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse), label = "a")
+                Box(Modifier.size(8.dp).clip(CircleShape).background(AppPalette.Coral.copy(alpha = a)))
+                Spacer(Modifier.width(6.dp))
+                Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_live), color = AppPalette.Coral, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+        if (tips.isEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_all_good), color = Muted, style = MaterialTheme.typography.bodyMedium)
+        }
+        tips.take(3).forEach { t ->
+            Spacer(Modifier.height(12.dp))
+            Box(Modifier.fillMaxWidth().height(1.dp).background(PlanEdge))
+            Spacer(Modifier.height(12.dp))
+            val tone = when (t.tone) {
+                org.openstrap.app.presentation.Coach.Tone.Warn -> AppPalette.Coral
+                org.openstrap.app.presentation.Coach.Tone.Calm -> Color(0xFFF5B657)
+                org.openstrap.app.presentation.Coach.Tone.Good -> Color(0xFF5FD3A6)
+            }
+            Row(verticalAlignment = Alignment.Top) {
+                Box(Modifier.padding(top = 7.dp).size(9.dp).clip(CircleShape).background(tone))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text(t.title, color = AppPalette.Cream, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Spacer(Modifier.height(3.dp))
+                    Text(t.body, color = Muted, style = MaterialTheme.typography.bodyMedium)
+                    val action = when (t.action) {
+                        org.openstrap.app.presentation.Coach.Action.Breathe -> org.openstrap.app.R.string.coach_breathe_action to breathe
+                        org.openstrap.app.presentation.Coach.Action.Workout -> org.openstrap.app.R.string.coach_workout_action to onWorkout
+                        org.openstrap.app.presentation.Coach.Action.None -> null
+                    }
+                    if (action != null) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(
+                            androidx.compose.ui.res.stringResource(action.first),
+                            Modifier.clip(CircleShape).background(tone.copy(alpha = 0.16f)).clickable(onClick = action.second).padding(horizontal = 14.dp, vertical = 7.dp),
+                            color = tone, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                        )
+                    }
+                }
+            }
+        }
     }
 }

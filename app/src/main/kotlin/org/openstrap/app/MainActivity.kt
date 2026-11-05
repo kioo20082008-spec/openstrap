@@ -328,6 +328,7 @@ private fun AppRoot(
     val strapFacts by rootVm.strap.collectAsStateWithLifecycle()
     val connected = strapFacts.connection is ConnectionState.Connected
     val live by rootVm.liveHeartRate.collectAsStateWithLifecycle()
+    var breatheOpen by remember { mutableStateOf(false) }
     val liveEnabled by rootVm.liveEnabled.collectAsStateWithLifecycle()
     val workoutState by container.workout.state.collectAsStateWithLifecycle()
     val workoutMinimized by container.workout.minimized.collectAsStateWithLifecycle()
@@ -422,6 +423,8 @@ private fun AppRoot(
     val hinge = folds.table
     CompositionLocalProvider(
         LocalGoals provides goals, LocalHeartZones provides heartZones, LocalGlassHost provides glassHost,
+        org.openstrap.app.ui.glow.LocalOpenBreathe provides { breatheOpen = true },
+        org.openstrap.app.ui.glow.LocalStrapBattery provides ((strapFacts.connection as? org.openstrap.app.device.ConnectionState.Connected)?.let { it.batteryPercent to it.charging } ?: (null to false)),
         LocalGrowOrigin provides growOrigin,
     ) {
       Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -443,7 +446,6 @@ private fun AppRoot(
             val showBar = !rail && !barHidden && !(detailOpen && maxWidth < SideBySideWidth)
             val selectTab: (Int) -> Unit = { t -> tapTab(t, nav, firmwareVm, scroll) }
             var quickOpen by remember { mutableStateOf(false) }
-            var breatheOpen by remember { mutableStateOf(false) }
             if (breatheOpen) org.openstrap.app.ui.glow.BreatheScreen(live, liveEnabled, { container.strap.setLiveHeartRate(it) }) { breatheOpen = false }
             val quickScope = androidx.compose.runtime.rememberCoroutineScope()
             if (quickOpen) org.openstrap.app.ui.glow.QuickSheet(

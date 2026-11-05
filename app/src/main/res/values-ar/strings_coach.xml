@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="coach_title">مدرّبك</string>
+    <string name="coach_live">مباشر</string>
+    <string name="coach_all_good">ما فيه شي يحتاجك الحين. قراءاتك ضمن معدلك.</string>
+    <string name="coach_breathe_action">تنفّس</string>
+    <string name="coach_workout_action">ابدأ تمرين</string>
+    <string name="coach_list_join">، </string>
+    <string name="coach_illness_title">جسمك ممكن يقاوم شي</string>
+    <string name="coach_illness_body">أكثر من مؤشر بعيد عن معدلك مع بعض: ⁨%1$s⁩. خلّ يومك خفيف، واشرب زين، ونم بدري.</string>
+    <string name="coach_heart_title">نبضك الحين ⁨%1$d⁩</string>
+    <string name="coach_heart_body">أعلى من نبض راحتك (⁨%2$d⁩) بـ ⁨%1$d⁩ وأنت مو في تمرين. إذا كنت جالس، دقيقتين تنفّس بطيء تنزّله.</string>
+    <string name="coach_stress_title">توترك ⁨%1$d⁩ ومستمر</string>
+    <string name="coach_stress_body">مرتفع من ⁨%1$d⁩ دقيقة. مشية قصيرة أو جلسة تنفّس الحين تفيدك أكثر من بعدين.</string>
+    <string name="coach_hrv_low_title">HRV ⁨%1$d⁩ م.ث، أقل من معدلك بـ ⁨%2$d⁩%%</string>
+    <string name="coach_hrv_low_sleep">نمت ⁨%1$s⁩، أقل من حاجتك بـ ⁨%2$s⁩. خفّف اليوم ونم بدري الليلة.</string>
+    <string name="coach_hrv_low_body">جسمك لسا يتعافى. خلّ تمرينك خفيف اليوم.</string>
+    <string name="coach_hrv_high_title">HRV أعلى من معدلك بـ ⁨%1$d⁩%%</string>
+    <string name="coach_hrv_high_body">جسمك مستشفي زين. يوم مناسب تضغط فيه شوي.</string>
+    <string name="coach_rhr_title">نبض الراحة ⁨%1$d⁩، أعلى بـ ⁨%2$d⁩</string>
+    <string name="coach_rhr_body">الأكل المتأخر أو الحر أو التوتر أو يوم شاق ممكن يرفعه. إذا بقي مرتفع بكرة بعد، خذ يوم راحة.</string>
+    <string name="coach_load_high_title">جهد أسبوعك أعلى من لياقتك بـ ⁨%1$d⁩%%</string>
+    <string name="coach_load_high_body">قاعد ترفع جهدك أسرع من قاعدتك. يوم خفيف يمنعه يتحول لإرهاق.</string>
+    <string name="coach_load_room_title">عندك مجال تتمرن أقوى</string>
+    <string name="coach_load_room_body">استشفاؤك أخضر وجهد أسبوعك أقل من لياقتك.</string>
+    <string name="coach_steps_title">⁨%1$s⁩ خطوة لين الحين، ومعتادك لهالوقت ⁨%2$s⁩</string>
+    <string name="coach_steps_body">مشي تقريباً ⁨%1$d⁩ دقيقة يعوّضها.</string>
+    <string name="coach_bed_title">نم الساعة ⁨%1$s⁩ الليلة</string>
+    <string name="coach_bed_debt">عشان تصحى ⁨%1$s⁩ وتعوّض ⁨%2$s⁩ من دَين نومك.</string>
+    <string name="coach_bed_body">عشان تاخذ نومك كامل قبل ⁨%1$s⁩.</string>
+    <string name="coach_charge_title">بطارية السترب ⁨%1$d⁩%%</string>
+    <string name="coach_charge_now">اشحنه الحين، وإلا ممكن ما يسجل نومك الليلة.</string>
+    <string name="coach_charge_good">الحين وقت مناسب تشحنه: ما عندك تمرين، ويرجع على يدك قبل نومك الساعة ⁨%1$s⁩.</string>
+    <string name="coach_fitter_title">نبض راحتك نزل ⁨%1$d⁩ خلال أسابيع</string>
+    <string name="coach_fitter_body">لياقتك تتحسن. كمّل على نفس الإيقاع.</string>
+</resources>
