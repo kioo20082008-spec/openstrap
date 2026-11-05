@@ -33,10 +33,13 @@ jobs:
           path: app/build/outputs/apk/debug/app-debug.apk
       # Each build is a release, so the app finds it on this fork and updates itself.
       - name: Publish as a release
+        # Only the branch the phone follows publishes, and a re-run reuses its tag.
+        if: github.ref == 'refs/heads/design/navy-arabic'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: 3.0.${{ github.run_number }}
         run: |
           cp app/build/outputs/apk/debug/app-debug.apk "openstrap-$VERSION.apk"
           gh release create "v$VERSION" "openstrap-$VERSION.apk" --target "$GITHUB_SHA" \
-            --title "OpenStrap $VERSION" --notes "Redesign build $VERSION."
+            --title "OpenStrap $VERSION" --notes "Redesign build $VERSION." \
+            || gh release upload "v$VERSION" "openstrap-$VERSION.apk" --clobber

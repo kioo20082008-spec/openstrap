@@ -169,7 +169,7 @@ private fun RecoveryHero(
     val yesterday = r?.readinessTrend?.dropLast(1)?.lastOrNull()?.second
     val alert = ready?.strainAlert == true
     // The redesign: with a score, the Pulse hero; before one, the card that says why there's none.
-    if (score != null) {
+    if (score != null && !firstNights && !firstScore && TabCopy.learning(ready.phase, ready.baselineNights) == null) {
         val vs = TabCopy.vsYesterday(score, yesterday)
         PulseHero(
             score = score, word = TodayCopy.recoveryWord(score, alert),

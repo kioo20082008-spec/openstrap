@@ -36,7 +36,9 @@ class CoachWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
         val day = runCatching { c.days.day(today, true).first() }.getOrNull() ?: return Result.success()
         val connected = c.strap.connection.value as? ConnectionState.Connected
         val need = c.settings.goals.first().sleepMinutes
-        val wake = day.sleep.main?.end?.let { Instant.ofEpochSecond(it).atZone(zone).toLocalTime() }
+        // After midnight today has no night yet: the wake is yesterday's.
+        val wake = (day.sleep.main ?: runCatching { c.days.day(today.minusDays(1), false).first().sleep.main }.getOrNull())
+            ?.end?.let { Instant.ofEpochSecond(it).atZone(zone).toLocalTime() }
         val tips = Coach.tips(
             Coach.Input(
                 now = now, zone = zone, isToday = true, readiness = null, loadTrend = null, sleepNeed = need,
@@ -55,11 +57,17 @@ class CoachWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
                 val until = (bed.toSecondOfDay() - Instant.ofEpochSecond(now).atZone(zone).toLocalTime().toSecondOfDay()).let { if (it < 0) it + 86_400 else it }
                 if (until > 30 * 60) return@forEach
             }
-            val key = "${tip.kind}-$today"
-            if (prefs.getBoolean(key, false)) return@forEach
-            prefs.edit().putBoolean(key, true).apply()
+            // Once in 20 hours a kind, so 23:50 and 00:05 aren't two warnings.
+            val key = "${tip.kind}-at"
+            if (now - prefs.getLong(key, 0L) < 20 * 3600) return@forEach
+            prefs.edit().putLong(key, now).apply()
+            val manager = app.getSystemService(NotificationManager::class.java)
+            if (!manager.areNotificationsEnabled()) return@forEach
             notify(app, tip)
-            if (connected != null) runCatching { c.strap.buzz(BUZZ) }
+            // The buzz only by day, and never in Do Not Disturb: a tip is never worth waking you.
+            val hour = Instant.ofEpochSecond(now).atZone(zone).hour
+            val quiet = manager.currentInterruptionFilter > NotificationManager.INTERRUPTION_FILTER_ALL || hour < 8 || hour >= 22
+            if (connected != null && !quiet) runCatching { c.strap.buzz(BUZZ) }
         }
         return Result.success()
     }

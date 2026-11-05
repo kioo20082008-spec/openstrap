@@ -75,7 +75,7 @@ internal fun DialsHero(
         Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onRecovery), contentAlignment = Alignment.TopCenter) {
             Ltr {
                 Canvas(Modifier.fillMaxWidth().height(190.dp)) {
-                    val r = size.width / 2 - 22.dp.toPx()
+                    val r = minOf(size.width / 2 - 22.dp.toPx(), size.height - 22.dp.toPx())
                     val c = Offset(size.width / 2, r + 14.dp.toPx())
                     for (k in 0..40) {
                         val a = Math.PI * (1 - k / 40.0)
@@ -124,6 +124,10 @@ internal fun DialsHero(
                     Text(v ?: "–", color = AppPalette.Cream, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
                 }
             }
+        }
+        if (plan.isNotEmpty()) {
+            Spacer(Modifier.height(12.dp))
+            PlanCard(planTitle, planNote, planChip, plan)
         }
     }
 }

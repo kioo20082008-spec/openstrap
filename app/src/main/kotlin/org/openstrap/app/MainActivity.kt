@@ -455,7 +455,8 @@ private fun AppRoot(
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.PersonSimpleRun, androidx.compose.ui.res.stringResource(R.string.glow_choose_title), nav::openChoose),
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.ArrowCounterClockwise, androidx.compose.ui.res.stringResource(R.string.you_strap_sync_now)) { container.strap.syncNow() },
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Vibrate, androidx.compose.ui.res.stringResource(R.string.you_strap_find)) {
-                        quickScope.launch { runCatching { container.strap.findStrap() } }
+                        // A second tap stops it, as on the Strap page.
+                        quickScope.launch { runCatching { if (container.strap.findingStrap.value) container.strap.stopFindingStrap() else container.strap.findStrap() } }
                     },
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Alarm, androidx.compose.ui.res.stringResource(R.string.you_alarms_title)) { nav.openPage(Page.Alarms) },
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Target, androidx.compose.ui.res.stringResource(R.string.glow_goals_title)) { nav.openPage(Page.GoalsAndBests) },

@@ -84,8 +84,8 @@ internal fun PulseHero(
         }),
         label = "beat",
     )
-    val ripple1 by pulse.animateFloat(0f, 1f, infiniteRepeatable(tween(beatMs, easing = LinearEasing)), label = "r1")
-    val ripple2 by pulse.animateFloat(
+    val ripple1 = pulse.animateFloat(0f, 1f, infiniteRepeatable(tween(beatMs, easing = LinearEasing)), label = "r1")
+    val ripple2 = pulse.animateFloat(
         0f, 1f, infiniteRepeatable(tween(beatMs, easing = LinearEasing), RepeatMode.Restart, StartOffset(beatMs / 4)), label = "r2",
     )
     val trace by pulse.animateFloat(0f, 1f, infiniteRepeatable(tween(2200, easing = LinearEasing)), label = "trace")
@@ -125,9 +125,9 @@ internal fun PulseHero(
             }
             Box(Modifier.align(Alignment.TopEnd)) { info() }
             Box(Modifier.align(Alignment.TopCenter).padding(top = 6.dp).size(64.dp), contentAlignment = Alignment.Center) {
-                listOf(ripple1, ripple2).forEach { r ->
+                listOf(ripple1, ripple2).forEach { state ->
                     Box(
-                        Modifier.size(64.dp).graphicsLayer { scaleX = 0.6f + 1.4f * r; scaleY = 0.6f + 1.4f * r; alpha = 0.45f * (1f - r) }
+                        Modifier.size(64.dp).graphicsLayer { val r = state.value; scaleX = 0.6f + 1.4f * r; scaleY = 0.6f + 1.4f * r; alpha = 0.45f * (1f - r) }
                             .border(1.dp, Color(0xFFFFB59A), CircleShape),
                     )
                 }

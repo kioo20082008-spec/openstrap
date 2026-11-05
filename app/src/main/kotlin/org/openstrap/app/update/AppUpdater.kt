@@ -164,7 +164,12 @@ class AppUpdater(
     suspend fun autoUpdate() {
         if (!check()) return
         val newest = Releases.newer(_state.value.releases, installed).firstOrNull() ?: return
-        if (canInstall() && !recording()) install(newest)
+        // One automatic try per release: a declined or failed install isn't pushed again, Updates still offers it.
+        val tried = app.getSharedPreferences("auto_update", android.content.Context.MODE_PRIVATE)
+        if (canInstall() && !recording() && tried.getString("tag", null) != newest.tag) {
+            tried.edit().putString("tag", newest.tag).apply()
+            install(newest)
+        }
         else if (settings.updateNotified() != newest.tag) {
             UpdateNotifier(app).available(newest)
             settings.setUpdateNotified(newest.tag)
@@ -371,7 +376,7 @@ class AppUpdater(
         /** Starts the daily check; a no-op when it's already scheduled. Runs only with a network. */
         fun schedule(context: Context) {
             val request = PeriodicWorkRequestBuilder<UpdateWorker>(3, TimeUnit.HOURS)
-                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+                .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.UNMETERED).build())
                 .build()
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(DAILY, ExistingPeriodicWorkPolicy.UPDATE, request)
         }

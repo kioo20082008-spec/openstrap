@@ -116,7 +116,11 @@ object Coach {
             }
         }
         // Steps against your usual pace by this hour.
-        val usual = i.usualSteps?.getOrNull(time.hour)?.roundToInt()
+        val usual = i.usualSteps?.let { u ->
+            val before = if (time.hour == 0) 0f else u.getOrNull(time.hour - 1) ?: return@let null
+            val after = u.getOrNull(time.hour) ?: return@let null
+            (before + (after - before) * time.minute / 60f).roundToInt()
+        }
         if (usual != null && time.hour in 10..20 && usual > 1000 && i.steps < usual * 0.7f && i.steps < i.stepGoal) {
             val behind = usual - i.steps
             out += Tip(

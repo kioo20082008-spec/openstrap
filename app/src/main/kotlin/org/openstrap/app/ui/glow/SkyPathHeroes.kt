@@ -153,9 +153,9 @@ internal fun SkyHero(
 @Composable
 internal fun PathHero(steps: Int, goal: Int, stepsWord: String, line: String, onOpen: () -> Unit) {
     val share = if (goal > 0) (steps / goal.toFloat()).coerceIn(0f, 1f) else 0f
-    val walk = remember(share) { Animatable(0f) }
+    val walk = remember { Animatable(0f) }
     LaunchedEffect(share) { walk.animateTo(share, tween(2200, easing = FastOutSlowInEasing)) }
-    val count = remember(steps) { Animatable(0f) }
+    val count = remember { Animatable(0f) }
     LaunchedEffect(steps) { count.animateTo(steps.toFloat(), tween(1500, easing = FastOutSlowInEasing)) }
     val mirror = LocalLayoutDirection.current == LayoutDirection.Rtl
     val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)

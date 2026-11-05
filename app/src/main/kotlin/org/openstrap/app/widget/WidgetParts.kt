@@ -341,9 +341,11 @@ private fun CardWidget(
 private fun StatusTapTarget(line: StatusLine, top: Float) {
     val action = statusAction(line.status) ?: return
     val reach = (StatusButton.TOUCH_DP - StatusButton.SIZE_DP) / 2
-    Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.TopEnd) {
+    // Over the button wherever the row put it: at the start in Arabic.
+    Box(GlanceModifier.fillMaxSize(), contentAlignment = if (WidgetRtl) Alignment.TopStart else Alignment.TopEnd) {
         Box(
-            GlanceModifier.padding(top = (WidgetSizes.PADDING_DP + top - reach).coerceAtLeast(0f).dp, end = (WidgetSizes.PADDING_DP - reach).dp),
+            if (WidgetRtl) GlanceModifier.padding(top = (WidgetSizes.PADDING_DP + top - reach).coerceAtLeast(0f).dp, start = (WidgetSizes.PADDING_DP - reach).dp)
+            else GlanceModifier.padding(top = (WidgetSizes.PADDING_DP + top - reach).coerceAtLeast(0f).dp, end = (WidgetSizes.PADDING_DP - reach).dp),
         ) {
             Box(
                 GlanceModifier.size(StatusButton.TOUCH_DP.dp).clickable(action).semantics { contentDescription = line.full },
@@ -447,7 +449,7 @@ internal fun TopRowView(title: String, note: String?, top: TopRow, f: WidgetFram
         if (WidgetRtl) {
             if (line != null) StatusButtonView(line, f) else if (note != null && top.note) FontText(note, WidgetText.SECONDARY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
             Spacer(GlanceModifier.defaultWeight())
-            FontText(title, top.titleSp, Color.White, strong = true)
+            FontText(title, top.titleSp, Color.White, strong = true, maxWidthDp = f.contentWidth * 0.7f)
             return@Row
         }
         Text(title, style = titleStyle.copy(fontSize = top.titleSp.sp), maxLines = 1, modifier = GlanceModifier.defaultWeight())
@@ -589,7 +591,8 @@ internal fun WeekChart(bars: ImageProvider, description: String, letters: List<P
 /* ------------------------------------------- Redesign fonts ------------------------------------------- */
 
 /** Arabic widgets read right to left, whatever the phone's own language (the launcher lays widgets out in that). */
-internal val WidgetRtl: Boolean get() = java.util.Locale.getDefault().language == "ar"
+internal val WidgetRtl: Boolean get() = java.util.Locale.getDefault().language == "ar" &&
+    android.content.res.Resources.getSystem().configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_LTR
 
 /** The app's fonts for widgets, which Glance can't use as text: Inter for numbers, Almarai for words. */
 private object WidgetFonts {
@@ -621,15 +624,17 @@ private fun renderNumber(context: Context, text: String, w: Float, h: Float): Bi
 
 /** [text] drawn in the app's Almarai at [sp], as an image: Glance offers only the system's fonts for its own text. */
 @Composable
-internal fun FontText(text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier) {
+internal fun FontText(text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier, maxWidthDp: Float = 220f) {
     val context = LocalContext.current
     val d = context.resources.displayMetrics.density
-    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+    val paint = android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
         typeface = WidgetFonts.text(context, strong)
         textSize = sp * context.resources.configuration.fontScale * d
         this.color = color.toArgb()
     }
     val fm = paint.fontMetrics
+    // Never wider than the card: a long line ends in an ellipsis, as Glance's own text would.
+    val text = android.text.TextUtils.ellipsize(text, paint, maxWidthDp * d, android.text.TextUtils.TruncateAt.END).toString()
     val w = paint.measureText(text).coerceAtLeast(1f) + 2f
     val h = fm.descent - fm.ascent
     Image(

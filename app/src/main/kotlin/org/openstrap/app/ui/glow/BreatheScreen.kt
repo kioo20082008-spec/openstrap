@@ -94,6 +94,8 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
         running = false
         done = true
     }
+    // The live stream needs a moment after Start: the first reading that comes is the session's start.
+    LaunchedEffect(running, liveBpm) { if (running && startBpm == null && liveBpm != null) startBpm = liveBpm }
     LaunchedEffect(running) {
         if (!running) return@LaunchedEffect
         left = minutes * 60
@@ -162,7 +164,7 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
             }
             Box(
                 Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(29.dp)).background(if (running) Color(0xFF1C2C50) else AppPalette.Coral)
-                    .clickable { if (running) { running = false; done = false } else { done = false; endBpm = null; running = true } },
+                    .clickable { if (running) { running = false; done = false } else { done = false; endBpm = null; startBpm = null; running = true } },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
