@@ -43,6 +43,13 @@ android {
             keyAlias = env("OPENSTRAP_KEY_ALIAS")
             keyPassword = env("OPENSTRAP_KEY_PASSWORD")
         }
+        // A fixed key for the redesign test builds, so each one installs over the last.
+        getByName("debug") {
+            storeFile = file("redesign-debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {
