@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Bitmap
+import org.openstrap.app.R
 import android.os.Bundle
 import android.util.Log
 import android.util.SizeF
@@ -319,10 +320,13 @@ private fun CardWidget(
         GlanceModifier.fillMaxSize()
             .appWidgetBackground()
             .cornerRadius(corner.dp)
-            .background(ImageProvider(background(w, h, corner, density)), ContentScale.FillBounds)
+            .background(ImageProvider(background(w, h, corner, density).let { if (WidgetRtl) mirrored(it) else it }), ContentScale.FillBounds)
             .clickable(actionStartActivity(open)),
     ) {
-        Column(GlanceModifier.fillMaxSize().padding(horizontal = sidePadding.dp, vertical = WidgetSizes.PADDING_DP.dp)) { content(frame) }
+        Column(
+            GlanceModifier.fillMaxSize().padding(horizontal = sidePadding.dp, vertical = WidgetSizes.PADDING_DP.dp),
+            horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start,
+        ) { content(frame) }
         frame.spot.line?.let { StatusTapTarget(it, frame.spot.top) }
     }
 }
@@ -440,6 +444,12 @@ internal fun TopRowView(title: String, note: String?, top: TopRow, f: WidgetFram
     val line = top.status
     if (line != null) f.spot.put(above + (top.height - StatusButton.SIZE_DP) / 2, line)
     Row(GlanceModifier.fillMaxWidth().height(top.height.dp), verticalAlignment = Alignment.CenterVertically) {
+        if (WidgetRtl) {
+            if (line != null) StatusButtonView(line, f) else if (note != null && top.note) FontText(note, WidgetText.SECONDARY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
+            Spacer(GlanceModifier.defaultWeight())
+            FontText(title, top.titleSp, Color.White, strong = true)
+            return@Row
+        }
         Text(title, style = titleStyle.copy(fontSize = top.titleSp.sp), maxLines = 1, modifier = GlanceModifier.defaultWeight())
         if (line != null) {
             top.words?.let {
@@ -540,8 +550,9 @@ internal fun WaitingContent(title: String, line: String?, f: WidgetFrame) {
 @Composable
 internal fun DotNumber(text: String, dot: Float, density: Float, description: String?) {
     val layout = dotLayout(text, dot, 1f)
+    val context = LocalContext.current
     Image(
-        ImageProvider(renderDots(text, dot, density)),
+        ImageProvider(renderNumber(context, text, layout.width * density, layout.height * density)),
         contentDescription = description,
         modifier = GlanceModifier.size(layout.width.dp, layout.height.dp),
         contentScale = ContentScale.FillBounds,
@@ -574,3 +585,59 @@ internal fun WeekChart(bars: ImageProvider, description: String, letters: List<P
         }
     }
 }
+
+/* ------------------------------------------- Redesign fonts ------------------------------------------- */
+
+/** Arabic widgets read right to left, whatever the phone's own language (the launcher lays widgets out in that). */
+internal val WidgetRtl: Boolean get() = java.util.Locale.getDefault().language == "ar"
+
+/** The app's fonts for widgets, which Glance can't use as text: Inter for numbers, Almarai for words. */
+private object WidgetFonts {
+    @Volatile private var number: android.graphics.Typeface? = null
+    @Volatile private var bold: android.graphics.Typeface? = null
+    @Volatile private var regular: android.graphics.Typeface? = null
+
+    fun number(c: Context): android.graphics.Typeface = number ?: (
+        androidx.core.content.res.ResourcesCompat.getFont(c, R.font.inter)?.let { android.graphics.Typeface.create(it, 800, false) }
+            ?: android.graphics.Typeface.DEFAULT_BOLD
+        ).also { number = it }
+
+    fun text(c: Context, strong: Boolean): android.graphics.Typeface =
+        if (strong) bold ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.almarai_bold) ?: android.graphics.Typeface.DEFAULT_BOLD).also { bold = it }
+        else regular ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.almarai_regular) ?: android.graphics.Typeface.DEFAULT).also { regular = it }
+}
+
+/** [text] in bold Inter, as tall as a [w] by [h] px box and no wider, against its start (the right in Arabic). */
+private fun renderNumber(context: Context, text: String, w: Float, h: Float): Bitmap {
+    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        typeface = WidgetFonts.number(context); color = android.graphics.Color.WHITE
+        textSize = h / 0.73f
+    }
+    val width = paint.measureText(text)
+    if (width > w) paint.textSize *= w / width
+    val drawn = paint.measureText(text)
+    return renderToBitmap(w, h) { c -> c.drawText(text, if (WidgetRtl) w - drawn else 0f, h, paint) }
+}
+
+/** [text] drawn in the app's Almarai at [sp], as an image: Glance offers only the system's fonts for its own text. */
+@Composable
+internal fun FontText(text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier) {
+    val context = LocalContext.current
+    val d = context.resources.displayMetrics.density
+    val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+        typeface = WidgetFonts.text(context, strong)
+        textSize = sp * context.resources.configuration.fontScale * d
+        this.color = color.toArgb()
+    }
+    val fm = paint.fontMetrics
+    val w = paint.measureText(text).coerceAtLeast(1f) + 2f
+    val h = fm.descent - fm.ascent
+    Image(
+        ImageProvider(renderToBitmap(w, h) { c -> c.drawText(text, 1f, -fm.ascent, paint) }), text,
+        modifier.size((w / d).dp, (h / d).dp), contentScale = ContentScale.FillBounds,
+    )
+}
+
+/** [b] mirrored left to right, for a light or a bar that should start on the right in Arabic. */
+internal fun mirrored(b: Bitmap): Bitmap =
+    Bitmap.createBitmap(b, 0, 0, b.width, b.height, android.graphics.Matrix().apply { preScale(-1f, 1f) }, true)

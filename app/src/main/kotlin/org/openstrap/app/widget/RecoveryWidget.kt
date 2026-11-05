@@ -11,6 +11,7 @@ import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.layout.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.glance.layout.Column
 import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.Row
@@ -100,7 +101,7 @@ private fun ColumnScope.SmallContent(m: RecoveryWidgetModel, fit: RecoveryLayout
     m.score?.let { DotNumber(it, fit.dot, f.density, m.scoreDescription) }
     if (fit.word) m.word?.let {
         Gap()
-        Text(it, style = WidgetType.word.copy(fontSize = fit.wordSp.sp), maxLines = 1)
+        if (WidgetRtl) FontText(it, fit.wordSp, Color.White.copy(alpha = 0.72f)) else Text(it, style = WidgetType.word.copy(fontSize = fit.wordSp.sp), maxLines = 1)
     }
     Edge(fit.spread, f)
 }
@@ -147,6 +148,14 @@ private fun ColumnScope.LargeContent(m: RecoveryWidgetModel, fit: RecoveryLayout
 @Composable
 private fun ScoreRow(m: RecoveryWidgetModel, dot: Float, density: Float) {
     Row(verticalAlignment = Alignment.Bottom) {
+        if (WidgetRtl) {
+            m.word?.let {
+                FontText(it, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
+                Spacer(GlanceModifier.width(RecoveryLayout.WORD_GAP_DP.dp))
+            }
+            m.score?.let { DotNumber(it, dot, density, m.scoreDescription) }
+            return@Row
+        }
         m.score?.let { DotNumber(it, dot, density, m.scoreDescription) }
         m.word?.let {
             Spacer(GlanceModifier.width(RecoveryLayout.WORD_GAP_DP.dp))

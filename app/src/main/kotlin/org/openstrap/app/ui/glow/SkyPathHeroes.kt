@@ -81,8 +81,8 @@ internal fun SkyHero(
     LaunchedEffect(Unit) { fill.animateTo(1f, tween(1200, 400, FastOutSlowInEasing)) }
 
     Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen).padding(vertical = 6.dp)) {
-        Ltr {
-            Column {
+        val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+        Column {
                 Canvas(Modifier.fillMaxWidth().aspectRatio(360f / 190f)) {
                     val w = size.width
                     val h = size.height
@@ -90,9 +90,10 @@ internal fun SkyHero(
                         val a = 0.2f + 0.8f * (0.5f + 0.5f * sin(2 * PI * (twinkle + s.phase)).toFloat())
                         drawCircle(AppPalette.Cream.copy(alpha = a), s.r.dp.toPx(), Offset(s.x * w, s.y * h))
                     }
-                    val p0 = Offset(w * 30 / 360, h * 175 / 190)
+                    // Bedtime at the start of the line (the right in Arabic), waking at its end.
+                    val p0 = Offset(w * (if (rtl) 330 else 30) / 360, h * 175 / 190)
                     val c = Offset(w * 180 / 360, -h * 10 / 190)
-                    val p1 = Offset(w * 330 / 360, h * 175 / 190)
+                    val p1 = Offset(w * (if (rtl) 30 else 330) / 360, h * 175 / 190)
                     val arc = Path().apply { moveTo(p0.x, p0.y); quadraticTo(c.x, c.y, p1.x, p1.y) }
                     drawPath(
                         arc, AppPalette.Cream.copy(alpha = 0.18f),
@@ -103,14 +104,13 @@ internal fun SkyHero(
                     val at = Offset(u * u * p0.x + 2 * u * t * c.x + t * t * p1.x, u * u * p0.y + 2 * u * t * c.y + t * t * p1.y)
                     val r = 15.dp.toPx()
                     drawCircle(AppPalette.Cream, r, at)
-                    drawCircle(AppPalette.Navy, r, at + Offset(r * 0.47f, -r * 0.33f))
+                    drawCircle(AppPalette.Navy, r, at + Offset(r * (if (rtl) -0.47f else 0.47f), -r * 0.33f))
                 }
                 Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp)) {
                     Text(start, color = Muted, style = MaterialTheme.typography.labelMedium)
                     Spacer(Modifier.weight(1f))
                     Text(end, color = Muted, style = MaterialTheme.typography.labelMedium)
                 }
-            }
         }
         val big = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 64.sp, lineHeight = 70.sp)
         Text(
@@ -189,12 +189,13 @@ internal fun PathHero(steps: Int, goal: Int, stepsWord: String, line: String, on
             drawCircle(AppPalette.Coral, 12.dp.toPx(), at)
             drawCircle(AppPalette.Cream, 8.dp.toPx(), at)
         }
-        Column(Modifier.clip(RoundedCornerShape(16.dp)).background(AppPalette.Navy).padding(horizontal = 12.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+        val shade = androidx.compose.ui.graphics.Shadow(AppPalette.Navy, blurRadius = 18f)
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 n.format(count.value.toInt()), color = AppPalette.Cream,
-                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 56.sp, lineHeight = 60.sp),
+                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 56.sp, lineHeight = 60.sp, shadow = shade),
             )
-            Text("$stepsWord · $line", color = Muted, style = MaterialTheme.typography.bodyMedium)
+            Text("$stepsWord · $line", color = Muted, style = MaterialTheme.typography.bodyMedium.copy(shadow = shade))
         }
     }
 }

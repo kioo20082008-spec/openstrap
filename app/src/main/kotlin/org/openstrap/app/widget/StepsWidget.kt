@@ -114,19 +114,19 @@ private fun ColumnScope.SmallContent(m: StepsWidgetModel, f: WidgetFrame) {
     TopRowView(m.title, null, fit.top, f, fit.spread.edge(f.drawContentHeight))
     Gap()
     // Each block one child of the column: Glance drops a column's children past ten.
-    Column(GlanceModifier.fillMaxWidth()) {
+    Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
         DotNumber(m.smallText, fit.dot, f.density, m.description)
         if (fit.word) {
             Spacer(GlanceModifier.height(StepsLayout.SMALL_WORD_GAP_DP.dp))
-            Text(m.word, style = WidgetType.word, maxLines = 1)
+            if (WidgetRtl) FontText(m.word, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f)) else Text(m.word, style = WidgetType.word, maxLines = 1)
         }
     }
     Gap()
-    Column(GlanceModifier.fillMaxWidth()) {
+    Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
         GoalBar(m.progress, f)
         if (fit.share) {
             Spacer(GlanceModifier.height(StepsLayout.SMALL_BAR_GAP_DP.dp))
-            Text(m.share, style = WidgetType.secondary, maxLines = 1)
+            if (WidgetRtl) FontText(m.share, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f)) else Text(m.share, style = WidgetType.secondary, maxLines = 1)
         }
     }
     Edge(fit.spread, f)
@@ -164,6 +164,16 @@ private fun ColumnScope.LargeContent(m: StepsWidgetModel, f: WidgetFrame) {
 @Composable
 private fun NumberRow(m: StepsWidgetModel, row: StepsLayout.NumberRow, f: WidgetFrame) {
     Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
+        if (WidgetRtl) {
+            FontText(m.toGo, WidgetText.SECONDARY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
+            Spacer(GlanceModifier.defaultWeight())
+            if (row.word) {
+                FontText(m.word, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
+                Spacer(GlanceModifier.width(StepsLayout.WORD_GAP_DP.dp))
+            }
+            DotNumber(m.stepsText, row.dot, f.density, m.description)
+            return@Row
+        }
         DotNumber(m.stepsText, row.dot, f.density, m.description)
         if (row.word) {
             Spacer(GlanceModifier.width(StepsLayout.WORD_GAP_DP.dp))
@@ -202,7 +212,7 @@ private fun StepsLine(m: StepsWidgetModel, height: Float?, f: WidgetFrame) {
 @Composable
 private fun GoalBar(progress: Float, f: WidgetFrame) {
     Image(
-        ImageProvider(goalBar(progress, f.drawContentWidth, f.density)),
+        ImageProvider(goalBar(progress, f.drawContentWidth, f.density).let { if (WidgetRtl) mirrored(it) else it }),
         contentDescription = null,
         modifier = GlanceModifier.fillMaxWidth().height(StepsLayout.BAR_DP.dp),
         contentScale = ContentScale.FillBounds,

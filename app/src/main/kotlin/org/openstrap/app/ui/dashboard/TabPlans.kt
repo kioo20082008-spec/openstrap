@@ -61,7 +61,7 @@ data class RecoveryFacts(val habitAge: Boolean = true, val learning: Boolean = f
 fun recoveryCards(facts: RecoveryFacts = RecoveryFacts()): List<TabSlot<RecoveryCard>> = listOfNotNull(
     TabSlot(RecoveryCard.Hero, glow(Hue.Recovery), Pane.Full),
     TabSlot(RecoveryCard.Drivers, ListLook, Pane.Left),
-    TabSlot(RecoveryCard.Charge, CardLook(Tier.Glow, Hue.Charge, shape = Shape.Tall), Pane.Right, CardSize.Tall),
+    TabSlot(RecoveryCard.Charge, CardLook(Tier.Glow, Hue.Charge, shape = Shape.Tall), Pane.Right, CardSize.Wide),
     small(RecoveryCard.Recharged, Hue.Charge, Edge.Bottom, Pane.Right),
     small(RecoveryCard.Drained, Hue.Charge, Edge.Top, Pane.Right),
     TabSlot(RecoveryCard.BodySignals, ListLook, Pane.Right),
