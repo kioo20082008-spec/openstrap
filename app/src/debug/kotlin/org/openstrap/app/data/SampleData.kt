@@ -17,7 +17,8 @@ import kotlin.random.Random
 
 /** Debug builds only: fills the database with a plausible week so the UI can be previewed without a strap. */
 object SampleData {
-    const val AVAILABLE = true
+    // Off in the redesign test builds: they run on a real strap, and the sample week would mix into its data.
+    const val AVAILABLE = false
 
     suspend fun load(dao: HealthDao) {
         val zone = ZoneId.systemDefault()
