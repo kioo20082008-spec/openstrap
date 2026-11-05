@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.ui.input.pointer.pointerInput
@@ -64,7 +65,10 @@ data class NavItem(val label: String, val icon: ImageVector, val selectedIcon: I
 @Composable
 fun FloatingNavBar(
     items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, glass: HazeState,
+    /** The redesign's coral "+" in the middle of the bar; null leaves the plain bar. */
+    onPlus: (() -> Unit)? = null,
 ) {
+    if (onPlus != null) return DialsNavBar(items, selected, onSelect, onPlus, modifier, glass)
     Box(
         modifier.fillMaxWidth().drawBehind {
             val height = maxOf(TabBarFade.Height.toPx(), size.height)
@@ -212,11 +216,45 @@ fun Modifier.pinnedFade(): Modifier = drawBehind {
 val NavRailWidth = 92.dp
 
 /** One destination's icon and label, tinted for whether it's [on]. */
+/** The redesign's bar: tabs in a navy pill, the selected one in coral, and the coral "+" raised in the middle. */
 @Composable
-private fun NavCell(item: NavItem, on: Boolean, modifier: Modifier, verticalArrangement: Arrangement.Vertical = Arrangement.Top) {
+private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, onPlus: () -> Unit, modifier: Modifier, glass: HazeState) {
+    val coral = org.openstrap.app.ui.theme.AppPalette.Coral
+    Box(
+        modifier.fillMaxWidth().drawBehind {
+            val height = maxOf(TabBarFade.Height.toPx(), size.height)
+            drawRect(TabBarFade.brush(size.height - height, size.height), Offset(0f, size.height - height), Size(size.width, height))
+        }.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(
+            Modifier.widthIn(max = 480.dp).fillMaxWidth().glassPill(glass).padding(horizontal = 6.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            val half = (items.size + 1) / 2
+            items.forEachIndexed { i, item ->
+                if (i == half) Spacer(Modifier.width(72.dp))
+                NavCell(item, i == selected, Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).padding(vertical = 6.dp), onTint = coral)
+            }
+        }
+        Box(
+            Modifier.size(64.dp).clip(CircleShape).background(coral).clickable(onClick = onPlus),
+            contentAlignment = Alignment.Center,
+        ) {
+            androidx.compose.foundation.Canvas(Modifier.size(24.dp)) {
+                val w = 3.dp.toPx()
+                drawLine(org.openstrap.app.ui.theme.AppPalette.Cream, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
+                drawLine(org.openstrap.app.ui.theme.AppPalette.Cream, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
+            }
+        }
+    }
+}
+
+@Composable
+private fun NavCell(item: NavItem, on: Boolean, modifier: Modifier, verticalArrangement: Arrangement.Vertical = Arrangement.Top, onTint: Color = Color.White) {
     Column(modifier, verticalArrangement = verticalArrangement, horizontalAlignment = Alignment.CenterHorizontally) {
         val tint by androidx.compose.animation.animateColorAsState(
-            if (on) Color.White else Color.White.copy(alpha = 0.55f),
+            if (on) onTint else Color.White.copy(alpha = 0.55f),
             tween(Motion.QUICK), label = "nav tint",
         )
         val iconScale by animateFloatAsState(if (on) 1.08f else 1f, tween(Motion.SWIFT, easing = Motion.easing), label = "nav icon")

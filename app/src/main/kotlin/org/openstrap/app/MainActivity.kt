@@ -447,7 +447,7 @@ private fun AppRoot(
                         showBar,
                         enter = slideInVertically { it } + fadeIn(),
                         exit = slideOutVertically { it } + fadeOut(),
-                    ) { FloatingNavBar(navItems, tab, selectTab, glass = navGlass) }
+                    ) { FloatingNavBar(navItems, tab, selectTab, glass = navGlass, onPlus = nav::openChoose) }
                 },
                 containerColor = MaterialTheme.colorScheme.background,
             ) { padding ->
