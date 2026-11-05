@@ -83,8 +83,8 @@ private val Grid = ChartInk.Grid
 /** A target, goal or average across a chart: solid, white at 40%, 1 dp. */
 private val Target = ChartInk.Target
 
-private val axisText = TextStyle(color = Muted, fontSize = 10.sp, fontFamily = FunnelSans)
-private val valueText = TextStyle(color = Ink, fontSize = 11.sp, fontFamily = FunnelSans)
+private val axisText get() = TextStyle(color = Muted, fontSize = 10.sp, fontFamily = FunnelSans)
+private val valueText get() = TextStyle(color = Ink, fontSize = 11.sp, fontFamily = FunnelSans)
 private val readoutText = TextStyle(color = Ink, fontSize = 12.sp, fontFamily = FunnelSans)
 
 /** A solid horizontal hairline across the chart: a grid row by default, or a target in [color]. */

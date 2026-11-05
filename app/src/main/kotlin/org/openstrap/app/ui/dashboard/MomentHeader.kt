@@ -231,6 +231,6 @@ private fun chipDotColor(dot: StrapChip.Dot): Color = when (dot) {
     StrapChip.Dot.Quiet -> Color.White.copy(alpha = 0.3f)
 }
 
-private val Avatar = Color(0xFF1C1C1E)
-private val ChipSurface = Color(0xFF16161A)
+private val Avatar = Color(0xFF1C2C50)
+private val ChipSurface = Color(0xFF172644)
 private val PeekWidth = 34.dp

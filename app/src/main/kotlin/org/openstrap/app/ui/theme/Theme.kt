@@ -30,7 +30,7 @@ object MetricColors {
     val hrv = Color(0xFF2DD4BF)
     val temperature = Color(0xFFFF8A3D)
     /** Recovery: one teal on every surface. */
-    val readiness = Color(0xFF7CF2C9)
+    val readiness = Color(0xFFFF6B5B)
     /** Charge: Ember orange on every surface, whatever the level. */
     val charge = Color(0xFFF66C28)
     /**
@@ -58,60 +58,69 @@ object MetricColors {
     }
 }
 
+/** The OpenStrap palette: navy pages, cream ink, one coral accent. */
+object AppPalette {
+    val Navy = Color(0xFF14213D)
+    val NavyRaised = Color(0xFF1C2C50)
+    val NavyHigh = Color(0xFF243760)
+    val Cream = Color(0xFFF4EDE0)
+    val Coral = Color(0xFFFF6B5B)
+}
+
 private val Dark = darkColorScheme(
-    // No accent: controls (switches, checkboxes, buttons, progress) are white with black on top, like the
-    // marks on the glow cards, so colour in the app always means data. The containers Material would
-    // otherwise fill with its own purple-blue are neutral greys.
-    primary = Color(0xFFFFFFFF),
-    onPrimary = Color(0xFF000000),
-    primaryContainer = Color(0xFF2C2C2E),
-    onPrimaryContainer = Color(0xFFFFFFFF),
-    secondary = Color(0xFFFFFFFF),
-    onSecondary = Color(0xFF000000),
-    secondaryContainer = Color(0xFF2C2C2E),
-    onSecondaryContainer = Color(0xFFFFFFFF),
-    tertiary = Color(0xFFFFFFFF),
-    onTertiary = Color(0xFF000000),
-    tertiaryContainer = Color(0xFF2C2C2E),
-    onTertiaryContainer = Color(0xFFFFFFFF),
-    // Elevation would tint raised surfaces with the primary; white would lift them to grey.
+    // Coral is the one accent: switches, primary buttons and progress. Containers are raised navies.
+    primary = AppPalette.Coral,
+    onPrimary = AppPalette.Navy,
+    primaryContainer = AppPalette.NavyHigh,
+    onPrimaryContainer = AppPalette.Cream,
+    secondary = AppPalette.Cream,
+    onSecondary = AppPalette.Navy,
+    secondaryContainer = AppPalette.NavyHigh,
+    onSecondaryContainer = AppPalette.Cream,
+    tertiary = AppPalette.Cream,
+    onTertiary = AppPalette.Navy,
+    tertiaryContainer = AppPalette.NavyHigh,
+    onTertiaryContainer = AppPalette.Cream,
     surfaceTint = Color.Transparent,
-    // OLED black page with neutral grey cards, so the metric accents carry all the colour.
-    background = Color(0xFF000000),
-    onBackground = Color(0xFFFFFFFF),
-    surface = Color(0xFF000000),
-    onSurface = Color(0xFFFFFFFF),
-    surfaceContainerLowest = Color(0xFF000000),
-    surfaceContainerLow = Color(0xFF0A0A0A),
-    surfaceContainer = Color(0xFF141414),
-    surfaceContainerHigh = Color(0xFF1C1C1E),
-    surfaceContainerHighest = Color(0xFF2C2C2E),
-    onSurfaceVariant = Color(0xFF8E8E93),
-    outline = Color(0xFF2C2C2E),
-    outlineVariant = Color(0xFF232323),
+    background = AppPalette.Navy,
+    onBackground = AppPalette.Cream,
+    surface = AppPalette.Navy,
+    onSurface = AppPalette.Cream,
+    surfaceContainerLowest = AppPalette.Navy,
+    surfaceContainerLow = Color(0xFF172644),
+    surfaceContainer = AppPalette.NavyRaised,
+    surfaceContainerHigh = Color(0xFF20325A),
+    surfaceContainerHighest = AppPalette.NavyHigh,
+    onSurfaceVariant = Color(0xFFA9ADB9),
+    outline = Color(0xFF2E4069),
+    outlineVariant = Color(0xFF24365E),
     error = Color(0xFFFF6B6B),
 )
 
-private fun variable(res: Int, weight: Int) = Font(
-    res,
+private fun inter(weight: Int) = Font(
+    R.font.inter,
     weight = FontWeight(weight),
     variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
 
-/** Funnel Display for numbers and headings, Funnel Sans for text. Both SIL OFL 1.1 (see licenses/). */
-val FunnelDisplay = FontFamily(
-    variable(R.font.funnel_display, 300),
-    variable(R.font.funnel_display, 400),
-    variable(R.font.funnel_display, 500),
-    variable(R.font.funnel_display, 600),
-    variable(R.font.funnel_display, 700),
+/** Inter for Latin text and numbers. Both Inter and Almarai are SIL OFL 1.1. */
+private val InterFamily = FontFamily(inter(300), inter(400), inter(500), inter(600), inter(700), inter(800))
+
+/** Almarai when the app runs in Arabic; it carries its own Latin digits so mixed lines stay even. */
+private val AlmaraiFamily = FontFamily(
+    Font(R.font.almarai_regular, FontWeight.Light),
+    Font(R.font.almarai_regular, FontWeight.Normal),
+    Font(R.font.almarai_regular, FontWeight.Medium),
+    Font(R.font.almarai_bold, FontWeight.SemiBold),
+    Font(R.font.almarai_bold, FontWeight.Bold),
+    Font(R.font.almarai_extrabold, FontWeight.ExtraBold),
 )
-val FunnelSans = FontFamily(
-    variable(R.font.funnel_sans, 400),
-    variable(R.font.funnel_sans, 500),
-    variable(R.font.funnel_sans, 600),
-    variable(R.font.funnel_sans, 700),
-)
+
+private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
+
+/** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
+val FunnelDisplay: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
+val FunnelSans: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
 
 private val Base = Typography()
 
@@ -121,7 +130,7 @@ private fun display(style: TextStyle, weight: FontWeight, size: Int, tracking: F
 
 private fun text(style: TextStyle) = style.copy(fontFamily = FunnelSans)
 
-private val AppTypography = Typography(
+private val AppTypography get() = Typography(
     displayLarge = display(Base.displayLarge, FontWeight.SemiBold, 64, -1.5f),
     displayMedium = display(Base.displayMedium, FontWeight.SemiBold, 48, -1f),
     displaySmall = display(Base.displaySmall, FontWeight.SemiBold, 34, -0.5f),
@@ -140,7 +149,7 @@ private val AppTypography = Typography(
     labelSmall = text(Base.labelSmall),
 )
 
-/** Always dark: the glow design is built for OLED black and doesn't follow the system light mode. */
+/** Always dark: navy pages with cream ink, whatever the system light mode. */
 @Composable
 fun OpenStrapTheme(content: @Composable () -> Unit) {
     MaterialTheme(

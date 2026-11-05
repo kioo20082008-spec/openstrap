@@ -609,7 +609,7 @@ private fun ZoneGoal(goal: WorkoutTarget.Zones, onGoal: (WorkoutTarget.Zones) ->
 }
 
 /** A zone button not chosen: dark, with its colour along the bottom. */
-private val ZoneOff = Color(0xFF1A1A1D)
+private val ZoneOff = Color(0xFF1C2C50)
 
 /**
  * Intervals: "6 × 400 m" over "with 90 s rest between". Any number taps to type, then on to the next: how many, each

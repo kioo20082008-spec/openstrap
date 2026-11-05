@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.components
 
+import org.openstrap.app.ui.theme.AppPalette
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,7 @@ import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.launch
 
 /** The nav bar's glass: near-black, see-through, with a lit top edge. Popups use it over a blurred screen. */
-val GlassTint = Color(0xFF0B0B0D)
+val GlassTint = Color(0xFF0E1830)
 val GlassEdge = BorderStroke(
     1.dp, Brush.verticalGradient(0f to Color.White.copy(alpha = 0.2f), 0.5f to Color.White.copy(alpha = 0.05f), 1f to Color.Black.copy(alpha = 0.4f)),
 )
@@ -56,13 +57,13 @@ fun OledSurfaces(content: @Composable () -> Unit) {
     val c = MaterialTheme.colorScheme
     MaterialTheme(
         colorScheme = c.copy(
-            background = Color.Black,
-            surface = Color.Black,
-            surfaceContainerLowest = Color.Black,
-            surfaceContainerLow = Color.Black,
-            surfaceContainer = Color.Black,
-            surfaceContainerHigh = Color(0xFF101012),
-            surfaceContainerHighest = Color(0xFF1A1A1D),
+            background = AppPalette.Navy,
+            surface = AppPalette.Navy,
+            surfaceContainerLowest = AppPalette.Navy,
+            surfaceContainerLow = AppPalette.Navy,
+            surfaceContainer = AppPalette.Navy,
+            surfaceContainerHigh = Color(0xFF0E1830),
+            surfaceContainerHighest = Color(0xFF1C2C50),
             outline = Color.White.copy(alpha = 0.16f),
             outlineVariant = Color.White.copy(alpha = 0.12f),
         ),
@@ -107,7 +108,7 @@ private fun GlassPortal(host: GlassHost, sheet: Boolean, onDismiss: () -> Unit, 
 /** The page behind a popup: blurred and darkened, the nav bar's glass spread across the screen. */
 private val BackdropBlur = dev.chrisbanes.haze.blur.HazeBlurStyle {
     blurRadius(28.dp)
-    backgroundColor(Color.Black)
+    backgroundColor(AppPalette.Navy)
     colorEffects(listOf(dev.chrisbanes.haze.blur.HazeColorEffect.tint(Color.Black.copy(alpha = 0.45f))))
     fallbackColorEffect(dev.chrisbanes.haze.blur.HazeColorEffect.tint(Color.Black.copy(alpha = 0.8f)))
 }

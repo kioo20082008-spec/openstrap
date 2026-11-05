@@ -45,7 +45,7 @@ import java.util.Locale
 private const val TILES_STYLE = "https://tiles.openfreemap.org/styles/dark"
 
 /** The black of [BLANK_STYLE], for a map that can't be drawn. */
-private val RouteOnlyBlack = Color(0xFF0B0B0D)
+private val RouteOnlyBlack = Color(0xFF0E1830)
 
 /** "Route only": no tile requests at all, just the line on black. */
 private const val BLANK_STYLE = """{"version":8,"sources":{},"layers":[{"id":"bg","type":"background","paint":{"background-color":"#0B0B0D"}}]}"""

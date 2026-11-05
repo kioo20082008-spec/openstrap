@@ -407,7 +407,7 @@ fun <T> PageMenuRow(
 }
 
 private val MenuShape = RoundedCornerShape(18.dp)
-private val MenuSurface = Color(0xFF232326)
+private val MenuSurface = Color(0xFF243760)
 
 /**
  * A row with a switch: the [title], an optional [subtitle] under it, and the switch on the right. A tap anywhere on

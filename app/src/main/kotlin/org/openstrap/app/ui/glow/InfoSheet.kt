@@ -73,7 +73,7 @@ fun InfoSheet(
                 modifier = Modifier.padding(top = if (info.scale.isEmpty()) 16.dp else 10.dp),
             )
             Column(
-                Modifier.padding(top = 24.dp).fillMaxWidth().background(Color(0xFF141416), GlowLayout.CardShape).padding(horizontal = 18.dp),
+                Modifier.padding(top = 24.dp).fillMaxWidth().background(Color(0xFF172644), GlowLayout.CardShape).padding(horizontal = 18.dp),
             ) {
                 val folds = rows ?: listOf(
                     stringResource(R.string.glow_info_how) to info.how,

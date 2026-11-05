@@ -231,10 +231,10 @@ private fun NavCell(item: NavItem, on: Boolean, modifier: Modifier, verticalArra
 /* Black glass: what passes under is blurred and darkened until only its colour shows; a light catching the top edge, shade along the bottom. */
 private val GlassBlur = HazeBlurStyle {
     blurRadius(24.dp)
-    backgroundColor(Color.Black)
-    colorEffects(listOf(HazeColorEffect.tint(Color(0xFF0B0B0D).copy(alpha = 0.7f))))
+    backgroundColor(org.openstrap.app.ui.theme.AppPalette.Navy)
+    colorEffects(listOf(HazeColorEffect.tint(Color(0xFF0E1830).copy(alpha = 0.7f))))
     // Without blur (before Android 12), a near-opaque tint instead.
-    fallbackColorEffect(HazeColorEffect.tint(Color(0xFF0B0B0D).copy(alpha = 0.92f)))
+    fallbackColorEffect(HazeColorEffect.tint(Color(0xFF0E1830).copy(alpha = 0.92f)))
 }
 private val GlassChip = Color.White.copy(alpha = 0.1f)
 private val GlassChipEdge = BorderStroke(

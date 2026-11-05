@@ -140,7 +140,7 @@ fun GrowFromButton(
     from: Rect?,
     modifier: Modifier = Modifier,
     progress: GrowProgress = rememberGrowProgress(visible),
-    buttonColor: Color = Color(0xFF1F1F22),
+    buttonColor: Color = Color(0xFF1C2C50),
     pageColor: Color = Color.Black,
     cornerRadius: Dp = 28.dp,
     content: @Composable (closing: Boolean) -> Unit,

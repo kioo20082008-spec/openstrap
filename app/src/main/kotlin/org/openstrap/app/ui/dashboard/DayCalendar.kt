@@ -137,7 +137,7 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
 }
 
 /** A day with data: a light grey disc, so the days that can be picked read as something to press. */
-private val DayFill = Color(0xFF2C2C2E)
+private val DayFill = Color(0xFF243760)
 
 /** The legend's words, quieter than the days. */
 private val LegendInk = Color.White.copy(alpha = 0.6f)

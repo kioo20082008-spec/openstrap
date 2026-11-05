@@ -454,7 +454,7 @@ internal fun WorkoutDayHeader(text: String) {
 /** The effort light's tile, as the mock draws it: 38 dp, 12 dp corners, a shade above the panel. */
 private val EffortTile = 38.dp
 private val EffortShape = RoundedCornerShape(12.dp)
-private val EffortSurface = Color(0xFF151517)
+private val EffortSurface = Color(0xFF172644)
 private val EffortGap = 12.dp
 
 /**
