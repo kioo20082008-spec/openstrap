@@ -35,4 +35,18 @@
     <string name="dials_unit_m">min</string>
     <string name="dials_steps_word">steps</string>
     <string name="dials_path_left">%1$s to your goal</string>
+    <string name="breathe_title">Breathe</string>
+    <string name="breathe_close">Close</string>
+    <string name="breathe_ready">Ready</string>
+    <string name="breathe_in">Breathe in</string>
+    <string name="breathe_out">Breathe out</string>
+    <string name="breathe_done">Well done</string>
+    <string name="breathe_live">Heart rate %1$d bpm</string>
+    <string name="breathe_waiting">Waiting for heart rate</string>
+    <string name="breathe_result">Heart rate %1$d → %2$d bpm</string>
+    <string name="breathe_minutes">%1$d min</string>
+    <string name="breathe_start">Start</string>
+    <string name="breathe_stop">Stop</string>
+    <string name="breathe_again">Again</string>
+    <string name="dials_quick_breathe">Breathe</string>
 </resources>

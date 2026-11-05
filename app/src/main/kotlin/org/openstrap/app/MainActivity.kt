@@ -443,10 +443,13 @@ private fun AppRoot(
             val showBar = !rail && !barHidden && !(detailOpen && maxWidth < SideBySideWidth)
             val selectTab: (Int) -> Unit = { t -> tapTab(t, nav, firmwareVm, scroll) }
             var quickOpen by remember { mutableStateOf(false) }
+            var breatheOpen by remember { mutableStateOf(false) }
+            if (breatheOpen) org.openstrap.app.ui.glow.BreatheScreen(live, liveEnabled, { container.strap.setLiveHeartRate(it) }) { breatheOpen = false }
             val quickScope = androidx.compose.runtime.rememberCoroutineScope()
             if (quickOpen) org.openstrap.app.ui.glow.QuickSheet(
                 androidx.compose.ui.res.stringResource(R.string.dials_quick_title),
                 listOf(
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Wind, androidx.compose.ui.res.stringResource(R.string.dials_quick_breathe)) { breatheOpen = true },
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.PersonSimpleRun, androidx.compose.ui.res.stringResource(R.string.glow_choose_title), nav::openChoose),
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.ArrowCounterClockwise, androidx.compose.ui.res.stringResource(R.string.you_strap_sync_now)) { container.strap.syncNow() },
                     org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Vibrate, androidx.compose.ui.res.stringResource(R.string.you_strap_find)) {

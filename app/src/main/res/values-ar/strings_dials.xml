@@ -35,4 +35,18 @@
     <string name="dials_unit_m">د</string>
     <string name="dials_steps_word">خطوة</string>
     <string name="dials_path_left">باقي ⁨%1$s⁩ للهدف</string>
+    <string name="breathe_title">تنفّس</string>
+    <string name="breathe_close">إغلاق</string>
+    <string name="breathe_ready">جاهز</string>
+    <string name="breathe_in">شهيق</string>
+    <string name="breathe_out">زفير</string>
+    <string name="breathe_done">أحسنت</string>
+    <string name="breathe_live">النبض ⁨%1$d⁩ ن/د</string>
+    <string name="breathe_waiting">بانتظار النبض</string>
+    <string name="breathe_result">النبض من ⁨%1$d⁩ إلى ⁨%2$d⁩ ن/د</string>
+    <string name="breathe_minutes">⁨%1$d⁩ د</string>
+    <string name="breathe_start">ابدأ</string>
+    <string name="breathe_stop">إيقاف</string>
+    <string name="breathe_again">مرة أخرى</string>
+    <string name="dials_quick_breathe">جلسة تنفّس</string>
 </resources>
