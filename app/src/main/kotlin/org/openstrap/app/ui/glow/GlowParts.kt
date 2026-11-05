@@ -28,6 +28,8 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.em
 import org.openstrap.app.ui.glow.draw.DotFont
 import org.openstrap.app.ui.glow.draw.dotLayout
 import org.openstrap.app.ui.glow.draw.drawDots
@@ -50,16 +52,16 @@ fun DotMatrixText(
     /** Shrinks the dots below [dot] where the number must fit a space (the live workout's arc), 0..1. */
     scale: Float = 1f,
 ) {
-    // The shared dot geometry ([dotLayout]), as a widget's number draws it.
-    val dotDp = (dot.dot * scale).value
-    val box = dotLayout(text, dotDp, 1f)
-    Canvas(
-        modifier
-            .size(box.width.dp, box.height.dp)
-            .semantics { contentDescription = text },
-    ) {
-        drawDots(dotLayout(text, dotDp, density), color)
-    }
+    // The redesign draws numbers as bold Inter rather than dots, at the height the dots took.
+    val size = (dot.dot.value * scale * 9f).sp
+    Text(
+        text, modifier.semantics { contentDescription = text }, color = color, maxLines = 1, softWrap = false,
+        style = TextStyle(
+            fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
+            fontSize = size, lineHeight = size, letterSpacing = (-0.02f).em,
+            textDirection = androidx.compose.ui.text.style.TextDirection.Ltr,
+        ),
+    )
 }
 
 /* ------------------------------------------------------------------------------------------------ */

@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow
 
+import androidx.compose.foundation.border
 import android.graphics.Paint
 import android.graphics.RectF
 import android.provider.Settings
@@ -93,6 +94,11 @@ val LocalGlowPaused = staticCompositionLocalOf<() -> Boolean> { { false } }
  * [LocalGlowPaused] so a screen's own scroll state doesn't override it. Cores hold still then, so a swipe between
  * tabs gets every frame to itself and the pages kept ready either side don't animate unseen.
  */
+/** The redesign: cards are flat navy panels with a hairline, no glow. */
+internal const val FlatCards = true
+internal val FlatSurface = Color(0xFF1C2C50)
+internal val FlatHairline = Color(0xFF2E4069)
+
 val LocalGlowPagePaused = staticCompositionLocalOf<() -> Boolean> { { false } }
 
 @Composable
@@ -157,7 +163,7 @@ fun GlowCard(
         // cards): the plain body colour in between would flash.
         GlowCache.peek(key)?.let { value = it; return@produceState }
         if (value == null) value = GlowCache.latest(still, density.density)
-        if (key.size == IntSize.Zero || lit.outline) return@produceState
+        if (key.size == IntSize.Zero || lit.outline || FlatCards) return@produceState
         value = withContext(Dispatchers.Default) { GlowCache.get(key) }
     }
     // The swell's peak is one more cached look, rendered once: each frame of the swell only changes how much of it shows.
@@ -178,7 +184,7 @@ fun GlowCard(
             .let { if (onClick != null) it.pressClickable(opening?.onClick ?: onClick, shape) else it }
             // The slab's edge: a darker copy of the card showing underneath, for a 3D look.
             .let {
-                if (lit.depth > 0.dp) it.drawBehind {
+                if (lit.depth > 0.dp && !FlatCards) it.drawBehind {
                     val d = lit.depth.toPx()
                     drawRoundRect(slab, topLeft = Offset(0f, d), size = this.size, cornerRadius = CornerRadius(lit.radius.toPx()))
                 } else it
@@ -188,7 +194,7 @@ fun GlowCard(
         // Content gets the card's full size, e.g. to centre itself in a fixed-height card.
         propagateMinConstraints = true,
     ) {
-        val b = bitmaps.takeUnless { lit.outline }
+        val b = bitmaps.takeUnless { lit.outline || FlatCards }
         // Base: fill and rim light. Until its bitmap is ready, the plain mid colour; an outline card is black.
         Spacer(
             Modifier.matchParentSize().drawBehind {
@@ -196,10 +202,11 @@ fun GlowCard(
                 val h = this.size.height
                 // A card built anew (a detail closing beside the tab) draws once before it knows its size: the layers
                 // already made for the size it's drawn at stand in, core and all, for that frame.
-                val first = if (b == null && !lit.outline) {
+                val first = if (b == null && !lit.outline && !FlatCards) {
                     GlowCache.peek(GlowCache.Key(still, IntSize(w.roundToInt(), h.roundToInt()), density.density)) ?: GlowCache.latest(still, density.density)
                 } else null
                 when {
+                    FlatCards -> drawRect(FlatSurface)
                     lit.outline -> drawRect(Color.Black)
                     first != null -> drawIntoCanvas {
                         it.nativeCanvas.drawBitmap(first.base, null, first.baseIn(w, h), FILTER)
@@ -225,7 +232,8 @@ fun GlowCard(
             Box(Modifier.padding(contentPadding), content = content)
         }
         // Grain and the hairline edge, on top of everything; static.
-        Spacer(Modifier.matchParentSize().drawWithCache { overlay(lit, grainSeed) })
+        if (FlatCards) Spacer(Modifier.matchParentSize().border(1.dp, FlatHairline, shape))
+        else Spacer(Modifier.matchParentSize().drawWithCache { overlay(lit, grainSeed) })
     }
 }
 

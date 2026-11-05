@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dials_sleep">Sleep</string>
+    <string name="dials_recovery">Recovery</string>
+    <string name="dials_load">Load</string>
+    <string name="dials_plan_green_title">Ready to train</string>
+    <string name="dials_plan_green_note">A green day. Your plan, built on last night\'s recovery.</string>
+    <string name="dials_plan_yellow_title">Take it steady</string>
+    <string name="dials_plan_yellow_note">A middling day. Train, but keep it moderate.</string>
+    <string name="dials_plan_red_title">Recovery day</string>
+    <string name="dials_plan_red_note">Your body needs rest today. Keep it light.</string>
+    <string name="dials_plan_none_title">Your plan today</string>
+    <string name="dials_plan_none_note">The plan follows your recovery once the strap has seen a night.</string>
+    <string name="dials_plan_chip">Recovery %1$d%%</string>
+    <string name="dials_workout_green">A hard workout fits today</string>
+    <string name="dials_workout_green_note">Zones 3 to 4, about 45 min</string>
+    <string name="dials_workout_yellow">An easy workout</string>
+    <string name="dials_workout_yellow_note">Zone 2, 30 to 40 min</string>
+    <string name="dials_workout_red">Rest or a gentle walk</string>
+    <string name="dials_workout_red_note">Let your body recover</string>
+    <string name="dials_workout_done">Workout done</string>
+    <string name="dials_workout_done_note">%1$s today</string>
+    <string name="dials_steps_left">%1$s steps to go</string>
+    <string name="dials_steps_left_note">To reach %1$s today</string>
+    <string name="dials_steps_done">Step goal met</string>
+    <string name="dials_steps_done_note">%1$s steps today</string>
+    <string name="dials_bed">In bed by %1$s</string>
+    <string name="dials_bed_note">For a full night\'s sleep</string>
+</resources>

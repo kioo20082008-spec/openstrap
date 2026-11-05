@@ -83,7 +83,7 @@ fun EdgeCard(
             .then(opening?.modifier ?: Modifier)
             .let { if (onClick != null) it.pressClickable(opening?.onClick ?: onClick, EdgeShape) else it }
             .let {
-                if (override.plain) it.clip(EdgeShape).background(ListSurface, EdgeShape).border(1.dp, RowHairline, EdgeShape)
+                if (override.plain || FlatCards) it.clip(EdgeShape).background(FlatSurface, EdgeShape).border(1.dp, FlatHairline, EdgeShape)
                 else it.drawWithCache {
                     // The shared edge light ([edgePaint]), as a widget's background draws it.
                     val paint = edgePaint(light, tint, level, mood, size.width, size.height, density)

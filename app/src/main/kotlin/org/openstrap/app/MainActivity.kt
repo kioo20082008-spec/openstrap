@@ -109,6 +109,8 @@ import org.openstrap.app.ui.theme.OpenStrapTheme
 import org.openstrap.app.ui.workout.WorkoutsViewModel
 
 class MainActivity : ComponentActivity() {
+    override fun attachBaseContext(newBase: android.content.Context) = super.attachBaseContext(org.openstrap.app.i18n.LatinDigits.wrap(newBase))
+
     /** Debug: what the screens are shown in place of the real state, from the debug extras. */
     private val previews = DebugPreviews()
 

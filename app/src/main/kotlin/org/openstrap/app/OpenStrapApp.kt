@@ -88,6 +88,8 @@ class AppContainer(val app: Application) {
 }
 
 class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
+    override fun attachBaseContext(base: android.content.Context) = super.attachBaseContext(org.openstrap.app.i18n.LatinDigits.wrap(base))
+
     lateinit var container: AppContainer
         private set
 

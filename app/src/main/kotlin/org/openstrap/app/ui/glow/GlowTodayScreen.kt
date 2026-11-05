@@ -442,15 +442,64 @@ private fun Hero(
         when (k) {
             HeroKind.Pair -> PairHero(pairing ?: PairStep.Ready, onPair, m)
             HeroKind.Stuck -> StuckHero(ctx, strap, onSyncNow, m)
-            HeroKind.Waking -> WakingHero(ctx, lightAngle, { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) }, onRetryRecovery, m)
-            HeroKind.Midday -> ChargeHero(ctx, onOpenCharge, onRetryRecovery, m)
-            HeroKind.NoSleep -> ChargeHero(ctx, onOpenCharge, onRetryRecovery, m, noSleep = true)
-            HeroKind.Window -> WindowHero(ctx, lightAngle, onStartSport, onOtherSport, m)
-            HeroKind.After -> AfterHero(ctx, lightAngle, onOpenWorkout, m)
-            HeroKind.Evening -> EveningHero(ctx, lightAngle, bedtime, energyHidden, onOpenRecovery, m)
+            // The redesign: the same dials and plan at every moment of the day, unless Recovery failed to work out.
+            HeroKind.Waking, HeroKind.Midday, HeroKind.NoSleep, HeroKind.Window, HeroKind.After, HeroKind.Evening ->
+                if (ctx.recoveryFailure != null) WakingHero(ctx, lightAngle, { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) }, onRetryRecovery, m)
+                else DialsToday(ctx, bedtime, onOpenScore, onOtherSport)
             HeroKind.During -> (running ?: lastRunning.value)?.let { DuringHero(it, onOpenRunning, liveHero, m) }
         }
     }
+}
+
+/** The dials and the day's plan ([DialsHero]), from what Today already knows. */
+@Composable
+private fun DialsToday(ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit, onOtherSport: () -> Unit) {
+    val score = ctx.recoveryShown.value
+    val goal = LocalGoals.current.steps
+    val steps = ctx.state.steps
+    val n = java.text.NumberFormat.getIntegerInstance()
+    val done = ctx.dayWorkouts.lastOrNull()
+    val zone = when {
+        score == null -> 0
+        score >= 67 -> 3
+        score >= 34 -> 2
+        else -> 1
+    }
+    val (title, note) = when (zone) {
+        3 -> R.string.dials_plan_green_title to R.string.dials_plan_green_note
+        2 -> R.string.dials_plan_yellow_title to R.string.dials_plan_yellow_note
+        1 -> R.string.dials_plan_red_title to R.string.dials_plan_red_note
+        else -> R.string.dials_plan_none_title to R.string.dials_plan_none_note
+    }
+    val plan = buildList {
+        if (done != null) add(PlanItem(
+            stringResource(R.string.dials_workout_done),
+            stringResource(R.string.dials_workout_done_note, sportNoun(done.workout.sportType) ?: ""), true,
+        ))
+        else if (zone > 0) {
+            val (t, d) = when (zone) {
+                3 -> R.string.dials_workout_green to R.string.dials_workout_green_note
+                2 -> R.string.dials_workout_yellow to R.string.dials_workout_yellow_note
+                else -> R.string.dials_workout_red to R.string.dials_workout_red_note
+            }
+            add(PlanItem(stringResource(t), stringResource(d), false, onOtherSport))
+        }
+        if (steps >= goal) add(PlanItem(stringResource(R.string.dials_steps_done), stringResource(R.string.dials_steps_done_note, n.format(steps)), true))
+        else add(PlanItem(stringResource(R.string.dials_steps_left, n.format(goal - steps)), stringResource(R.string.dials_steps_left_note, n.format(goal)), false))
+        if (bedtime != null) add(PlanItem(
+            stringResource(R.string.dials_bed, bedtime.format(java.time.format.DateTimeFormatter.ofPattern("H:mm"))),
+            stringResource(R.string.dials_bed_note), false,
+        ))
+    }
+    DialsHero(
+        recovery = score, sleep = ctx.state.sleep?.score, strain = ctx.rec?.strain,
+        labels = Triple(stringResource(R.string.dials_sleep), stringResource(R.string.dials_recovery), stringResource(R.string.dials_load)),
+        planTitle = stringResource(title), planNote = stringResource(note),
+        planChip = score?.let { stringResource(R.string.dials_plan_chip, it) }, plan = plan,
+        onSleep = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Sleep) },
+        onRecovery = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) },
+        onLoad = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Load) },
+    )
 }
 
 private enum class HeroKind { Pair, Stuck, Waking, NoSleep, Midday, Window, After, Evening, During }

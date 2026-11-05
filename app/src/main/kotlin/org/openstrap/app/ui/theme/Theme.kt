@@ -119,6 +119,8 @@ private val AlmaraiFamily = FontFamily(
 private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
 
 /** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
+/** Numbers stay in Inter in every language. */
+val NumberFamily: FontFamily get() = InterFamily
 val FunnelDisplay: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
 val FunnelSans: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
 
