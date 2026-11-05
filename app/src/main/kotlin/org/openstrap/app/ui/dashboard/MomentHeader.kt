@@ -152,10 +152,11 @@ private fun DaySwitcher(
     val prev by rememberUpdatedState(onPrev)
     val next by rememberUpdatedState(onNext)
     val canNext by rememberUpdatedState(hasNext)
+    val dir = if (androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl) -1f else 1f
     val description = stringResource(R.string.day_header_day_description, title, dateLine(date))
     Row(
         modifier.height(72.dp)
-            .pointerInput(threshold) {
+            .pointerInput(threshold, dir) {
                 detectHorizontalDragGestures(
                     onDragStart = { dragging = true },
                     onDragEnd = {
@@ -166,11 +167,12 @@ private fun DaySwitcher(
                     onDragCancel = { dragging = false; drag = 0f },
                 ) { change, amount ->
                     change.consume()
-                    // No day after today: the drag that way only gives a little.
-                    drag = (drag + amount).let { if (it < 0 && !canNext) it.coerceAtLeast(-threshold / 3) else it }
+                    // No day after today: the drag that way only gives a little. In Arabic the days run right to left,
+                    // so the drag is read mirrored: pulling left brings the day before.
+                    drag = (drag + amount * dir).let { if (it < 0 && !canNext) it.coerceAtLeast(-threshold / 3) else it }
                 }
             }
-            .graphicsLayer { translationX = shift * 0.4f },
+            .graphicsLayer { translationX = shift * dir * 0.4f },
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
