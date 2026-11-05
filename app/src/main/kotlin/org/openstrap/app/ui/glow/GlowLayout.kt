@@ -53,7 +53,7 @@ object GlowLayout {
     val TileShape = RoundedCornerShape(TileCorner)
 
     /** From a card's edge to its content, on every side and every tier. */
-    val CardInset = 20.dp
+    val CardInset = 16.dp
     val CardPadding = PaddingValues(CardInset)
     /** Above and below each list row; the panel adds the rest of [CardInset] at its top and bottom. */
     val RowPadding = 14.dp

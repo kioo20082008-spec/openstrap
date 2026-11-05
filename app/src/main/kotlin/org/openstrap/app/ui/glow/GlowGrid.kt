@@ -46,7 +46,7 @@ object GlowGrid {
     val Gap = 12.dp
 
     /** One unit's height: 160 dp, so a Small sits just under square on a phone and two stacked meet a Tall. */
-    val UnitHeight = 160.dp
+    val UnitHeight = 136.dp
 
     val StripHeight = 68.dp
 
