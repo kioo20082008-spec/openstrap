@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_notif_end_question">تنهي التمرين؟ اضغط «نعم، أنهِ» لحفظه.</string>
+    <string name="core_notif_paused">متوقف مؤقتاً</string>
+    <string name="core_notif_waiting">في الانتظار</string>
+    <string name="core_notif_bpm">%1$d ن/د</string>
+    <string name="core_notif_still_recording">ما زال يسجّل</string>
+    <string name="core_notif_minutes_in_target">%1$d د في %2$s</string>
+    <string name="core_notif_goal">الهدف %1$s</string>
+</resources>

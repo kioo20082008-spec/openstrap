@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_tab_stage_awake">يقظة</string>
+    <string name="core_tab_stage_rem">REM</string>
+    <string name="core_tab_stage_light">خفيف</string>
+    <string name="core_tab_stage_deep">عميق</string>
+    <string name="core_tab_vs_yesterday_up">+%1$d مقارنة بالأمس</string>
+    <string name="core_tab_vs_yesterday_down">−%1$d مقارنة بالأمس</string>
+    <string name="core_tab_same_as_yesterday">مثل الأمس</string>
+    <string name="core_tab_learning_nights">نتعلّم معدلك، %1$d من %2$d ليالٍ</string>
+    <string name="core_tab_factor_hrv">HRV</string>
+    <string name="core_tab_factor_resting_hr">نبض الراحة</string>
+    <string name="core_tab_factor_sleep">نوم الليلة الماضية</string>
+    <string name="core_tab_factor_sleep_balance">النوم في الليالي الأخيرة</string>
+    <string name="core_tab_factor_temperature">حرارة الجلد</string>
+    <string name="core_tab_factor_breathing">معدل التنفس</string>
+    <string name="core_tab_factor_previous_load">جهد الأمس</string>
+    <string name="core_tab_factor_blood_oxygen">أكسجين الدم</string>
+    <string name="core_tab_factor_recovery_index">متى هدأ قلبك</string>
+    <string name="core_tab_phrase_hrv">HRV</string>
+    <string name="core_tab_phrase_resting_hr">نبض الراحة</string>
+    <string name="core_tab_phrase_sleep">نوم الليلة الماضية</string>
+    <string name="core_tab_phrase_sleep_balance">النوم في الليالي الأخيرة</string>
+    <string name="core_tab_phrase_temperature">حرارة الجلد</string>
+    <string name="core_tab_phrase_breathing">معدل التنفس</string>
+    <string name="core_tab_phrase_previous_load">جهد الأمس</string>
+    <string name="core_tab_phrase_blood_oxygen">أكسجين الدم</string>
+    <string name="core_tab_phrase_recovery_index">تأخر هدوء قلبك</string>
+    <string name="core_tab_held_back_by">أكثر ما أثّر عليه: %1$s.</string>
+    <string name="core_tab_recovery_waiting">يظهر الاستشفاء بعد مزامنة نوم الليلة الماضية.</string>
+    <string name="core_tab_no_sleep_score">لم يُسجَّل نوم الليلة الماضية، لذلك لا توجد نتيجة اليوم.</string>
+    <string name="core_tab_deleted_sleep_score">حذفت نوم الليلة الماضية، لذلك لا توجد نتيجة اليوم.</string>
+    <string name="core_tab_contributor_helping">يساعد</string>
+    <string name="core_tab_contributor_usual">معتاد</string>
+    <string name="core_tab_contributor_little">يؤثر قليلاً</string>
+    <string name="core_tab_contributor_holding">يؤثر سلباً</string>
+    <string name="core_tab_charge_sleep_rest">النوم والراحة الهادئة</string>
+    <string name="core_tab_charge_movement">الحركة</string>
+    <string name="core_tab_charge_stress">التوتر</string>
+    <string name="core_tab_charge_awake">الاستيقاظ</string>
+    <string name="core_tab_charge_recharged">امتلأت</string>
+    <string name="core_tab_charge_drained">استُهلكت</string>
+    <string name="core_tab_charge_first_night">تبدأ الطاقة بعد أول ليلة لك. النوم هو ما يملؤها.</string>
+    <string name="core_tab_charge_waiting">تظهر الطاقة بعد ساعات قليلة من قياس النبض.</string>
+    <string name="core_tab_charge_now">الآن</string>
+    <string name="core_tab_charge_used">استهلكت %1$d منذ الاستيقاظ</string>
+    <string name="core_tab_charge_up">ارتفعت %1$d منذ الاستيقاظ</string>
+    <string name="core_tab_charge_level">مثل وقت الاستيقاظ</string>
+    <string name="core_tab_night_asleep">نمت %1$s.</string>
+    <string name="core_tab_night_longest">%1$s، أطول نوم لك هذا الأسبوع.</string>
+    <string name="core_tab_night_shortest">%1$s، أقصر نوم لك هذا الأسبوع.</string>
+    <string name="core_tab_first_night_sleep">أول ليلة لك مع السترب تظهر هنا في الصباح.</string>
+    <string name="core_tab_only_naps">لم يُسجَّل نوم ليلي، قيلولات فقط.</string>
+    <string name="core_tab_no_sleep_that_night">لم يُسجَّل نوم في تلك الليلة.</string>
+    <string name="core_tab_sleep_score_poor">نتيجة النوم: ضعيفة</string>
+    <string name="core_tab_sleep_score_fair">نتيجة النوم: مقبولة</string>
+    <string name="core_tab_sleep_score_good">نتيجة النوم: جيدة</string>
+    <string name="core_tab_sleep_score_great">نتيجة النوم: ممتازة</string>
+    <string name="core_tab_no_strap_score">لا توجد نتيجة من السترب</string>
+    <string name="core_tab_stage_total">%1$s %2$s</string>
+    <string name="core_tab_asleep">%1$s نوم</string>
+    <string name="core_tab_slept_through">نوم متواصل</string>
+    <plurals name="core_tab_woke"><item quantity="zero">استيقظت %d مرات</item><item quantity="one">استيقظت مرة</item><item quantity="two">استيقظت %d مرات</item><item quantity="few">استيقظت %d مرات</item><item quantity="many">استيقظت %d مرات</item><item quantity="other">استيقظت %d مرات</item></plurals>
+    <string name="core_tab_regularity_needs">يحتاج نحو 5 أيام من اللبس</string>
+    <string name="core_tab_regularity_steady">مواعيد نوم ثابتة هذا الأسبوع</string>
+    <string name="core_tab_regularity_moved">تغيّرت مواعيد نومك هذا الأسبوع</string>
+    <string name="core_tab_usual_times">تنام عادةً قبل %1$s وتستيقظ %2$s.</string>
+    <string name="core_tab_breathing_learning">نتعلّم معدلك، %1$d من %2$d ليالٍ</string>
+    <string name="core_tab_breathing_usual">معدلك المعتاد %1$s في الساعة</string>
+    <string name="core_tab_breathing_short_learning">نتعلّم، %1$d من %2$d ليالٍ</string>
+    <string name="core_tab_breathing_short_usual">المعتاد %1$s، تقدير أولي</string>
+    <string name="core_tab_load_usual">معدلك المعتاد %1$d</string>
+    <string name="core_tab_load_learning">نتعلّم معدلك</string>
+    <string name="core_tab_balance_building">في ارتفاع</string>
+    <string name="core_tab_balance_easing">في انخفاض</string>
+    <string name="core_tab_balance_steady">ثابت</string>
+    <string name="core_tab_active_reached">آخر 7 أيام، حققت هدف %1$d</string>
+    <string name="core_tab_active_goal">آخر 7 أيام، الهدف %1$d</string>
+    <string name="core_tab_points_reached">آخر 7 أيام، %1$d أو أكثر</string>
+    <string name="core_tab_points_aim">آخر 7 أيام، الهدف %1$d</string>
+    <string name="core_tab_calories_today">السعرات المقدّرة حتى الآن اليوم</string>
+    <string name="core_tab_calories_partial">السعرات المقدّرة، لبست السترب جزءاً من اليوم</string>
+    <string name="core_tab_calories">السعرات المقدّرة</string>
+    <string name="core_tab_mostly_movement">أغلبها من الحركة</string>
+    <string name="core_tab_mostly_stress">أغلبها من التوتر</string>
+    <string name="core_tab_mostly_awake">أغلبها من الاستيقاظ</string>
+    <string name="core_tab_nothing_yet">لا شيء بعد</string>
+    <plurals name="core_tab_naps_title"><item quantity="zero">قيلولات</item><item quantity="one">قيلولة</item><item quantity="two">قيلولات</item><item quantity="few">قيلولات</item><item quantity="many">قيلولات</item><item quantity="other">قيلولات</item></plurals>
+    <string name="core_tab_nap_at">الساعة %1$s</string>
+    <plurals name="core_tab_naps_first_at"><item quantity="zero">%1$d قيلولات، الأولى %2$s</item><item quantity="one">%1$d قيلولة، الأولى %2$s</item><item quantity="two">%1$d قيلولات، الأولى %2$s</item><item quantity="few">%1$d قيلولات، الأولى %2$s</item><item quantity="many">%1$d قيلولات، الأولى %2$s</item><item quantity="other">%1$d قيلولات، الأولى %2$s</item></plurals>
+    <string name="core_tab_last_7_days">آخر 7 أيام</string>
+    <string name="core_tab_auto_detected">اكتُشف تلقائياً</string>
+    <string name="core_tab_fact_average_bpm">المتوسط %1$d ن/د</string>
+    <plurals name="core_tab_fact_sets"><item quantity="zero">%d مجموعات</item><item quantity="one">%d مجموعة</item><item quantity="two">%d مجموعات</item><item quantity="few">%d مجموعات</item><item quantity="many">%d مجموعات</item><item quantity="other">%d مجموعات</item></plurals>
+    <string name="core_tab_fact_distance_pace">%1$s، %2$s</string>
+    <string name="core_tab_workout_line">%1$s، %2$s</string>
+    <string name="core_tab_habit_age_updated">حُدّث %1$s</string>
+    <string name="core_tab_first_estimate">أول تقدير %1$s</string>
+    <string name="core_tab_age_for_now">عمرك حالياً</string>
+    <string name="core_tab_age_for_now_waiting">عمرك حالياً. %1$s</string>
+    <string name="core_tab_habit_age_likely">غالباً من %1$d إلى %2$d</string>
+    <plurals name="core_tab_habit_age_younger"><item quantity="zero">أصغر بـ %d سنوات من الأسبوع الماضي</item><item quantity="one">أصغر بسنة من الأسبوع الماضي</item><item quantity="two">أصغر بـ %d سنوات من الأسبوع الماضي</item><item quantity="few">أصغر بـ %d سنوات من الأسبوع الماضي</item><item quantity="many">أصغر بـ %d سنوات من الأسبوع الماضي</item><item quantity="other">أصغر بـ %d سنوات من الأسبوع الماضي</item></plurals>
+    <plurals name="core_tab_habit_age_older"><item quantity="zero">أكبر بـ %d سنوات من الأسبوع الماضي</item><item quantity="one">أكبر بسنة من الأسبوع الماضي</item><item quantity="two">أكبر بـ %d سنوات من الأسبوع الماضي</item><item quantity="few">أكبر بـ %d سنوات من الأسبوع الماضي</item><item quantity="many">أكبر بـ %d سنوات من الأسبوع الماضي</item><item quantity="other">أكبر بـ %d سنوات من الأسبوع الماضي</item></plurals>
+    <string name="core_tab_habit_age_same">مثل الأسبوع الماضي</string>
+    <string name="core_tab_age_range">%1$d إلى %2$d</string>
+    <string name="core_tab_your_age">أنت، %1$d</string>
+</resources>

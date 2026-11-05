@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="day_tab_today">اليوم</string>
+    <string name="day_tab_recovery">الاستشفاء</string>
+    <string name="day_tab_sleep">النوم</string>
+    <string name="day_tab_activity">النشاط</string>
+    <string name="day_hc_unavailable">Health Connect غير متاح على هذا الجوال.</string>
+    <string name="day_hc_install_first">ثبّت Health Connect أولاً.</string>
+    <string name="day_hc_not_granted">OpenStrap لا يملك إذن Health Connect.</string>
+    <string name="day_bluetooth_required">يحتاج OpenStrap إذن الأجهزة القريبة للوصول إلى السترب.</string>
+    <string name="day_location_declined">بدون الموقع، تُحسب المسافة من خطوات السترب.</string>
+    <string name="day_nearby_title">اسمح بالأجهزة القريبة</string>
+    <string name="day_nearby_text">يحتاج OpenStrap إذن الأجهزة القريبة للعثور على السترب والاتصال به. لن يسألك أندرويد مرة أخرى، ففعّله من إعدادات OpenStrap تحت الأذونات.</string>
+    <string name="day_nearby_open_settings">افتح الإعدادات</string>
+    <string name="day_nearby_not_now">ليس الآن</string>
+    <string name="day_pull_sync_failed">تعذّرت المزامنة. %1$s</string>
+    <string name="day_pull_not_connected">السترب غير متصل.</string>
+    <string name="day_pull_syncing">جارٍ مزامنة السترب…</string>
+    <string name="day_pull_release">اترك للمزامنة</string>
+    <string name="day_pull_pull">اسحب لمزامنة السترب</string>
+</resources>

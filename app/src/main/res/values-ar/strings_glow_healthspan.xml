@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="glow_healthspan_pace_learning">نتعلم</string>
+    <string name="glow_healthspan_pace_slower">أبطأ</string>
+    <string name="glow_healthspan_pace_faster">أسرع</string>
+    <string name="glow_healthspan_pace_steady">ثابتة</string>
+    <string name="glow_healthspan_pace_times">%1$sx</string>
+    <string name="glow_healthspan_effect_none">بدون تغيير</string>
+    <string name="glow_healthspan_effect_off_months">ينقص بضعة أشهر</string>
+    <string name="glow_healthspan_effect_adds_months">يضيف بضعة أشهر</string>
+    <string name="glow_healthspan_effect_off_half">ينقص نحو نصف سنة</string>
+    <string name="glow_healthspan_effect_adds_half">يضيف نحو نصف سنة</string>
+    <plurals name="glow_healthspan_effect_off_years"><item quantity="zero">ينقص نحو %d سنوات</item><item quantity="one">ينقص نحو سنة %d</item><item quantity="two">ينقص نحو %d سنوات</item><item quantity="few">ينقص نحو %d سنوات</item><item quantity="many">ينقص نحو %d سنوات</item><item quantity="other">ينقص نحو %d سنوات</item></plurals>
+    <plurals name="glow_healthspan_effect_adds_years"><item quantity="zero">يضيف نحو %d سنوات</item><item quantity="one">يضيف نحو سنة %d</item><item quantity="two">يضيف نحو %d سنوات</item><item quantity="few">يضيف نحو %d سنوات</item><item quantity="many">يضيف نحو %d سنوات</item><item quantity="other">يضيف نحو %d سنوات</item></plurals>
+    <string name="glow_healthspan_no_vo2max">لا يوجد VO2 max من التمارين بعد، يُحتسب كالمعتاد</string>
+    <string name="glow_healthspan_no_data">البيانات غير كافية بعد، يُحتسب كالمعتاد</string>
+    <string name="glow_healthspan_strength_none_aim">لا شيء مسجل، المعتاد: لا شيء، استهدف %1$d د أسبوعياً</string>
+    <string name="glow_healthspan_strength_none">لا شيء مسجل، المعتاد: لا شيء</string>
+    <string name="glow_healthspan_strength_minutes_aim">%1$d د أسبوعياً، المعتاد: لا شيء، استهدف %2$d د</string>
+    <string name="glow_healthspan_strength_minutes">%1$d د أسبوعياً، المعتاد: لا شيء</string>
+    <string name="glow_healthspan_vo2max">%1$d مل/كغ/د، المعتاد عند %2$d: %3$s</string>
+    <string name="glow_healthspan_steps_aim">%1$s يومياً، المعتاد: %2$s، استهدف %3$s</string>
+    <string name="glow_healthspan_steps">%1$s يومياً، المعتاد: %2$s</string>
+    <string name="glow_healthspan_regularity">%1$d، المعتاد: %2$s</string>
+    <string name="glow_healthspan_resting_hr">%1$d ن/د أثناء النوم، المعتاد: نحو %2$s</string>
+    <string name="glow_healthspan_time_asleep">%1$s في الليلة، يُحتسب فقط تحت %2$s</string>
+    <string name="glow_healthspan_profile_birth_year">أضف سنة ميلادك إلى ملفك لترى عمر عاداتك.</string>
+    <string name="glow_healthspan_profile_sex">أضف جنسك إلى ملفك لترى عمر عاداتك.</string>
+    <string name="glow_healthspan_profile_both">أضف سنة ميلادك وجنسك إلى ملفك لترى عمر عاداتك.</string>
+    <string name="glow_healthspan_title">عمر عاداتك</string>
+    <string name="glow_healthspan_about">عن عمر عاداتك</string>
+    <string name="glow_healthspan_years">سنة</string>
+    <string name="glow_healthspan_updated_today">حُدّث اليوم، التالي يوم الأحد</string>
+    <string name="glow_healthspan_updated_tomorrow">حُدّث الأحد، التالي غداً</string>
+    <plurals name="glow_healthspan_updated_next"><item quantity="zero">حُدّث الأحد، التالي بعد %d أيام</item><item quantity="one">حُدّث الأحد، التالي بعد يوم %d</item><item quantity="two">حُدّث الأحد، التالي بعد %d أيام</item><item quantity="few">حُدّث الأحد، التالي بعد %d أيام</item><item quantity="many">حُدّث الأحد، التالي بعد %d أيام</item><item quantity="other">حُدّث الأحد، التالي بعد %d أيام</item></plurals>
+    <string name="glow_healthspan_updated_weekly">يُحدَّث أسبوعياً، يوم الأحد</string>
+    <string name="glow_healthspan_pace_title">وتيرة التقدم في العمر</string>
+    <string name="glow_healthspan_pace_note">%1$s، %2$s</string>
+    <string name="glow_healthspan_last_30_days">آخر 30 يوماً</string>
+    <string name="glow_healthspan_pace_needs">يحتاج 30 يوماً ببيانات كافية، و3 أشهر قبلها للتمييز بين التغير الحقيقي وتذبذب الأيام.</string>
+    <string name="glow_healthspan_pace_beat">آخر 30 يوماً أفضل من عاداتك في 6 أشهر. إذا استمريت، سينخفض التقدير.</string>
+    <string name="glow_healthspan_pace_behind">آخر 30 يوماً أسوأ من عاداتك في 6 أشهر. إذا استمر ذلك، سيرتفع التقدير.</string>
+    <string name="glow_healthspan_pace_match">آخر 30 يوماً تطابق عاداتك في 6 أشهر، فالتقدير يتحرك مع التقويم.</string>
+    <string name="glow_healthspan_scale_slower">أبطأ −1x</string>
+    <string name="glow_healthspan_scale_steady">1x</string>
+    <string name="glow_healthspan_scale_faster">أسرع 3x</string>
+    <string name="glow_healthspan_terms_title">ما يحرّكه</string>
+    <string name="glow_healthspan_terms_note">خلال 6 أشهر</string>
+    <string name="glow_healthspan_scale_younger">أصغر بسنة ونصف</string>
+    <string name="glow_healthspan_scale_older">أكبر بسنة ونصف</string>
+    <string name="glow_healthspan_fitness_capped">عادات اللياقة محدودة: نبض الراحة والخطوات وVO2 max معاً تُحتسب 3 سنوات كحد أقصى في أي اتجاه.</string>
+</resources>

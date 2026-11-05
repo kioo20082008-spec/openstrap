@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="glow_workout_untitled">تمرين</string>
+    <string name="glow_workout_loading">جارٍ التحميل…</string>
+    <string name="glow_workout_day_times">%1$s، %2$s</string>
+    <string name="glow_workout_zone_under">تحت %1$d ن/د</string>
+    <string name="glow_workout_zone_range">%1$s ن/د</string>
+    <string name="glow_workout_suggestion_title">يبدو أنك تمرنت</string>
+    <string name="glow_workout_suggestion_text">%1$s، %2$s، غالباً في المنطقة %3$d، بمتوسط %4$d ن/د. لم يُسجَّل.</string>
+    <string name="glow_workout_suggestion_save">احفظه كتمرين</string>
+    <string name="glow_workout_suggestion_dismiss">ليس تمريناً</string>
+    <string name="glow_workout_offer_title">يبدو أنه تمرين</string>
+    <string name="glow_workout_offer_text">نبضك مرتفع منذ %1$s، بمتوسط %2$d ن/د. تسجّله كـ %3$s من %1$s؟</string>
+    <string name="glow_workout_offer_record">سجّل</string>
+    <string name="glow_workout_offer_decline">ليس الآن</string>
+    <string name="glow_workout_add_title">أضف تمريناً</string>
+    <string name="glow_workout_add_choose_sport">اختر الرياضة</string>
+    <string name="glow_workout_add_no_heart">لم يرسل السترب نبض هذا اليوم بعد. زامن ثم حاول مرة أخرى.</string>
+    <string name="glow_workout_add_when">متى كان؟</string>
+    <string name="glow_workout_add_hint">اسحب المقابض إلى حيث بدأ التمرين وانتهى. نبضه من سجلات السترب الدقيقة.</string>
+    <string name="glow_workout_delete">احذف هذا التمرين</string>
+    <string name="glow_workout_delete_confirm">حذف هذا التمرين؟</string>
+    <string name="glow_workout_delete_phone">يُحذف نبضه وأوقاته من OpenStrap. يبقى سجل السترب نفسه.</string>
+    <string name="glow_workout_delete_strap">يُحذف نبضه وأوقاته من OpenStrap، ولن تعيده المزامنة التالية. يبقى سجل السترب نفسه.</string>
+    <string name="glow_workout_trim_title">قصّ البداية والنهاية</string>
+    <string name="glow_workout_undo">تراجع</string>
+    <string name="glow_workout_trim_start">قُصّ ليبدأ الساعة %1$s. لا يُحذف شيء.</string>
+    <string name="glow_workout_trim_seconds">%1$d ث</string>
+    <string name="glow_workout_trim_minutes">%1$d د</string>
+    <string name="glow_workout_trim_car">انتهى الساعة %1$s. استُبعدت %2$s من القيادة.</string>
+    <string name="glow_workout_trim_auto">انتهى الساعة %1$s، حين توقفت. استُبعدت %2$s بعدها.</string>
+    <string name="glow_workout_trim_range">قُصّ، الآن من %1$s. لا يُحذف شيء.</string>
+    <string name="glow_workout_heart_by_zone">ملون حسب المنطقة</string>
+    <string name="glow_workout_heart_at">عند %1$s</string>
+    <string name="glow_workout_heart_at_after">عند %1$s، بعد النهاية</string>
+    <string name="glow_workout_unit_bpm_average">متوسط ن/د</string>
+    <string name="glow_workout_heart_max_lowest">الأعلى %1$d، الأدنى %2$d ن/د</string>
+    <string name="glow_workout_heart_max">الأعلى %1$d ن/د</string>
+    <string name="glow_workout_heart_lowest">الأدنى %1$d ن/د</string>
+    <string name="glow_workout_heart_none">لم يرسل السترب نبض هذا التمرين بعد.</string>
+    <string name="glow_workout_heart_drop_after">الانخفاض بعد %1$s</string>
+    <string name="glow_workout_heart_dimmed">باهت: %1$s جاء من سجل السترب.</string>
+    <string name="glow_workout_in_your_day">في يومك</string>
+    <string name="glow_workout_facts_title">التمرين</string>
+    <string name="glow_workout_list_title">التمارين</string>
+    <plurals name="glow_workout_list_recorded"><item quantity="zero">%d مسجلة</item><item quantity="one">%d مسجل</item><item quantity="two">%d مسجلة</item><item quantity="few">%d مسجلة</item><item quantity="many">%d مسجلة</item><item quantity="other">%d مسجلة</item></plurals>
+    <string name="glow_workout_list_empty">لا توجد تمارين بعد</string>
+    <string name="glow_workout_list_empty_text">التمارين التي تبدؤها في OpenStrap تظهر هنا، وتمارين السترب بعد المزامنة.</string>
+    <string name="glow_workout_capsule_pause">إيقاف مؤقت</string>
+    <string name="glow_workout_capsule_next">التالي</string>
+    <string name="glow_workout_capsule_lines">%1$s. %2$s</string>
+</resources>

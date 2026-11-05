@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_activity_pace_more_now">أكثر من المعتاد حتى الآن</string>
+    <string name="core_activity_pace_about_now">قريب من المعتاد حتى الآن</string>
+    <string name="core_activity_pace_fewer_now">أقل من المعتاد حتى الآن</string>
+    <string name="core_activity_pace_more_day">أكثر من يومك المعتاد</string>
+    <string name="core_activity_pace_about_day">قريب من يومك المعتاد</string>
+    <string name="core_activity_pace_fewer_day">أقل من يومك المعتاد</string>
+    <string name="core_activity_goal_met">تحقق الهدف</string>
+    <string name="core_activity_goal_share">%1$d%% من هدفك</string>
+    <string name="core_activity_line_more_now">%1$s، أكثر من المعتاد حتى الآن</string>
+    <string name="core_activity_line_about_now">%1$s، قريب من المعتاد حتى الآن</string>
+    <string name="core_activity_line_fewer_now">%1$s، أقل من المعتاد حتى الآن</string>
+    <string name="core_activity_line_more_day">%1$s، أكثر من يومك المعتاد</string>
+    <string name="core_activity_line_about_day">%1$s، قريب من يومك المعتاد</string>
+    <string name="core_activity_line_fewer_day">%1$s، أقل من يومك المعتاد</string>
+    <string name="core_activity_hour_label">خطوة، من %1$s إلى %2$s</string>
+    <string name="core_activity_points_at_aim">عند هدفك</string>
+    <string name="core_activity_points_week_met">الأهم هو الاستمرار على %1$d أو أكثر أسبوعاً بعد أسبوع.</string>
+    <string name="core_activity_points_week_to_go">باقي %1$d للوصول إلى %2$d.</string>
+    <plurals name="core_activity_points_drop_off"><item quantity="zero">غداً تُحذف %1$d نقاط من %2$s.</item><item quantity="one">غداً تُحذف نقطة واحدة من %2$s.</item><item quantity="two">غداً تُحذف %1$d نقاط من %2$s.</item><item quantity="few">غداً تُحذف %1$d نقاط من %2$s.</item><item quantity="many">غداً تُحذف %1$d نقاط من %2$s.</item><item quantity="other">غداً تُحذف %1$d نقاط من %2$s.</item></plurals>
+    <string name="core_activity_points_earned">نقاط مكتسبة، %1$s</string>
+    <string name="core_activity_points_month_under">أقل من %1$d كل يوم في آخر 30 يوماً، بين %2$d و%3$d.</string>
+    <string name="core_activity_points_month_all">%1$d أو أكثر في كل يوم له مجموع في آخر 30 يوماً.</string>
+    <string name="core_activity_points_month_some">%1$d أو أكثر في %2$d من %3$d يوماً في آخر 30 يوماً.</string>
+    <string name="core_activity_active_goal_met">تحقق الهدف</string>
+    <string name="core_activity_active_week_at">تماماً عند هدف %1$d.</string>
+    <string name="core_activity_active_week_past">تجاوزت هدف %2$d بـ %1$d.</string>
+    <string name="core_activity_active_week_to_go">باقي %1$d للوصول إلى %2$d.</string>
+    <plurals name="core_activity_minutes"><item quantity="zero">%1$d دقيقة</item><item quantity="one">دقيقة واحدة</item><item quantity="two">%1$d دقيقة</item><item quantity="few">%1$d دقيقة</item><item quantity="many">%1$d دقيقة</item><item quantity="other">%1$d دقيقة</item></plurals>
+    <string name="core_activity_active_none_today">لا توجد دقائق نشاط حتى الآن اليوم.</string>
+    <string name="core_activity_active_none_day">لا توجد دقائق نشاط ذلك اليوم.</string>
+    <string name="core_activity_active_brisk_today">حتى الآن اليوم، %1$s من الحركة النشطة.</string>
+    <string name="core_activity_active_brisk_day">ذلك اليوم، %1$s من الحركة النشطة.</string>
+    <string name="core_activity_active_hard_today">حتى الآن اليوم، %1$s من المجهود القوي.</string>
+    <string name="core_activity_active_hard_day">ذلك اليوم، %1$s من المجهود القوي.</string>
+    <string name="core_activity_active_both_today">حتى الآن اليوم، %1$s نشطة و%2$s قوية.</string>
+    <string name="core_activity_active_both_day">ذلك اليوم، %1$s نشطة و%2$s قوية.</string>
+    <string name="core_activity_usual_band">معدلك المعتاد، من %1$d إلى %2$d</string>
+    <string name="core_activity_load_learning">يظهر معدلك المعتاد بعد أسبوع من اللبس.</string>
+    <string name="core_activity_load_harder_today">حتى الآن اليوم، بقوة %1$d%% على الأقل من أيامك في آخر 3 أشهر.</string>
+    <string name="core_activity_load_harder_day">ذلك اليوم، بقوة %1$d%% على الأقل من أيامك في آخر 3 أشهر.</string>
+    <string name="core_activity_load_easier_today">حتى الآن اليوم، أخف من %1$d%% من أيامك في آخر 3 أشهر.</string>
+    <string name="core_activity_load_easier_day">ذلك اليوم، أخف من %1$d%% من أيامك في آخر 3 أشهر.</string>
+    <string name="core_activity_balance_building">آخر 7 أيام أعلى بكثير من معدلك، فأنت تبني لياقتك.</string>
+    <string name="core_activity_balance_easing">آخر 7 أيام أقل بكثير من معدلك، فأنت تخفف.</string>
+    <string name="core_activity_balance_steady">آخر 7 أيام قريبة من معدلك، فترة ثابتة.</string>
+    <string name="core_activity_span_none_week">لا يوجد يوم فوق معدلك في آخر 7 أيام.</string>
+    <string name="core_activity_span_none_month">لا يوجد يوم فوق معدلك في آخر 30 يوماً.</string>
+    <string name="core_activity_span_one_week">يوم واحد فوق معدلك في آخر 7 أيام.</string>
+    <string name="core_activity_span_one_month">يوم واحد فوق معدلك في آخر 30 يوماً.</string>
+    <plurals name="core_activity_span_days_week"><item quantity="zero">%1$d أيام فوق معدلك في آخر 7 أيام.</item><item quantity="one">يوم واحد فوق معدلك في آخر 7 أيام.</item><item quantity="two">%1$d أيام فوق معدلك في آخر 7 أيام.</item><item quantity="few">%1$d أيام فوق معدلك في آخر 7 أيام.</item><item quantity="many">%1$d أيام فوق معدلك في آخر 7 أيام.</item><item quantity="other">%1$d أيام فوق معدلك في آخر 7 أيام.</item></plurals>
+    <plurals name="core_activity_span_days_month"><item quantity="zero">%1$d يوماً فوق معدلك في آخر 30 يوماً.</item><item quantity="one">يوم واحد فوق معدلك في آخر 30 يوماً.</item><item quantity="two">%1$d يوماً فوق معدلك في آخر 30 يوماً.</item><item quantity="few">%1$d يوماً فوق معدلك في آخر 30 يوماً.</item><item quantity="many">%1$d يوماً فوق معدلك في آخر 30 يوماً.</item><item quantity="other">%1$d يوماً فوق معدلك في آخر 30 يوماً.</item></plurals>
+    <string name="core_activity_strap_range">النطاق المفيد حسب السترب، من %1$d إلى %2$d</string>
+    <string name="core_activity_vo2_workout">من آخر تمرين فيه قراءة صالحة.</string>
+    <string name="core_activity_vo2_profile">مقدّر من ملفك الشخصي ونبض الراحة، ويُحدّث أسبوعياً.</string>
+    <string name="core_activity_ended">%1$s الساعة %2$s</string>
+    <string name="core_activity_recover">محسوب من %1$s الذي انتهى %2$s.</string>
+    <string name="core_activity_calories_at_rest">يستهلك جسمك نحو %1$s سعرة يومياً في الراحة، قبل أي حركة.</string>
+    <string name="core_activity_distance_from_steps">كم، من خطواتك</string>
+    <string name="core_activity_distance_from_strap">كم، من السترب</string>
+    <string name="core_activity_distance_steps_today">أكثر من %1$s خطوة حتى الآن اليوم.</string>
+    <string name="core_activity_distance_steps_day">أكثر من %1$s خطوة ذلك اليوم.</string>
+</resources>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_metric_heart_rate">النبض</string>
+    <string name="core_metric_resting_hr">نبض الراحة</string>
+    <string name="core_metric_hrv">HRV</string>
+    <string name="core_metric_spo2">أكسجين الدم</string>
+    <string name="core_metric_stress">التوتر</string>
+    <string name="core_metric_skin_temperature">حرارة الجلد</string>
+    <string name="core_metric_breathing">معدل التنفس</string>
+    <string name="core_metric_steps">الخطوات</string>
+    <string name="core_metric_range_day">يوم</string>
+    <string name="core_metric_range_week">أسبوع</string>
+    <string name="core_metric_range_month">شهر</string>
+    <string name="core_metric_range_year">سنة</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_firmware_part_firmware">النظام</string>
+    <string name="core_firmware_part_resources">الصور والنصوص</string>
+    <string name="core_firmware_part_base_resources">الصور والنصوص الأساسية</string>
+    <string name="core_firmware_part_extra_resources">صور ونصوص إضافية</string>
+    <string name="core_firmware_part_font">الخط</string>
+    <string name="core_firmware_part_gps">GPS</string>
+</resources>

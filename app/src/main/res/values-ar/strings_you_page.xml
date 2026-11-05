@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="you_action_cancel">إلغاء</string>
+    <string name="you_action_save">حفظ</string>
+    <string name="you_action_restore">استعادة</string>
+    <string name="you_action_show">إظهار</string>
+    <string name="you_action_hide">إخفاء</string>
+    <string name="you_value_on">مفعّل</string>
+    <string name="you_value_off">متوقف</string>
+    <string name="you_title">أنت</string>
+    <string name="you_row_profile">الملف الشخصي</string>
+    <string name="you_row_goals">الأهداف</string>
+    <string name="you_row_sleep_goal">هدف النوم</string>
+    <string name="you_row_goals_and_bests">الأهداف والأرقام القياسية</string>
+    <string name="you_row_health_connect">Health Connect</string>
+    <string name="you_row_backup">النسخ الاحتياطي</string>
+    <string name="you_row_deleted_sleep">النوم المحذوف</string>
+    <string name="you_row_updates">التحديثات</string>
+    <string name="you_row_diagnostics">التشخيص</string>
+    <string name="you_row_sample_data">إضافة بيانات تجريبية</string>
+    <string name="you_row_sample_data_note">في نسخ التطوير فقط</string>
+    <string name="you_section_your_data">بياناتك</string>
+    <string name="you_section_help">المساعدة</string>
+    <plurals name="you_goals_and_bests_line"><item quantity="zero">%1$d تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="one">تمرين واحد أسبوعياً، أرقامك القياسية والشارات</item><item quantity="two">%1$d تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="few">%1$d تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="many">%1$d تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="other">%1$d تمارين أسبوعياً، أرقامك القياسية والشارات</item></plurals>
+    <plurals name="you_diagnostics_line"><item quantity="zero">%1$d سطر، لبلاغات الأخطاء</item><item quantity="one">سطر واحد، لبلاغات الأخطاء</item><item quantity="two">%1$d سطر، لبلاغات الأخطاء</item><item quantity="few">%1$d سطر، لبلاغات الأخطاء</item><item quantity="many">%1$d سطر، لبلاغات الأخطاء</item><item quantity="other">%1$d سطر، لبلاغات الأخطاء</item></plurals>
+    <string name="you_footer">OpenStrap %1$s. كل بياناتك تبقى على هذا الجوال.</string>
+    <string name="you_goals_line">%1$s، %2$s، %3$s</string>
+    <plurals name="you_goals_steps"><item quantity="zero">%1$s خطوة</item><item quantity="one">%1$s خطوة</item><item quantity="two">%1$s خطوة</item><item quantity="few">%1$s خطوة</item><item quantity="many">%1$s خطوة</item><item quantity="other">%1$s خطوة</item></plurals>
+    <string name="you_goals_active_kcal">%1$s سعرة نشطة</string>
+    <plurals name="you_goals_active_hours"><item quantity="zero">%1$d ساعات نشطة</item><item quantity="one">ساعة نشطة واحدة</item><item quantity="two">%1$d ساعات نشطة</item><item quantity="few">%1$d ساعات نشطة</item><item quantity="many">%1$d ساعات نشطة</item><item quantity="other">%1$d ساعات نشطة</item></plurals>
+    <string name="you_sleep_goal_line">%1$s. حاجتك من النوم %2$s</string>
+    <string name="you_profile_empty">أضف العمر والجنس لحساب أدق للجهد والاستشفاء</string>
+    <string name="you_profile_age">العمر</string>
+    <string name="you_profile_summary_female">أنثى</string>
+    <string name="you_profile_summary_male">ذكر</string>
+    <string name="you_profile_title">ملفك الشخصي</string>
+    <string name="you_profile_discard_title">تجاهل التغييرات؟</string>
+    <string name="you_profile_discard_text">لم تُحفظ تغييرات ملفك الشخصي.</string>
+    <string name="you_profile_discard">تجاهل</string>
+    <string name="you_profile_keep_editing">متابعة التعديل</string>
+    <string name="you_profile_note">العمر يحدد أقصى نبض لك، وعليه تعتمد كل أرقام الجهد والاستشفاء. كل الحقول اختيارية وتبقى على هذا الجوال.</string>
+    <string name="you_profile_age">العمر</string>
+    <string name="you_profile_age_unit">سنة</string>
+    <string name="you_profile_sex_note">الجنس، للسعرات والجهد واللياقة وعمر العادات</string>
+    <string name="you_profile_sex_female">أنثى</string>
+    <string name="you_profile_sex_male">ذكر</string>
+    <string name="you_profile_units">الوحدات</string>
+    <string name="you_profile_units_metric">متري</string>
+    <string name="you_profile_units_imperial">إمبراطوري</string>
+    <string name="you_profile_weight">الوزن</string>
+    <string name="you_profile_unit_lb">رطل</string>
+    <string name="you_profile_unit_kg">كغ</string>
+    <string name="you_profile_feet">قدم</string>
+    <string name="you_profile_unit_ft">قدم</string>
+    <string name="you_profile_inches">بوصة</string>
+    <string name="you_profile_unit_in">بوصة</string>
+    <string name="you_profile_height">الطول</string>
+    <string name="you_profile_unit_cm">سم</string>
+    <string name="you_profile_activity_note">نشاطك المعتاد، لتقدير اللياقة</string>
+    <string name="you_profile_activity_pick">اختر المستوى الأقرب لأسبوعك المعتاد.</string>
+    <string name="you_profile_beta_blockers">أتناول حاصرات بيتا</string>
+    <string name="you_profile_pregnant">حامل</string>
+    <string name="you_profile_sleep_need">حاجتك من النوم بالساعات (من 7 إلى 9، أو اتركه فارغاً)</string>
+    <string name="you_unit_h">س</string>
+    <string name="you_goals_title">أهدافك</string>
+    <string name="you_goals_note">ما تطمح له كل يوم وأسبوع. غيّرها متى ما توقفت عن مناسبتك.</string>
+    <string name="you_goals_steps_label">الخطوات</string>
+    <string name="you_goals_steps_unit">خطوة</string>
+    <string name="you_goals_sleep_label">النوم</string>
+    <string name="you_unit_min">د</string>
+    <string name="you_goals_active_label">الساعات النشطة</string>
+    <string name="you_goals_active_unit">من 24</string>
+    <string name="you_goals_active_note">الساعة النشطة فيها 250 خطوة على الأقل.</string>
+    <string name="you_goals_workouts_label">التمارين</string>
+    <string name="you_goals_workouts_fewer">تمارين أقل أسبوعياً</string>
+    <string name="you_goals_workouts_more">تمارين أكثر أسبوعياً</string>
+    <plurals name="you_goals_workouts_value"><item quantity="zero">%1$d أسبوعياً</item><item quantity="one">%1$d أسبوعياً</item><item quantity="two">%1$d أسبوعياً</item><item quantity="few">%1$d أسبوعياً</item><item quantity="many">%1$d أسبوعياً</item><item quantity="other">%1$d أسبوعياً</item></plurals>
+    <string name="you_goals_workouts_note">تُحسب التمارين التي مدتها 10 دقائق أو أكثر، بحد أقصى تمرينان يومياً.</string>
+    <string name="you_goals_calories_label">السعرات</string>
+    <string name="you_goals_calories_lower">خفّض هدف السعرات</string>
+    <string name="you_goals_calories_raise">ارفع هدف السعرات</string>
+    <string name="you_goals_calories_type">اكتب هدف السعرات</string>
+    <string name="you_goals_suggested">المقترح %1$s، من آخر 4 أسابيع</string>
+    <string name="you_goals_suggested_matched">المقترح %1$s، من آخر 4 أسابيع. هدف السترب مضبوط ليطابقه.</string>
+    <string name="you_goals_use">استخدم</string>
+    <string name="you_updates_title">التحديثات</string>
+    <string name="you_updates_check_now">تحقق الآن</string>
+    <string name="you_updates_release">OpenStrap %1$s</string>
+    <string name="you_updates_daily">تحقق كل يوم</string>
+    <string name="you_updates_daily_note">ينبهك بالإصدارات الجديدة</string>
+    <string name="you_updates_all_releases">كل الإصدارات</string>
+    <string name="you_updates_on_github">على GitHub</string>
+    <string name="you_updates_whats_new">الجديد</string>
+    <string name="you_updates_in_your_version">في إصدارك</string>
+    <string name="you_updates_latest">أحدث إصدار</string>
+    <string name="you_updates_installed">لديك OpenStrap %1$s.</string>
+    <string name="you_updates_no_notes">لا توجد ملاحظات لهذا الإصدار.</string>
+    <string name="you_diagnostics_title">التشخيص</string>
+    <string name="you_diagnostics_copy">نسخ</string>
+    <string name="you_diagnostics_clip_label">سجل OpenStrap</string>
+    <string name="you_diagnostics_log">سجل السترب</string>
+    <plurals name="you_diagnostics_lines"><item quantity="zero">%1$d سطر</item><item quantity="one">سطر واحد</item><item quantity="two">%1$d سطر</item><item quantity="few">%1$d سطر</item><item quantity="many">%1$d سطر</item><item quantity="other">%1$d سطر</item></plurals>
+    <string name="you_diagnostics_empty">لا توجد أحداث بعد.</string>
+</resources>

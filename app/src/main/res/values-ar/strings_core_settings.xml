@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_settings_buzz_single">مفرد</string>
+    <string name="core_settings_buzz_double">مزدوج</string>
+    <string name="core_settings_buzz_triple">ثلاثي</string>
+    <string name="core_settings_buzz_long">طويل</string>
+    <string name="core_settings_call_steady">متواصل</string>
+    <string name="core_settings_call_pulsed">متقطع</string>
+</resources>

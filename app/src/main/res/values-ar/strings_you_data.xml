@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="you_backup_status_off">متوقف. ملف zip كل يوم في مجلد تختاره</string>
+    <string name="you_backup_status_failed">فشل آخر نسخ احتياطي. %1$s</string>
+    <string name="you_backup_status_waiting">كل يوم أثناء شحن الجوال. لا يوجد نسخ احتياطي بعد</string>
+    <string name="you_backup_last">آخر نسخ احتياطي %1$s</string>
+    <string name="you_backup_summary_failed">فشل آخر نسخ احتياطي</string>
+    <string name="you_backup_summary_waiting">مفعّل. لا يوجد نسخ احتياطي بعد</string>
+    <string name="you_backup_failure_folder_gone">المجلد لم يعد متاحاً.</string>
+    <string name="you_backup_failure_permission">لم يعد OpenStrap قادراً على الوصول للمجلد. اختره مرة أخرى.</string>
+    <string name="you_backup_failure_no_space">لا توجد مساحة كافية.</string>
+    <string name="you_backup_failure_cant_write">تعذّر على OpenStrap الكتابة في المجلد.</string>
+    <string name="you_backup_failure_other">حاول مرة أخرى، أو انتظر نسخة الغد.</string>
+    <plurals name="you_backup_restored_records_settings"><item quantity="zero">استُعيدت %1$s سجلات وإعداداتك.</item><item quantity="one">استُعيد سجل %1$s وإعداداتك.</item><item quantity="two">استُعيدت %1$s سجلات وإعداداتك.</item><item quantity="few">استُعيدت %1$s سجلات وإعداداتك.</item><item quantity="many">استُعيدت %1$s سجلات وإعداداتك.</item><item quantity="other">استُعيدت %1$s سجلات وإعداداتك.</item></plurals>
+    <plurals name="you_backup_restored_records"><item quantity="zero">استُعيدت %1$s سجلات.</item><item quantity="one">استُعيد سجل %1$s.</item><item quantity="two">استُعيدت %1$s سجلات.</item><item quantity="few">استُعيدت %1$s سجلات.</item><item quantity="many">استُعيدت %1$s سجلات.</item><item quantity="other">استُعيدت %1$s سجلات.</item></plurals>
+    <string name="you_backup_restored_settings">استُعيدت إعداداتك. سجلاتك كانت موجودة.</string>
+    <string name="you_backup_restored_nothing">لا شيء للاستعادة. كل شيء موجود.</string>
+    <plurals name="you_backup_restored_skipped"><item quantity="zero">تعذّرت قراءة %1$s سجلات.</item><item quantity="one">تعذّرت قراءة سجل %1$s.</item><item quantity="two">تعذّرت قراءة %1$s سجلات.</item><item quantity="few">تعذّرت قراءة %1$s سجلات.</item><item quantity="many">تعذّرت قراءة %1$s سجلات.</item><item quantity="other">تعذّرت قراءة %1$s سجلات.</item></plurals>
+    <string name="you_backup_restored_with_skipped">%1$s %2$s</string>
+    <string name="you_backup_folder_unknown">المجلد الذي اخترته</string>
+    <string name="you_backup_outcome_done">نُسخ احتياطياً باسم %1$s.</string>
+    <string name="you_backup_outcome_recording">يوجد تمرين قيد التسجيل. يعمل النسخ الاحتياطي بعد انتهائه.</string>
+    <string name="you_backup_outcome_off">النسخ الاحتياطي التلقائي متوقف.</string>
+    <string name="you_backup_outcome_failed">تعذّر النسخ الاحتياطي. %1$s</string>
+    <string name="you_backup_saved_copy">حُفظت نسخة.</string>
+    <string name="you_backup_folder_refused">لا يستطيع OpenStrap الاستمرار في الكتابة في ذلك المجلد. اختر مجلداً آخر.</string>
+    <string name="you_backup_title">النسخ الاحتياطي</string>
+    <string name="you_backup_automatic">نسخ احتياطي تلقائي</string>
+    <string name="you_backup_folder">مجلد النسخ الاحتياطي</string>
+    <string name="you_backup_now">انسخ الآن</string>
+    <string name="you_backup_now_running">جارٍ النسخ الاحتياطي…</string>
+    <string name="you_backup_now_note">يحفظ ملف zip اليوم في ذلك المجلد</string>
+    <string name="you_backup_restore_note">أي ملف zip من OpenStrap. يكمل ما ينقص هذا الجوال</string>
+    <string name="you_backup_save_copy">احفظ نسخة</string>
+    <string name="you_backup_save_copy_note">ملف zip في مكان تختاره. لا يحذفه OpenStrap أبداً</string>
+    <string name="you_deleted_sleep_title">النوم المحذوف</string>
+    <string name="you_hc_line_stopped_permissions">متوقف. أُوقفت أذونات Health Connect</string>
+    <string name="you_hc_line_stopped_install">متوقف. ثبّت Health Connect لتفعيله مرة أخرى</string>
+    <string name="you_hc_line_stopped_unavailable">متوقف. Health Connect غير متاح على هذا الجوال</string>
+    <string name="you_hc_line_off">متوقف. ينسخ البيانات الجديدة بعد كل مزامنة للسترب</string>
+    <string name="you_hc_line_on">مفعّل. ينسخ البيانات الجديدة بعد كل مزامنة للسترب</string>
+    <string name="you_hc_line_last">مفعّل. آخر نسخ %1$s</string>
+    <string name="you_hc_summary_stopped_permissions">متوقف. أُوقفت الأذونات</string>
+    <string name="you_hc_summary_stopped_install">متوقف. ثبّت Health Connect</string>
+    <string name="you_hc_summary_stopped_unavailable">متوقف. غير متاح على هذا الجوال</string>
+    <string name="you_hc_title">Health Connect</string>
+    <string name="you_hc_auto">نسخ تلقائي إلى Health Connect</string>
+    <string name="you_hc_any_time">في أي وقت</string>
+    <string name="you_hc_copy_now">انسخ الآن</string>
+    <string name="you_hc_copy_now_note">آخر 30 يوماً، إلى Health Connect</string>
+    <string name="you_hc_restore_note">أرجع ما حفظه OpenStrap هناك</string>
+    <string name="you_hc_open">افتح Health Connect</string>
+    <string name="you_hc_open_note">الأذونات والبيانات</string>
+    <string name="you_hc_install">ثبّت Health Connect</string>
+    <string name="you_hc_install_note">على هذا الجوال Health Connect تطبيق من متجر Play. ثبّته لنسخ بياناتك إليه.</string>
+    <string name="you_hc_store_failed">تعذّر فتح متجر Play.</string>
+    <string name="you_hc_restored_none">لا توجد بيانات OpenStrap في Health Connect لاستعادتها.</string>
+    <plurals name="you_hc_restored"><item quantity="zero">استُعيدت %1$s سجلات من Health Connect.</item><item quantity="one">استُعيد سجل %1$s من Health Connect.</item><item quantity="two">استُعيدت %1$s سجلات من Health Connect.</item><item quantity="few">استُعيدت %1$s سجلات من Health Connect.</item><item quantity="many">استُعيدت %1$s سجلات من Health Connect.</item><item quantity="other">استُعيدت %1$s سجلات من Health Connect.</item></plurals>
+    <plurals name="you_hc_wrote"><item quantity="zero">نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="one">نُسخ سجل %1$d إلى Health Connect (آخر 30 يوماً).</item><item quantity="two">نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="few">نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="many">نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="other">نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item></plurals>
+    <plurals name="you_hc_auto_wrote"><item quantity="zero">النسخ التلقائي مفعّل. نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="one">النسخ التلقائي مفعّل. نُسخ سجل %1$d إلى Health Connect (آخر 30 يوماً).</item><item quantity="two">النسخ التلقائي مفعّل. نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="few">النسخ التلقائي مفعّل. نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="many">النسخ التلقائي مفعّل. نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item><item quantity="other">النسخ التلقائي مفعّل. نُسخت %1$d سجلات إلى Health Connect (آخر 30 يوماً).</item></plurals>
+    <string name="you_hc_restore_failed">تعذّرت الاستعادة من Health Connect</string>
+    <string name="you_hc_write_failed">تعذّر النسخ إلى Health Connect</string>
+    <string name="you_hc_auto_failed">النسخ التلقائي مفعّل، لكن النسخة الأولى لم تنجح</string>
+    <string name="you_error_save_copy">تعذّر حفظ النسخة. %1$s</string>
+    <string name="you_error_save_copy_permission">لم يُسمح لـ OpenStrap بالكتابة هناك. اختر مكاناً آخر.</string>
+    <string name="you_error_save_copy_gone">ذلك المكان لم يعد متاحاً. اختر مكاناً آخر.</string>
+    <string name="you_error_save_copy_other">حاول مرة أخرى، أو اختر مكاناً آخر.</string>
+    <string name="you_error_restore_copy">تعذّرت استعادة النسخة. %1$s</string>
+    <string name="you_error_restore_not_copy">هذا الملف ليس نسخة من OpenStrap.</string>
+    <string name="you_error_restore_cant_open">لا يستطيع OpenStrap فتح ذلك الملف. اختره مرة أخرى.</string>
+    <string name="you_error_try_again">حاول مرة أخرى.</string>
+    <string name="you_error_hc">%1$s. %2$s</string>
+    <string name="you_error_hc_permission">لم يعد لدى OpenStrap إذن. اسمح له في Health Connect.</string>
+    <string name="you_error_hc_no_answer">لم يستجب Health Connect. حاول مرة أخرى.</string>
+</resources>

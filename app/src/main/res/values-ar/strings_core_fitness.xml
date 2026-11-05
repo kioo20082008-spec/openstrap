@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_checkin_poor">سيئ</string>
+    <string name="core_checkin_low">منخفض</string>
+    <string name="core_checkin_ok">عادي</string>
+    <string name="core_checkin_good">جيد</string>
+    <string name="core_checkin_great">ممتاز</string>
+    <string name="core_strength_bench_press">بنش برس</string>
+    <string name="core_strength_squat">سكوات</string>
+    <string name="core_strength_deadlift">ديدلفت</string>
+    <string name="core_strength_overhead_press">ضغط الكتف</string>
+    <string name="core_strength_barbell_row">سحب البار</string>
+    <string name="core_strength_pull_up">عقلة</string>
+    <string name="core_strength_lat_pulldown">سحب علوي</string>
+    <string name="core_strength_romanian_deadlift">ديدلفت روماني</string>
+    <string name="core_strength_hip_thrust">دفع الورك</string>
+    <string name="core_strength_leg_press">دفع الأرجل</string>
+    <string name="core_strength_lunge">طعنات</string>
+    <string name="core_strength_dumbbell_curl">تمرين البايسبس بالدمبل</string>
+    <string name="core_strength_triceps_extension">تمديد الترايسبس</string>
+    <string name="core_strength_push_up">ضغط</string>
+    <string name="core_strength_dips">متوازي</string>
+    <string name="core_strength_plank">بلانك</string>
+    <string name="core_vo2_activity_inactive">غير نشط، أو نشاط قليل يتجاوز الأعمال اليومية</string>
+    <string name="core_vo2_activity_light">نشاط خفيف، 10 دقائق على الأقل في كل مرة، 5 أيام أو أكثر أسبوعياً</string>
+    <string name="core_vo2_activity_aerobic_low">تمارين هوائية من 20 إلى 60 دقيقة أسبوعياً</string>
+    <string name="core_vo2_activity_aerobic_mid">تمارين هوائية من ساعة إلى 3 ساعات أسبوعياً</string>
+    <string name="core_vo2_activity_aerobic_high">تمارين هوائية أكثر من 3 ساعات أسبوعياً</string>
+</resources>

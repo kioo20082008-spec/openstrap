@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="core_body_title">بعض مؤشرات جسمك خارج معدلك</string>
+    <string name="core_body_short">بعض المؤشرات خارج معدلك</string>
+    <string name="core_body_causes">قد يحدث هذا مع التمرين الشاق، أو الكحول، أو السفر، أو قلة النوم، أو عندما يقاوم جسمك عدوى.</string>
+    <string name="core_body_advice">يوم أخف قد يساعدك. وإذا شعرت بتعب، قد يفيدك مراجعة مختص صحي.</string>
+    <string name="core_body_disclaimer">هذا تقدير صحي عام، وليس تقييماً طبياً.</string>
+    <string name="core_body_push_several_again">عدة مؤشرات ليلية (%1$s) خارج معدلك لليلتين أو أكثر.</string>
+    <string name="core_body_push_several_once">عدة مؤشرات ليلية (%1$s) كانت خارج معدلك الليلة الماضية.</string>
+    <string name="core_body_push_one_again">%1$s الليلي خارج معدلك لليلتين أو أكثر.</string>
+    <string name="core_body_push_one_once">%1$s الليلي كان خارج معدلك الليلة الماضية.</string>
+    <string name="core_body_family_cardiac">نبض الراحة</string>
+    <string name="core_body_family_thermal">حرارة الجلد</string>
+    <string name="core_body_family_respiratory">معدل التنفس</string>
+    <string name="core_body_signal_rhr">نبض الراحة أعلى بـ %1$d ن/د</string>
+    <string name="core_body_signal_temperature">حرارة الجلد أعلى من معدلك</string>
+    <string name="core_body_signal_breathing">معدل التنفس أعلى بـ %1$s/د</string>
+    <string name="core_body_signal_hrv">HRV أقل بكثير من معدلك</string>
+</resources>

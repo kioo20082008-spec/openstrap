@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="update_summary_ready">OpenStrap %1$s جاهز للتثبيت</string>
+    <string name="update_summary_checking">جارٍ التحقق…</string>
+    <string name="update_summary_version">الإصدار %1$s</string>
+    <string name="update_summary_up_to_date">محدّث. تم التحقق %1$s</string>
+    <string name="update_check_checking">جارٍ التحقق من GitHub…</string>
+    <string name="update_check_failed_last">تعذّر الوصول إلى GitHub. آخر تحقق %1$s</string>
+    <string name="update_check_failed">تعذّر الوصول إلى GitHub</string>
+    <string name="update_check_last">آخر تحقق %1$s</string>
+    <string name="update_check_never">لم يتم التحقق أبداً</string>
+    <string name="update_install_downloading_percent">جارٍ التنزيل، %1$d%%</string>
+    <string name="update_install_downloading_size">جارٍ التنزيل، %1$s</string>
+    <string name="update_install_installing">جارٍ التثبيت. يُغلق OpenStrap عند الانتهاء</string>
+    <string name="update_install_no_apk">لا يوجد ملف تطبيق في هذا الإصدار. افتحه على GitHub</string>
+    <string name="update_install_after_workout">بعد تمرينك. التثبيت يغلق التطبيق</string>
+    <string name="update_install_download">نزّل وثبّت، %1$s</string>
+    <string name="update_megabytes">%1$.1f م.ب</string>
+    <string name="update_failure_network">توقف التنزيل. اضغط للمحاولة مرة أخرى</string>
+    <string name="update_failure_checksum">التنزيل لا يطابق الملف على GitHub. اضغط للمحاولة مرة أخرى</string>
+    <string name="update_failure_no_checksum">لم يوفر GitHub طريقة للتحقق من التنزيل، فلم يُثبَّت</string>
+    <string name="update_failure_not_openstrap">التنزيل ليس OpenStrap، فلم يُثبَّت</string>
+    <string name="update_failure_signature">هذه النسخة من OpenStrap موقّعة بمفتاح آخر. ثبّتها من GitHub بدلاً من ذلك</string>
+    <string name="update_failure_storage">لا توجد مساحة كافية للتثبيت</string>
+    <string name="update_failure_android">تعذّر على أندرويد التثبيت. اضغط للمحاولة مرة أخرى</string>
+    <string name="update_available_title">صدر OpenStrap %1$s</string>
+    <string name="update_available_text">اطّلع على الجديد وثبّته من صفحة التحديثات.</string>
+    <string name="update_installed_title">تم التحديث إلى OpenStrap %1$s</string>
+    <string name="update_installed_text">اضغط لترى الجديد.</string>
+    <string name="update_channel_name">تحديثات التطبيق</string>
+</resources>

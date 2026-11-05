@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="day_week_active_minutes"><item quantity="zero">%1$d دقيقة نشاط</item><item quantity="one">دقيقة نشاط واحدة</item><item quantity="two">%1$d دقيقة نشاط</item><item quantity="few">%1$d دقيقة نشاط</item><item quantity="many">%1$d دقيقة نشاط</item><item quantity="other">%1$d دقيقة نشاط</item></plurals>
+    <string name="day_week_asleep">%1$s نوم</string>
+    <plurals name="day_week_busiest"><item quantity="zero">أنشط يوم %2$s، %1$s خطوة.</item><item quantity="one">أنشط يوم %2$s، %1$s خطوة.</item><item quantity="two">أنشط يوم %2$s، %1$s خطوة.</item><item quantity="few">أنشط يوم %2$s، %1$s خطوة.</item><item quantity="many">أنشط يوم %2$s، %1$s خطوة.</item><item quantity="other">أنشط يوم %2$s، %1$s خطوة.</item></plurals>
+    <string name="day_week_workouts_none">لا توجد تمارين هذا الأسبوع ولا الأسبوع السابق.</string>
+    <plurals name="day_week_workouts_same"><item quantity="zero">%1$d تمارين، مثل الأسبوع السابق.</item><item quantity="one">تمرين واحد، مثل الأسبوع السابق.</item><item quantity="two">%1$d تمارين، مثل الأسبوع السابق.</item><item quantity="few">%1$d تمارين، مثل الأسبوع السابق.</item><item quantity="many">%1$d تمارين، مثل الأسبوع السابق.</item><item quantity="other">%1$d تمارين، مثل الأسبوع السابق.</item></plurals>
+    <plurals name="day_week_workouts_more"><item quantity="zero">%1$d تمارين، أكثر بـ %2$d من الأسبوع السابق.</item><item quantity="one">تمرين واحد، أكثر بـ %2$d من الأسبوع السابق.</item><item quantity="two">%1$d تمارين، أكثر بـ %2$d من الأسبوع السابق.</item><item quantity="few">%1$d تمارين، أكثر بـ %2$d من الأسبوع السابق.</item><item quantity="many">%1$d تمارين، أكثر بـ %2$d من الأسبوع السابق.</item><item quantity="other">%1$d تمارين، أكثر بـ %2$d من الأسبوع السابق.</item></plurals>
+    <plurals name="day_week_workouts_fewer"><item quantity="zero">%1$d تمارين، أقل بـ %2$d من الأسبوع السابق.</item><item quantity="one">تمرين واحد، أقل بـ %2$d من الأسبوع السابق.</item><item quantity="two">%1$d تمارين، أقل بـ %2$d من الأسبوع السابق.</item><item quantity="few">%1$d تمارين، أقل بـ %2$d من الأسبوع السابق.</item><item quantity="many">%1$d تمارين، أقل بـ %2$d من الأسبوع السابق.</item><item quantity="other">%1$d تمارين، أقل بـ %2$d من الأسبوع السابق.</item></plurals>
+    <string name="day_week_steps_up">الخطوات أعلى %1$d%% من الأسبوع السابق.</string>
+    <string name="day_week_steps_down">الخطوات أقل %1$d%% من الأسبوع السابق.</string>
+    <string name="day_week_steps_steady">الخطوات ثابتة مقارنة بالأسبوع السابق.</string>
+    <string name="day_week_label">خطوة يومياً، %1$s</string>
+    <string name="day_week_nothing">لم يُسجَّل شيء</string>
+</resources>

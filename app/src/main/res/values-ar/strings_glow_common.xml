@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="glow_cancel">إلغاء</string>
+    <string name="glow_done">تم</string>
+    <string name="glow_save">حفظ</string>
+    <string name="glow_close">إغلاق</string>
+    <string name="glow_delete">حذف</string>
+    <string name="glow_continue">متابعة</string>
+    <string name="glow_share">مشاركة</string>
+    <string name="glow_trim">قصّ</string>
+    <string name="glow_no_reading">لا توجد قراءة</string>
+    <string name="glow_loading">جارٍ التحميل…</string>
+    <string name="glow_unit_bpm">ن/د</string>
+    <string name="glow_unit_min">د</string>
+    <string name="glow_unit_km">كم</string>
+    <string name="glow_no_value">لا شيء لهذا اليوم</string>
+    <string name="glow_no_night_value">لا شيء لهذه الليلة</string>
+    <string name="glow_no_reading_yet">لا توجد قراءة بعد</string>
+    <string name="glow_after_next_sync">بعد المزامنة القادمة للسترب</string>
+    <string name="glow_add_profile">أضف العمر والوزن والطول</string>
+    <string name="glow_no_value_yet">لا توجد قيمة بعد</string>
+    <string name="glow_back">رجوع</string>
+    <string name="glow_page_switch">تبديل</string>
+    <string name="glow_page_change">تغيير</string>
+    <string name="glow_tag_about">عن %1$s</string>
+    <string name="glow_info_how">كيف يُحسب</string>
+    <string name="glow_info_moves">ما الذي يغيّره</string>
+    <string name="glow_info_off">لماذا قد يكون غير دقيق</string>
+    <string name="glow_info_fold">طيّ</string>
+    <string name="glow_info_open">توسيع</string>
+    <string name="glow_tabletop_heart_rate">النبض</string>
+    <string name="glow_tabletop_latest">الأحدث</string>
+    <string name="glow_tabletop_live">مباشر</string>
+    <string name="glow_tabletop_resting">الراحة %1$d</string>
+    <string name="glow_tabletop_bpm">%1$d ن/د</string>
+    <string name="glow_unit_h">س</string>
+    <string name="glow_unit_s">ث</string>
+</resources>

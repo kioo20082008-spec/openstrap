@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OpenStrap</string>
+    <string name="shortcut_run">ابدأ الجري</string>
+    <string name="shortcut_strength">ابدأ تمرين القوة</string>
+    <string name="shortcut_run_long">ابدأ جرياً</string>
+    <string name="shortcut_strength_long">ابدأ تمرين قوة</string>
+    <string name="tile_workout">ابدأ تمريناً</string>
+    <string name="widget_moment_name">اللحظة</string>
+    <string name="widget_moment_description">المهم الآن، يتغيّر خلال يومك</string>
+    <string name="widget_recovery_name">الاستشفاء</string>
+    <string name="widget_recovery_description">استشفاء هذا الصباح وأسبابه</string>
+    <string name="widget_steps_name">الخطوات</string>
+    <string name="widget_steps_description">خطوات اليوم وهدفك</string>
+    <string name="widget_sleep_name">النوم</string>
+    <string name="widget_sleep_description">نتيجة الليلة الماضية ومدة النوم ومراحله</string>
+    <string name="widget_start_name">ابدأ تمريناً</string>
+    <string name="widget_start_description">ابدأ رياضتك المعتادة بلمسة واحدة</string>
+</resources>
