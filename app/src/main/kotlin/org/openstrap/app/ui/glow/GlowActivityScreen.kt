@@ -164,7 +164,14 @@ fun GlowActivityScreen(
             tabCards(slots) { card, m ->
                 when (card) {
                     ActivityCard.Start -> StartCard(sports, onStartWorkout, onAllSports)
-                    ActivityCard.Steps -> StepsGlow(state, usualSteps, partial) { onOpenMetric(Metric.Steps) }
+                    ActivityCard.Steps -> LocalGoals.current.steps.let { goal ->
+                        val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
+                        PathHero(
+                            state.steps, goal, stringResource(R.string.dials_steps_word),
+                            if (state.steps >= goal) stringResource(R.string.dials_steps_done)
+                            else stringResource(R.string.dials_path_left, n.format(goal - state.steps)),
+                        ) { onOpenMetric(Metric.Steps) }
+                    }
                     ActivityCard.ActiveMinutes -> r?.activity.let { a ->
                         SmallCard(
                             MetricColors.steps, stringResource(R.string.glow_activity_active_minutes), a?.weekEquivalent?.toString(), null,

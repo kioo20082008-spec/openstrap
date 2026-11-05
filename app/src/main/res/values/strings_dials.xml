@@ -31,4 +31,8 @@
     <string name="dials_zone_rest">Rest</string>
     <string name="dials_zone_calm">Steady</string>
     <string name="dials_zone_ready">Ready</string>
+    <string name="dials_unit_h">h</string>
+    <string name="dials_unit_m">min</string>
+    <string name="dials_steps_word">steps</string>
+    <string name="dials_path_left">%1$s to your goal</string>
 </resources>

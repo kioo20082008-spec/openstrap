@@ -147,6 +147,25 @@ internal val SleepGlow = GlowStyle.Midnight.copy(
 private fun NightHero(state: DayUiState, firstNights: Boolean, onRestore: (org.openstrap.app.data.db.SleepSession) -> Unit, onOpen: () -> Unit) {
     val session = state.sleep
     val isToday = state.date == LocalDate.now()
+    // The redesign: a night to show gets the Sky hero; none keeps the card that says why.
+    if (session != null) {
+        val asleep = state.asleepSeconds ?: (session.end - session.start)
+        val zone = java.time.ZoneId.systemDefault()
+        val totals = state.sleepBreakdown?.let { stageTotals(it.byStage) }.orEmpty()
+        val longest = totals.maxOfOrNull { it.second }?.coerceAtLeast(1L) ?: 1L
+        SkyHero(
+            hours = asleep / 3600, minutes = asleep % 3600 / 60,
+            units = stringResource(R.string.dials_unit_h) to stringResource(R.string.dials_unit_m),
+            line = listOfNotNull(session.score?.let { "$it · ${TabCopy.sleepScoreLine(it)}" }, TabCopy.woke(session.wakeCount)).joinToString(" · "),
+            start = org.openstrap.app.presentation.TimeOfDay.format(session.start, zone),
+            end = org.openstrap.app.presentation.TimeOfDay.format(session.end, zone),
+            stages = totals.map { (stage, seconds) ->
+                StageLine(org.openstrap.app.presentation.SLEEP_NAMES[stage].orEmpty(), seconds / longest.toFloat(), org.openstrap.app.presentation.Units.duration(seconds), stageColor(stage))
+            },
+            onOpen = onOpen,
+        )
+        return
+    }
     GlowCard(SleepGlow, Modifier.fillMaxWidth().gridSize(CardSize.Wide), onClick = onOpen) {
         Column {
             GlowHeader(stringResource(R.string.glow_sleep_last_night), trailing = session?.let { TabCopy.nightTimes(it.start, it.end) })

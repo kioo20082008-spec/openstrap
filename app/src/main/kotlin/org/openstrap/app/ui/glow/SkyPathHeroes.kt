@@ -1,0 +1,200 @@
+package org.openstrap.app.ui.glow
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.openstrap.app.ui.theme.AppPalette
+import org.openstrap.app.ui.theme.NumberFamily
+import kotlin.math.PI
+import kotlin.math.sin
+import kotlin.random.Random
+
+private val Muted = Color(0xFFA9ADB9)
+private val Track = Color(0xFF2E3B5C)
+private val SleepBlue = Color(0xFF8FB4FF)
+
+/** One stage's line on the Sky hero: its name, its share of the longest stage, its time, its colour. */
+@androidx.compose.runtime.Immutable
+internal data class StageLine(val name: String, val share: Float, val time: String, val color: Color)
+
+private class Star(val x: Float, val y: Float, val r: Float, val phase: Float)
+
+private val Stars = Random(7).let { rnd -> List(34) { Star(rnd.nextFloat(), rnd.nextFloat() * 0.8f, 1f + rnd.nextFloat() * 0.9f, rnd.nextFloat()) } }
+
+/**
+ * The redesign's Sleep hero, "Sky": stars twinkling over the night, the moon travelling along an arc from bedtime to
+ * waking, how long you slept, the score's word, and each stage's bar filling in.
+ */
+@Composable
+internal fun SkyHero(
+    hours: Long, minutes: Long, units: Pair<String, String>, line: String, start: String, end: String,
+    stages: List<StageLine>, onOpen: () -> Unit,
+) {
+    val sky = rememberInfiniteTransition(label = "sky")
+    val twinkle by sky.animateFloat(0f, 1f, infiniteRepeatable(tween(3000, easing = LinearEasing)), label = "twinkle")
+    val moon = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { moon.animateTo(1f, tween(2600, easing = FastOutSlowInEasing)) }
+    val fill = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { fill.animateTo(1f, tween(1200, 400, FastOutSlowInEasing)) }
+
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen).padding(vertical = 6.dp)) {
+        Ltr {
+            Column {
+                Canvas(Modifier.fillMaxWidth().aspectRatio(360f / 190f)) {
+                    val w = size.width
+                    val h = size.height
+                    Stars.forEach { s ->
+                        val a = 0.2f + 0.8f * (0.5f + 0.5f * sin(2 * PI * (twinkle + s.phase)).toFloat())
+                        drawCircle(AppPalette.Cream.copy(alpha = a), s.r.dp.toPx(), Offset(s.x * w, s.y * h))
+                    }
+                    val p0 = Offset(w * 30 / 360, h * 175 / 190)
+                    val c = Offset(w * 180 / 360, -h * 10 / 190)
+                    val p1 = Offset(w * 330 / 360, h * 175 / 190)
+                    val arc = Path().apply { moveTo(p0.x, p0.y); quadraticTo(c.x, c.y, p1.x, p1.y) }
+                    drawPath(
+                        arc, AppPalette.Cream.copy(alpha = 0.18f),
+                        style = Stroke(2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 6.dp.toPx()))),
+                    )
+                    val t = moon.value
+                    val u = 1 - t
+                    val at = Offset(u * u * p0.x + 2 * u * t * c.x + t * t * p1.x, u * u * p0.y + 2 * u * t * c.y + t * t * p1.y)
+                    val r = 15.dp.toPx()
+                    drawCircle(AppPalette.Cream, r, at)
+                    drawCircle(AppPalette.Navy, r, at + Offset(r * 0.47f, -r * 0.33f))
+                }
+                Row(Modifier.fillMaxWidth().padding(horizontal = 14.dp)) {
+                    Text(start, color = Muted, style = MaterialTheme.typography.labelMedium)
+                    Spacer(Modifier.weight(1f))
+                    Text(end, color = Muted, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+        }
+        val big = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 64.sp, lineHeight = 70.sp)
+        Text(
+            buildAnnotatedString {
+                append(hours.toString()); withStyle(SpanStyle(fontSize = 22.sp, color = Muted)) { append(" ${units.first}  ") }
+                append(minutes.toString()); withStyle(SpanStyle(fontSize = 22.sp, color = Muted)) { append(" ${units.second}") }
+            },
+            Modifier.fillMaxWidth().padding(top = 6.dp), color = AppPalette.Cream, style = big, textAlign = TextAlign.Center,
+        )
+        Text(line, Modifier.fillMaxWidth(), color = SleepBlue, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), textAlign = TextAlign.Center)
+        if (stages.isNotEmpty()) {
+            Spacer(Modifier.height(14.dp))
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color(0xFF1C2C50)).padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                stages.forEach { s ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(s.name, Modifier.width(52.dp), color = AppPalette.Cream, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                        Ltr {
+                            Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(6.dp)).background(Track)) {
+                                Box(Modifier.fillMaxWidth((s.share * fill.value).coerceIn(0.02f, 1f)).height(10.dp).clip(RoundedCornerShape(6.dp)).background(s.color))
+                            }
+                        }
+                        Text(
+                            s.time, Modifier.width(64.dp), color = AppPalette.Cream, textAlign = TextAlign.End,
+                            style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * The redesign's Activity hero, "Path": a winding trail and a walker moving along it to the day's share of the step
+ * goal, a flag at the end, the steps counting up over it and what's left under them. In Arabic the trail starts on the right.
+ */
+@Composable
+internal fun PathHero(steps: Int, goal: Int, stepsWord: String, line: String, onOpen: () -> Unit) {
+    val share = if (goal > 0) (steps / goal.toFloat()).coerceIn(0f, 1f) else 0f
+    val walk = remember(share) { Animatable(0f) }
+    LaunchedEffect(share) { walk.animateTo(share, tween(2200, easing = FastOutSlowInEasing)) }
+    val count = remember(steps) { Animatable(0f) }
+    LaunchedEffect(steps) { count.animateTo(steps.toFloat(), tween(1500, easing = FastOutSlowInEasing)) }
+    val mirror = LocalLayoutDirection.current == LayoutDirection.Rtl
+    val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
+
+    Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.fillMaxWidth().aspectRatio(360f / 320f)) {
+            val sx = size.width / 360f
+            val sy = size.height / 320f
+            fun p(x: Float, y: Float) = Offset((if (mirror) 360 - x else x) * sx, y * sy)
+            val path = Path().apply {
+                val a = p(40f, 300f); moveTo(a.x, a.y)
+                listOf(
+                    Triple(p(40f, 220f), p(320f, 240f), p(320f, 170f)),
+                    Triple(p(320f, 100f), p(40f, 120f), p(60f, 60f)),
+                    Triple(p(80f, 0f), p(300f, 40f), p(320f, 20f)),
+                ).forEach { (c1, c2, e) -> cubicTo(c1.x, c1.y, c2.x, c2.y, e.x, e.y) }
+            }
+            val wide = 14.dp.toPx()
+            drawPath(path, Track, style = Stroke(wide, cap = StrokeCap.Round))
+            val measure = PathMeasure().apply { setPath(path, false) }
+            val len = measure.length
+            val upTo = len * walk.value
+            if (upTo > 0f) {
+                val done = Path()
+                measure.getSegment(0f, upTo, done, true)
+                drawPath(done, AppPalette.Coral, style = Stroke(wide, cap = StrokeCap.Round))
+            }
+            val flag = p(320f, 20f)
+            drawCircle(Color(0xFF5FD3A6).copy(alpha = 0.25f), 16.dp.toPx(), flag)
+            drawCircle(Color(0xFF5FD3A6), 6.dp.toPx(), flag)
+            val at = measure.getPosition(upTo)
+            drawCircle(AppPalette.Coral, 12.dp.toPx(), at)
+            drawCircle(AppPalette.Cream, 8.dp.toPx(), at)
+        }
+        Column(Modifier.clip(RoundedCornerShape(16.dp)).background(AppPalette.Navy).padding(horizontal = 12.dp, vertical = 4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                n.format(count.value.toInt()), color = AppPalette.Cream,
+                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 56.sp, lineHeight = 60.sp),
+            )
+            Text("$stepsWord · $line", color = Muted, style = MaterialTheme.typography.bodyMedium)
+        }
+    }
+}

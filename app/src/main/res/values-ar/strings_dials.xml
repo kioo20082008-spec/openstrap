@@ -31,4 +31,8 @@
     <string name="dials_zone_rest">راحة</string>
     <string name="dials_zone_calm">هادئ</string>
     <string name="dials_zone_ready">جاهز</string>
+    <string name="dials_unit_h">س</string>
+    <string name="dials_unit_m">د</string>
+    <string name="dials_steps_word">خطوة</string>
+    <string name="dials_path_left">باقي ⁨%1$s⁩ للهدف</string>
 </resources>
