@@ -30,7 +30,7 @@
     <plurals name="you_goals_active_hours"><item quantity="zero">%1$d ساعات نشطة</item><item quantity="one">ساعة نشطة واحدة</item><item quantity="two">%1$d ساعات نشطة</item><item quantity="few">%1$d ساعات نشطة</item><item quantity="many">%1$d ساعات نشطة</item><item quantity="other">%1$d ساعات نشطة</item></plurals>
     <string name="you_sleep_goal_line">%1$s. حاجتك من النوم %2$s</string>
     <string name="you_profile_empty">أضف العمر والجنس لحساب أدق للجهد والاستشفاء</string>
-    <string name="you_profile_age">العمر</string>
+    <plurals name="you_profile_age"><item quantity="zero">%1$d سنة</item><item quantity="one">سنة %1$d</item><item quantity="two">سنتان</item><item quantity="few">%1$d سنوات</item><item quantity="many">%1$d سنة</item><item quantity="other">%1$d سنة</item></plurals>
     <string name="you_profile_summary_female">أنثى</string>
     <string name="you_profile_summary_male">ذكر</string>
     <string name="you_profile_title">ملفك الشخصي</string>
