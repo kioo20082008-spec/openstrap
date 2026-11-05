@@ -29,6 +29,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
+import org.openstrap.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
@@ -440,6 +442,22 @@ private fun AppRoot(
             val detailOpen = nav.stack(nav.current).isNotEmpty()
             val showBar = !rail && !barHidden && !(detailOpen && maxWidth < SideBySideWidth)
             val selectTab: (Int) -> Unit = { t -> tapTab(t, nav, firmwareVm, scroll) }
+            var quickOpen by remember { mutableStateOf(false) }
+            val quickScope = androidx.compose.runtime.rememberCoroutineScope()
+            if (quickOpen) org.openstrap.app.ui.glow.QuickSheet(
+                androidx.compose.ui.res.stringResource(R.string.dials_quick_title),
+                listOf(
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.PersonSimpleRun, androidx.compose.ui.res.stringResource(R.string.glow_choose_title), nav::openChoose),
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Refresh, androidx.compose.ui.res.stringResource(R.string.you_strap_sync_now)) { container.strap.syncNow() },
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Vibrate, androidx.compose.ui.res.stringResource(R.string.you_strap_find)) {
+                        quickScope.launch { runCatching { container.strap.findStrap() } }
+                    },
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Alarm, androidx.compose.ui.res.stringResource(R.string.you_alarms_title)) { nav.openPage(Page.Alarms) },
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Target, androidx.compose.ui.res.stringResource(R.string.glow_goals_title)) { nav.openPage(Page.GoalsAndBests) },
+                    org.openstrap.app.ui.glow.QuickAction(org.openstrap.app.ui.theme.AppIcons.Heartbeat, androidx.compose.ui.res.stringResource(R.string.workout_zones_title)) { nav.openPage(Page.HeartZones) },
+                ),
+                onDismiss = { quickOpen = false },
+            )
             Scaffold(
                 bottomBar = {
                     // Qualified: inside the Column, the plain name would pick its ColumnScope overload.
@@ -447,7 +465,7 @@ private fun AppRoot(
                         showBar,
                         enter = slideInVertically { it } + fadeIn(),
                         exit = slideOutVertically { it } + fadeOut(),
-                    ) { FloatingNavBar(navItems, tab, selectTab, glass = navGlass, onPlus = nav::openChoose) }
+                    ) { FloatingNavBar(navItems, tab, selectTab, glass = navGlass, onPlus = { quickOpen = true }) }
                 },
                 containerColor = MaterialTheme.colorScheme.background,
             ) { padding ->

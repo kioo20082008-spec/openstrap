@@ -26,4 +26,5 @@
     <string name="dials_steps_done_note">%1$s steps today</string>
     <string name="dials_bed">In bed by %1$s</string>
     <string name="dials_bed_note">For a full night\'s sleep</string>
+    <string name="dials_quick_title">Quick actions</string>
 </resources>

@@ -26,4 +26,5 @@
     <string name="dials_steps_done_note">%1$s خطوة اليوم</string>
     <string name="dials_bed">في السرير قبل %1$s</string>
     <string name="dials_bed_note">لليلة نوم كاملة</string>
+    <string name="dials_quick_title">إجراءات سريعة</string>
 </resources>

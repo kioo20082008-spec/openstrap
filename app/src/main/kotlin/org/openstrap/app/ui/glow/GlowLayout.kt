@@ -258,7 +258,7 @@ private fun BalancedColumns(left: List<@Composable () -> Unit>, right: List<@Com
         layout(cs.maxWidth, maxOf(height(l), height(r))) {
             listOf(l to 0, r to column + gap).forEach { (col, x) ->
                 var y = 0
-                col.forEach { placeables[it].place(x, y); y += placeables[it].height + gap }
+                col.forEach { placeables[it].placeRelative(x, y); y += placeables[it].height + gap }
             }
         }
     }
@@ -355,7 +355,7 @@ internal fun CardTitle(title: String, modifier: Modifier = Modifier) {
         if (cs.hasBoundedWidth && full + minGap + c.width > cs.maxWidth && full <= cs.maxWidth) {
             val t = text.measure(Constraints(maxWidth = cs.maxWidth, maxHeight = cs.maxHeight))
             val h = t.height.coerceAtLeast(cs.minHeight)
-            return@Layout layout(t.width.coerceIn(cs.minWidth, cs.maxWidth), h) { t.place(0, (h - t.height) / 2) }
+            return@Layout layout(t.width.coerceIn(cs.minWidth, cs.maxWidth), h) { t.placeRelative(0, (h - t.height) / 2) }
         }
         val t = text.measure(
             if (!cs.hasBoundedWidth) Constraints(maxHeight = cs.maxHeight)
@@ -365,8 +365,8 @@ internal fun CardTitle(title: String, modifier: Modifier = Modifier) {
         val w = (t.width + g + c.width).let { if (cs.hasBoundedWidth) it.coerceIn(cs.minWidth, cs.maxWidth) else it.coerceAtLeast(cs.minWidth) }
         val h = maxOf(t.height, c.height).coerceAtLeast(cs.minHeight)
         layout(w, h) {
-            t.place(0, (h - t.height) / 2)
-            c.place(t.width + g, (h - c.height) / 2)
+            t.placeRelative(0, (h - t.height) / 2)
+            c.placeRelative(t.width + g, (h - c.height) / 2)
         }
     }
 }
@@ -397,15 +397,15 @@ internal fun TitleRow(modifier: Modifier = Modifier, start: @Composable () -> Un
             val title = s.measure(Constraints(maxWidth = w - gap - note.width))
             val h = maxOf(title.height, note.height)
             layout(w, h) {
-                title.place(0, (h - title.height) / 2)
-                note.place(w - note.width, (h - note.height) / 2)
+                title.placeRelative(0, (h - title.height) / 2)
+                note.placeRelative(w - note.width, (h - note.height) / 2)
             }
         } else {
             val title = s.measure(Constraints(maxWidth = w))
             val under = NoteUnder.roundToPx()
             layout(w, title.height + under + note.height) {
-                title.place(0, 0)
-                note.place(0, title.height + under)
+                title.placeRelative(0, 0)
+                note.placeRelative(0, title.height + under)
             }
         }
     }

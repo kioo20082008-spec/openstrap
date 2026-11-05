@@ -132,10 +132,10 @@ private fun CentredRow(
         val w = constraints.maxWidth
         val h = constraints.maxHeight
         layout(w, h) {
-            sp.place(0, (h - sp.height) / 2)
-            ep.place(w - ep.width, (h - ep.height) / 2)
+            sp.placeRelative(0, (h - sp.height) / 2)
+            ep.placeRelative(w - ep.width, (h - ep.height) / 2)
             val x = ((w - cp.width) / 2).coerceIn(sp.width, (w - ep.width - cp.width + over).coerceAtLeast(sp.width))
-            cp.place(x, (h - cp.height) / 2)
+            cp.placeRelative(x, (h - cp.height) / 2)
         }
     }
 }

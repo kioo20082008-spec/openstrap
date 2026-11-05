@@ -318,7 +318,7 @@ internal fun RowNameValue(name: String, nameColor: Color, value: String?, modifi
         val loose = Constraints(maxWidth = width)
         val nameP = measurables[0].measure(loose)
         val v = measurables.getOrNull(1)
-        if (v == null) return@Layout layout(width, nameP.height) { nameP.place(0, 0) }
+        if (v == null) return@Layout layout(width, nameP.height) { nameP.placeRelative(0, 0) }
         val gap = RowValueGap.roundToPx()
         if (valueBeside(measurables[0].maxIntrinsicWidth(Constraints.Infinity), v.maxIntrinsicWidth(Constraints.Infinity), width, gap)) {
             val valueP = v.measure(Constraints(maxWidth = (width - nameP.width - gap).coerceAtLeast(0)))
@@ -327,15 +327,15 @@ internal fun RowNameValue(name: String, nameColor: Color, value: String?, modifi
             val top = minOf(0, shift)
             val height = maxOf(nameP.height, valueP.height + shift) - top
             layout(width, height) {
-                nameP.place(0, -top)
-                valueP.place(width - valueP.width, shift - top)
+                nameP.placeRelative(0, -top)
+                valueP.placeRelative(width - valueP.width, shift - top)
             }
         } else {
             val valueP = v.measure(loose)
             val line = RowLineGap.roundToPx()
             layout(width, nameP.height + line + valueP.height) {
-                nameP.place(0, 0)
-                valueP.place(0, nameP.height + line)
+                nameP.placeRelative(0, 0)
+                valueP.placeRelative(0, nameP.height + line)
             }
         }
     }
