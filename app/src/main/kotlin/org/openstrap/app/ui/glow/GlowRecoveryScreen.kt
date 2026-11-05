@@ -206,7 +206,7 @@ private fun RecoveryHero(
             val figure = score ?: shown?.value?.takeIf { shown.estimate }
             if (figure != null) {
                 // Before the first score the sentence already says how many nights are in, so the caveat waits for a score.
-                if (score != null) ready.let { TabCopy.learning(it.phase, it.baselineNights) }?.let { CaveatLine(it, MetricColors.readiness) }
+                if (score != null) ready?.let { TabCopy.learning(it.phase, it.baselineNights) }?.let { CaveatLine(it, MetricColors.readiness) }
                 Spacer(Modifier.height(22.dp))
                 androidx.compose.foundation.layout.Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
                     HeroFigure(figure.toString(), if (score != null) TodayCopy.recoveryWord(score, alert) else shown?.word.orEmpty(), big = true)
