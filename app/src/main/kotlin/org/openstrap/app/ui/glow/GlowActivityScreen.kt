@@ -297,9 +297,11 @@ private fun HourPills(hourly: List<Float>, picked: Int?, onPick: (Int?) -> Unit)
             // The shared pill bars ([hourPills]), as a widget's chart draws them.
             hourPills(hourly, picked, size.width, size.height, density)?.let { drawHourPills(it) }
         }
-        Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-            listOf("00", "06", "12", "18", "24").forEach {
-                Text(it, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
+        Ltr {
+            Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                listOf("00", "06", "12", "18", "24").forEach {
+                    Text(it, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
+                }
             }
         }
     }

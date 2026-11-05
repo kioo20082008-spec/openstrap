@@ -832,6 +832,7 @@ private fun StackedBars(
             }
             goal?.let { g -> val y = yOf(g); drawLine(Color.White.copy(alpha = 0.4f), Offset(0f, y), Offset(size.width, y), 1.dp.toPx()) }
         }
+        Ltr {
         androidx.compose.foundation.layout.Row(
             Modifier.fillMaxWidth().padding(top = 6.dp),
             horizontalArrangement = if (spread) androidx.compose.foundation.layout.Arrangement.SpaceBetween else androidx.compose.foundation.layout.Arrangement.Start,
@@ -842,6 +843,7 @@ private fun StackedBars(
                     modifier = if (spread) Modifier else Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
+        }
         }
     }
 }

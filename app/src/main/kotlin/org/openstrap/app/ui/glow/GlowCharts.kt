@@ -1042,3 +1042,12 @@ fun StageStrip(spans: List<StageSpan>, modifier: Modifier = Modifier, height: Dp
         }
     }
 }
+
+/**
+ * Charts read left to right in every language, as clocks and calendars on them do: labels laid out beside a chart
+ * that draws on a canvas go in here, so in Arabic they stay under the times the canvas drew them at.
+ */
+@Composable
+fun Ltr(content: @Composable () -> Unit) = androidx.compose.runtime.CompositionLocalProvider(
+    androidx.compose.ui.platform.LocalLayoutDirection provides androidx.compose.ui.unit.LayoutDirection.Ltr, content = content,
+)

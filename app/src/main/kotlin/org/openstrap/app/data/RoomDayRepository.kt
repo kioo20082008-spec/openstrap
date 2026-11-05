@@ -62,12 +62,7 @@ class RoomDayRepository(
             actAndLive, vitals, sleepAndExtras, weekly(date, zone), more(date, day, night),
         ) { (ah, live), (spo2, stress, hrv), (sleepPart, extraParts, base), weeklyParts, moreParts ->
             val (skin, breath, pai) = extraParts
-            val (raw, hr) = ah
-            // Steps the strap logs while you're asleep are arm movement, not walking: they don't count.
-            val asleepSpans = listOfNotNull(sleepPart.sleep?.main) + sleepPart.sleep?.naps.orEmpty()
-            val act = if (asleepSpans.isEmpty()) raw else raw.map { m ->
-                if (m.steps > 0 && asleepSpans.any { m.timestamp >= it.start && m.timestamp < it.end }) m.copy(steps = 0) else m
-            }
+            val (act, hr) = ah
             moreParts.copy(
                 isToday = isToday,
                 day = day,
@@ -75,11 +70,7 @@ class RoomDayRepository(
                 minutes = act,
                 heartRate = hr,
                 // Only today's count touches the shared anchor: another day's would move it off today.
-                steps = Summaries.totalSteps(act).let { total ->
-                    // The strap's running total counts the steps logged in sleep too: take them off it as well.
-                    val asleep = Summaries.totalSteps(raw) - total
-                    if (isToday) liveSteps.today(date, total, live?.let { it.copy(steps = (it.steps - asleep).coerceAtLeast(0)) }) else total
-                },
+                steps = Summaries.totalSteps(act).let { total -> if (isToday) liveSteps.today(date, total, live) else total },
                 restingTrend = weeklyParts.resting,
                 restingEstimated = weeklyParts.restingEstimated,
                 hrvTrend = weeklyParts.hrv,
