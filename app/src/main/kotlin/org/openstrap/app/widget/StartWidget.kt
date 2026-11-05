@@ -176,22 +176,39 @@ private fun ColumnScope.SmallContent(m: StartWidgetModel, f: WidgetFrame) {
     val fit = StartLayout.small(sport, listOf(StartWidgetModel.USUAL), false, f.contentWidth, f.contentHeight, f.fontScale)
     val sz = fit.sizes
     val words: @Composable () -> Unit = {
-        Text(fit.words.name, style = NameStyle, maxLines = 1)
-        fit.words.line?.let { Text(it, style = WidgetType.secondary, maxLines = 1) }
+        if (WidgetRtl) {
+            FontText(fit.words.name, WidgetText.BODY_SP, Color.White, strong = true)
+            fit.words.line?.let { FontText(it, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f)) }
+        } else {
+            Text(fit.words.name, style = NameStyle, maxLines = 1)
+            fit.words.line?.let { Text(it, style = WidgetType.secondary, maxLines = 1) }
+        }
     }
     Gap()
     if (fit.actionTop) {
         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (WidgetRtl) {
+                Action(m, sz, f)
+                Spacer(GlanceModifier.defaultWeight())
+                if (fit.tile) UsualTile(sport, false, sz, f.density)
+                return@Row
+            }
             if (fit.tile) UsualTile(sport, false, sz, f.density)
             Spacer(GlanceModifier.defaultWeight())
             Action(m, sz, f)
         }
         Gap()
-        Column(GlanceModifier.fillMaxWidth()) { words() }
+        Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) { words() }
     } else {
         UsualTile(sport, false, sz, f.density)
         Gap()
         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            if (WidgetRtl) {
+                Action(m, sz, f)
+                Spacer(GlanceModifier.width(StartLayout.SMALL_GAP_DP.dp))
+                Column(GlanceModifier.defaultWeight(), horizontalAlignment = Alignment.End) { words() }
+                return@Row
+            }
             Column(GlanceModifier.defaultWeight()) { words() }
             Spacer(GlanceModifier.width(StartLayout.SMALL_GAP_DP.dp))
             Action(m, sz, f)

@@ -113,10 +113,11 @@ private fun ColumnScope.SmallContent(m: SleepWidgetModel, f: WidgetFrame) {
     if (fit.lines.isNotEmpty() || fit.bar) {
         Gap()
         // One child of the column, its rows inside: Glance drops a column's children past ten.
-        Column(GlanceModifier.fillMaxWidth()) {
+        Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
             fit.lines.forEachIndexed { i, line ->
                 if (i > 0) Spacer(GlanceModifier.height(SleepLayout.SMALL_GAP_DP.dp))
-                Text(line.text, style = WidgetType.secondary, maxLines = line.lines)
+                if (WidgetRtl && line.lines == 1) FontText(line.text, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f))
+                else Text(line.text, style = WidgetType.secondary, maxLines = line.lines)
             }
             if (fit.bar) {
                 if (fit.lines.isNotEmpty()) Spacer(GlanceModifier.height(SleepLayout.SMALL_GAP_DP.dp))
@@ -170,6 +171,22 @@ private fun ColumnScope.LargeContent(m: SleepWidgetModel, f: WidgetFrame) {
 private fun ScoreRow(m: SleepWidgetModel, row: SleepLayout.ScoreRow, wordGap: Float, density: Float) {
     Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
         val score = m.score
+        if (WidgetRtl) {
+            // Arabic: what's on the side first, then the word, the score at the right edge.
+            row.right?.let {
+                FontText(it, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f))
+                Spacer(GlanceModifier.width(SleepLayout.SIDE_GAP_DP.dp))
+            }
+            Spacer(GlanceModifier.defaultWeight())
+            if (row.dot > 0f && score != null) {
+                row.word?.let {
+                    FontText(it, WidgetText.BODY_SP, Color.White.copy(alpha = 0.72f))
+                    Spacer(GlanceModifier.width(wordGap.dp))
+                }
+                DotNumber(score, row.dot, density, m.scoreDescription)
+            } else row.word?.let { FontText(it, WidgetText.BODY_SP, Color.White.copy(alpha = 0.72f)) }
+            return@Row
+        }
         if (row.dot > 0f && score != null) {
             DotNumber(score, row.dot, density, m.scoreDescription)
             row.word?.let {
@@ -243,6 +260,7 @@ private fun LegendItem(item: SleepLegendItem) {
 private fun StageBar(m: SleepWidgetModel, heightDp: Float, f: WidgetFrame, described: Boolean = true) {
     val w = f.drawContentWidth * f.density
     val bitmap = renderToBitmap(w, heightDp * f.density) { c -> drawStageBar(c, m.totals, 0f, 0f, w, f.density, heightDp) }
+        .let { if (WidgetRtl) mirrored(it) else it }
     Image(
         ImageProvider(bitmap),
         contentDescription = if (described) m.legend.joinToString(", ") { it.label } else null,

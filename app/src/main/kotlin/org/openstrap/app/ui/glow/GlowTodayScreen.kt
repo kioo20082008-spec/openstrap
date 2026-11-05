@@ -277,6 +277,7 @@ fun GlowTodayScreen(
                                             onOpenRecovery, onOpenWorkout, onRetryRecovery,
                                             onOpenScore = { onOpen(org.openstrap.app.ui.dashboard.Detail.OfScore(it)) },
                                             energyHidden = slots.none { it.card == TodayCard.Charge },
+                                            usualSteps = usualSteps,
                                         )
                                         TodayCard.EditToday -> EditTodayButton({ editing = true })
                                         else -> TodayRow(slot, ctx, healthspan, history, checkIn, onCheckIn, onOpenMetric,
@@ -410,6 +411,8 @@ private fun Hero(
     onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit,
     /** The Energy card is hidden in Edit Today, so the evening hero says Energy itself. */
     energyHidden: Boolean = false,
+    /** Your usual steps by each hour, for the coach's pace. */
+    usualSteps: List<Float>? = null,
 ) {
     val onOpenCharge = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Energy) }
     // Every hero is as high as its content with the card padding around it. The floor is only a Wide's height, under
