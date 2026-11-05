@@ -3,7 +3,7 @@
     <string name="core_first_night_after">بعد أول ليلة لك</string>
     <string name="core_header_during_workout">تمرين</string>
     <string name="core_header_after_workout">بعد تمرينك</string>
-    <string name="core_header_after_sport">بعد %1$s</string>
+    <string name="core_header_after_sport">بعد ⁨%1$s⁩</string>
     <string name="core_header_workout_window">وقت التمرين</string>
     <string name="core_header_waking">الاستيقاظ</string>
     <string name="core_header_night">الليل</string>
@@ -30,9 +30,9 @@
     <string name="core_today_meaning_ready">تعافيت بما يكفي لتمرينك المعتاد.</string>
     <string name="core_today_meaning_moderate">لم تتعافَ تماماً. اجعل الجهد متوسطاً.</string>
     <string name="core_today_meaning_low">ما زلت تتعافى. يوم هادئ يساعدك.</string>
-    <string name="core_today_no_score_learning">ما زال OpenStrap يتعلّم لياليك، %1$d من %2$d.</string>
+    <string name="core_today_no_score_learning">ما زال OpenStrap يتعلّم لياليك، ⁨%1$d⁩ من ⁨%2$d⁩.</string>
     <string name="core_today_no_score_heart">بيانات النبض غير كافية الليلة الماضية لحساب الاستشفاء.</string>
-    <string name="core_today_slept">نمت %1$s.</string>
+    <string name="core_today_slept">نمت ⁨%1$s⁩.</string>
     <string name="core_today_no_sleep_that_night">لم يُسجَّل نوم في تلك الليلة.</string>
     <string name="core_today_recovery_first_night">يبدأ الاستشفاء بعد أول ليلة لك مع السترب.</string>
     <string name="core_today_no_sleep">لم يُسجَّل نوم الليلة الماضية. هل كنت لابساً السترب؟</string>
@@ -41,8 +41,8 @@
     <string name="core_today_strap_estimate">تقدير السترب</string>
     <string name="core_today_own_score_not_ready">نتيجة OpenStrap الخاصة ليست جاهزة بعد.</string>
     <string name="core_today_energy_first_night">تبدأ الطاقة بعد أول ليلة لك. النوم هو ما يملؤها.</string>
-    <string name="core_today_energy_morning_drained">استهلك الصباح %1$d.</string>
-    <string name="core_today_energy_day_drained">استهلك اليوم %1$d حتى الآن.</string>
+    <string name="core_today_energy_morning_drained">استهلك الصباح ⁨%1$d⁩.</string>
+    <string name="core_today_energy_day_drained">استهلك اليوم ⁨%1$d⁩ حتى الآن.</string>
     <string name="core_today_energy_nothing_drained">لم يُستهلك شيء منذ الاستيقاظ.</string>
     <string name="core_today_energy_plenty">متبقٍ الكثير لهذا المساء.</string>
     <string name="core_today_energy_enough">يكفي لمساء هادئ.</string>
@@ -58,16 +58,16 @@
     <string name="core_today_window_usually_hike">عادةً تمشي مشياً جبلياً في هذا الوقت.</string>
     <string name="core_today_window_usually_row">عادةً تجدّف في هذا الوقت.</string>
     <string name="core_today_window_usually_workout">عادةً تتمرن في هذا الوقت.</string>
-    <string name="core_today_window_energy_plenty">الطاقة %1$d، متبقٍ الكثير.</string>
-    <string name="core_today_window_energy_enough">الطاقة %1$d، تكفي لشيء خفيف.</string>
-    <string name="core_today_window_energy_low">الطاقة %1$d، منخفضة.</string>
+    <string name="core_today_window_energy_plenty">الطاقة ⁨%1$d⁩، متبقٍ الكثير.</string>
+    <string name="core_today_window_energy_enough">الطاقة ⁨%1$d⁩، تكفي لشيء خفيف.</string>
+    <string name="core_today_window_energy_low">الطاقة ⁨%1$d⁩، منخفضة.</string>
     <string name="core_today_after_waiting">يظهر نبضك بعد التمرين عندما يرسله السترب.</string>
-    <string name="core_today_after_now">النبض %1$d الآن.</string>
+    <string name="core_today_after_now">النبض ⁨%1$d⁩ الآن.</string>
     <string name="core_today_after_settled">النبض عاد قرب الراحة.</string>
     <string name="core_today_after_settling">النبض يهدأ.</string>
-    <string name="core_today_evening_full">يوم حافل. %1$s.</string>
-    <string name="core_today_evening_quiet">يوم هادئ. %1$s.</string>
-    <string name="core_today_evening_steady">يوم متوازن. %1$s.</string>
+    <string name="core_today_evening_full">يوم حافل. ⁨%1$s⁩.</string>
+    <string name="core_today_evening_quiet">يوم هادئ. ⁨%1$s⁩.</string>
+    <string name="core_today_evening_steady">يوم متوازن. ⁨%1$s⁩.</string>
     <string name="core_today_evening_one_run">جري</string>
     <string name="core_today_evening_one_walk">مشي</string>
     <string name="core_today_evening_one_ride">ركوب دراجة</string>
@@ -75,39 +75,39 @@
     <string name="core_today_evening_one_hike">مشي جبلي</string>
     <string name="core_today_evening_one_row">تجديف</string>
     <string name="core_today_evening_one_workout">تمرين</string>
-    <plurals name="core_today_evening_workouts"><item quantity="zero">%d تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">%d تمارين</item><item quantity="few">%d تمارين</item><item quantity="many">%d تمارين</item><item quantity="other">%d تمارين</item></plurals>
-    <plurals name="core_today_evening_steps"><item quantity="zero">%1$s خطوة</item><item quantity="one">%1$s خطوة</item><item quantity="two">%1$s خطوة</item><item quantity="few">%1$s خطوة</item><item quantity="many">%1$s خطوة</item><item quantity="other">%1$s خطوة</item></plurals>
+    <plurals name="core_today_evening_workouts"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">⁨%d⁩ تمارين</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمارين</item><item quantity="other">⁨%d⁩ تمارين</item></plurals>
+    <plurals name="core_today_evening_steps"><item quantity="zero">⁨%1$s⁩ خطوة</item><item quantity="one">⁨%1$s⁩ خطوة</item><item quantity="two">⁨%1$s⁩ خطوة</item><item quantity="few">⁨%1$s⁩ خطوة</item><item quantity="many">⁨%1$s⁩ خطوة</item><item quantity="other">⁨%1$s⁩ خطوة</item></plurals>
     <string name="core_today_evening_load_above">جهد أعلى من معدلك</string>
     <string name="core_today_evening_load_below">جهد أقل من معدلك</string>
     <string name="core_today_evening_load_usual">جهد قريب من معدلك</string>
-    <string name="core_today_list_comma">%1$s، %2$s</string>
-    <string name="core_today_list_and">%1$s و%2$s</string>
+    <string name="core_today_list_comma">⁨%1$s⁩، ⁨%2$s⁩</string>
+    <string name="core_today_list_and">⁨%1$s⁩ و⁨%2$s⁩</string>
     <string name="core_today_goal_past">تجاوزت هدف الخطوات</string>
     <string name="core_today_goal_close">قريب من هدف الخطوات</string>
     <string name="core_today_goal_short">أقل من هدف الخطوات</string>
     <string name="core_today_goal_well_short">بعيد عن هدف الخطوات</string>
-    <string name="core_today_bedtime_in">موعد النوم بعد %1$s</string>
+    <string name="core_today_bedtime_in">موعد النوم بعد ⁨%1$s⁩</string>
     <string name="core_today_recovered">تعافيت</string>
-    <plurals name="core_today_recover_by"><item quantity="zero">ساعات متبقية، جاهز الساعة %1$s</item><item quantity="one">باقي ساعة، جاهز الساعة %1$s</item><item quantity="two">ساعات متبقية، جاهز الساعة %1$s</item><item quantity="few">ساعات متبقية، جاهز الساعة %1$s</item><item quantity="many">ساعات متبقية، جاهز الساعة %1$s</item><item quantity="other">ساعات متبقية، جاهز الساعة %1$s</item></plurals>
+    <plurals name="core_today_recover_by"><item quantity="zero">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز الساعة ⁨%1$s⁩</item><item quantity="two">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="few">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="many">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item><item quantity="other">ساعات متبقية، جاهز الساعة ⁨%1$s⁩</item></plurals>
     <plurals name="core_today_recover_tomorrow"><item quantity="zero">ساعات متبقية، جاهز غداً</item><item quantity="one">باقي ساعة، جاهز غداً</item><item quantity="two">ساعات متبقية، جاهز غداً</item><item quantity="few">ساعات متبقية، جاهز غداً</item><item quantity="many">ساعات متبقية، جاهز غداً</item><item quantity="other">ساعات متبقية، جاهز غداً</item></plurals>
-    <plurals name="core_today_recover_day"><item quantity="zero">ساعات متبقية، جاهز %1$s</item><item quantity="one">باقي ساعة، جاهز %1$s</item><item quantity="two">ساعات متبقية، جاهز %1$s</item><item quantity="few">ساعات متبقية، جاهز %1$s</item><item quantity="many">ساعات متبقية، جاهز %1$s</item><item quantity="other">ساعات متبقية، جاهز %1$s</item></plurals>
-    <string name="core_today_recover_short_by">جاهز الساعة %1$s</string>
+    <plurals name="core_today_recover_day"><item quantity="zero">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="one">باقي ساعة، جاهز ⁨%1$s⁩</item><item quantity="two">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="few">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="many">ساعات متبقية، جاهز ⁨%1$s⁩</item><item quantity="other">ساعات متبقية، جاهز ⁨%1$s⁩</item></plurals>
+    <string name="core_today_recover_short_by">جاهز الساعة ⁨%1$s⁩</string>
     <string name="core_today_recover_short_tomorrow">جاهز غداً</string>
-    <string name="core_today_recover_short_day">جاهز %1$s</string>
+    <string name="core_today_recover_short_day">جاهز ⁨%1$s⁩</string>
     <string name="core_today_load_line_learning">الجهد، نتعلّم معدلك</string>
     <string name="core_today_load_line_above">الجهد أعلى من معدلك</string>
     <string name="core_today_load_line_usual">الجهد قريب من معدلك</string>
     <string name="core_today_load_line_below">الجهد أقل من معدلك</string>
     <string name="core_today_load_line_so_far">الجهد حتى الآن اليوم</string>
     <string name="core_today_load_word_learning">نتعلّم معدلك</string>
-    <string name="core_today_week_first">تبدأ المقارنة الأسبوعية %1$s القادم.</string>
-    <string name="core_today_steps_up">الخطوات أعلى %1$d%%</string>
-    <string name="core_today_steps_down">الخطوات أقل %1$d%%</string>
+    <string name="core_today_week_first">تبدأ المقارنة الأسبوعية ⁨%1$s⁩ القادم.</string>
+    <string name="core_today_steps_up">الخطوات أعلى ⁨%1$d%%⁩</string>
+    <string name="core_today_steps_down">الخطوات أقل ⁨%1$d%%⁩</string>
     <string name="core_today_steps_steady">الخطوات ثابتة</string>
-    <string name="core_today_last_night_score">%1$s، النتيجة %2$d</string>
+    <string name="core_today_last_night_score">⁨%1$s⁩، النتيجة ⁨%2$d⁩</string>
     <string name="core_today_heart_note_band">المس الخط مطولاً لقراءة أي لحظة. الشريط هو نطاق راحتك.</string>
     <string name="core_today_heart_note">المس الخط مطولاً لقراءة أي لحظة.</string>
     <string name="core_today_heart_live">مباشر الآن</string>
-    <string name="core_today_heart_at">الساعة %1$s</string>
+    <string name="core_today_heart_at">الساعة ⁨%1$s⁩</string>
     <string name="core_today_heart_waiting">بانتظار السترب</string>
 </resources>

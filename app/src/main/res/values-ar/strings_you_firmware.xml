@@ -5,7 +5,7 @@
     <string name="you_firmware_unknown">غير معروف</string>
     <string name="you_firmware_hardware">العتاد</string>
     <string name="you_firmware_battery">البطارية</string>
-    <string name="you_firmware_percent">%1$d%%</string>
+    <string name="you_firmware_percent">⁨%1$d%%⁩</string>
     <string name="you_firmware_not_connected">غير متصل</string>
     <string name="you_firmware_service">خدمة التحديث</string>
     <string name="you_firmware_service_available">متاحة</string>
@@ -24,14 +24,14 @@
     <string name="you_firmware_updates_text">اسأل خادم تحديث Zepp إن كان هناك نظام أحدث لهذا السترب.</string>
     <string name="you_firmware_check">تحقق من التحديثات</string>
     <string name="you_firmware_checking">جارٍ التحقق من التحديثات…</string>
-    <string name="you_firmware_downloading">جارٍ تنزيل %1$s %2$s…</string>
-    <string name="you_firmware_part_title">%1$s %2$s</string>
+    <string name="you_firmware_downloading">جارٍ تنزيل ⁨%1$s⁩ ⁨%2$s⁩…</string>
+    <string name="you_firmware_part_title">⁨%1$s⁩ ⁨%2$s⁩</string>
     <string name="you_firmware_ready">جاهز للتثبيت</string>
     <string name="you_firmware_image">الصورة</string>
     <string name="you_firmware_size">الحجم</string>
-    <string name="you_firmware_megabytes">%1$.1f م.ب</string>
+    <string name="you_firmware_megabytes">⁨%1$.1f⁩ م.ب</string>
     <string name="you_firmware_signed_for">موقّع لـ</string>
-    <string name="you_firmware_signed_for_value">المنتج %1$d الإصدار %2$d</string>
+    <string name="you_firmware_signed_for_value">المنتج ⁨%1$d⁩ الإصدار ⁨%2$d⁩</string>
     <string name="you_firmware_install">تثبيت</string>
     <string name="you_firmware_installing_note">أبقِ السترب قريباً وهذه الشاشة مفتوحة. قد يستغرق ذلك عدة دقائق.</string>
     <string name="you_firmware_installed">تم التثبيت</string>
@@ -43,30 +43,30 @@
     <string name="you_firmware_up_to_date_text">لا يوجد لدى خادم التحديث أحدث لهذا السترب.</string>
     <string name="you_firmware_required">تحديث إلزامي</string>
     <string name="you_firmware_available">يتوفر تحديث</string>
-    <string name="you_firmware_part_size">%1$s، %2$s ك.ب</string>
+    <string name="you_firmware_part_size">⁨%1$s⁩، ⁨%2$s⁩ ك.ب</string>
     <string name="you_firmware_parts_note">تُثبَّت الأجزاء واحداً تلو الآخر. بعد إعادة تشغيل السترب، تحقق مرة أخرى لتثبيت التالي.</string>
     <string name="you_firmware_not_now">ليس الآن</string>
     <string name="you_firmware_unsupported">لا يمكن التثبيت</string>
     <string name="you_firmware_download">تنزيل</string>
-    <string name="you_firmware_confirm_title">تثبيت %1$s؟</string>
+    <string name="you_firmware_confirm_title">تثبيت ⁨%1$s⁩؟</string>
     <string name="you_firmware_confirm_text">سيستقبل السترب الصورة ويتحقق منها ويثبتها ثم يعيد التشغيل. أبقه قرب الجوال ولا تغلق OpenStrap حتى ينتهي.</string>
     <string name="you_firmware_confirm_anyway">أفهم ذلك وأريد التثبيت على أي حال</string>
     <string name="you_firmware_no_account">سجّل الدخول إلى Zepp أولاً.</string>
     <string name="you_firmware_no_version">اتصل بالسترب أولاً ليُعرف إصدار نظامه.</string>
     <string name="you_firmware_check_failed">فشل التحقق من التحديث</string>
-    <string name="you_firmware_unknown_part">لا يستطيع OpenStrap تثبيت هذا النوع من الأجزاء (%1$s)</string>
+    <string name="you_firmware_unknown_part">لا يستطيع OpenStrap تثبيت هذا النوع من الأجزاء (⁨%1$s⁩)</string>
     <string name="you_firmware_download_failed">فشل التنزيل</string>
     <string name="you_firmware_install_failed">فشل التثبيت</string>
-    <plurals name="you_firmware_file_size"><item quantity="zero">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="one">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="two">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="few">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="many">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="other">حجم الملف %1$d بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item></plurals>
+    <plurals name="you_firmware_file_size"><item quantity="zero">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="one">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="two">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="few">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="many">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item><item quantity="other">حجم الملف ⁨%1$d⁩ بايت، وهذا ليس حجماً معقولاً لصورة نظام.</item></plurals>
     <string name="you_firmware_file_untrusted">هذا الملف لم يأتِ من خادم تحديث Zepp لهذا السترب. ثبّت فقط الملفات التي تثق بها.</string>
     <string name="you_firmware_file_unsigned">هذا الملف بلا توقيع نظام. على الأرجح ليس نظاماً لهذا السترب.</string>
     <string name="you_firmware_file_title">نظام من ملف</string>
     <string name="you_firmware_file_unread">تعذّرت قراءة الملف. اختره مرة أخرى.</string>
-    <string name="you_firmware_wrong_product">الصورة تقول إنها للمنتج %1$d، لكن هذا السترب هو المنتج %2$d.</string>
-    <string name="you_firmware_wrong_size">الملف أقصر مما تذكره الصورة (%1$d بايت). قد يكون ناقصاً.</string>
+    <string name="you_firmware_wrong_product">الصورة تقول إنها للمنتج ⁨%1$d⁩، لكن هذا السترب هو المنتج ⁨%2$d⁩.</string>
+    <string name="you_firmware_wrong_size">الملف أقصر مما تذكره الصورة (⁨%1$d⁩ بايت). قد يكون ناقصاً.</string>
     <string name="you_firmware_block_connect">اتصل بالسترب.</string>
     <string name="you_firmware_block_battery_unknown">مستوى البطارية غير معروف. أعد الاتصال بالسترب.</string>
-    <string name="you_firmware_block_battery">اشحن السترب فوق %1$d%% (الآن %2$d%%).</string>
+    <string name="you_firmware_block_battery">اشحن السترب فوق ⁨%1$d%%⁩ (الآن ⁨%2$d%%⁩).</string>
     <string name="you_firmware_step_starting">جارٍ البدء…</string>
     <string name="you_firmware_step_sending">جارٍ الإرسال للسترب…</string>
     <string name="you_firmware_step_validating">السترب يتحقق من الصورة…</string>
@@ -83,8 +83,8 @@
     <string name="you_zepp_title">حساب Zepp</string>
     <string name="you_zepp_save_sign_in">احفظ تسجيل الدخول</string>
     <string name="you_zepp_account_none">لا يجيب Zepp على طلبات التحقق من التحديث إلا للمستخدمين المسجّلين. سجّل الدخول، أو الصق رمز التطبيق ومعرّف المستخدم بنفسك. يُحفظان على هذا الجوال فقط.</string>
-    <string name="you_zepp_account_user">يستخدم التحقق من التحديث رمزك المحفوظ للمستخدم %1$s على %2$s.</string>
-    <string name="you_zepp_account">يستخدم التحقق من التحديث رمزك المحفوظ على %1$s.</string>
+    <string name="you_zepp_account_user">يستخدم التحقق من التحديث رمزك المحفوظ للمستخدم ⁨%1$s⁩ على ⁨%2$s⁩.</string>
+    <string name="you_zepp_account">يستخدم التحقق من التحديث رمزك المحفوظ على ⁨%1$s⁩.</string>
     <string name="you_zepp_sign_in_again">سجّل الدخول مرة أخرى</string>
     <string name="you_zepp_paste_token">الصق الرمز</string>
     <string name="you_zepp_edit">تعديل</string>
@@ -100,7 +100,7 @@
     <string name="you_zepp_reset">إعادة تعيين</string>
     <string name="you_zepp_sign_in_text">استخدم البريد وكلمة المرور لحساب Zepp المرتبط به السترب. تسجيل الدخول بـ Google وApple وFacebook وXiaomi لا يعمل هنا.</string>
     <string name="you_zepp_sign_in_note">هذه صفحة Zepp نفسها، فلا يرى OpenStrap كلمة مرورك أبداً. يقرأ فقط رمز التطبيق ومعرّف المستخدم، ثم يسأل Zepp مرة واحدة عن أجهزتك.</string>
-    <string name="you_zepp_third_party">تسجيل الدخول بـ %1$s لا يعمل داخل OpenStrap، لأن %1$s يمنع تسجيل الدخول في الصفحات المضمّنة.\n\nافتح تطبيق Zepp وأضف بريداً وكلمة مرور لحسابك من إعدادات الحساب. ثم سجّل الدخول هنا بذلك البريد. أو احصل على مفتاح المصادقة من كمبيوتر.</string>
+    <string name="you_zepp_third_party">تسجيل الدخول بـ ⁨%1$s⁩ لا يعمل داخل OpenStrap، لأن ⁨%1$s⁩ يمنع تسجيل الدخول في الصفحات المضمّنة.\n\nافتح تطبيق Zepp وأضف بريداً وكلمة مرور لحسابك من إعدادات الحساب. ثم سجّل الدخول هنا بذلك البريد. أو احصل على مفتاح المصادقة من كمبيوتر.</string>
     <string name="you_zepp_fetching">تم تسجيل الدخول. جارٍ البحث عن أجهزتك…</string>
     <string name="you_zepp_use_email">استخدم تسجيل الدخول بالبريد</string>
     <string name="you_zepp_no_devices">تعذّر جلب أجهزتك</string>
@@ -108,7 +108,7 @@
     <string name="you_zepp_found">وُجد Helio Strap الخاص بك</string>
     <string name="you_zepp_not_found">لا يوجد Helio Strap في هذا الحساب</string>
     <string name="you_zepp_account_empty">هذا الحساب بلا أجهزة. اربط السترب في تطبيق Zepp أولاً. إذا كان مربوطاً، سجّل الدخول ببريد الحساب الذي يستخدمه تطبيق Zepp.</string>
-    <plurals name="you_zepp_account_other_devices"><item quantity="zero">في هذا الحساب %1$d أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="one">في هذا الحساب جهاز %1$d، لكنه ليس Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="two">في هذا الحساب %1$d أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="few">في هذا الحساب %1$d أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="many">في هذا الحساب %1$d أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="other">في هذا الحساب %1$d أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item></plurals>
+    <plurals name="you_zepp_account_other_devices"><item quantity="zero">في هذا الحساب ⁨%1$d⁩ أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="one">في هذا الحساب جهاز ⁨%1$d⁩، لكنه ليس Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="two">في هذا الحساب ⁨%1$d⁩ أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="few">في هذا الحساب ⁨%1$d⁩ أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="many">في هذا الحساب ⁨%1$d⁩ أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item><item quantity="other">في هذا الحساب ⁨%1$d⁩ أجهزة، وليس بينها Amazfit Helio Strap. اربط السترب في تطبيق Zepp ثم سجّل الدخول مرة أخرى.</item></plurals>
     <string name="you_zepp_key_missing">غير موجود في الحساب</string>
     <string name="you_zepp_serial">الرقم التسلسلي</string>
     <string name="you_zepp_region">المنطقة</string>

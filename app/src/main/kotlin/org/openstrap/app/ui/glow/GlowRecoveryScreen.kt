@@ -119,7 +119,7 @@ fun GlowRecoveryScreen(
                         else RecoveryHero(
                             r, onOpen = { onOpenScore(Score.Recovery) }, onInfo = { info = true }, firstNights = firstNights,
                             noSleep = isToday && state.loaded && state.asleepSeconds == null, deleted = state.deletedSleep != null, firstScore = firstScore,
-                            shown = TodayCopy.recoveryShown(r?.readiness, strapScore, waiting),
+                            shown = TodayCopy.recoveryShown(r?.readiness, strapScore, waiting), restingHr = state.restingHeartRate,
                         )
                     RecoveryCard.Drivers -> DriversList(r?.readiness, onAll = { onOpenScore(Score.Recovery) })
                     // Charge is worked out with Recovery, so a failure there says so here too, not "after your first night".
@@ -162,12 +162,25 @@ private fun recoveryHeroStyle(color: Color) = GlowStyle.Bloom.copy(
 @Composable
 private fun RecoveryHero(
     r: RecoveryResult?, onOpen: () -> Unit, onInfo: () -> Unit, firstNights: Boolean = false, noSleep: Boolean = false, deleted: Boolean = false, firstScore: Boolean = false,
-    shown: TodayCopy.RecoveryShown? = null,
+    shown: TodayCopy.RecoveryShown? = null, restingHr: Int? = null,
 ) {
     val ready = r?.readiness
     val score = ready?.score
     val yesterday = r?.readinessTrend?.dropLast(1)?.lastOrNull()?.second
     val alert = ready?.strainAlert == true
+    // The redesign: with a score, the Pulse hero; before one, the card that says why there's none.
+    if (score != null) {
+        val vs = TabCopy.vsYesterday(score, yesterday)
+        PulseHero(
+            score = score, word = TodayCopy.recoveryWord(score, alert),
+            line = listOfNotNull(restingHr?.let { stringResource(R.string.dials_pulse_resting, it) }, vs).joinToString(" · "),
+            sentence = TabCopy.recovery(score, alert, ready.contributors),
+            zones = Triple(stringResource(R.string.dials_zone_rest), stringResource(R.string.dials_zone_calm), stringResource(R.string.dials_zone_ready)),
+            restingHr = restingHr, onOpen = onOpen,
+            info = { InfoButton(stringResource(R.string.glow_recovery_about), onInfo) },
+        )
+        return
+    }
     GlowCard(recoveryHeroStyle(MetricColors.readiness), Modifier.fillMaxWidth().gridSize(CardSize.Wide), onClick = onOpen) {
         Column {
             GlowHeader(

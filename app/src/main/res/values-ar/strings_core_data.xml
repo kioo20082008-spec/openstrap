@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_data_recovery_hrv">%1$s م.ث، %2$s%% مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_resting_hr">%1$s ن/د، %2$s مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_asleep">%1$s نوم</string>
+    <string name="core_data_recovery_hrv">⁨%1$s⁩ م.ث، ⁨%2$s%%⁩ مقارنة بالمعتاد</string>
+    <string name="core_data_recovery_resting_hr">⁨%1$s⁩ ن/د، ⁨%2$s⁩ مقارنة بالمعتاد</string>
+    <string name="core_data_recovery_asleep">⁨%1$s⁩ نوم</string>
     <string name="core_data_recovery_no_debt">لا يوجد دَين نوم</string>
-    <string name="core_data_recovery_debt">%1$s دَين نوم</string>
-    <string name="core_data_recovery_lowest_hr">أدنى نبض %1$s قبل الاستيقاظ</string>
-    <string name="core_data_recovery_temperature">%1$s °م مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_breathing">%1$s/د مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_blood_oxygen">%1$s%%، %2$s مقارنة بالمعتاد</string>
-    <string name="core_data_recovery_load">الجهد %1$s، المعتاد %2$s</string>
+    <string name="core_data_recovery_debt">⁨%1$s⁩ دَين نوم</string>
+    <string name="core_data_recovery_lowest_hr">أدنى نبض ⁨%1$s⁩ قبل الاستيقاظ</string>
+    <string name="core_data_recovery_temperature">⁨%1$s⁩ °م مقارنة بالمعتاد</string>
+    <string name="core_data_recovery_breathing">⁨%1$s⁩/د مقارنة بالمعتاد</string>
+    <string name="core_data_recovery_blood_oxygen">⁨%1$s%%⁩، ⁨%2$s⁩ مقارنة بالمعتاد</string>
+    <string name="core_data_recovery_load">الجهد ⁨%1$s⁩، المعتاد ⁨%2$s⁩</string>
     <string name="core_data_edit_wake_before_sleep">يجب أن يكون الاستيقاظ بعد النوم.</string>
     <string name="core_data_edit_nap_too_short">القيلولة تحتاج 5 دقائق على الأقل.</string>
     <string name="core_data_edit_sleep_too_short">النوم يحتاج ساعة على الأقل.</string>
@@ -17,8 +17,8 @@
     <string name="core_data_edit_sleep_too_long">النوم 16 ساعة كحد أقصى.</string>
     <string name="core_data_edit_future">هذا بعد الوقت الحالي.</string>
     <string name="core_data_edit_too_far">أبقه ضمن 3 ساعات مما رآه السترب.</string>
-    <string name="core_data_edit_runs_into_nap">هذا يتداخل مع قيلولتك الساعة %1$s.</string>
-    <string name="core_data_edit_runs_into_sleep">هذا يتداخل مع نومك الساعة %1$s.</string>
+    <string name="core_data_edit_runs_into_nap">هذا يتداخل مع قيلولتك الساعة ⁨%1$s⁩.</string>
+    <string name="core_data_edit_runs_into_sleep">هذا يتداخل مع نومك الساعة ⁨%1$s⁩.</string>
     <string name="core_data_vo2_needs_age">يحتاج عمراً بين 20 و79.</string>
     <string name="core_data_vo2_needs_sex">يحتاج جنسك: المعادلة تختلف للنساء والرجال.</string>
     <string name="core_data_vo2_needs_body">يحتاج وزناً وطولاً مُدخلين خلال آخر 90 يوماً.</string>
@@ -29,8 +29,8 @@
     <string name="core_data_vo2_band_30_50">من المئين 30 إلى 50</string>
     <string name="core_data_vo2_band_50_70">من المئين 50 إلى 70</string>
     <string name="core_data_vo2_band_70_90">من المئين 70 إلى 90</string>
-    <string name="core_data_vo2_band_top_10">أعلى %1$d%%</string>
-    <string name="core_data_vo2_estimate_rest">إلى %1$s مل/كغ/د</string>
-    <string name="core_data_goal_summary">%1$s خطوة، %2$s سعرة نشطة، %3$s نوم، %4$s ساعات نشطة</string>
-    <string name="core_data_goal_out_of_range">اختر رقماً من %1$s إلى %2$s</string>
+    <string name="core_data_vo2_band_top_10">أعلى ⁨%1$d%%⁩</string>
+    <string name="core_data_vo2_estimate_rest">إلى ⁨%1$s⁩ مل/كغ/د</string>
+    <string name="core_data_goal_summary">⁨%1$s⁩ خطوة، ⁨%2$s⁩ سعرة نشطة، ⁨%3$s⁩ نوم، ⁨%4$s⁩ ساعات نشطة</string>
+    <string name="core_data_goal_out_of_range">اختر رقماً من ⁨%1$s⁩ إلى ⁨%2$s⁩</string>
 </resources>

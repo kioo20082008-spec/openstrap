@@ -37,20 +37,20 @@
     <string name="day_pair_key_rejected">رفض السترب الربط. افتح صفحة السترب لتربطه من جديد.</string>
     <string name="day_first_score">أول نتيجة</string>
     <string name="day_partial_day">يوم جزئي</string>
-    <string name="day_partial_line_today">سجّل السترب %1$s من أصل %2$s حتى الآن اليوم.</string>
-    <string name="day_partial_line">سجّل السترب %1$s من اليوم.</string>
+    <string name="day_partial_line_today">سجّل السترب ⁨%1$s⁩ من أصل ⁨%2$s⁩ حتى الآن اليوم.</string>
+    <string name="day_partial_line">سجّل السترب ⁨%1$s⁩ من اليوم.</string>
     <string name="day_partial_meaning">لُبس السترب جزءاً من اليوم، لذلك مجاميعه منخفضة.</string>
     <string name="day_partial_lowers_title">ما الذي يتأثر</string>
     <string name="day_partial_lowers">الخطوات والسعرات والطاقة تُحسب فقط وقت لبس السترب، والشحن يوقفها أيضاً.</string>
     <string name="day_partial_when_title">متى يُعتبر اليوم جزئياً</string>
-    <string name="day_partial_when">عندما يُلبس السترب أقل من %1$s من اليوم. واليوم، أقل من هذه النسبة من الساعات حتى الآن.</string>
-    <string name="day_up_to">حتى %1$s</string>
+    <string name="day_partial_when">عندما يُلبس السترب أقل من ⁨%1$s⁩ من اليوم. واليوم، أقل من هذه النسبة من الساعات حتى الآن.</string>
+    <string name="day_up_to">حتى ⁨%1$s⁩</string>
     <string name="day_stuck_last_night_title">الليلة الماضية</string>
     <string name="day_stuck_last_night">بيانات الليلة الماضية ما زالت على السترب.</string>
     <string name="day_stuck_keep_near">أبقه قرب جوالك وسيُزامَن.</string>
     <string name="day_stuck_not_synced_title">لم يُزامَن</string>
-    <string name="day_stuck_data_since">بياناتك منذ %1$s ما زالت على السترب.</string>
-    <string name="day_last_tried">آخر محاولة %1$s</string>
+    <string name="day_stuck_data_since">بياناتك منذ ⁨%1$s⁩ ما زالت على السترب.</string>
+    <string name="day_last_tried">آخر محاولة ⁨%1$s⁩</string>
     <string name="day_recovery_failed">تعذّر حساب نتيجة اليوم.</string>
     <string name="day_charge_failed">تعذّر حساب طاقة اليوم.</string>
     <string name="day_failed_short">تعذّر حسابها</string>
@@ -60,28 +60,28 @@
     <string name="day_chip_not_paired">غير مربوط</string>
     <string name="day_chip_not_paired_description">لا يوجد سترب مربوط</string>
     <string name="day_chip_connecting_description">جارٍ الاتصال بالسترب</string>
-    <string name="day_chip_last_seen_description">آخر ظهور للسترب %1$s</string>
+    <string name="day_chip_last_seen_description">آخر ظهور للسترب ⁨%1$s⁩</string>
     <string name="day_chip_not_connected">غير متصل</string>
     <string name="day_chip_not_connected_description">السترب غير متصل</string>
-    <string name="day_chip_charging">يشحن %1$d%%</string>
-    <string name="day_chip_charging_description">السترب يشحن، البطارية %1$d بالمئة</string>
+    <string name="day_chip_charging">يشحن ⁨%1$d%%⁩</string>
+    <string name="day_chip_charging_description">السترب يشحن، البطارية ⁨%1$d⁩ بالمئة</string>
     <string name="day_chip_not_synced">لم يُزامَن</string>
     <string name="day_chip_not_synced_description">السترب متصل ولم يُزامَن</string>
     <string name="day_chip_connected_description">السترب متصل</string>
-    <string name="day_chip_battery">%1$d%%</string>
-    <string name="day_chip_battery_low_description">السترب متصل، البطارية منخفضة %1$d بالمئة</string>
-    <string name="day_chip_battery_description">السترب متصل، البطارية %1$d بالمئة</string>
+    <string name="day_chip_battery">⁨%1$d%%⁩</string>
+    <string name="day_chip_battery_low_description">السترب متصل، البطارية منخفضة ⁨%1$d⁩ بالمئة</string>
+    <string name="day_chip_battery_description">السترب متصل، البطارية ⁨%1$d⁩ بالمئة</string>
     <string name="day_ago_now">الآن</string>
-    <string name="day_ago_minutes">قبل %1$d د</string>
-    <string name="day_ago_hours">قبل %1$d س</string>
-    <plurals name="day_ago_days"><item quantity="zero">قبل %1$d أيام</item><item quantity="one">قبل يوم</item><item quantity="two">قبل %1$d أيام</item><item quantity="few">قبل %1$d أيام</item><item quantity="many">قبل %1$d أيام</item><item quantity="other">قبل %1$d أيام</item></plurals>
+    <string name="day_ago_minutes">قبل ⁨%1$d⁩ د</string>
+    <string name="day_ago_hours">قبل ⁨%1$d⁩ س</string>
+    <plurals name="day_ago_days"><item quantity="zero">قبل ⁨%1$d⁩ أيام</item><item quantity="one">قبل يوم</item><item quantity="two">قبل ⁨%1$d⁩ أيام</item><item quantity="few">قبل ⁨%1$d⁩ أيام</item><item quantity="many">قبل ⁨%1$d⁩ أيام</item><item quantity="other">قبل ⁨%1$d⁩ أيام</item></plurals>
     <string name="day_header_you">أنت</string>
     <string name="day_header_you_update">أنت، يوجد إصدار جديد</string>
     <string name="day_header_open_you">افتح صفحتك</string>
     <string name="day_header_all_metrics">كل المقاييس</string>
     <string name="day_header_open_all_metrics">افتح كل المقاييس</string>
     <string name="day_header_pick_day">اختر يوماً</string>
-    <string name="day_header_day_description">%1$s، %2$s</string>
+    <string name="day_header_day_description">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="day_header_open_strap">افتح صفحة السترب</string>
     <string name="day_calendar_previous_month">الشهر السابق</string>
     <string name="day_calendar_next_month">الشهر التالي</string>
@@ -92,9 +92,9 @@
     <string name="day_rating_good">جيد</string>
     <string name="day_rating_fair">مقبول</string>
     <string name="day_rating_low">منخفض</string>
-    <string name="day_stress_counts_from_calm">يُحسب التوتر من %1$d: أعلى بـ %2$d من مستوى هدوئك %3$d خلال آخر %4$s.</string>
-    <plurals name="day_stress_last_days"><item quantity="zero">%1$d أيام</item><item quantity="one">يوم</item><item quantity="two">%1$d أيام</item><item quantity="few">%1$d أيام</item><item quantity="many">%1$d أيام</item><item quantity="other">%1$d أيام</item></plurals>
-    <string name="day_stress_counts_for_now">يُحسب التوتر من %1$d مؤقتاً. بعد %2$s من اللبس يتكيّف مع مستوى هدوئك.</string>
-    <plurals name="day_stress_more_days"><item quantity="zero">%1$d أيام إضافية</item><item quantity="one">يوم إضافي</item><item quantity="two">%1$d أيام إضافية</item><item quantity="few">%1$d أيام إضافية</item><item quantity="many">%1$d أيام إضافية</item><item quantity="other">%1$d أيام إضافية</item></plurals>
-    <string name="day_stress_counts_until">يُحسب التوتر من %1$d مؤقتاً، حتى تتوفر قراءات هدوء كافية لمعرفة مستواك.</string>
+    <string name="day_stress_counts_from_calm">يُحسب التوتر من ⁨%1$d⁩: أعلى بـ ⁨%2$d⁩ من مستوى هدوئك ⁨%3$d⁩ خلال آخر ⁨%4$s⁩.</string>
+    <plurals name="day_stress_last_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم</item><item quantity="two">⁨%1$d⁩ أيام</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ أيام</item><item quantity="other">⁨%1$d⁩ أيام</item></plurals>
+    <string name="day_stress_counts_for_now">يُحسب التوتر من ⁨%1$d⁩ مؤقتاً. بعد ⁨%2$s⁩ من اللبس يتكيّف مع مستوى هدوئك.</string>
+    <plurals name="day_stress_more_days"><item quantity="zero">⁨%1$d⁩ أيام إضافية</item><item quantity="one">يوم إضافي</item><item quantity="two">⁨%1$d⁩ أيام إضافية</item><item quantity="few">⁨%1$d⁩ أيام إضافية</item><item quantity="many">⁨%1$d⁩ أيام إضافية</item><item quantity="other">⁨%1$d⁩ أيام إضافية</item></plurals>
+    <string name="day_stress_counts_until">يُحسب التوتر من ⁨%1$d⁩ مؤقتاً، حتى تتوفر قراءات هدوء كافية لمعرفة مستواك.</string>
 </resources>

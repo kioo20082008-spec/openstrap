@@ -197,8 +197,9 @@ private fun DaySwitcher(
 }
 
 @Composable
-private fun Peek(text: String) {
-    Text(text, Modifier.width(PeekWidth), color = Color.White.copy(alpha = 0.22f), style = GlowType.body, maxLines = 1, softWrap = false)
+private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
+    // The redesign keeps the header clean: the neighbouring days no longer peek in, the swipe still moves between them.
+    Spacer(Modifier.width(PeekWidth))
 }
 
 /** The strap chip: a dot, and words only when they matter. */

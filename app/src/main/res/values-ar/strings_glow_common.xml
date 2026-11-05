@@ -22,7 +22,7 @@
     <string name="glow_back">رجوع</string>
     <string name="glow_page_switch">تبديل</string>
     <string name="glow_page_change">تغيير</string>
-    <string name="glow_tag_about">عن %1$s</string>
+    <string name="glow_tag_about">عن ⁨%1$s⁩</string>
     <string name="glow_info_how">كيف يُحسب</string>
     <string name="glow_info_moves">ما الذي يغيّره</string>
     <string name="glow_info_off">لماذا قد يكون غير دقيق</string>
@@ -31,8 +31,8 @@
     <string name="glow_tabletop_heart_rate">النبض</string>
     <string name="glow_tabletop_latest">الأحدث</string>
     <string name="glow_tabletop_live">مباشر</string>
-    <string name="glow_tabletop_resting">الراحة %1$d</string>
-    <string name="glow_tabletop_bpm">%1$d ن/د</string>
+    <string name="glow_tabletop_resting">الراحة ⁨%1$d⁩</string>
+    <string name="glow_tabletop_bpm">⁨%1$d⁩ ن/د</string>
     <string name="glow_unit_h">س</string>
     <string name="glow_unit_s">ث</string>
 </resources>

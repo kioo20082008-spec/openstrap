@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="glow_summary_join">%1$s، %2$s</string>
-    <string name="glow_summary_minutes">%1$d د</string>
+    <string name="glow_summary_join">⁨%1$s⁩، ⁨%2$s⁩</string>
+    <string name="glow_summary_minutes">⁨%1$d⁩ د</string>
     <string name="glow_summary_unit_s">ث</string>
     <string name="glow_summary_unit_m">م</string>
     <string name="glow_summary_unit_avg_bpm">متوسط ن/د</string>
@@ -23,8 +23,8 @@
     <string name="glow_summary_figure_work_time">وقت التمرين</string>
     <string name="glow_summary_figure_zone_4_5">في المنطقتين 4 و5</string>
     <string name="glow_summary_figure_load">الجهد</string>
-    <string name="glow_summary_line_average_bpm">المتوسط %1$d ن/د</string>
-    <string name="glow_summary_line_active_kcal">%1$d سعرة نشطة</string>
+    <string name="glow_summary_line_average_bpm">المتوسط ⁨%1$d⁩ ن/د</string>
+    <string name="glow_summary_line_active_kcal">⁨%1$d⁩ سعرة نشطة</string>
     <string name="glow_summary_rest_title">الراحة</string>
     <string name="glow_summary_recovery_title">الراحة</string>
     <string name="glow_summary_each_rep">كل تكرار</string>
@@ -35,29 +35,29 @@
     <string name="glow_summary_rep_times_time">الوقت</string>
     <string name="glow_summary_peak_then_rest">الذروة ثم الراحة</string>
     <string name="glow_summary_round_down">انخفاض</string>
-    <plurals name="glow_summary_hard_efforts"><item quantity="zero">%d مجهودات قوية</item><item quantity="one">مجهود قوي %d</item><item quantity="two">%d مجهودات قوية</item><item quantity="few">%d مجهودات قوية</item><item quantity="many">%d مجهودات قوية</item><item quantity="other">%d مجهودات قوية</item></plurals>
+    <plurals name="glow_summary_hard_efforts"><item quantity="zero">⁨%d⁩ مجهودات قوية</item><item quantity="one">مجهود قوي ⁨%d⁩</item><item quantity="two">⁨%d⁩ مجهودات قوية</item><item quantity="few">⁨%d⁩ مجهودات قوية</item><item quantity="many">⁨%d⁩ مجهودات قوية</item><item quantity="other">⁨%d⁩ مجهودات قوية</item></plurals>
     <string name="glow_summary_period_avg"> متوسط</string>
     <string name="glow_summary_route">المسار</string>
-    <string name="glow_summary_climb">صعود %1$d م</string>
+    <string name="glow_summary_climb">صعود ⁨%1$d⁩ م</string>
     <string name="glow_summary_sets_title">المجموعات</string>
     <string name="glow_summary_peak_heart_rate">أعلى نبض</string>
-    <string name="glow_summary_set_peak">الذروة %1$d</string>
+    <string name="glow_summary_set_peak">الذروة ⁨%1$d⁩</string>
     <string name="glow_summary_time_in_zones">الوقت في المناطق</string>
-    <string name="glow_summary_zone_name">المنطقة %1$d، %2$s</string>
-    <string name="glow_summary_zone">المنطقة %1$d</string>
-    <string name="glow_summary_zones_max">الأقصى %1$d ن/د</string>
+    <string name="glow_summary_zone_name">المنطقة ⁨%1$d⁩، ⁨%2$s⁩</string>
+    <string name="glow_summary_zone">المنطقة ⁨%1$d⁩</string>
+    <string name="glow_summary_zones_max">الأقصى ⁨%1$d⁩ ن/د</string>
     <string name="glow_summary_heart_rate">النبض</string>
-    <string name="glow_summary_heart_down">انخفض %1$d</string>
+    <string name="glow_summary_heart_down">انخفض ⁨%1$d⁩</string>
     <string name="glow_summary_at_start">في البداية</string>
     <string name="glow_summary_at_end">في النهاية</string>
     <string name="glow_summary_vs_last">مقارنة بالمرة السابقة:</string>
     <string name="glow_summary_this_week">هذا الأسبوع</string>
     <string name="glow_summary_that_week">ذلك الأسبوع</string>
-    <plurals name="glow_summary_week_days_this"><item quantity="zero">%d أيام فيها تمرين هذا الأسبوع.</item><item quantity="one">يوم %d فيه تمرين هذا الأسبوع.</item><item quantity="two">%d أيام فيها تمرين هذا الأسبوع.</item><item quantity="few">%d أيام فيها تمرين هذا الأسبوع.</item><item quantity="many">%d أيام فيها تمرين هذا الأسبوع.</item><item quantity="other">%d أيام فيها تمرين هذا الأسبوع.</item></plurals>
-    <plurals name="glow_summary_week_days_that"><item quantity="zero">%d أيام فيها تمرين ذلك الأسبوع.</item><item quantity="one">يوم %d فيه تمرين ذلك الأسبوع.</item><item quantity="two">%d أيام فيها تمرين ذلك الأسبوع.</item><item quantity="few">%d أيام فيها تمرين ذلك الأسبوع.</item><item quantity="many">%d أيام فيها تمرين ذلك الأسبوع.</item><item quantity="other">%d أيام فيها تمرين ذلك الأسبوع.</item></plurals>
+    <plurals name="glow_summary_week_days_this"><item quantity="zero">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="one">يوم ⁨%d⁩ فيه تمرين هذا الأسبوع.</item><item quantity="two">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="many">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item><item quantity="other">⁨%d⁩ أيام فيها تمرين هذا الأسبوع.</item></plurals>
+    <plurals name="glow_summary_week_days_that"><item quantity="zero">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="one">يوم ⁨%d⁩ فيه تمرين ذلك الأسبوع.</item><item quantity="two">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="few">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="many">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item><item quantity="other">⁨%d⁩ أيام فيها تمرين ذلك الأسبوع.</item></plurals>
     <string name="glow_summary_earned">المكتسب</string>
     <string name="glow_summary_drop_title">انخفاض النبض</string>
-    <string name="glow_summary_drop_since">منذ %1$s</string>
+    <string name="glow_summary_drop_since">منذ ⁨%1$s⁩</string>
     <string name="glow_summary_drop_about">عن انخفاض النبض</string>
     <string name="glow_summary_unit_bpm_now">ن/د الآن</string>
     <string name="glow_summary_drop_last_minute">آخر دقيقة</string>
@@ -67,12 +67,12 @@
     <string name="glow_summary_load_none">النبض غير كافٍ لحساب الجهد.</string>
     <string name="glow_summary_splits">التقسيمات</string>
     <string name="glow_summary_laps">اللفات</string>
-    <string name="glow_summary_fastest_split">الأسرع: %1$s</string>
+    <string name="glow_summary_fastest_split">الأسرع: ⁨%1$s⁩</string>
     <string name="glow_summary_split_fastest">الأسرع</string>
-    <string name="glow_summary_split_fastest_bpm">الأسرع، متوسط %1$d ن/د</string>
-    <string name="glow_summary_split_average">متوسط %1$d ن/د</string>
-    <string name="glow_summary_lap">اللفة %1$d</string>
-    <plurals name="glow_summary_sets_done"><item quantity="zero">%d منجزة</item><item quantity="one">%d منجزة</item><item quantity="two">%d منجزة</item><item quantity="few">%d منجزة</item><item quantity="many">%d منجزة</item><item quantity="other">%d منجزة</item></plurals>
-    <string name="glow_summary_set">المجموعة %1$d</string>
-    <string name="glow_summary_set_rest">راحة %1$s</string>
+    <string name="glow_summary_split_fastest_bpm">الأسرع، متوسط ⁨%1$d⁩ ن/د</string>
+    <string name="glow_summary_split_average">متوسط ⁨%1$d⁩ ن/د</string>
+    <string name="glow_summary_lap">اللفة ⁨%1$d⁩</string>
+    <plurals name="glow_summary_sets_done"><item quantity="zero">⁨%d⁩ منجزة</item><item quantity="one">⁨%d⁩ منجزة</item><item quantity="two">⁨%d⁩ منجزة</item><item quantity="few">⁨%d⁩ منجزة</item><item quantity="many">⁨%d⁩ منجزة</item><item quantity="other">⁨%d⁩ منجزة</item></plurals>
+    <string name="glow_summary_set">المجموعة ⁨%1$d⁩</string>
+    <string name="glow_summary_set_rest">راحة ⁨%1$s⁩</string>
 </resources>

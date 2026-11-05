@@ -5,14 +5,14 @@
     <string name="glow_recovery_scored_each_morning">يُحسب الاستشفاء كل صباح من نوم الليلة.</string>
     <string name="glow_recovery_yesterday">أمس</string>
     <string name="glow_recovery_what_drove">ما الذي أثّر فيه</string>
-    <string name="glow_recovery_drivers_all">الكل %1$d</string>
+    <string name="glow_recovery_drivers_all">الكل ⁨%1$d⁩</string>
     <string name="glow_recovery_waiting_night">بانتظار ليلة</string>
     <string name="glow_recovery_drivers_waiting">ما أثّر في الاستشفاء يظهر هنا كل صباح</string>
     <string name="glow_recovery_energy">الطاقة</string>
-    <string name="glow_recovery_charge_at">الساعة %1$s</string>
+    <string name="glow_recovery_charge_at">الساعة ⁨%1$s⁩</string>
     <string name="glow_recovery_now">الآن</string>
-    <string name="glow_recovery_charge_at_start">%1$d في البداية</string>
-    <string name="glow_recovery_charge_at_waking">%1$d عند الاستيقاظ</string>
+    <string name="glow_recovery_charge_at_start">⁨%1$d⁩ في البداية</string>
+    <string name="glow_recovery_charge_at_waking">⁨%1$d⁩ عند الاستيقاظ</string>
     <string name="glow_recovery_recharged">امتلأت</string>
     <string name="glow_recovery_drained">استُهلكت</string>
     <string name="glow_recovery_resting_hr">نبض الراحة</string>
@@ -33,7 +33,7 @@
     <string name="glow_recovery_waiting">في الانتظار</string>
     <string name="glow_recovery_after_first_night">بعد أول ليلة لك</string>
     <string name="glow_recovery_needs_heart_rate">يحتاج بضع ساعات من قياس النبض</string>
-    <string name="glow_recovery_at_time">الساعة %1$s</string>
+    <string name="glow_recovery_at_time">الساعة ⁨%1$s⁩</string>
     <string name="glow_recovery_now_lower">الآن</string>
     <string name="glow_recovery_end_of_day">في نهاية اليوم</string>
     <string name="glow_recovery_at_start">في البداية</string>

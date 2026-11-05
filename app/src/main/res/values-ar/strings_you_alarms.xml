@@ -20,16 +20,16 @@
     <string name="you_alarms_letter_sat">س</string>
     <string name="you_alarms_letter_sun">ح</string>
     <string name="you_alarms_interval_continuous">متواصل</string>
-    <string name="you_alarms_interval_every">كل %1$d د</string>
+    <string name="you_alarms_interval_every">كل ⁨%1$d⁩ د</string>
     <string name="you_alarms_summary_none">لا يوجد</string>
     <string name="you_alarms_summary_all_off">الكل متوقف</string>
-    <string name="you_alarms_summary_first">%1$s %2$s</string>
-    <plurals name="you_alarms_summary_more"><item quantity="zero">%2$s و%1$d أخرى</item><item quantity="one">%2$s وواحد آخر</item><item quantity="two">%2$s و%1$d أخرى</item><item quantity="few">%2$s و%1$d أخرى</item><item quantity="many">%2$s و%1$d أخرى</item><item quantity="other">%2$s و%1$d أخرى</item></plurals>
+    <string name="you_alarms_summary_first">⁨%1$s⁩ ⁨%2$s⁩</string>
+    <plurals name="you_alarms_summary_more"><item quantity="zero">⁨%2$s⁩ و⁨%1$d⁩ أخرى</item><item quantity="one">⁨%2$s⁩ وواحد آخر</item><item quantity="two">⁨%2$s⁩ و⁨%1$d⁩ أخرى</item><item quantity="few">⁨%2$s⁩ و⁨%1$d⁩ أخرى</item><item quantity="many">⁨%2$s⁩ و⁨%1$d⁩ أخرى</item><item quantity="other">⁨%2$s⁩ و⁨%1$d⁩ أخرى</item></plurals>
     <string name="you_health_summary_both">النبض والأكسجين</string>
-    <string name="you_health_summary_over_under">فوق %1$d، تحت %2$d</string>
-    <string name="you_health_summary_over">فوق %1$d ن/د</string>
-    <string name="you_health_summary_under">تحت %1$d ن/د</string>
-    <string name="you_health_summary_oxygen">الأكسجين تحت %1$d%%</string>
+    <string name="you_health_summary_over_under">فوق ⁨%1$d⁩، تحت ⁨%2$d⁩</string>
+    <string name="you_health_summary_over">فوق ⁨%1$d⁩ ن/د</string>
+    <string name="you_health_summary_under">تحت ⁨%1$d⁩ ن/د</string>
+    <string name="you_health_summary_oxygen">الأكسجين تحت ⁨%1$d%%⁩</string>
     <string name="you_alarms_delete_all_title">حذف كل المنبهات؟</string>
     <string name="you_alarms_delete_all_text">سيحذف هذا كل المنبهات من السترب.</string>
     <string name="you_alarms_delete_all">حذف الكل</string>
@@ -37,7 +37,7 @@
     <string name="you_alarms_reading">جارٍ القراءة من السترب…</string>
     <string name="you_alarms_try_again">حاول مرة أخرى</string>
     <string name="you_alarms_on_strap">على السترب</string>
-    <string name="you_alarms_count">%1$d من %2$d</string>
+    <string name="you_alarms_count">⁨%1$d⁩ من ⁨%2$d⁩</string>
     <string name="you_alarms_none">لا توجد منبهات على السترب.</string>
     <string name="you_alarms_add">إضافة منبه</string>
     <string name="you_alarms_tip">يهتز السترب في وقت المنبه. لإيقافه، اضغط على واجهة السترب عدة مرات.</string>
@@ -51,19 +51,19 @@
     <string name="you_health_measuring">قياس النبض</string>
     <string name="you_health_measuring_note">تنبيهات النبض تحتاج قياساً متواصلاً أو كل دقيقة.</string>
     <string name="you_health_high">تنبيه النبض المرتفع</string>
-    <string name="you_health_above">فوق %1$d</string>
+    <string name="you_health_above">فوق ⁨%1$d⁩</string>
     <string name="you_health_low">تنبيه النبض المنخفض</string>
-    <string name="you_health_below">تحت %1$d</string>
+    <string name="you_health_below">تحت ⁨%1$d⁩</string>
     <string name="you_health_oxygen">تنبيه انخفاض أكسجين الدم</string>
-    <string name="you_health_below_percent">تحت %1$d%%</string>
+    <string name="you_health_below_percent">تحت ⁨%1$d%%⁩</string>
     <string name="you_health_note">يهتز السترب عند انطلاق أي تنبيه. OpenStrap ليس جهازاً طبياً.</string>
     <string name="you_phone_summary_both">المكالمات والإشعارات</string>
     <string name="you_phone_summary_calls">المكالمات</string>
     <string name="you_phone_summary_notifications">الإشعارات</string>
     <string name="you_phone_quiet_off">أوقف الاهتزاز ليلاً أو في ساعات تحددها.</string>
     <string name="you_phone_quiet_same">اختر وقتي بداية ونهاية مختلفين.</string>
-    <string name="you_phone_quiet_with_calls">لا اهتزاز من %1$s، بما فيها المكالمات.</string>
-    <string name="you_phone_quiet_notifications">لا اهتزاز للإشعارات من %1$s.</string>
+    <string name="you_phone_quiet_with_calls">لا اهتزاز من ⁨%1$s⁩، بما فيها المكالمات.</string>
+    <string name="you_phone_quiet_notifications">لا اهتزاز للإشعارات من ⁨%1$s⁩.</string>
     <string name="you_phone_title">تنبيهات الجوال</string>
     <string name="you_phone_calls">المكالمات الواردة</string>
     <string name="you_phone_calls_note">يهتز أثناء رنين جوالك. مكالمات التطبيقات مثل واتساب تحتاج إذن الإشعارات.</string>

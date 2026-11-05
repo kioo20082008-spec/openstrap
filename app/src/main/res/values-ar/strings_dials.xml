@@ -11,7 +11,7 @@
     <string name="dials_plan_red_note">جسمك يحتاج راحة اليوم. خلّها خفيفة.</string>
     <string name="dials_plan_none_title">خطتك اليوم</string>
     <string name="dials_plan_none_note">تتبع الخطة استشفاءك بعد أول ليلة يسجلها السترب.</string>
-    <string name="dials_plan_chip">الاستشفاء %1$d%%</string>
+    <string name="dials_plan_chip">الاستشفاء ⁨%1$d%%⁩</string>
     <string name="dials_workout_green">يناسبك تمرين قوي اليوم</string>
     <string name="dials_workout_green_note">المنطقة 3 إلى 4، نحو 45 دقيقة</string>
     <string name="dials_workout_yellow">تمرين خفيف</string>
@@ -19,12 +19,16 @@
     <string name="dials_workout_red">راحة أو مشي هادئ</string>
     <string name="dials_workout_red_note">خلّ جسمك يستشفي</string>
     <string name="dials_workout_done">تم التمرين</string>
-    <string name="dials_workout_done_note">%1$s اليوم</string>
-    <string name="dials_steps_left">باقي %1$s خطوة</string>
-    <string name="dials_steps_left_note">لتصل إلى %1$s اليوم</string>
+    <string name="dials_workout_done_note">⁨%1$s⁩ اليوم</string>
+    <string name="dials_steps_left">باقي ⁨%1$s⁩ خطوة</string>
+    <string name="dials_steps_left_note">لتصل إلى ⁨%1$s⁩ اليوم</string>
     <string name="dials_steps_done">تحقق هدف الخطوات</string>
-    <string name="dials_steps_done_note">%1$s خطوة اليوم</string>
-    <string name="dials_bed">في السرير قبل %1$s</string>
+    <string name="dials_steps_done_note">⁨%1$s⁩ خطوة اليوم</string>
+    <string name="dials_bed">في السرير قبل ⁨%1$s⁩</string>
     <string name="dials_bed_note">لليلة نوم كاملة</string>
     <string name="dials_quick_title">إجراءات سريعة</string>
+    <string name="dials_pulse_resting">القلب يرتاح على ⁨%1$d⁩ نبضة</string>
+    <string name="dials_zone_rest">راحة</string>
+    <string name="dials_zone_calm">هادئ</string>
+    <string name="dials_zone_ready">جاهز</string>
 </resources>

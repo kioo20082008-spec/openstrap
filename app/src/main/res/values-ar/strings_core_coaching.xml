@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_coach_zone">المنطقة %1$d</string>
-    <string name="core_coach_zones">المنطقة %1$d إلى %2$d</string>
-    <string name="core_coach_minutes">%1$d د</string>
-    <string name="core_coach_kcal">%1$d سعرة</string>
-    <string name="core_coach_meters">%1$d م</string>
-    <string name="core_coach_km">%1$s كم</string>
+    <string name="core_coach_zone">المنطقة ⁨%1$d⁩</string>
+    <string name="core_coach_zones">المنطقة ⁨%1$d⁩ إلى ⁨%2$d⁩</string>
+    <string name="core_coach_minutes">⁨%1$d⁩ د</string>
+    <string name="core_coach_kcal">⁨%1$d⁩ سعرة</string>
+    <string name="core_coach_meters">⁨%1$d⁩ م</string>
+    <string name="core_coach_km">⁨%1$s⁩ كم</string>
 </resources>

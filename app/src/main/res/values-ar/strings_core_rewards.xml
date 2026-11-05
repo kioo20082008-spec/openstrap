@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_rewards_best_fastest">أسرع %1$s</string>
-    <string name="core_rewards_best_heaviest">أثقل %1$s</string>
+    <string name="core_rewards_best_fastest">أسرع ⁨%1$s⁩</string>
+    <string name="core_rewards_best_heaviest">أثقل ⁨%1$s⁩</string>
     <string name="core_rewards_best_longest_run">أطول جري</string>
     <string name="core_rewards_best_longest_workout">أطول تمرين</string>
     <string name="core_rewards_best_most_steps">أكثر خطوات في يوم</string>
     <string name="core_rewards_best_personal">أفضل رقم شخصي</string>
     <string name="core_rewards_half_marathon">نصف ماراثون</string>
-    <string name="core_rewards_km">%1$d كم</string>
-    <string name="core_rewards_kg">%1$s كغ</string>
-    <string name="core_rewards_meters">%1$s م</string>
-    <string name="core_rewards_beat_faster">أسرع بـ %1$s</string>
-    <string name="core_rewards_beat_kg_more">أكثر بـ %1$s كغ</string>
-    <string name="core_rewards_beat_farther">أبعد بـ %1$s</string>
-    <string name="core_rewards_beat_longer">أطول بـ %1$d د</string>
-    <string name="core_rewards_beat_more">أكثر بـ %1$s خطوة</string>
-    <string name="core_rewards_beat_line_faster">أسرع بـ %1$s من أفضل رقم لك منذ %2$s.</string>
-    <string name="core_rewards_beat_line_kg_more">أكثر بـ %1$s كغ من أفضل رقم لك منذ %2$s.</string>
-    <string name="core_rewards_beat_line_farther">أبعد بـ %1$s من أفضل رقم لك منذ %2$s.</string>
-    <string name="core_rewards_beat_line_longer">أطول بـ %1$d د من أفضل رقم لك منذ %2$s.</string>
-    <string name="core_rewards_beat_line_more">أكثر بـ %1$s خطوة من أفضل رقم لك منذ %2$s.</string>
-    <plurals name="core_rewards_goal_weeks_in_a_row"><item quantity="zero">%1$d أسابيع متتالية</item><item quantity="one">أسبوع %1$d متتالٍ</item><item quantity="two">%1$d أسابيع متتالية</item><item quantity="few">%1$d أسابيع متتالية</item><item quantity="many">%1$d أسابيع متتالية</item><item quantity="other">%1$d أسابيع متتالية</item></plurals>
+    <string name="core_rewards_km">⁨%1$d⁩ كم</string>
+    <string name="core_rewards_kg">⁨%1$s⁩ كغ</string>
+    <string name="core_rewards_meters">⁨%1$s⁩ م</string>
+    <string name="core_rewards_beat_faster">أسرع بـ ⁨%1$s⁩</string>
+    <string name="core_rewards_beat_kg_more">أكثر بـ ⁨%1$s⁩ كغ</string>
+    <string name="core_rewards_beat_farther">أبعد بـ ⁨%1$s⁩</string>
+    <string name="core_rewards_beat_longer">أطول بـ ⁨%1$d⁩ د</string>
+    <string name="core_rewards_beat_more">أكثر بـ ⁨%1$s⁩ خطوة</string>
+    <string name="core_rewards_beat_line_faster">أسرع بـ ⁨%1$s⁩ من أفضل رقم لك منذ ⁨%2$s⁩.</string>
+    <string name="core_rewards_beat_line_kg_more">أكثر بـ ⁨%1$s⁩ كغ من أفضل رقم لك منذ ⁨%2$s⁩.</string>
+    <string name="core_rewards_beat_line_farther">أبعد بـ ⁨%1$s⁩ من أفضل رقم لك منذ ⁨%2$s⁩.</string>
+    <string name="core_rewards_beat_line_longer">أطول بـ ⁨%1$d⁩ د من أفضل رقم لك منذ ⁨%2$s⁩.</string>
+    <string name="core_rewards_beat_line_more">أكثر بـ ⁨%1$s⁩ خطوة من أفضل رقم لك منذ ⁨%2$s⁩.</string>
+    <plurals name="core_rewards_goal_weeks_in_a_row"><item quantity="zero">⁨%1$d⁩ أسابيع متتالية</item><item quantity="one">أسبوع ⁨%1$d⁩ متتالٍ</item><item quantity="two">⁨%1$d⁩ أسابيع متتالية</item><item quantity="few">⁨%1$d⁩ أسابيع متتالية</item><item quantity="many">⁨%1$d⁩ أسابيع متتالية</item><item quantity="other">⁨%1$d⁩ أسابيع متتالية</item></plurals>
     <string name="core_rewards_goal_met_this_week">تحقق الهدف هذا الأسبوع</string>
-    <plurals name="core_rewards_goal_to_go"><item quantity="zero">باقي %1$d هذا الأسبوع</item><item quantity="one">باقي %1$d هذا الأسبوع</item><item quantity="two">باقي %1$d هذا الأسبوع</item><item quantity="few">باقي %1$d هذا الأسبوع</item><item quantity="many">باقي %1$d هذا الأسبوع</item><item quantity="other">باقي %1$d هذا الأسبوع</item></plurals>
+    <plurals name="core_rewards_goal_to_go"><item quantity="zero">باقي ⁨%1$d⁩ هذا الأسبوع</item><item quantity="one">باقي ⁨%1$d⁩ هذا الأسبوع</item><item quantity="two">باقي ⁨%1$d⁩ هذا الأسبوع</item><item quantity="few">باقي ⁨%1$d⁩ هذا الأسبوع</item><item quantity="many">باقي ⁨%1$d⁩ هذا الأسبوع</item><item quantity="other">باقي ⁨%1$d⁩ هذا الأسبوع</item></plurals>
     <string name="core_rewards_goal_met">تحقق الهدف الأسبوعي</string>
     <string name="core_rewards_goal">الهدف الأسبوعي</string>
-    <string name="core_rewards_goal_count">%1$d من %2$d</string>
-    <string name="core_rewards_new_best">رقم جديد، %1$s</string>
+    <string name="core_rewards_goal_count">⁨%1$d⁩ من ⁨%2$d⁩</string>
+    <string name="core_rewards_new_best">رقم جديد، ⁨%1$s⁩</string>
     <string name="core_rewards_new_badge">وسام جديد</string>
-    <plurals name="core_rewards_moment_weeks"><item quantity="zero">%1$d أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="one">أسبوع %1$d متتالٍ. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="two">%1$d أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="few">%1$d أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="many">%1$d أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="other">%1$d أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item></plurals>
+    <plurals name="core_rewards_moment_weeks"><item quantity="zero">⁨%1$d⁩ أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="one">أسبوع ⁨%1$d⁩ متتالٍ. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="two">⁨%1$d⁩ أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="few">⁨%1$d⁩ أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="many">⁨%1$d⁩ أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item><item quantity="other">⁨%1$d⁩ أسابيع متتالية. أيام الراحة لا تُحتسب ضدك أبداً.</item></plurals>
     <string name="core_rewards_moment_first">أول أسبوع تحقق فيه الهدف. أيام الراحة لا تُحتسب ضدك أبداً.</string>
-    <string name="core_rewards_when_morning">%1$s، صباحاً %2$s</string>
-    <string name="core_rewards_when_afternoon">%1$s، عصراً %2$s</string>
-    <string name="core_rewards_when_evening">%1$s، مساءً %2$s</string>
-    <string name="core_rewards_when_night">%1$s، ليلاً %2$s</string>
-    <plurals name="core_rewards_run_best_is"><item quantity="zero">تحقق الهدف %1$d أسابيع متتالية. أفضل رقم لك %2$d.</item><item quantity="one">تحقق الهدف أسبوع %1$d متتالٍ. أفضل رقم لك %2$d.</item><item quantity="two">تحقق الهدف %1$d أسابيع متتالية. أفضل رقم لك %2$d.</item><item quantity="few">تحقق الهدف %1$d أسابيع متتالية. أفضل رقم لك %2$d.</item><item quantity="many">تحقق الهدف %1$d أسابيع متتالية. أفضل رقم لك %2$d.</item><item quantity="other">تحقق الهدف %1$d أسابيع متتالية. أفضل رقم لك %2$d.</item></plurals>
-    <plurals name="core_rewards_run_best_yet"><item quantity="zero">تحقق الهدف %1$d أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="one">تحقق الهدف أسبوع %1$d متتالٍ، أفضل رقم لك حتى الآن.</item><item quantity="two">تحقق الهدف %1$d أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="few">تحقق الهدف %1$d أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="many">تحقق الهدف %1$d أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="other">تحقق الهدف %1$d أسابيع متتالية، أفضل رقم لك حتى الآن.</item></plurals>
-    <plurals name="core_rewards_run_best_was"><item quantity="zero">أفضل رقم لك %1$d أسابيع متتالية.</item><item quantity="one">أفضل رقم لك أسبوع %1$d متتالٍ.</item><item quantity="two">أفضل رقم لك %1$d أسابيع متتالية.</item><item quantity="few">أفضل رقم لك %1$d أسابيع متتالية.</item><item quantity="many">أفضل رقم لك %1$d أسابيع متتالية.</item><item quantity="other">أفضل رقم لك %1$d أسابيع متتالية.</item></plurals>
+    <string name="core_rewards_when_morning">⁨%1$s⁩، صباحاً ⁨%2$s⁩</string>
+    <string name="core_rewards_when_afternoon">⁨%1$s⁩، عصراً ⁨%2$s⁩</string>
+    <string name="core_rewards_when_evening">⁨%1$s⁩، مساءً ⁨%2$s⁩</string>
+    <string name="core_rewards_when_night">⁨%1$s⁩، ليلاً ⁨%2$s⁩</string>
+    <plurals name="core_rewards_run_best_is"><item quantity="zero">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية. أفضل رقم لك ⁨%2$d⁩.</item><item quantity="one">تحقق الهدف أسبوع ⁨%1$d⁩ متتالٍ. أفضل رقم لك ⁨%2$d⁩.</item><item quantity="two">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية. أفضل رقم لك ⁨%2$d⁩.</item><item quantity="few">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية. أفضل رقم لك ⁨%2$d⁩.</item><item quantity="many">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية. أفضل رقم لك ⁨%2$d⁩.</item><item quantity="other">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية. أفضل رقم لك ⁨%2$d⁩.</item></plurals>
+    <plurals name="core_rewards_run_best_yet"><item quantity="zero">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="one">تحقق الهدف أسبوع ⁨%1$d⁩ متتالٍ، أفضل رقم لك حتى الآن.</item><item quantity="two">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="few">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="many">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية، أفضل رقم لك حتى الآن.</item><item quantity="other">تحقق الهدف ⁨%1$d⁩ أسابيع متتالية، أفضل رقم لك حتى الآن.</item></plurals>
+    <plurals name="core_rewards_run_best_was"><item quantity="zero">أفضل رقم لك ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="one">أفضل رقم لك أسبوع ⁨%1$d⁩ متتالٍ.</item><item quantity="two">أفضل رقم لك ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="few">أفضل رقم لك ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="many">أفضل رقم لك ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="other">أفضل رقم لك ⁨%1$d⁩ أسابيع متتالية.</item></plurals>
     <string name="core_rewards_run_none">حقق هدفك لتبدأ سلسلة أسابيع.</string>
-    <string name="core_rewards_progress_km">%1$s من %2$s كم</string>
-    <string name="core_rewards_progress_steps">%1$s من %2$s خطوة</string>
-    <string name="core_rewards_progress_workouts">%1$s من %2$s تمارين</string>
-    <string name="core_rewards_progress_weeks">%1$s من %2$s أسابيع</string>
-    <plurals name="core_rewards_recap"><item quantity="zero">%2$d من %1$d تمارين.</item><item quantity="one">%2$d من تمرين %1$d.</item><item quantity="two">%2$d من %1$d تمارين.</item><item quantity="few">%2$d من %1$d تمارين.</item><item quantity="many">%2$d من %1$d تمارين.</item><item quantity="other">%2$d من %1$d تمارين.</item></plurals>
-    <string name="core_rewards_recap_met">%1$d من %2$d تمارين، تحقق الهدف.</string>
-    <plurals name="core_rewards_recap_met_in_a_row"><item quantity="zero">%2$d من %3$d تمارين، تحقق الهدف. %1$d أسابيع متتالية.</item><item quantity="one">%2$d من %3$d تمارين، تحقق الهدف. أسبوع %1$d متتالٍ.</item><item quantity="two">%2$d من %3$d تمارين، تحقق الهدف. %1$d أسابيع متتالية.</item><item quantity="few">%2$d من %3$d تمارين، تحقق الهدف. %1$d أسابيع متتالية.</item><item quantity="many">%2$d من %3$d تمارين، تحقق الهدف. %1$d أسابيع متتالية.</item><item quantity="other">%2$d من %3$d تمارين، تحقق الهدف. %1$d أسابيع متتالية.</item></plurals>
+    <string name="core_rewards_progress_km">⁨%1$s⁩ من ⁨%2$s⁩ كم</string>
+    <string name="core_rewards_progress_steps">⁨%1$s⁩ من ⁨%2$s⁩ خطوة</string>
+    <string name="core_rewards_progress_workouts">⁨%1$s⁩ من ⁨%2$s⁩ تمارين</string>
+    <string name="core_rewards_progress_weeks">⁨%1$s⁩ من ⁨%2$s⁩ أسابيع</string>
+    <plurals name="core_rewards_recap"><item quantity="zero">⁨%2$d⁩ من ⁨%1$d⁩ تمارين.</item><item quantity="one">⁨%2$d⁩ من تمرين ⁨%1$d⁩.</item><item quantity="two">⁨%2$d⁩ من ⁨%1$d⁩ تمارين.</item><item quantity="few">⁨%2$d⁩ من ⁨%1$d⁩ تمارين.</item><item quantity="many">⁨%2$d⁩ من ⁨%1$d⁩ تمارين.</item><item quantity="other">⁨%2$d⁩ من ⁨%1$d⁩ تمارين.</item></plurals>
+    <string name="core_rewards_recap_met">⁨%1$d⁩ من ⁨%2$d⁩ تمارين، تحقق الهدف.</string>
+    <plurals name="core_rewards_recap_met_in_a_row"><item quantity="zero">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="one">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. أسبوع ⁨%1$d⁩ متتالٍ.</item><item quantity="two">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="few">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="many">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. ⁨%1$d⁩ أسابيع متتالية.</item><item quantity="other">⁨%2$d⁩ من ⁨%3$d⁩ تمارين، تحقق الهدف. ⁨%1$d⁩ أسابيع متتالية.</item></plurals>
 </resources>

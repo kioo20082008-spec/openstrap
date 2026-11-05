@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="glow_share_join">%1$s، %2$s</string>
-    <string name="glow_share_footer">%1$s، %2$s</string>
+    <string name="glow_share_join">⁨%1$s⁩، ⁨%2$s⁩</string>
+    <string name="glow_share_footer">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="glow_share_stat_distance">المسافة</string>
     <string name="glow_share_stat_time">الوقت</string>
     <string name="glow_share_stat_pace">الوتيرة</string>
@@ -10,22 +10,22 @@
     <string name="glow_share_unit_per_km">/كم</string>
     <string name="glow_share_unit_kg">كغ</string>
     <string name="glow_share_total">المجموع</string>
-    <string name="glow_share_total_minutes">%1$s د</string>
-    <string name="glow_share_total_seconds">%1$s ث</string>
-    <plurals name="glow_share_sets"><item quantity="zero">%d مجموعات</item><item quantity="one">مجموعة %d</item><item quantity="two">%d مجموعات</item><item quantity="few">%d مجموعات</item><item quantity="many">%d مجموعات</item><item quantity="other">%d مجموعات</item></plurals>
-    <string name="glow_share_row_reps">%1$d × %2$d</string>
-    <string name="glow_share_row_top">%1$s، الأعلى %2$s كغ</string>
-    <string name="glow_share_avg_bpm">متوسط %1$d ن/د</string>
-    <string name="glow_share_kcal">%1$s سعرة</string>
+    <string name="glow_share_total_minutes">⁨%1$s⁩ د</string>
+    <string name="glow_share_total_seconds">⁨%1$s⁩ ث</string>
+    <plurals name="glow_share_sets"><item quantity="zero">⁨%d⁩ مجموعات</item><item quantity="one">مجموعة ⁨%d⁩</item><item quantity="two">⁨%d⁩ مجموعات</item><item quantity="few">⁨%d⁩ مجموعات</item><item quantity="many">⁨%d⁩ مجموعات</item><item quantity="other">⁨%d⁩ مجموعات</item></plurals>
+    <string name="glow_share_row_reps">⁨%1$d⁩ × ⁨%2$d⁩</string>
+    <string name="glow_share_row_top">⁨%1$s⁩، الأعلى ⁨%2$s⁩ كغ</string>
+    <string name="glow_share_avg_bpm">متوسط ⁨%1$d⁩ ن/د</string>
+    <string name="glow_share_kcal">⁨%1$s⁩ سعرة</string>
     <string name="glow_share_workout_time">وقت التمرين</string>
     <string name="glow_share_unit_reps">تكرارات</string>
     <string name="glow_share_unit_rounds">جولات</string>
-    <string name="glow_share_unit_of_reps">من %1$d تكرارات</string>
-    <string name="glow_share_unit_of_rounds">من %1$d جولات</string>
-    <string name="glow_share_peak_bpm">الذروة %1$d ن/د</string>
-    <string name="glow_share_work_minutes">%1$d د من التمرين</string>
-    <string name="glow_share_work_seconds">%1$d ث من التمرين</string>
-    <string name="glow_share_peak">الذروة %1$d</string>
+    <string name="glow_share_unit_of_reps">من ⁨%1$d⁩ تكرارات</string>
+    <string name="glow_share_unit_of_rounds">من ⁨%1$d⁩ جولات</string>
+    <string name="glow_share_peak_bpm">الذروة ⁨%1$d⁩ ن/د</string>
+    <string name="glow_share_work_minutes">⁨%1$d⁩ د من التمرين</string>
+    <string name="glow_share_work_seconds">⁨%1$d⁩ ث من التمرين</string>
+    <string name="glow_share_peak">الذروة ⁨%1$d⁩</string>
     <string name="glow_share_my_week">أسبوعي</string>
     <string name="glow_share_saved">حُفظ</string>
     <string name="glow_share_not_saved">لم يُحفظ</string>

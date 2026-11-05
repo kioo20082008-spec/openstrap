@@ -12,14 +12,14 @@
     <string name="glow_choose_pick_title">اختر رياضة</string>
     <string name="glow_choose_search">بحث</string>
     <string name="glow_choose_sports">الرياضات</string>
-    <string name="glow_choose_no_match">لا توجد رياضة تطابق «%1$s».</string>
+    <string name="glow_choose_no_match">لا توجد رياضة تطابق «⁨%1$s⁩».</string>
     <string name="glow_choose_clear">مسح</string>
-    <plurals name="glow_choose_sports_count"><item quantity="zero">%d رياضات</item><item quantity="one">رياضة %d</item><item quantity="two">%d رياضات</item><item quantity="few">%d رياضات</item><item quantity="many">%d رياضات</item><item quantity="other">%d رياضات</item></plurals>
+    <plurals name="glow_choose_sports_count"><item quantity="zero">⁨%d⁩ رياضات</item><item quantity="one">رياضة ⁨%d⁩</item><item quantity="two">⁨%d⁩ رياضات</item><item quantity="few">⁨%d⁩ رياضات</item><item quantity="many">⁨%d⁩ رياضات</item><item quantity="other">⁨%d⁩ رياضات</item></plurals>
     <string name="glow_ready_bpm_live">ن/د، مباشر من السترب</string>
-    <string name="glow_ready_plan_description">%1$s. %2$s</string>
+    <string name="glow_ready_plan_description">⁨%1$s⁩. ⁨%2$s⁩</string>
     <string name="glow_ready_shorter">أقصر</string>
     <string name="glow_ready_longer">أطول</string>
-    <string name="glow_ready_save_title">%1$s %2$s</string>
+    <string name="glow_ready_save_title">⁨%1$s⁩ ⁨%2$s⁩</string>
     <string name="glow_ready_with">مع</string>
     <string name="glow_ready_rest_between">راحة بينها</string>
     <string name="glow_ready_rest_after_set">راحة بعد كل مجموعة</string>
@@ -30,5 +30,5 @@
     <string name="glow_ready_unit_s_on">ث تمرين</string>
     <string name="glow_ready_unit_s_off">ث راحة</string>
     <string name="glow_ready_unit_s_a_round">ث للجولة</string>
-    <plurals name="glow_ready_rounds_description"><item quantity="zero">%1$d جولات، %2$d ث تمرين، %3$d ث راحة</item><item quantity="one">جولة %1$d، %2$d ث تمرين، %3$d ث راحة</item><item quantity="two">%1$d جولات، %2$d ث تمرين، %3$d ث راحة</item><item quantity="few">%1$d جولات، %2$d ث تمرين، %3$d ث راحة</item><item quantity="many">%1$d جولات، %2$d ث تمرين، %3$d ث راحة</item><item quantity="other">%1$d جولات، %2$d ث تمرين، %3$d ث راحة</item></plurals>
+    <plurals name="glow_ready_rounds_description"><item quantity="zero">⁨%1$d⁩ جولات، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item><item quantity="one">جولة ⁨%1$d⁩، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item><item quantity="two">⁨%1$d⁩ جولات، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item><item quantity="few">⁨%1$d⁩ جولات، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item><item quantity="many">⁨%1$d⁩ جولات، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item><item quantity="other">⁨%1$d⁩ جولات، ⁨%2$d⁩ ث تمرين، ⁨%3$d⁩ ث راحة</item></plurals>
 </resources>

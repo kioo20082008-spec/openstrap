@@ -10,10 +10,10 @@
     <string name="day_info_scale_habit_younger">أصغر من عمرك</string>
     <string name="day_info_scale_habit_same">بعمرك</string>
     <string name="day_info_scale_habit_older">أكبر من عمرك</string>
-    <string name="day_info_normal_waiting_nights">يظهر معدلك بعد %1$d ليالٍ من البيانات. لديك %2$d حتى الآن.</string>
-    <string name="day_info_normal_waiting_days">يظهر معدلك بعد %1$d أيام من البيانات. لديك %2$d حتى الآن.</string>
-    <plurals name="day_info_normal_line_nights"><item quantity="zero">أنت هنا. معدلك %2$s، من %1$d ليالٍ.</item><item quantity="one">أنت هنا. معدلك %2$s، من ليلة %1$d.</item><item quantity="two">أنت هنا. معدلك %2$s، من %1$d ليالٍ.</item><item quantity="few">أنت هنا. معدلك %2$s، من %1$d ليالٍ.</item><item quantity="many">أنت هنا. معدلك %2$s، من %1$d ليالٍ.</item><item quantity="other">أنت هنا. معدلك %2$s، من %1$d ليالٍ.</item></plurals>
-    <plurals name="day_info_normal_line_days"><item quantity="zero">أنت هنا. معدلك %2$s، من %1$d أيام.</item><item quantity="one">أنت هنا. معدلك %2$s، من يوم %1$d.</item><item quantity="two">أنت هنا. معدلك %2$s، من %1$d أيام.</item><item quantity="few">أنت هنا. معدلك %2$s، من %1$d أيام.</item><item quantity="many">أنت هنا. معدلك %2$s، من %1$d أيام.</item><item quantity="other">أنت هنا. معدلك %2$s، من %1$d أيام.</item></plurals>
+    <string name="day_info_normal_waiting_nights">يظهر معدلك بعد ⁨%1$d⁩ ليالٍ من البيانات. لديك ⁨%2$d⁩ حتى الآن.</string>
+    <string name="day_info_normal_waiting_days">يظهر معدلك بعد ⁨%1$d⁩ أيام من البيانات. لديك ⁨%2$d⁩ حتى الآن.</string>
+    <plurals name="day_info_normal_line_nights"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من ليلة ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ ليالٍ.</item></plurals>
+    <plurals name="day_info_normal_line_days"><item quantity="zero">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="one">أنت هنا. معدلك ⁨%2$s⁩، من يوم ⁨%1$d⁩.</item><item quantity="two">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="few">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="many">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item><item quantity="other">أنت هنا. معدلك ⁨%2$s⁩، من ⁨%1$d⁩ أيام.</item></plurals>
     <string name="day_info_here">أنت هنا.</string>
     <string name="day_info_heart_rate_name">النبض</string>
     <string name="day_info_heart_rate_meaning">سرعة نبض قلبك بالنبضة في الدقيقة (ن/د)، يقرؤها السترب طوال اليوم والليل.</string>
@@ -58,7 +58,7 @@
     <string name="day_info_recovery_meaning">مدى جاهزية جسمك للمجهود اليوم، من 0 إلى 100، يُحسب كل صباح من ليلتك.</string>
     <string name="day_info_recovery_how">كل صباح يقارن OpenStrap ليلتك بما هو طبيعي لك، لا بالآخرين: HRV (تقلب النبض)، ونبض الراحة، وحرارة الجلد، ومعدل التنفس، وأكسجين الدم، ونوم البارحة والليالي الأخيرة، ومدى شدة يوم أمس. نحو نصف النتيجة من HRV ونبض الراحة، ونحو ربعها من النوم. إشارة واحدة بعيدة عن معدلك تحدّ النتيجة، فلا يعوضها النوم الجيد بالكامل. كل شيء يُحسب على هذا الجوال من بيانات السترب.</string>
     <string name="day_info_recovery_moves">النوم الجيد والأيام الخفيفة والليالي بلا كحول ترفعه. التمرين الشاق والليالي القصيرة والوجبات المتأخرة والتوتر والمرض تخفضه.</string>
-    <string name="day_info_recovery_off">يحتاج %1$d ليالٍ جيدة ليبدأ ويستقر خلال %2$d. ليلة يكون فيها السترب رخواً أو منزوعاً، أو قراءات HRV نظيفة قليلة، تعطيه بيانات أقل، وقد تحل قراءات السترب محلها.</string>
+    <string name="day_info_recovery_off">يحتاج ⁨%1$d⁩ ليالٍ جيدة ليبدأ ويستقر خلال ⁨%2$d⁩. ليلة يكون فيها السترب رخواً أو منزوعاً، أو قراءات HRV نظيفة قليلة، تعطيه بيانات أقل، وقد تحل قراءات السترب محلها.</string>
     <string name="day_info_energy_meaning">طاقتك الآن، من 0 إلى 100. النوم يملؤها واليوم يستهلكها.</string>
     <string name="day_info_energy_how">اعتبرها بطارية تعمل طوال اليوم. النوم يملؤها، والنوم العميق أكثر، والليلة الهادئة المستقرة تملؤها أسرع. اليقظة تستهلك قليلاً كل ساعة. الرياضة والتوتر يستهلكانها أسرع، واللحظات الهادئة تبطئ الاستهلاك. تُحسب على هذا الجوال من نبضك دقيقة بدقيقة، كدليل لتخطيط يومك، لا كنصيحة طبية.</string>
     <string name="day_info_energy_moves">الليلة الطويلة الهادئة تملؤها أكثر. التمارين واليوم المتوتر والسهر تستهلكها.</string>
@@ -68,19 +68,19 @@
     <string name="day_info_sleep_moves">مواعيد النوم المنتظمة والغرفة المظلمة الباردة وتقليل الكافيين والكحول آخر اليوم تساعد. السهر والليلة المضطربة والاستيقاظ المبكر تخفضها.</string>
     <string name="day_info_sleep_off">الاستلقاء مستيقظاً بلا حركة قد يُحسب نوماً، ويصعب التمييز بين النوم الخفيف والعميق عبر الجلد. ليلة نُزع فيها السترب أو كان رخواً قد تُفقد أو تُقتطع.</string>
     <string name="day_info_regularity_meaning">مدى تشابه أوقات نومك واستيقاظك من يوم لآخر. 100 تعني نفس الوقت كل يوم.</string>
-    <string name="day_info_regularity_how">يحسب OpenStrap مؤشر انتظام النوم. يعلّم كل دقيقة من اليوم نوماً أو يقظة ويحسب كم مرة تطابق الدقيقة نفسها في اليوم السابق، خلال آخر 7 أيام. يحتاج %1$d س من اللبس للمقارنة يوماً بيوم، أي نحو 5 أيام لبس متواصل، وحتى ذلك يعرض مقدار تحرك منتصف نومك. النطاقات تتبع نتائج بالغي UK Biobank، حيث كان نصفهم بين 74 و86. أوقاتك المعتادة هي متوسط آخر 7 ليالٍ.</string>
+    <string name="day_info_regularity_how">يحسب OpenStrap مؤشر انتظام النوم. يعلّم كل دقيقة من اليوم نوماً أو يقظة ويحسب كم مرة تطابق الدقيقة نفسها في اليوم السابق، خلال آخر 7 أيام. يحتاج ⁨%1$d⁩ س من اللبس للمقارنة يوماً بيوم، أي نحو 5 أيام لبس متواصل، وحتى ذلك يعرض مقدار تحرك منتصف نومك. النطاقات تتبع نتائج بالغي UK Biobank، حيث كان نصفهم بين 74 و86. أوقاتك المعتادة هي متوسط آخر 7 ليالٍ.</string>
     <string name="day_info_regularity_moves">النوم والاستيقاظ في نفس الأوقات، حتى في الإجازة، يرفعه. السهر والنوم المتأخر والقيلولات الطويلة تخفضه.</string>
     <string name="day_info_regularity_off">دقائق نزع السترب لا تُقارن، فالأسبوع قليل اللبس يعتمد على أيام أقل. الاستلقاء مستيقظاً في السرير قد يُحسب نوماً.</string>
     <string name="day_info_naps_meaning">النوم أثناء النهار، يسجله السترب منفصلاً عن ليلتك.</string>
     <string name="day_info_naps_how">يميّز السترب القيلولة عن الليل بنفسه، ويسجل مراحلها إذا طالت بما يكفي. تتبع القيلولة اليوم الذي بدأت فيه. نبضها من قراءات اليوم، لأن السترب لا يرسل متوسطاً للقيلولة.</string>
     <string name="day_info_naps_moves">القيلولة القصيرة أول العصر تنعش دون أن تأخذ كثيراً من الليل. الطويلة أو المتأخرة قد تصعّب النوم.</string>
     <string name="day_info_naps_off">الاستلقاء مستيقظاً بلا حركة قد يبدو قيلولة قصيرة، والقيلولة القصيرة قد لا تكون لها مراحل.</string>
-    <string name="day_info_heart_points_meaning">نقاط للدقائق التي يرتفع فيها نبضك، والدقائق الأصعب تكسب أكثر، خلال آخر 7 أيام. استهدف %1$d.</string>
+    <string name="day_info_heart_points_meaning">نقاط للدقائق التي يرتفع فيها نبضك، والدقائق الأصعب تكسب أكثر، خلال آخر 7 أيام. استهدف ⁨%1$d⁩.</string>
     <string name="day_info_heart_points_how">نقاط القلب هي PAI من السترب، أي ذكاء النشاط الشخصي. يحسبها السترب بنفسه من مدى ارتفاع نبضك فوق الراحة، حسب عمرك وجنسك، ويعرضها OpenStrap كما تصل. نقاط كل يوم تُحتسب 7 أيام ثم تسقط، فالمجموع يغطي دائماً الأسبوع الأخير.</string>
-    <string name="day_info_heart_points_moves">كل ما يقطع أنفاسك يضيف الأكثر. المشي السريع يضيف قليلاً. بضع جلسات شاقة أسبوعياً تبقي المجموع عند %1$d أو أكثر.</string>
+    <string name="day_info_heart_points_moves">كل ما يقطع أنفاسك يضيف الأكثر. المشي السريع يضيف قليلاً. بضع جلسات شاقة أسبوعياً تبقي المجموع عند ⁨%1$d⁩ أو أكثر.</string>
     <string name="day_info_heart_points_off">يتحدث المجموع عند مزامنة السترب، فقد يتأخر عن مجهود اليوم. السترب الرخو أثناء التمرين يفوّت ارتفاع النبض.</string>
-    <string name="day_info_active_minutes_meaning">دقائق الحركة السريعة أو الأشد خلال آخر 7 أيام، مقابل %1$d أسبوعياً التي تستهدفها الإرشادات الصحية.</string>
-    <string name="day_info_active_minutes_how">الدقيقة بـ %1$d خطوة أو أكثر تُعد متوسطة، و%2$d أو أكثر شديدة، ضمن سلسلة من %3$d دقائق على الأقل. المجهود بلا خطوات، كالدراجة أو التجديف، يُحتسب من النبض بعد %4$d دقائق متتالية عند %5$d%% من احتياطي نبضك أو أكثر، وشديد من %6$d%%. الدقيقة الشديدة تُحتسب مرتين، كما في إرشادات منظمة الصحة العالمية 2020.</string>
+    <string name="day_info_active_minutes_meaning">دقائق الحركة السريعة أو الأشد خلال آخر 7 أيام، مقابل ⁨%1$d⁩ أسبوعياً التي تستهدفها الإرشادات الصحية.</string>
+    <string name="day_info_active_minutes_how">الدقيقة بـ ⁨%1$d⁩ خطوة أو أكثر تُعد متوسطة، و⁨%2$d⁩ أو أكثر شديدة، ضمن سلسلة من ⁨%3$d⁩ دقائق على الأقل. المجهود بلا خطوات، كالدراجة أو التجديف، يُحتسب من النبض بعد ⁨%4$d⁩ دقائق متتالية عند ⁨%5$d%%⁩ من احتياطي نبضك أو أكثر، وشديد من ⁨%6$d%%⁩. الدقيقة الشديدة تُحتسب مرتين، كما في إرشادات منظمة الصحة العالمية 2020.</string>
     <string name="day_info_active_minutes_moves">المشي السريع لبضع دقائق أو أكثر، والدراجة والجري والرياضة كلها تُحتسب. التمشية والدفعات القصيرة لا تُحتسب.</string>
     <string name="day_info_active_minutes_off">لم تتحقق أي دراسة من عدّ خطوات السترب مقابل سرعة المشي، فالدقائق السريعة قرب الحد قد تُفوَّت أو تُحتسب خطأً. دفع عربة أو الإمساك بدرابزين يخفي الخطوات.</string>
     <string name="day_info_load_meaning">مدى عمل قلبك اليوم، من التمارين والحركة، مقارنة بيومك المعتاد.</string>
@@ -100,30 +100,30 @@
     <string name="day_info_calories_moves">الحركة الأكثر ترفعه، والتمارين أكثر شيء. الجسم الأثقل يستهلك أكثر في الراحة والحركة.</string>
     <string name="day_info_calories_off">هضم الطعام غير محتسب. يغطي فقط دقائق لبس السترب، فاليوم الذي نُزع فيه لساعات يقرأ منخفضاً. الملف غير المحدّث يخلّ بجزء الراحة.</string>
     <string name="day_info_distance_meaning">المسافة التي مشيتها وجريتها اليوم، مقدرة من خطواتك.</string>
-    <string name="day_info_distance_how">خطوات كل دقيقة مضروبة في طول خطوة من طولك: %1$s%% منه في المشي، ويرتفع إلى %2$s%% عند 130 خطوة في الدقيقة وأسرع. بدون طول يحل رقم السترب محله.</string>
+    <string name="day_info_distance_how">خطوات كل دقيقة مضروبة في طول خطوة من طولك: ⁨%1$s%%⁩ منه في المشي، ويرتفع إلى ⁨%2$s%%⁩ عند 130 خطوة في الدقيقة وأسرع. بدون طول يحل رقم السترب محله.</string>
     <string name="day_info_distance_moves">خطوات أكثر وأسرع، لأن الخطوات الأسرع أطول.</string>
     <string name="day_info_distance_off">طول الخطوة يختلف من شخص لآخر ومع المرتفعات، فقد يخطئ بعُشر أو أكثر. التمرين مع GPS له مسافته الخاصة.</string>
-    <string name="day_info_active_note_today">%1$d من دقائق اليوم جاءت من النبض.</string>
-    <string name="day_info_active_note_that_day">%1$d من دقائق ذلك اليوم جاءت من النبض.</string>
-    <string name="day_info_load_note_between_tested">اليوم يُقرأ بين %1$d ن/د راحة و%2$d ن/د أقصى، من اختبارك.</string>
-    <string name="day_info_load_note_between">اليوم يُقرأ بين %1$d ن/د راحة و%2$d ن/د أقصى.</string>
-    <string name="day_info_load_note_acwr">آخر 7 أيام مقابل آخر 4 أسابيع تساوي %1$.2f، نسبة الحاد إلى المزمن. تُعرض للاطلاع فقط، لأن الأدلة على نسبة آمنة محل خلاف، ولا تدخل في الاستشفاء أبداً.</string>
-    <string name="day_info_vo2_note_resting">تقدير هذا الأسبوع يستخدم نبض راحة %1$d ن/د أثناء النوم.</string>
-    <string name="day_info_vo2_note_age_man">هذا معتاد لرجل عمره نحو %1$d إلى %2$d.</string>
-    <string name="day_info_vo2_note_age_woman">هذا معتاد لامرأة عمرها نحو %1$d إلى %2$d.</string>
-    <string name="day_info_vo2_note_withheld">لا يوجد تقدير من ملفك بعد. %1$s</string>
-    <string name="day_info_calories_note_partial">يغطي %1$s من اللبس، فهو جزء من اليوم.</string>
+    <string name="day_info_active_note_today">⁨%1$d⁩ من دقائق اليوم جاءت من النبض.</string>
+    <string name="day_info_active_note_that_day">⁨%1$d⁩ من دقائق ذلك اليوم جاءت من النبض.</string>
+    <string name="day_info_load_note_between_tested">اليوم يُقرأ بين ⁨%1$d⁩ ن/د راحة و⁨%2$d⁩ ن/د أقصى، من اختبارك.</string>
+    <string name="day_info_load_note_between">اليوم يُقرأ بين ⁨%1$d⁩ ن/د راحة و⁨%2$d⁩ ن/د أقصى.</string>
+    <string name="day_info_load_note_acwr">آخر 7 أيام مقابل آخر 4 أسابيع تساوي ⁨%1$.2f⁩، نسبة الحاد إلى المزمن. تُعرض للاطلاع فقط، لأن الأدلة على نسبة آمنة محل خلاف، ولا تدخل في الاستشفاء أبداً.</string>
+    <string name="day_info_vo2_note_resting">تقدير هذا الأسبوع يستخدم نبض راحة ⁨%1$d⁩ ن/د أثناء النوم.</string>
+    <string name="day_info_vo2_note_age_man">هذا معتاد لرجل عمره نحو ⁨%1$d⁩ إلى ⁨%2$d⁩.</string>
+    <string name="day_info_vo2_note_age_woman">هذا معتاد لامرأة عمرها نحو ⁨%1$d⁩ إلى ⁨%2$d⁩.</string>
+    <string name="day_info_vo2_note_withheld">لا يوجد تقدير من ملفك بعد. ⁨%1$s⁩</string>
+    <string name="day_info_calories_note_partial">يغطي ⁨%1$s⁩ من اللبس، فهو جزء من اليوم.</string>
     <string name="day_info_calories_note_unusual">هذا مجموع غير معتاد ليوم كامل. تحقق من ملفك وطريقة لبس السترب.</string>
-    <plurals name="day_info_calories_note_heart_rate"><item quantity="zero">%1$d دقائق جاءت من النبض بدل الخطوات.</item><item quantity="one">دقيقة %1$d جاءت من النبض بدل الخطوات.</item><item quantity="two">%1$d دقائق جاءت من النبض بدل الخطوات.</item><item quantity="few">%1$d دقائق جاءت من النبض بدل الخطوات.</item><item quantity="many">%1$d دقائق جاءت من النبض بدل الخطوات.</item><item quantity="other">%1$d دقائق جاءت من النبض بدل الخطوات.</item></plurals>
+    <plurals name="day_info_calories_note_heart_rate"><item quantity="zero">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="one">دقيقة ⁨%1$d⁩ جاءت من النبض بدل الخطوات.</item><item quantity="two">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="few">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="many">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item><item quantity="other">⁨%1$d⁩ دقائق جاءت من النبض بدل الخطوات.</item></plurals>
     <string name="day_info_night_heart_rate">عند فتحه من الليلة يعرض نومك فقط: الخط من النوم حتى الاستيقاظ، والأدنى أثناء النوم، ومتوسط السترب لليلة. الشهر والسنة أيام كاملة.</string>
     <string name="day_info_night_spo2">عند فتحه من الليلة يعرض قراءات السترب أثناء النوم، منفصلة عن القراءات الفورية في النهار، مقابل لياليك السابقة.</string>
     <string name="day_info_night_breathing">عند فتحه من الليلة يعرض قراءات تلك الليلة، مقابل لياليك السابقة.</string>
     <string name="day_info_night_other">عند فتحه من الليلة يعرض متوسط القراءات أثناء نومك، مقابل لياليك السابقة. الشهر والسنة أيام كاملة، نهاراً وليلاً.</string>
     <string name="day_info_disturbances_name">اضطرابات التنفس</string>
     <string name="day_info_disturbances_meaning">انخفاضات أكسجين الدم أثناء نومك، يعدّها السترب، كعدد في الساعة. تقدير مبكر.</string>
-    <string name="day_info_disturbances_how">يعدّ السترب كل انخفاض قصير في أكسجين الدم أثناء النوم، ويُقسم على ساعات النوم. معتادك هو منتصف لياليك السابقة، بعد أن يكون لديك %1$d منها. تبقى ثابتة نسبياً لكل شخص، فتُعرض مع نومك بدل احتسابها في الاستشفاء.</string>
+    <string name="day_info_disturbances_how">يعدّ السترب كل انخفاض قصير في أكسجين الدم أثناء النوم، ويُقسم على ساعات النوم. معتادك هو منتصف لياليك السابقة، بعد أن يكون لديك ⁨%1$d⁩ منها. تبقى ثابتة نسبياً لكل شخص، فتُعرض مع نومك بدل احتسابها في الاستشفاء.</string>
     <string name="day_info_disturbances_moves">الكحول وانسداد الأنف والنوم على الظهر والارتفاعات قد ترفعها.</string>
-    <string name="day_info_disturbances_off">طريقة عدّ السترب لها غير مؤكدة بعد، فاعتبر الرقم تقديراً مبكراً. السترب الرخو قد يُقرأ كانخفاض. %1$s ليس اختباراً لانقطاع النفس أثناء النوم.</string>
+    <string name="day_info_disturbances_off">طريقة عدّ السترب لها غير مؤكدة بعد، فاعتبر الرقم تقديراً مبكراً. السترب الرخو قد يُقرأ كانخفاض. ⁨%1$s⁩ ليس اختباراً لانقطاع النفس أثناء النوم.</string>
     <string name="day_info_habit_age_name">عمر عاداتك</string>
     <string name="day_info_habit_age_meaning">كم تجعل عاداتك جسمك يبدو عمراً، كنطاق من السنوات، يُحسب كل أحد.</string>
     <string name="day_info_habit_age_how">كل عادة تُقيَّم مقابل الشخص المعتاد بعمرك وجنسك: نبض الراحة، والخطوات، وانتظام النوم، ومدة النوم، وتمارين القوة، واللياقة (VO2 max، أقصى أكسجين يستخدمه جسمك في المجهود الشاق). الأفضل من المعتاد ينقص سنوات، والأسوأ يضيفها. يُقلَّص المجموع لأن العادات تتداخل، ويُحدّ بـ 5 سنوات في أي اتجاه. ينظر 6 أشهر للخلف، و3 للياقة.</string>
@@ -134,18 +134,18 @@
     <string name="day_info_week_how">الخطوات هي مجموع كل يوم من دقائق السترب، والخطوات اليومية متوسط الأيام التي فيها خطوات. الدقائق النشطة تُحسب كما في صفحتها. الليلة تتبع المساء الذي بدأت فيه، فآخر ليلة في الأسبوع تمتد للأسبوع التالي.</string>
     <string name="day_info_week_moves">كل مشية وتمرين ونوم مبكر يظهر هنا بعد أسبوع.</string>
     <string name="day_info_week_off">الخطوات والتمارين تُقارن بالأسبوع السابق. الدقائق النشطة والنوم ترجع أسبوعين فقط، فتُعرض بدون مقارنة. اليوم الذي نُزع فيه السترب يقرأ منخفضاً.</string>
-    <string name="day_info_disturbances_last_night">البارحة %1$.1f في الساعة.</string>
-    <string name="day_info_disturbances_that_night">تلك الليلة %1$.1f في الساعة.</string>
-    <string name="day_info_disturbances_learning">نتعلم معتادك، %1$d من %2$d ليالٍ.</string>
-    <string name="day_info_disturbances_usual">معتادك %1$.1f.</string>
-    <string name="day_info_regularity_note_compares">هذا الأسبوع يقارن %1$d س من اللبس.</string>
-    <string name="day_info_regularity_note_needs">لا يوجد لبس كافٍ للقياس الكامل بعد: %1$d س من %2$d س المطلوبة.</string>
-    <string name="day_info_regularity_note_midpoint">في الأثناء تحرك منتصف نومك نحو %1$s هذا الأسبوع.</string>
-    <string name="day_info_sleep_note_need">حاجتك للنوم هنا %1$s، من عمرك أو إعدادك.</string>
-    <string name="day_info_recovery_note_strap">نتيجة السترب نفسه اليوم %1$d. لا تحسب مدة النوم، فبعد ليلة قصيرة تقرأ أعلى من نتيجة OpenStrap. تُحفظ للمقارنة ولا تدخل في نتيجة OpenStrap أبداً.</string>
+    <string name="day_info_disturbances_last_night">البارحة ⁨%1$.1f⁩ في الساعة.</string>
+    <string name="day_info_disturbances_that_night">تلك الليلة ⁨%1$.1f⁩ في الساعة.</string>
+    <string name="day_info_disturbances_learning">نتعلم معتادك، ⁨%1$d⁩ من ⁨%2$d⁩ ليالٍ.</string>
+    <string name="day_info_disturbances_usual">معتادك ⁨%1$.1f⁩.</string>
+    <string name="day_info_regularity_note_compares">هذا الأسبوع يقارن ⁨%1$d⁩ س من اللبس.</string>
+    <string name="day_info_regularity_note_needs">لا يوجد لبس كافٍ للقياس الكامل بعد: ⁨%1$d⁩ س من ⁨%2$d⁩ س المطلوبة.</string>
+    <string name="day_info_regularity_note_midpoint">في الأثناء تحرك منتصف نومك نحو ⁨%1$s⁩ هذا الأسبوع.</string>
+    <string name="day_info_sleep_note_need">حاجتك للنوم هنا ⁨%1$s⁩، من عمرك أو إعدادك.</string>
+    <string name="day_info_recovery_note_strap">نتيجة السترب نفسه اليوم ⁨%1$d⁩. لا تحسب مدة النوم، فبعد ليلة قصيرة تقرأ أعلى من نتيجة OpenStrap. تُحفظ للمقارنة ولا تدخل في نتيجة OpenStrap أبداً.</string>
     <string name="day_info_recovery_note_capped">اليوم إشارة جسدية واحدة بعيدة عن معدلك، فالنتيجة محدودة.</string>
-    <string name="day_info_recovery_note_hrv">HRV البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب %1$d م.ث.</string>
-    <string name="day_info_recovery_note_resting_hr">نبض راحة البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب %1$d ن/د.</string>
-    <string name="day_info_recovery_note_week_thin">HRV الأسبوع يعتمد على %1$d من 7 ليالٍ، فهو أقل يقيناً من المعتاد.</string>
+    <string name="day_info_recovery_note_hrv">HRV البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب ⁨%1$d⁩ م.ث.</string>
+    <string name="day_info_recovery_note_resting_hr">نبض راحة البارحة لم يكن نظيفاً بما يكفي، فحلّت محله قراءة السترب ⁨%1$d⁩ ن/د.</string>
+    <string name="day_info_recovery_note_week_thin">HRV الأسبوع يعتمد على ⁨%1$d⁩ من 7 ليالٍ، فهو أقل يقيناً من المعتاد.</string>
     <string name="day_info_charge_note_estimated">نُزع السترب ليلاً، فبدأ اليوم من تقدير.</string>
 </resources>

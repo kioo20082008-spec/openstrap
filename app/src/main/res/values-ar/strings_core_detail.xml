@@ -3,11 +3,11 @@
     <string name="core_detail_status_above">أعلى من معدلك</string>
     <string name="core_detail_status_below">أقل من معدلك</string>
     <string name="core_detail_status_usual">معتاد</string>
-    <string name="core_detail_band_label">معدلك، من %1$s إلى %2$s</string>
-    <string name="core_detail_learning_nights">نتعلّم معدلك، %1$d من %2$d ليالٍ</string>
-    <string name="core_detail_learning_days">نتعلّم معدلك، %1$d من %2$d أيام</string>
-    <string name="core_detail_learning_nights_sentence">نتعلّم معدلك، %1$d من %2$d ليالٍ.</string>
-    <string name="core_detail_learning_days_sentence">نتعلّم معدلك، %1$d من %2$d أيام.</string>
+    <string name="core_detail_band_label">معدلك، من ⁨%1$s⁩ إلى ⁨%2$s⁩</string>
+    <string name="core_detail_learning_nights">نتعلّم معدلك، ⁨%1$d⁩ من ⁨%2$d⁩ ليالٍ</string>
+    <string name="core_detail_learning_days">نتعلّم معدلك، ⁨%1$d⁩ من ⁨%2$d⁩ أيام</string>
+    <string name="core_detail_learning_nights_sentence">نتعلّم معدلك، ⁨%1$d⁩ من ⁨%2$d⁩ ليالٍ.</string>
+    <string name="core_detail_learning_days_sentence">نتعلّم معدلك، ⁨%1$d⁩ من ⁨%2$d⁩ أيام.</string>
     <string name="core_detail_number_0">لا</string>
     <string name="core_detail_number_1">واحد</string>
     <string name="core_detail_number_2">اثنان</string>
@@ -18,8 +18,8 @@
     <string name="core_detail_number_7">سبعة</string>
     <string name="core_detail_number_8">ثمانية</string>
     <string name="core_detail_number_9">تسعة</string>
-    <plurals name="core_detail_nights"><item quantity="zero">%1$s ليالٍ</item><item quantity="one">ليلة %1$s</item><item quantity="two">%1$s ليالٍ</item><item quantity="few">%1$s ليالٍ</item><item quantity="many">%1$s ليالٍ</item><item quantity="other">%1$s ليالٍ</item></plurals>
-    <plurals name="core_detail_days"><item quantity="zero">%1$s أيام</item><item quantity="one">يوم %1$s</item><item quantity="two">%1$s أيام</item><item quantity="few">%1$s أيام</item><item quantity="many">%1$s أيام</item><item quantity="other">%1$s أيام</item></plurals>
+    <plurals name="core_detail_nights"><item quantity="zero">⁨%1$s⁩ ليالٍ</item><item quantity="one">ليلة ⁨%1$s⁩</item><item quantity="two">⁨%1$s⁩ ليالٍ</item><item quantity="few">⁨%1$s⁩ ليالٍ</item><item quantity="many">⁨%1$s⁩ ليالٍ</item><item quantity="other">⁨%1$s⁩ ليالٍ</item></plurals>
+    <plurals name="core_detail_days"><item quantity="zero">⁨%1$s⁩ أيام</item><item quantity="one">يوم ⁨%1$s⁩</item><item quantity="two">⁨%1$s⁩ أيام</item><item quantity="few">⁨%1$s⁩ أيام</item><item quantity="many">⁨%1$s⁩ أيام</item><item quantity="other">⁨%1$s⁩ أيام</item></plurals>
     <string name="core_detail_label_bpm_now">ن/د الآن</string>
     <string name="core_detail_label_bpm_latest">ن/د، الأحدث</string>
     <string name="core_detail_label_bpm_resting">ن/د في الراحة</string>
@@ -27,16 +27,16 @@
     <string name="core_detail_label_steps">خطوة</string>
     <string name="core_detail_label_breathing">نفس/د أثناء النوم</string>
     <string name="core_detail_label_day_average">متوسط اليوم</string>
-    <string name="core_detail_label_unit_day_average">%1$s، متوسط اليوم</string>
+    <string name="core_detail_label_unit_day_average">⁨%1$s⁩، متوسط اليوم</string>
     <string name="core_detail_label_steps_week">خطوة يومياً، آخر 7 أيام</string>
     <string name="core_detail_label_steps_month">خطوة يومياً، آخر 30 يوماً</string>
     <string name="core_detail_label_steps_year">خطوة يومياً، آخر 12 شهراً</string>
     <string name="core_detail_label_average_week">متوسط آخر 7 أيام</string>
     <string name="core_detail_label_average_month">متوسط آخر 30 يوماً</string>
     <string name="core_detail_label_average_year">متوسط آخر 12 شهراً</string>
-    <string name="core_detail_label_unit_average_week">%1$s، متوسط آخر 7 أيام</string>
-    <string name="core_detail_label_unit_average_month">%1$s، متوسط آخر 30 يوماً</string>
-    <string name="core_detail_label_unit_average_year">%1$s، متوسط آخر 12 شهراً</string>
+    <string name="core_detail_label_unit_average_week">⁨%1$s⁩، متوسط آخر 7 أيام</string>
+    <string name="core_detail_label_unit_average_month">⁨%1$s⁩، متوسط آخر 30 يوماً</string>
+    <string name="core_detail_label_unit_average_year">⁨%1$s⁩، متوسط آخر 12 شهراً</string>
     <string name="core_detail_day_night_today_above">الليلة الماضية، أعلى من معدلك.</string>
     <string name="core_detail_day_night_today_below">الليلة الماضية، أقل من معدلك.</string>
     <string name="core_detail_day_night_today_within">الليلة الماضية، ضمن معدلك.</string>
@@ -63,10 +63,10 @@
     <string name="core_detail_none_week">في آخر 7 أيام</string>
     <string name="core_detail_none_month">في آخر 30 يوماً</string>
     <string name="core_detail_none_year">في آخر 12 شهراً</string>
-    <string name="core_detail_heart_day_today">بين %1$d و%2$d ن/د حتى الآن اليوم.</string>
-    <string name="core_detail_heart_day_past">بين %1$d و%2$d ن/د ذلك اليوم.</string>
-    <string name="core_detail_run_above">أعلى من معدلك منذ %1$s.</string>
-    <string name="core_detail_run_below">أقل من معدلك منذ %1$s.</string>
+    <string name="core_detail_heart_day_today">بين ⁨%1$d⁩ و⁨%2$d⁩ ن/د حتى الآن اليوم.</string>
+    <string name="core_detail_heart_day_past">بين ⁨%1$d⁩ و⁨%2$d⁩ ن/د ذلك اليوم.</string>
+    <string name="core_detail_run_above">أعلى من معدلك منذ ⁨%1$s⁩.</string>
+    <string name="core_detail_run_below">أقل من معدلك منذ ⁨%1$s⁩.</string>
     <string name="core_detail_every_night">ضمن معدلك كل ليلة.</string>
     <string name="core_detail_every_night_with_data">ضمن معدلك كل ليلة فيها بيانات.</string>
     <string name="core_detail_every_night_month">ضمن معدلك كل ليلة في آخر 30 يوماً.</string>
@@ -75,21 +75,21 @@
     <string name="core_detail_every_day_with_data">ضمن معدلك كل يوم فيه بيانات.</string>
     <string name="core_detail_every_day_month">ضمن معدلك كل يوم في آخر 30 يوماً.</string>
     <string name="core_detail_every_day_with_data_month">ضمن معدلك كل يوم فيه بيانات في آخر 30 يوماً.</string>
-    <string name="core_detail_inside_nights">ضمن معدلك في %1$d من %2$d ليالٍ.</string>
-    <string name="core_detail_inside_nights_month">ضمن معدلك في %1$d من %2$d ليلة في آخر 30 يوماً.</string>
-    <string name="core_detail_inside_days">ضمن معدلك في %1$d من %2$d أيام.</string>
-    <string name="core_detail_inside_days_month">ضمن معدلك في %1$d من %2$d يوماً في آخر 30 يوماً.</string>
-    <string name="core_detail_year_unit">خلال آخر 12 شهراً، تراوحت المتوسطات الأسبوعية من %1$s إلى %2$s %3$s.</string>
-    <string name="core_detail_year">خلال آخر 12 شهراً، تراوحت المتوسطات الأسبوعية من %1$s إلى %2$s.</string>
+    <string name="core_detail_inside_nights">ضمن معدلك في ⁨%1$d⁩ من ⁨%2$d⁩ ليالٍ.</string>
+    <string name="core_detail_inside_nights_month">ضمن معدلك في ⁨%1$d⁩ من ⁨%2$d⁩ ليلة في آخر 30 يوماً.</string>
+    <string name="core_detail_inside_days">ضمن معدلك في ⁨%1$d⁩ من ⁨%2$d⁩ أيام.</string>
+    <string name="core_detail_inside_days_month">ضمن معدلك في ⁨%1$d⁩ من ⁨%2$d⁩ يوماً في آخر 30 يوماً.</string>
+    <string name="core_detail_year_unit">خلال آخر 12 شهراً، تراوحت المتوسطات الأسبوعية من ⁨%1$s⁩ إلى ⁨%2$s⁩ ⁨%3$s⁩.</string>
+    <string name="core_detail_year">خلال آخر 12 شهراً، تراوحت المتوسطات الأسبوعية من ⁨%1$s⁩ إلى ⁨%2$s⁩.</string>
     <string name="core_detail_score_week_one">نتيجة واحدة في آخر 7 أيام حتى الآن.</string>
-    <string name="core_detail_score_week">المتوسط %1$d خلال آخر 7 أيام، من %2$d إلى %3$d.</string>
-    <string name="core_detail_charge_started">بدأ اليوم عند %1$d وانتهى عند %2$d.</string>
-    <string name="core_detail_charge_ended">انتهى اليوم عند %1$d.</string>
+    <string name="core_detail_score_week">المتوسط ⁨%1$d⁩ خلال آخر 7 أيام، من ⁨%2$d⁩ إلى ⁨%3$d⁩.</string>
+    <string name="core_detail_charge_started">بدأ اليوم عند ⁨%1$d⁩ وانتهى عند ⁨%2$d⁩.</string>
+    <string name="core_detail_charge_ended">انتهى اليوم عند ⁨%1$d⁩.</string>
     <string name="core_detail_recovery_waiting">في الانتظار</string>
     <string name="core_detail_recovery_for_last_night">لنوم الليلة الماضية</string>
     <string name="core_detail_recovery_no_sleep">لم يُسجَّل نوم تلك الليلة</string>
     <string name="core_detail_recovery_learning">نتعلّم</string>
-    <string name="core_detail_recovery_nights">%1$d من %2$d ليالٍ</string>
+    <string name="core_detail_recovery_nights">⁨%1$d⁩ من ⁨%2$d⁩ ليالٍ</string>
     <string name="core_detail_recovery_no_score">لا توجد نتيجة</string>
     <string name="core_detail_recovery_no_heart_data">بيانات النبض غير كافية تلك الليلة</string>
     <string name="core_detail_recovery_scored_mornings">يُحسب كل صباح من الليلة السابقة</string>

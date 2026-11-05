@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="day_calories_row_line">نشطة من %1$s. المجموع %2$s</string>
-    <string name="day_calories_row_line_met">نشطة، تحقق الهدف. المجموع %1$s</string>
+    <string name="day_calories_row_line">نشطة من ⁨%1$s⁩. المجموع ⁨%2$s⁩</string>
+    <string name="day_calories_row_line_met">نشطة، تحقق الهدف. المجموع ⁨%1$s⁩</string>
     <string name="day_calories_day_label_today">سعرة نشطة حتى الآن اليوم</string>
     <string name="day_calories_day_label">سعرة نشطة</string>
-    <string name="day_calories_to_goal">%1$s للوصول إلى هدفك %2$s</string>
-    <string name="day_calories_to_goal_met">تحقق هدف %1$s</string>
-    <string name="day_calories_peak">الذروة الساعة %1$s، %2$s سعرة</string>
-    <string name="day_calories_hour_label">سعرة نشطة، %1$s</string>
-    <string name="day_calories_source_workout_line">%1$s، %2$s</string>
+    <string name="day_calories_to_goal">⁨%1$s⁩ للوصول إلى هدفك ⁨%2$s⁩</string>
+    <string name="day_calories_to_goal_met">تحقق هدف ⁨%1$s⁩</string>
+    <string name="day_calories_peak">الذروة الساعة ⁨%1$s⁩، ⁨%2$s⁩ سعرة</string>
+    <string name="day_calories_hour_label">سعرة نشطة، ⁨%1$s⁩</string>
+    <string name="day_calories_source_workout_line">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="day_calories_source_walking">المشي</string>
     <string name="day_calories_source_everyday">الحركة اليومية</string>
     <string name="day_calories_source_everyday_line">الوقوف والأعمال اليومية والتنقل</string>
     <string name="day_calories_walking_none">لا يوجد مشي خارج التمارين</string>
-    <plurals name="day_calories_walking"><item quantity="zero">%1$d دقيقة مشي أو جري، خارج التمارين</item><item quantity="one">دقيقة واحدة مشي أو جري، خارج التمارين</item><item quantity="two">%1$d دقيقة مشي أو جري، خارج التمارين</item><item quantity="few">%1$d دقيقة مشي أو جري، خارج التمارين</item><item quantity="many">%1$d دقيقة مشي أو جري، خارج التمارين</item><item quantity="other">%1$d دقيقة مشي أو جري، خارج التمارين</item></plurals>
+    <plurals name="day_calories_walking"><item quantity="zero">⁨%1$d⁩ دقيقة مشي أو جري، خارج التمارين</item><item quantity="one">دقيقة واحدة مشي أو جري، خارج التمارين</item><item quantity="two">⁨%1$d⁩ دقيقة مشي أو جري، خارج التمارين</item><item quantity="few">⁨%1$d⁩ دقيقة مشي أو جري، خارج التمارين</item><item quantity="many">⁨%1$d⁩ دقيقة مشي أو جري، خارج التمارين</item><item quantity="other">⁨%1$d⁩ دقيقة مشي أو جري، خارج التمارين</item></plurals>
     <string name="day_calories_range_label_year">سعرة نشطة يومياً، آخر 12 شهراً</string>
-    <plurals name="day_calories_range_label"><item quantity="zero">سعرة نشطة يومياً، آخر %1$d أيام</item><item quantity="one">سعرة نشطة يومياً، آخر يوم</item><item quantity="two">سعرة نشطة يومياً، آخر %1$d أيام</item><item quantity="few">سعرة نشطة يومياً، آخر %1$d أيام</item><item quantity="many">سعرة نشطة يومياً، آخر %1$d أيام</item><item quantity="other">سعرة نشطة يومياً، آخر %1$d أيام</item></plurals>
-    <string name="day_calories_goal_days">تحقق الهدف في %1$d من %2$s</string>
-    <plurals name="day_calories_days"><item quantity="zero">%1$d أيام</item><item quantity="one">يوم واحد</item><item quantity="two">%1$d أيام</item><item quantity="few">%1$d أيام</item><item quantity="many">%1$d أيام</item><item quantity="other">%1$d أيام</item></plurals>
+    <plurals name="day_calories_range_label"><item quantity="zero">سعرة نشطة يومياً، آخر ⁨%1$d⁩ أيام</item><item quantity="one">سعرة نشطة يومياً، آخر يوم</item><item quantity="two">سعرة نشطة يومياً، آخر ⁨%1$d⁩ أيام</item><item quantity="few">سعرة نشطة يومياً، آخر ⁨%1$d⁩ أيام</item><item quantity="many">سعرة نشطة يومياً، آخر ⁨%1$d⁩ أيام</item><item quantity="other">سعرة نشطة يومياً، آخر ⁨%1$d⁩ أيام</item></plurals>
+    <string name="day_calories_goal_days">تحقق الهدف في ⁨%1$d⁩ من ⁨%2$s⁩</string>
+    <plurals name="day_calories_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم واحد</item><item quantity="two">⁨%1$d⁩ أيام</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ أيام</item><item quantity="other">⁨%1$d⁩ أيام</item></plurals>
     <string name="day_calories_vs_year">مقارنة بالسنة السابقة</string>
-    <plurals name="day_calories_vs_days"><item quantity="zero">مقارنة بالـ %1$d أيام السابقة</item><item quantity="one">مقارنة باليوم السابق</item><item quantity="two">مقارنة بالـ %1$d أيام السابقة</item><item quantity="few">مقارنة بالـ %1$d أيام السابقة</item><item quantity="many">مقارنة بالـ %1$d أيام السابقة</item><item quantity="other">مقارنة بالـ %1$d أيام السابقة</item></plurals>
-    <string name="day_calories_range_workouts">التمارين شكّلت %1$d%% من سعراتك النشطة، والباقي من المشي والحركة.</string>
-    <string name="day_calories_range_busiest">أنشط يوم لك كان %1$s، بـ %2$s سعرة نشطة.</string>
-    <string name="day_calories_in_your_day_phone_today">%1$s هذا يمثل %2$s من %3$s سعرة نشطة اليوم، ويومك يحسب نفس الرقم.</string>
-    <string name="day_calories_in_your_day_phone_yesterday">%1$s هذا يمثل %2$s من %3$s سعرة نشطة أمس، ويومك يحسب نفس الرقم.</string>
-    <string name="day_calories_in_your_day_phone_that_day">%1$s هذا يمثل %2$s من %3$s سعرة نشطة ذلك اليوم، ويومك يحسب نفس الرقم.</string>
-    <string name="day_calories_in_your_day_strap_today">%1$s هذا يمثل %2$s من %3$s سعرة نشطة اليوم، واليوم يحسبها من رقم السترب.</string>
-    <string name="day_calories_in_your_day_strap_yesterday">%1$s هذا يمثل %2$s من %3$s سعرة نشطة أمس، واليوم يحسبها من رقم السترب.</string>
-    <string name="day_calories_in_your_day_strap_that_day">%1$s هذا يمثل %2$s من %3$s سعرة نشطة ذلك اليوم، واليوم يحسبها من رقم السترب.</string>
+    <plurals name="day_calories_vs_days"><item quantity="zero">مقارنة بالـ ⁨%1$d⁩ أيام السابقة</item><item quantity="one">مقارنة باليوم السابق</item><item quantity="two">مقارنة بالـ ⁨%1$d⁩ أيام السابقة</item><item quantity="few">مقارنة بالـ ⁨%1$d⁩ أيام السابقة</item><item quantity="many">مقارنة بالـ ⁨%1$d⁩ أيام السابقة</item><item quantity="other">مقارنة بالـ ⁨%1$d⁩ أيام السابقة</item></plurals>
+    <string name="day_calories_range_workouts">التمارين شكّلت ⁨%1$d%%⁩ من سعراتك النشطة، والباقي من المشي والحركة.</string>
+    <string name="day_calories_range_busiest">أنشط يوم لك كان ⁨%1$s⁩، بـ ⁨%2$s⁩ سعرة نشطة.</string>
+    <string name="day_calories_in_your_day_phone_today">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة اليوم، ويومك يحسب نفس الرقم.</string>
+    <string name="day_calories_in_your_day_phone_yesterday">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة أمس، ويومك يحسب نفس الرقم.</string>
+    <string name="day_calories_in_your_day_phone_that_day">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة ذلك اليوم، ويومك يحسب نفس الرقم.</string>
+    <string name="day_calories_in_your_day_strap_today">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة اليوم، واليوم يحسبها من رقم السترب.</string>
+    <string name="day_calories_in_your_day_strap_yesterday">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة أمس، واليوم يحسبها من رقم السترب.</string>
+    <string name="day_calories_in_your_day_strap_that_day">⁨%1$s⁩ هذا يمثل ⁨%2$s⁩ من ⁨%3$s⁩ سعرة نشطة ذلك اليوم، واليوم يحسبها من رقم السترب.</string>
 </resources>

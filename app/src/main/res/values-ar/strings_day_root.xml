@@ -13,7 +13,7 @@
     <string name="day_nearby_text">يحتاج OpenStrap إذن الأجهزة القريبة للعثور على السترب والاتصال به. لن يسألك أندرويد مرة أخرى، ففعّله من إعدادات OpenStrap تحت الأذونات.</string>
     <string name="day_nearby_open_settings">افتح الإعدادات</string>
     <string name="day_nearby_not_now">ليس الآن</string>
-    <string name="day_pull_sync_failed">تعذّرت المزامنة. %1$s</string>
+    <string name="day_pull_sync_failed">تعذّرت المزامنة. ⁨%1$s⁩</string>
     <string name="day_pull_not_connected">السترب غير متصل.</string>
     <string name="day_pull_syncing">جارٍ مزامنة السترب…</string>
     <string name="day_pull_release">اترك للمزامنة</string>

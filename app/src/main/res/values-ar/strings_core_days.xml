@@ -4,8 +4,8 @@
     <string name="core_day_yesterday">أمس</string>
     <string name="core_day_today_in_sentence">اليوم</string>
     <string name="core_day_yesterday_in_sentence">أمس</string>
-    <string name="core_day_at">%1$s الساعة %2$s</string>
-    <string name="core_day_done_today">اليوم الساعة %1$s</string>
-    <string name="core_day_done_yesterday">أمس الساعة %1$s</string>
-    <string name="core_day_done_on">في %1$s</string>
+    <string name="core_day_at">⁨%1$s⁩ الساعة ⁨%2$s⁩</string>
+    <string name="core_day_done_today">اليوم الساعة ⁨%1$s⁩</string>
+    <string name="core_day_done_yesterday">أمس الساعة ⁨%1$s⁩</string>
+    <string name="core_day_done_on">في ⁨%1$s⁩</string>
 </resources>

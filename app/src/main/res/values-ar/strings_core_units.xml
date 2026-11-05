@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="core_unit_meters">%1$s م</string>
-    <string name="core_unit_km">%1$s كم</string>
-    <string name="core_unit_minutes">%1$s د</string>
-    <string name="core_unit_hours">%1$s س</string>
-    <string name="core_unit_hours_minutes">%1$s س %2$s</string>
-    <string name="core_unit_seconds">%1$s ث</string>
-    <string name="core_unit_pace">%1$s/كم</string>
-    <string name="core_unit_kcal">%1$s سعرة</string>
+    <string name="core_unit_meters">⁨%1$s⁩ م</string>
+    <string name="core_unit_km">⁨%1$s⁩ كم</string>
+    <string name="core_unit_minutes">⁨%1$s⁩ د</string>
+    <string name="core_unit_hours">⁨%1$s⁩ س</string>
+    <string name="core_unit_hours_minutes">⁨%1$s⁩ س ⁨%2$s⁩</string>
+    <string name="core_unit_seconds">⁨%1$s⁩ ث</string>
+    <string name="core_unit_pace">⁨%1$s⁩/كم</string>
+    <string name="core_unit_kcal">⁨%1$s⁩ سعرة</string>
     <string name="core_unit_bpm">ن/د</string>
     <string name="core_unit_ms">م.ث</string>
     <string name="core_unit_celsius">°م</string>
     <string name="core_unit_breaths">نفس/د</string>
     <string name="core_unit_steps">خطوة</string>
-    <string name="core_unit_lb">%1$d رطل</string>
-    <string name="core_unit_kg">%1$d كغ</string>
-    <string name="core_unit_feet_inches">%1$d′%2$d″</string>
-    <string name="core_unit_cm">%1$d سم</string>
-    <string name="core_range">%1$s إلى %2$s</string>
+    <string name="core_unit_lb">⁨%1$d⁩ رطل</string>
+    <string name="core_unit_kg">⁨%1$d⁩ كغ</string>
+    <string name="core_unit_feet_inches">⁨%1$d⁩′⁨%2$d⁩″</string>
+    <string name="core_unit_cm">⁨%1$d⁩ سم</string>
+    <string name="core_range">⁨%1$s⁩ إلى ⁨%2$s⁩</string>
 </resources>

@@ -3,16 +3,16 @@
     <string name="glow_goals_title">الأهداف والأرقام القياسية</string>
     <string name="glow_goals_loading">جارٍ التحميل…</string>
     <string name="glow_goals_this_week">هذا الأسبوع</string>
-    <string name="glow_goals_goal_button">الهدف %1$d</string>
-    <plurals name="glow_goals_of_workouts"><item quantity="zero">من %d تمارين</item><item quantity="one">من %d تمرين</item><item quantity="two">من %d تمارين</item><item quantity="few">من %d تمارين</item><item quantity="many">من %d تمارين</item><item quantity="other">من %d تمارين</item></plurals>
-    <string name="glow_goals_count_of_goal">%1$d من %2$d تمارين</string>
+    <string name="glow_goals_goal_button">الهدف ⁨%1$d⁩</string>
+    <plurals name="glow_goals_of_workouts"><item quantity="zero">من ⁨%d⁩ تمارين</item><item quantity="one">من ⁨%d⁩ تمرين</item><item quantity="two">من ⁨%d⁩ تمارين</item><item quantity="few">من ⁨%d⁩ تمارين</item><item quantity="many">من ⁨%d⁩ تمارين</item><item quantity="other">من ⁨%d⁩ تمارين</item></plurals>
+    <string name="glow_goals_count_of_goal">⁨%1$d⁩ من ⁨%2$d⁩ تمارين</string>
     <string name="glow_goals_personal_bests">أرقامك القياسية</string>
     <string name="glow_goals_no_bests">تظهر أرقامك القياسية هنا بعد تمارينك الأولى.</string>
-    <string name="glow_goals_badges_count">الأوسمة، %1$d من %2$d</string>
+    <string name="glow_goals_badges_count">الأوسمة، ⁨%1$d⁩ من ⁨%2$d⁩</string>
     <string name="glow_goals_all_badges">كل الأوسمة</string>
     <string name="glow_goals_last_week">الأسبوع الماضي</string>
     <string name="glow_goals_celebrations">الاحتفالات</string>
-    <string name="glow_goals_earned_count">%1$d من %2$d مكتسبة</string>
+    <string name="glow_goals_earned_count">⁨%1$d⁩ من ⁨%2$d⁩ مكتسبة</string>
     <string name="glow_goals_group_firsts">الأوائل</string>
     <string name="glow_goals_group_milestones">المحطات</string>
     <string name="glow_goals_group_kinds">شيء جديد</string>
@@ -20,18 +20,18 @@
     <string name="glow_goals_sheet_note">التغيير يسري على هذا الأسبوع. الأسابيع الماضية تحتفظ بهدفها.</string>
     <string name="glow_goals_your_week">أسبوعك</string>
     <string name="glow_goals_goal_met">تحقق الهدف</string>
-    <plurals name="glow_goals_weekly_streak"><item quantity="zero">تحقق الهدف %d أسابيع متتالية</item><item quantity="one">تحقق الهدف أسبوع %d متتالٍ</item><item quantity="two">تحقق الهدف %d أسابيع متتالية</item><item quantity="few">تحقق الهدف %d أسابيع متتالية</item><item quantity="many">تحقق الهدف %d أسابيع متتالية</item><item quantity="other">تحقق الهدف %d أسابيع متتالية</item></plurals>
-    <plurals name="glow_goals_short_of_goal"><item quantity="zero">ينقصك %d تمارين لهدفك</item><item quantity="one">ينقصك تمرين %d لهدفك</item><item quantity="two">ينقصك %d تمارين لهدفك</item><item quantity="few">ينقصك %d تمارين لهدفك</item><item quantity="many">ينقصك %d تمارين لهدفك</item><item quantity="other">ينقصك %d تمارين لهدفك</item></plurals>
+    <plurals name="glow_goals_weekly_streak"><item quantity="zero">تحقق الهدف ⁨%d⁩ أسابيع متتالية</item><item quantity="one">تحقق الهدف أسبوع ⁨%d⁩ متتالٍ</item><item quantity="two">تحقق الهدف ⁨%d⁩ أسابيع متتالية</item><item quantity="few">تحقق الهدف ⁨%d⁩ أسابيع متتالية</item><item quantity="many">تحقق الهدف ⁨%d⁩ أسابيع متتالية</item><item quantity="other">تحقق الهدف ⁨%d⁩ أسابيع متتالية</item></plurals>
+    <plurals name="glow_goals_short_of_goal"><item quantity="zero">ينقصك ⁨%d⁩ تمارين لهدفك</item><item quantity="one">ينقصك تمرين ⁨%d⁩ لهدفك</item><item quantity="two">ينقصك ⁨%d⁩ تمارين لهدفك</item><item quantity="few">ينقصك ⁨%d⁩ تمارين لهدفك</item><item quantity="many">ينقصك ⁨%d⁩ تمارين لهدفك</item><item quantity="other">ينقصك ⁨%d⁩ تمارين لهدفك</item></plurals>
     <string name="glow_goals_highlights">أبرز اللحظات</string>
-    <string name="glow_goals_best">%1$s، %2$s</string>
+    <string name="glow_goals_best">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="glow_goals_in_all">الإجمالي</string>
-    <plurals name="glow_goals_workouts_count"><item quantity="zero">%d تمارين</item><item quantity="one">تمرين %d</item><item quantity="two">%d تمارين</item><item quantity="few">%d تمارين</item><item quantity="many">%d تمارين</item><item quantity="other">%d تمارين</item></plurals>
+    <plurals name="glow_goals_workouts_count"><item quantity="zero">⁨%d⁩ تمارين</item><item quantity="one">تمرين ⁨%d⁩</item><item quantity="two">⁨%d⁩ تمارين</item><item quantity="few">⁨%d⁩ تمارين</item><item quantity="many">⁨%d⁩ تمارين</item><item quantity="other">⁨%d⁩ تمارين</item></plurals>
     <string name="glow_goals_hours">الساعات</string>
     <string name="glow_goals_distance">المسافة</string>
     <string name="glow_goals_active_kcal">سعرات نشطة</string>
-    <string name="glow_goals_next_week">الأسبوع القادم: %1$d</string>
+    <string name="glow_goals_next_week">الأسبوع القادم: ⁨%1$d⁩</string>
     <string name="glow_goals_share_week">شارك الأسبوع</string>
     <plurals name="glow_goals_workouts_word"><item quantity="zero">تمارين</item><item quantity="one">تمرين</item><item quantity="two">تمارين</item><item quantity="few">تمارين</item><item quantity="many">تمارين</item><item quantity="other">تمارين</item></plurals>
-    <string name="glow_goals_story_goal">%1$s، الهدف %2$d</string>
-    <plurals name="glow_goals_weeks_in_a_row"><item quantity="zero">%d أسابيع متتالية</item><item quantity="one">أسبوع %d متتالٍ</item><item quantity="two">%d أسابيع متتالية</item><item quantity="few">%d أسابيع متتالية</item><item quantity="many">%d أسابيع متتالية</item><item quantity="other">%d أسابيع متتالية</item></plurals>
+    <string name="glow_goals_story_goal">⁨%1$s⁩، الهدف ⁨%2$d⁩</string>
+    <plurals name="glow_goals_weeks_in_a_row"><item quantity="zero">⁨%d⁩ أسابيع متتالية</item><item quantity="one">أسبوع ⁨%d⁩ متتالٍ</item><item quantity="two">⁨%d⁩ أسابيع متتالية</item><item quantity="few">⁨%d⁩ أسابيع متتالية</item><item quantity="many">⁨%d⁩ أسابيع متتالية</item><item quantity="other">⁨%d⁩ أسابيع متتالية</item></plurals>
 </resources>

@@ -27,4 +27,8 @@
     <string name="dials_bed">In bed by %1$s</string>
     <string name="dials_bed_note">For a full night\'s sleep</string>
     <string name="dials_quick_title">Quick actions</string>
+    <string name="dials_pulse_resting">Resting heart %1$d bpm</string>
+    <string name="dials_zone_rest">Rest</string>
+    <string name="dials_zone_calm">Steady</string>
+    <string name="dials_zone_ready">Ready</string>
 </resources>
