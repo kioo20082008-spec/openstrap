@@ -85,7 +85,7 @@ import org.openstrap.app.ui.theme.ControlSurface
 
 private val PanelShape = GlowLayout.CardShape
 private val PanelSurface = ListSurface
-private val Hairline = Color.White.copy(alpha = 0.05f)
+private val Hairline = Color.White.copy(alpha = 0.08f)
 /** A [PageRow] whose page is open beside the list. */
 private val SelectedTint = Color.White.copy(alpha = 0.08f)
 

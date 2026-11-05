@@ -57,7 +57,7 @@ fun DotMatrixText(
     Text(
         text, modifier.semantics { contentDescription = text }, color = color, maxLines = 1, softWrap = false,
         style = TextStyle(
-            fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold,
+            fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = if (dot.dot.value >= 3.6f) androidx.compose.ui.text.font.FontWeight.ExtraLight else androidx.compose.ui.text.font.FontWeight.Light,
             fontSize = size, lineHeight = size, letterSpacing = (-0.02f).em,
             textDirection = androidx.compose.ui.text.style.TextDirection.Ltr,
         ),

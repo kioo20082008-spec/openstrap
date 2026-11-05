@@ -234,11 +234,15 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
             val half = (items.size + 1) / 2
             items.forEachIndexed { i, item ->
                 if (i == half) Spacer(Modifier.width(72.dp))
-                NavCell(item, i == selected, Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).padding(vertical = 6.dp), onTint = coral)
+                NavCell(item, i == selected, Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).padding(vertical = 6.dp), onTint = org.openstrap.app.ui.theme.AppPalette.Cream)
             }
         }
         Box(
-            Modifier.size(64.dp).clip(CircleShape).background(coral).clickable(onClick = onPlus),
+            Modifier.size(60.dp)
+                .drawBehind { drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(coral.copy(alpha = 0.45f), Color.Transparent), radius = size.minDimension), size.minDimension) }
+                .clip(CircleShape)
+                .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFF8A6E), Color(0xFFFF5C4E))))
+                .clickable(onClick = onPlus),
             contentAlignment = Alignment.Center,
         ) {
             androidx.compose.foundation.Canvas(Modifier.size(24.dp)) {

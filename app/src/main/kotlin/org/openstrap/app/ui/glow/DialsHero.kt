@@ -50,8 +50,8 @@ internal data class PlanItem(val title: String, val note: String, val done: Bool
 
 private val Track = Color(0xFF2E3B5C)
 private val Muted = Color(0xFFA9ADB9)
-private val PlanSurface = Color(0xFF1C2C50)
-private val PlanEdge = Color(0xFF2E4069)
+private val PlanSurface = Color.White.copy(alpha = 0.055f)
+private val PlanEdge = Color.White.copy(alpha = 0.10f)
 
 /**
  * The redesign's Today hero: three dials (Sleep, Recovery, Load) with Recovery largest in the middle, then the day's
@@ -64,15 +64,67 @@ internal fun DialsHero(
     planTitle: String, planNote: String, planChip: String?, plan: List<PlanItem>,
     onSleep: () -> Unit, onRecovery: () -> Unit, onLoad: () -> Unit,
     modifier: Modifier = Modifier,
+    hrv: Int? = null,
 ) {
-    Column(modifier.fillMaxWidth()) {
-        Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.Bottom) {
-            Dial(labels.first, sleep?.toString(), "%", (sleep ?: 0) / 100f, AppPalette.Cream, 100.dp, 10.dp, 28.sp, onSleep)
-            Dial(labels.second, recovery?.toString(), "%", (recovery ?: 0) / 100f, AppPalette.Coral, 132.dp, 13.dp, 40.sp, onRecovery)
-            Dial(labels.third, strain?.let { String.format(java.util.Locale.US, "%.1f", it) }, null, (strain ?: 0f) / 21f, AppPalette.Cream, 100.dp, 10.dp, 28.sp, onLoad)
+    val fill = androidx.compose.runtime.remember(recovery) { androidx.compose.animation.core.Animatable(0f) }
+    androidx.compose.runtime.LaunchedEffect(recovery) {
+        fill.animateTo((recovery ?: 0) / 100f, androidx.compose.animation.core.tween(1800, 300, androidx.compose.animation.core.CubicBezierEasing(0.16f, 1f, 0.3f, 1f)))
+    }
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // The gauge: a hairline half circle with fine ticks, filled in coral to amber, a glowing point at the score.
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onRecovery), contentAlignment = Alignment.TopCenter) {
+            Ltr {
+                Canvas(Modifier.fillMaxWidth().height(190.dp)) {
+                    val r = size.width / 2 - 22.dp.toPx()
+                    val c = Offset(size.width / 2, r + 14.dp.toPx())
+                    for (k in 0..40) {
+                        val a = Math.PI * (1 - k / 40.0)
+                        val cos = kotlin.math.cos(a).toFloat(); val sin = kotlin.math.sin(a).toFloat()
+                        drawLine(Color.White.copy(alpha = 0.22f), Offset(c.x + (r - 8.dp.toPx()) * cos, c.y - (r - 8.dp.toPx()) * sin), Offset(c.x + (r - 3.dp.toPx()) * cos, c.y - (r - 3.dp.toPx()) * sin), 1.dp.toPx())
+                    }
+                    val box = androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r)
+                    drawArc(Color.White.copy(alpha = 0.12f), 180f, 180f, false, box.topLeft, box.size, style = Stroke(1.5.dp.toPx()))
+                    val sweep = 180f * fill.value
+                    if (sweep > 0f) drawArc(
+                        androidx.compose.ui.graphics.Brush.sweepGradient(0.5f to AppPalette.Coral, 1f to Color(0xFFFFC27A), center = c),
+                        180f, sweep, false, box.topLeft, box.size, style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round),
+                    )
+                    val a = Math.PI * (1 - fill.value)
+                    val p = Offset(c.x + r * kotlin.math.cos(a).toFloat(), c.y - r * kotlin.math.sin(a).toFloat())
+                    drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(Color(0xAAFFC27A), Color.Transparent), p, 14.dp.toPx()), 14.dp.toPx(), p)
+                    drawCircle(Color(0xFFFFF3E2), 4.5.dp.toPx(), p)
+                }
+            }
+            Row(Modifier.padding(top = 64.dp), verticalAlignment = Alignment.Top) {
+                Text(
+                    recovery?.toString() ?: "–", color = AppPalette.Cream,
+                    style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 112.sp, lineHeight = 112.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
+                )
+                if (recovery != null) Text("%", Modifier.padding(top = 18.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
+            }
         }
+        Text(labels.second, color = Muted, style = MaterialTheme.typography.labelLarge)
+        Spacer(Modifier.height(4.dp))
+        Text(planTitle, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+        Spacer(Modifier.height(14.dp))
+        Text(planNote, color = AppPalette.Cream.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp))
         Spacer(Modifier.height(20.dp))
-        PlanCard(planTitle, planNote, planChip, plan)
+        // Three figures in one pane of glass, hairlines between.
+        val shape = RoundedCornerShape(24.dp)
+        Row(Modifier.fillMaxWidth().clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(vertical = 14.dp)) {
+            listOf(
+                Triple(labels.first, sleep?.let { "$it" }, onSleep),
+                Triple(labels.third, strain?.let { String.format(java.util.Locale.US, "%.1f", it) }, onLoad),
+                Triple("HRV", hrv?.let { "$it" }, onRecovery),
+            ).forEachIndexed { i, (k, v, open) ->
+                if (i > 0) Box(Modifier.width(1.dp).height(52.dp).background(PlanEdge))
+                Column(Modifier.weight(1f).clickable(onClick = open).padding(horizontal = 16.dp)) {
+                    Text(k, color = Muted, style = MaterialTheme.typography.labelMedium)
+                    Spacer(Modifier.height(4.dp))
+                    Text(v ?: "–", color = AppPalette.Cream, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
+                }
+            }
+        }
     }
 }
 

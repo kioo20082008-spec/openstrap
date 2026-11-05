@@ -120,28 +120,28 @@ internal fun PulseHero(
                     val head = len * 1.4f * trace
                     val seg = Path()
                     measure.getSegment((head - len * 0.4f).coerceAtLeast(0f), head.coerceAtMost(len), seg, true)
-                    drawPath(seg, AppPalette.Coral.copy(alpha = 0.55f), style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+                    drawPath(seg, Color(0xFFFFB59A).copy(alpha = 0.3f), style = Stroke(1.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
                 }
             }
             Box(Modifier.align(Alignment.TopEnd)) { info() }
             Box(Modifier.align(Alignment.TopCenter).padding(top = 6.dp).size(64.dp), contentAlignment = Alignment.Center) {
                 listOf(ripple1, ripple2).forEach { r ->
                     Box(
-                        Modifier.size(64.dp).graphicsLayer { scaleX = 0.6f + 1.4f * r; scaleY = 0.6f + 1.4f * r; alpha = 0.9f * (1f - r) }
-                            .border(2.dp, AppPalette.Coral, CircleShape),
+                        Modifier.size(64.dp).graphicsLayer { scaleX = 0.6f + 1.4f * r; scaleY = 0.6f + 1.4f * r; alpha = 0.45f * (1f - r) }
+                            .border(1.dp, Color(0xFFFFB59A), CircleShape),
                     )
                 }
-                Icon(AppIcons.HeartFill, null, tint = AppPalette.Coral, modifier = Modifier.size(34.dp).graphicsLayer { scaleX = beat; scaleY = beat })
+                Icon(AppIcons.Heart, null, tint = Color(0xFFFFB59A), modifier = Modifier.size(30.dp).graphicsLayer { scaleX = beat; scaleY = beat })
             }
         }
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 shown.value.toInt().toString(), color = AppPalette.Cream,
-                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 88.sp, lineHeight = 88.sp, letterSpacing = (-2).sp, textDirection = TextDirection.Ltr),
+                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 108.sp, lineHeight = 108.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
             )
-            Text("%", Modifier.padding(bottom = 14.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Bold, fontSize = 22.sp))
+            Text("%", Modifier.padding(bottom = 64.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
         }
-        Text(word, color = color, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+        Text(word, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(6.dp))
         Text(line, color = Muted, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
         Spacer(Modifier.height(18.dp))
@@ -151,12 +151,11 @@ internal fun PulseHero(
                 val full = maxWidth
                 Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf(0 until 34 to AppPalette.Coral, 34 until 67 to Amber, 67..100 to Mint).forEach { (range, c) ->
-                        Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(6.dp)).background(c.copy(alpha = if (score in range) 1f else 0.3f)))
+                        Box(Modifier.weight(1f).padding(top = 4.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(if (score in range) c else Color.White.copy(alpha = 0.16f)))
                     }
                 }
                 Box(
-                    Modifier.offset(x = (full - 22.dp) * marker.value).size(22.dp).clip(CircleShape)
-                        .background(AppPalette.Navy).border(4.dp, AppPalette.Cream, CircleShape),
+                    Modifier.offset(x = (full - 10.dp) * marker.value, y = 2.dp).size(10.dp).clip(CircleShape).background(Color(0xFFFFF3E2)),
                 )
             }
         }

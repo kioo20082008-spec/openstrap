@@ -201,11 +201,20 @@ internal fun TabsPager(
                 nav.stack(t), isOpen = { it.isNotEmpty() }, keys = { s -> s.map(Detail::keyOf) }, minWidth = SideBySideWidth,
                 detail = { stack -> stack.lastOrNull()?.let { detail(t, it) } },
             ) {
-                PullToSync(strap.sync, connected, container.strap::syncNow) {
-                    TabRoot(
-                        t, nav, shown, histories, today, container, dayVm, workoutsVm, rootVm, live, padding, showCharge,
-                        onChargeConsume, header, onOpenPage, seeHabitAge,
-                    )
+                // The redesign: each tab on its own sky.
+                val tint = when (t) {
+                    Tab.Today -> org.openstrap.app.ui.glow.SkyTint.Today
+                    Tab.Recovery -> org.openstrap.app.ui.glow.SkyTint.Recovery
+                    Tab.Sleep -> org.openstrap.app.ui.glow.SkyTint.Sleep
+                    Tab.Activity -> org.openstrap.app.ui.glow.SkyTint.Activity
+                }
+                org.openstrap.app.ui.glow.SkyBackground(tint) {
+                    PullToSync(strap.sync, connected, container.strap::syncNow) {
+                        TabRoot(
+                            t, nav, shown, histories, today, container, dayVm, workoutsVm, rootVm, live, padding, showCharge,
+                            onChargeConsume, header, onOpenPage, seeHabitAge,
+                        )
+                    }
                 }
             }
         }

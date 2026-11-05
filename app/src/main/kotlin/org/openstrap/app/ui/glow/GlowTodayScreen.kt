@@ -500,6 +500,7 @@ private fun DialsToday(
     Column {
     DialsHero(
         recovery = score, sleep = ctx.state.sleep?.score, strain = ctx.rec?.strain,
+        hrv = (ctx.rec?.readiness?.contributors?.firstOrNull { it.factor == Recovery.Factor.HrvBalance }?.detail as? Recovery.Detail.Hrv)?.ms,
         labels = Triple(stringResource(R.string.dials_sleep), stringResource(R.string.dials_recovery), stringResource(R.string.dials_load)),
         planTitle = stringResource(title), planNote = stringResource(note),
         planChip = score?.let { stringResource(R.string.dials_plan_chip, it) }, plan = plan,

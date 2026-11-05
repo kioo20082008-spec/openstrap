@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -96,8 +97,8 @@ internal fun SkyHero(
                     val p1 = Offset(w * (if (rtl) 30 else 330) / 360, h * 175 / 190)
                     val arc = Path().apply { moveTo(p0.x, p0.y); quadraticTo(c.x, c.y, p1.x, p1.y) }
                     drawPath(
-                        arc, AppPalette.Cream.copy(alpha = 0.18f),
-                        style = Stroke(2.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 6.dp.toPx()))),
+                        arc, AppPalette.Cream.copy(alpha = 0.25f),
+                        style = Stroke(1.dp.toPx(), pathEffect = PathEffect.dashPathEffect(floatArrayOf(2.dp.toPx(), 5.dp.toPx()))),
                     )
                     val t = moon.value
                     val u = 1 - t
@@ -112,7 +113,7 @@ internal fun SkyHero(
                     Text(end, color = Muted, style = MaterialTheme.typography.labelMedium)
                 }
         }
-        val big = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 64.sp, lineHeight = 70.sp)
+        val big = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 92.sp, lineHeight = 96.sp, letterSpacing = (-4).sp)
         Text(
             buildAnnotatedString {
                 append(hours.toString()); withStyle(SpanStyle(fontSize = 22.sp, color = Muted)) { append(" ${units.first}  ") }
@@ -120,23 +121,23 @@ internal fun SkyHero(
             },
             Modifier.fillMaxWidth().padding(top = 6.dp), color = AppPalette.Cream, style = big, textAlign = TextAlign.Center,
         )
-        Text(line, Modifier.fillMaxWidth(), color = SleepBlue, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold), textAlign = TextAlign.Center)
+        Text(line, Modifier.fillMaxWidth(), color = AppPalette.Cream, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         if (stages.isNotEmpty()) {
             Spacer(Modifier.height(14.dp))
             Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Color(0xFF1C2C50)).padding(horizontal = 16.dp, vertical = 8.dp),
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(GlassFill).border(1.dp, GlassEdge, RoundedCornerShape(24.dp)).padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 stages.forEach { s ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(s.name, Modifier.width(52.dp), color = AppPalette.Cream, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
                         Ltr {
-                            Box(Modifier.weight(1f).height(10.dp).clip(RoundedCornerShape(6.dp)).background(Track)) {
-                                Box(Modifier.fillMaxWidth((s.share * fill.value).coerceIn(0.02f, 1f)).height(10.dp).clip(RoundedCornerShape(6.dp)).background(s.color))
+                            Box(Modifier.weight(1f).height(3.dp).clip(RoundedCornerShape(2.dp)).background(Color.White.copy(alpha = 0.1f))) {
+                                Box(Modifier.fillMaxWidth((s.share * fill.value).coerceIn(0.02f, 1f)).height(3.dp).clip(RoundedCornerShape(2.dp)).background(s.color))
                             }
                         }
                         Text(
                             s.time, Modifier.width(64.dp), color = AppPalette.Cream, textAlign = TextAlign.End,
-                            style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp),
+                            style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 16.sp),
                         )
                     }
                 }
@@ -172,28 +173,27 @@ internal fun PathHero(steps: Int, goal: Int, stepsWord: String, line: String, on
                     Triple(p(80f, 0f), p(300f, 40f), p(320f, 20f)),
                 ).forEach { (c1, c2, e) -> cubicTo(c1.x, c1.y, c2.x, c2.y, e.x, e.y) }
             }
-            val wide = 14.dp.toPx()
-            drawPath(path, Track, style = Stroke(wide, cap = StrokeCap.Round))
+            val wide = 2.5.dp.toPx()
+            drawPath(path, Color.White.copy(alpha = 0.12f), style = Stroke(2.dp.toPx(), cap = StrokeCap.Round))
             val measure = PathMeasure().apply { setPath(path, false) }
             val len = measure.length
             val upTo = len * walk.value
             if (upTo > 0f) {
                 val done = Path()
                 measure.getSegment(0f, upTo, done, true)
-                drawPath(done, AppPalette.Coral, style = Stroke(wide, cap = StrokeCap.Round))
+                drawPath(done, androidx.compose.ui.graphics.Brush.linearGradient(listOf(AppPalette.Cream, Color(0xFF7FE3C0))), style = Stroke(wide, cap = StrokeCap.Round))
             }
             val flag = p(320f, 20f)
-            drawCircle(Color(0xFF5FD3A6).copy(alpha = 0.25f), 16.dp.toPx(), flag)
-            drawCircle(Color(0xFF5FD3A6), 6.dp.toPx(), flag)
+            drawCircle(Color(0xFF7FE3C0), 3.5.dp.toPx(), flag, style = Stroke(1.3.dp.toPx()))
             val at = measure.getPosition(upTo)
-            drawCircle(AppPalette.Coral, 12.dp.toPx(), at)
-            drawCircle(AppPalette.Cream, 8.dp.toPx(), at)
+            drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(Color(0x997FE3C0), Color.Transparent), at, 16.dp.toPx()), 16.dp.toPx(), at)
+            drawCircle(Color(0xFFF4FFF9), 4.5.dp.toPx(), at)
         }
         val shade = androidx.compose.ui.graphics.Shadow(AppPalette.Navy, blurRadius = 18f)
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 n.format(count.value.toInt()), color = AppPalette.Cream,
-                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 56.sp, lineHeight = 60.sp, shadow = shade),
+                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 72.sp, lineHeight = 76.sp, letterSpacing = (-3).sp, shadow = shade),
             )
             Text("$stepsWord · $line", color = Muted, style = MaterialTheme.typography.bodyMedium.copy(shadow = shade))
         }

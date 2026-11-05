@@ -104,7 +104,7 @@ private fun inter(weight: Int) = Font(
 )
 
 /** Inter for Latin text and numbers. Both Inter and Almarai are SIL OFL 1.1. */
-private val InterFamily = FontFamily(inter(300), inter(400), inter(500), inter(600), inter(700), inter(800))
+private val InterFamily = FontFamily(inter(200), inter(300), inter(400), inter(500), inter(600), inter(700), inter(800))
 
 /** Almarai when the app runs in Arabic; it carries its own Latin digits so mixed lines stay even. */
 private val AlmaraiFamily = FontFamily(
