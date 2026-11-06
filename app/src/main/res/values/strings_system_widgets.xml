@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The home screen widgets (widget/): Moment, Recovery, Steps, Sleep and Start a workout. Room is tight. A widget's
+  The home screen widgets (widget/): Moment, Recovery, Steps, Sleep, Start a workout and Energy. Room is tight. A widget's
   smallest cell is about 140 dp across, and no text wraps: a title, a word or a figure has one short line, and where a
   wording doesn't fit the widget takes a shorter one or leaves it out. Keep each as short as the English, or shorter.
   Lines marked TalkBack are only read out, never shown, so they can be longer.
@@ -165,4 +165,12 @@
     <string name="system_widget_moment_energy_since_now">Energy since <xliff:g id="time" example="07:10">%1$s</xliff:g>, <xliff:g id="energy" example="62">%2$d</xliff:g> now</string>
     <!-- TalkBack, for the day's heart rate chart. -->
     <string name="system_widget_moment_heart_today">Your heart rate today</string>
+
+    <!-- Energy: the line at the right of the Energy number, what it was when you woke up. Energy is the body's energy score, 0 to 100, not the strap battery. -->
+    <string name="system_widget_energy_at_waking">At waking <xliff:g id="energy" example="84">%1$d</xliff:g></string>
+    <!-- The same after a night with the strap off, when the day started from an estimate. -->
+    <string name="system_widget_energy_at_start">At start <xliff:g id="energy" example="82">%1$d</xliff:g></string>
+    <!-- Energy, on the largest size: two figures' labels over their amounts, what sleep and rest filled today ("+38") and what the day took ("60"). One short word each. -->
+    <string name="system_widget_energy_recharged">Recharged</string>
+    <string name="system_widget_energy_drained">Drained</string>
 </resources>

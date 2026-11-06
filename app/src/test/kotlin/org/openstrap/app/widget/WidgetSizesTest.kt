@@ -35,7 +35,7 @@ class WidgetSizesTest {
         val all = providers()
         assertTrue("no widget providers in res/xml", all.containsKey("widget_recovery.xml"))
         // Each widget built so far, so a provider dropped by mistake fails here too.
-        listOf("widget_moment.xml", "widget_recovery.xml", "widget_steps.xml", "widget_sleep.xml", "widget_start.xml").forEach {
+        listOf("moment", "recovery", "steps", "sleep", "start", "energy").map { "widget_$it.xml" }.forEach {
             assertTrue("$it missing from res/xml", all.containsKey(it))
         }
         val wrong = mutableListOf<String>()
@@ -81,7 +81,7 @@ class WidgetSizesTest {
         }
         // Each widget's receiver has its picker name.
         val manifest = File(root, "AndroidManifest.xml").readText()
-        listOf("moment", "recovery", "steps", "sleep", "start").forEach {
+        listOf("moment", "recovery", "steps", "sleep", "start", "energy").forEach {
             assertTrue("widget_${it}_name not the receiver's label", "@string/widget_${it}_name" in manifest)
             assertTrue("widget_${it}_name missing", "name=\"widget_${it}_name\"" in strings)
         }

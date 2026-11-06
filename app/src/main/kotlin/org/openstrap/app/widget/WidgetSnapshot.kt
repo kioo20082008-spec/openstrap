@@ -9,6 +9,7 @@ import org.openstrap.app.data.HealthRepository
 import org.openstrap.app.data.LiveSteps
 import org.openstrap.app.data.MomentInputs
 import org.openstrap.app.data.MomentResolver
+import org.openstrap.app.data.Recovery
 import org.openstrap.app.data.RecoveryResult
 import org.openstrap.app.data.SleepHistory
 import org.openstrap.app.data.Summaries
@@ -59,6 +60,7 @@ class WidgetData(
     val recovery: RecoveryRead?,
     val sleep: Result<SleepRead>?,
     val momentWidget: Result<MomentWidgetInput>?,
+    val energy: EnergyRead?,
 ) {
     /** The moment's inputs with [bedtime], null when they couldn't be read. */
     fun momentInputs(bedtime: LocalTime?): MomentInputs? = moment?.getOrNull()?.copy(usualBedtime = bedtime)
@@ -81,6 +83,12 @@ class StartRead(val workouts: List<WorkoutAnalysis>?, val sides: Map<Int, Boolea
 
 /** The Recovery widget's reads: [today] and, while its score isn't in, [yesterday], null where it wasn't worked out. */
 class RecoveryRead(val todayResult: RecoveryResult?, val today: RecoveryDay?, val yesterday: RecoveryDay?)
+
+/**
+ * The Energy widget's read: today's [charge] from the same Recovery result Today and Moment read, null when it couldn't
+ * be worked out, and that result's [usualBedtime] for the mood.
+ */
+class EnergyRead(val charge: Recovery.ChargeDay?, val usualBedtime: LocalTime?)
 
 /** The Sleep widget's reads, as [SleepWidgetModel.from] takes them. */
 class SleepRead(
@@ -147,6 +155,9 @@ class WidgetSnapshot(
                 catching { sleep(s.getOrThrow(), today, zone) }.onFailure { logUnread("sleep for $today", it) }
             },
             momentWidget = if (WidgetKind.Moment in kinds) catching { momentWidget(reads) } else null,
+            // Today's Recovery is read once for every widget that shows it: Energy is its Charge.
+            energy = profile?.takeIf { WidgetKind.Energy in kinds }
+                ?.let { EnergyRead(rec?.takeIf { it.date == today }?.charge, rec?.usualBedtime) },
         )
     }
 
@@ -325,11 +336,11 @@ class WidgetSnapshot(
 
     companion object {
         /** The widgets lit in the moment's mood ([widgetMood]), and Moment, which is the moment. */
-        private val MOOD_KINDS = setOf(WidgetKind.Steps, WidgetKind.Start, WidgetKind.Recovery, WidgetKind.Moment)
+        private val MOOD_KINDS = setOf(WidgetKind.Steps, WidgetKind.Start, WidgetKind.Recovery, WidgetKind.Energy, WidgetKind.Moment)
 
-        /** The widgets that read the nights, those that read Recovery and those that read today's steps. */
+        /** The widgets that read the nights, those that read Recovery (Energy is its Charge) and those that read today's steps. */
         private val NIGHT_KINDS = setOf(WidgetKind.Sleep, WidgetKind.Moment)
-        private val RECOVERY_KINDS = setOf(WidgetKind.Recovery, WidgetKind.Moment)
+        private val RECOVERY_KINDS = setOf(WidgetKind.Recovery, WidgetKind.Energy, WidgetKind.Moment)
         private val STEP_KINDS = setOf(WidgetKind.Steps, WidgetKind.Moment)
 
         /** Nights the Sleep tab reads for the week's other nights, as Today's sleep (`ui.dashboard.SLEEP_NIGHTS`). */
@@ -350,9 +361,10 @@ class WidgetSnapshot(
     }
 }
 
-/** Steps and Start light their mood by the usual bedtime, and Moment when Recovery didn't give one. */
+/** Steps and Start light their mood by the usual bedtime, and Moment and Energy when Recovery didn't give one. */
 private fun bedtimeNeeded(kinds: Set<WidgetKind>, rec: RecoveryResult?): Boolean =
-    WidgetKind.Steps in kinds || WidgetKind.Start in kinds || (WidgetKind.Moment in kinds && rec?.usualBedtime == null)
+    WidgetKind.Steps in kinds || WidgetKind.Start in kinds ||
+        ((WidgetKind.Moment in kinds || WidgetKind.Energy in kinds) && rec?.usualBedtime == null)
 
 /** You started it: not one the strap noticed or filed as "Activity" by itself (WorkoutAnalysis.startedByYou). */
 private fun startedByYou(w: Workout) = w.subtype != Workouts.SUBTYPE_AUTO_DETECTED && w.sportType != Workouts.GENERIC_ACTIVITY

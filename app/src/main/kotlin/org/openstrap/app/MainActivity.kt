@@ -222,7 +222,7 @@ class MainActivity : ComponentActivity() {
         const val EXTRA_READY_PICK = "ready_pick"
         const val EXTRA_OPEN_WORKOUT = "open_workout"
 
-        /** A metric's detail by [org.openstrap.app.presentation.Metric] name ("Hrv"), or "Recovery" or "Sleep". */
+        /** A metric's detail by [org.openstrap.app.presentation.Metric] name ("Hrv"), or one of [org.openstrap.app.data.DetailRoutes]. */
         const val EXTRA_OPEN_METRIC = "open_metric"
 
         /** The day for [EXTRA_OPEN_METRIC], as an ISO date ("2026-10-23"); without it the day showing stays. */

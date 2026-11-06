@@ -27,7 +27,8 @@ enum class MomentLead {
 /**
  * What Moment leads with at [moment] when the widgets in [placed] are on the home screen (widgets spec 3.1, the
  * duplicate rule): never a metric that has its own widget placed, but the moment's next lead instead. Only waking
- * has one to give way: Recovery falls back to last night, and with Sleep placed too, to Energy, which has no widget.
+ * has one to give way: Recovery falls back to last night, and with Sleep placed too, to Energy. Energy is the last
+ * lead there is, so it stays Moment's even with an Energy widget placed (spec 9, open question 5).
  */
 fun momentLead(moment: Moment, placed: Set<WidgetKind>): MomentLead = when (moment) {
     Moment.Waking -> when {

@@ -17,4 +17,6 @@
     <string name="widget_sleep_description">Last night\'s score, time asleep and stages</string>
     <string name="widget_start_name">Start a workout</string>
     <string name="widget_start_description">Start your usual sport in one tap</string>
+    <string name="widget_energy_name">Energy</string>
+    <string name="widget_energy_description">Your energy now and what moved it today</string>
 </resources>

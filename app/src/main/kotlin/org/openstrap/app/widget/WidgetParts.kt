@@ -81,6 +81,7 @@ import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.WeekBarsLook
 import org.openstrap.app.ui.glow.draw.dotLayout
 import org.openstrap.app.ui.glow.draw.edgePaint
+import org.openstrap.app.ui.glow.draw.edgeLevel
 import org.openstrap.app.ui.glow.draw.renderDots
 import org.openstrap.app.ui.glow.draw.renderEdge
 import java.time.LocalDate
@@ -274,15 +275,21 @@ class StatusSpot {
  * content's bitmaps take beside the backgrounds in the budget (spec 6.2): every size's bitmaps go to the launcher at
  * once and are scaled down together if they'd pass the limit. [sidePadding] narrower than the card's 20 dp lets a row
  * reach into the padding (Start's centred captions); the content then pads itself back to 20 dp, and [WidgetFrame]'s
- * content sizes stay those inside the full padding.
+ * content sizes stay those inside the full padding. A [level] (0 to 1, for a
+ * [org.openstrap.app.ui.glow.draw.EdgeKind.Level] light) fills the light across to it, as the app's level cards do,
+ * in place of the edge's glow.
  */
 @Composable
 internal fun EdgeWidget(
     light: EdgeLight, ink: Color, mood: GlowMood, open: Intent, bitmapExtra: Double,
     sidePadding: Float = WidgetSizes.PADDING_DP,
     showStatus: Boolean = true,
+    level: Float? = null,
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
-) = CardWidget(open, bitmapExtra, sidePadding, showStatus, { w, h, corner, density -> edgeBackground(light, ink, mood, w, h, corner, density) }, content)
+) = CardWidget(
+    open, bitmapExtra, sidePadding, showStatus,
+    { w, h, corner, density -> edgeBackground(light, ink, mood, w, h, corner, density, level) }, content,
+)
 
 /**
  * A glow card widget (Moment, spec 2.2): [style] behind, its mood already set, drawn at the cell's real size as the
@@ -374,10 +381,12 @@ private fun glowBackground(style: GlowStyle, w: Float, h: Float, corner: Float, 
 
 /**
  * An edge card's light ([light] in [ink] at [mood]) for a widget [w] by [h] dp, with [corner] dp corners, at
- * [density] px per dp: the same [edgePaint] the app's edge cards draw.
+ * [density] px per dp: the same [edgePaint] the app's edge cards draw, filled across to [level] when there is one.
  */
-private fun edgeBackground(light: EdgeLight, ink: Color, mood: GlowMood, w: Float, h: Float, corner: Float, density: Float): Bitmap {
-    val paint = edgePaint(light, ink, null, mood, w * density, h * density, density)
+private fun edgeBackground(
+    light: EdgeLight, ink: Color, mood: GlowMood, w: Float, h: Float, corner: Float, density: Float, level: Float? = null,
+): Bitmap {
+    val paint = edgePaint(light, ink, edgeLevel(level), mood, w * density, h * density, density)
     return renderEdge(paint.copy(radius = corner * density))
 }
 

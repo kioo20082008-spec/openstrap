@@ -178,6 +178,14 @@ class FrameTest {
         assertNull(Detail.fromRoute("Readiness"))
     }
 
+    @Test fun `the widgets' routes open the details they name`() {
+        // The widgets build their taps from DetailRoutes, below the screens: each has to come back as its detail.
+        assertEquals(Detail.Recovery, Detail.fromRoute(org.openstrap.app.data.DetailRoutes.RECOVERY))
+        assertEquals(Detail.OfMetric(Metric.Steps), Detail.fromRoute(org.openstrap.app.data.DetailRoutes.STEPS))
+        assertEquals(Detail.OfScore(Score.Sleep), Detail.fromRoute(org.openstrap.app.data.DetailRoutes.SLEEP_SCORE))
+        assertEquals(Detail.OfScore(Score.Energy), Detail.fromRoute(org.openstrap.app.data.DetailRoutes.ENERGY))
+    }
+
     @Test fun `stacks with the new screens survive process death`() {
         val stack = listOf(Detail.Recovery, Detail.OfMetric(Metric.Spo2), Detail.Sleep, Detail.Workout(1792227300))
         val saved = with(Detail.StackSaver) { androidx.compose.runtime.saveable.SaverScope { true }.save(stack) }!!

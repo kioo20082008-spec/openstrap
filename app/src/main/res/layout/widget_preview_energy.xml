@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The Energy widget in the launcher's picker on Android 12 and later (widgets spec 6.4), a Small with the mockups'
+  sample: 62 left, the battery bar at 62%. RemoteViews' own views only, so the number is plain text where the widget
+  draws dots, and the bar has no cap. Android 15 and later show the generated preview from the real layout instead
+  (WidgetUpdater.publishPreviews).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_preview_bg_energy"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:ignore="HardcodedText">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/widget_energy_name"
+        android:textSize="17sp"
+        android:textColor="#FFFFFFFF"
+        android:fontFamily="sans-serif-medium"
+        android:maxLines="1"
+        android:includeFontPadding="true" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="62"
+        android:textSize="40sp"
+        android:textColor="#FFFFFFFF"
+        android:fontFamily="sans-serif-light"
+        android:maxLines="1"
+        android:includeFontPadding="true" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/system_widget_moment_left"
+        android:textSize="15sp"
+        android:textColor="#B8FFFFFF"
+        android:maxLines="1"
+        android:includeFontPadding="true" />
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:layout_marginTop="6dp"
+        android:max="100"
+        android:progress="62"
+        android:progressDrawable="@drawable/widget_preview_energy_bar" />
+</LinearLayout>

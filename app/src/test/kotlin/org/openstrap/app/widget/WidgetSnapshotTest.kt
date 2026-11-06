@@ -51,6 +51,7 @@ class WidgetSnapshotTest {
         assertNull(none.moment)
         assertNull(none.steps)
         assertNull(none.sleep)
+        assertNull(none.energy)
         val steps = snapshot.gather(setOf(WidgetKind.Steps), now, zone)
         assertNotNull(steps.steps)
         // Steps is lit in the moment's mood, so the moment is read, and nothing else is.
@@ -59,6 +60,25 @@ class WidgetSnapshotTest {
         assertNull(steps.recovery)
         assertNull(steps.start)
         assertNull(steps.momentWidget)
+        assertNull(steps.energy)
+    }
+
+    @Test fun `Energy reads today's Recovery, lit in the moment's mood, and waits before the first night`() = runBlocking {
+        val data = snapshot.gather(setOf(WidgetKind.Energy), now, zone)
+        val read = requireNotNull(data.energy)
+        assertNotNull(data.moment?.getOrNull())
+        // Read for Energy alone: the Recovery widget's own section stays unread.
+        assertNull(data.recovery)
+        assertNull(data.steps)
+        // No night yet, so no number: the first night's line, or the wait for heart rate where Recovery failed.
+        assertEquals(false, read.charge?.anchored ?: false)
+        val m = EnergyWidget.load(data).model
+        assertNotNull(m.waiting)
+        assertNull(m.now)
+    }
+
+    @Test fun `every kind has a widget registered, Energy too`() {
+        assertEquals(WidgetKind.entries.toSet(), WIDGETS.keys)
     }
 
     @Test fun `live steps carry on from the app's one counter, as Today's do`() = runBlocking {

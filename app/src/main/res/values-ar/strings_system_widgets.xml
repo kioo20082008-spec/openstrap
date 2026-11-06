@@ -74,4 +74,8 @@
     <string name="system_widget_moment_energy_since">الطاقة منذ ⁨%1$s⁩</string>
     <string name="system_widget_moment_energy_since_now">الطاقة منذ ⁨%1$s⁩، ⁨%2$d⁩ الآن</string>
     <string name="system_widget_moment_heart_today">نبضك اليوم</string>
+    <string name="system_widget_energy_at_waking">عند الاستيقاظ ⁨%1$d⁩</string>
+    <string name="system_widget_energy_at_start">في البداية ⁨%1$d⁩</string>
+    <string name="system_widget_energy_recharged">امتلأت</string>
+    <string name="system_widget_energy_drained">استُهلكت</string>
 </resources>

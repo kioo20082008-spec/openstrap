@@ -18,7 +18,7 @@ recovered, how far am I on steps, and start my workout.
 
 ## 2. The set
 
-Five widgets. Energy and Strap were explored and dropped (2.3).
+Six widgets. Strap was explored and dropped (2.3). Energy was dropped too, then added as the sixth (2026-11-06, 3.6).
 
 | Widget | Answers | Why it earns a place |
 |---|---|---|
@@ -27,6 +27,7 @@ Five widgets. Energy and Strap were explored and dropped (2.3).
 | Steps | How far am I today | Glanceable all day, the goal bar gives a reason to look again |
 | Recovery | Should I train | The same answer in the same spot every day, which Moment can't promise |
 | Start a workout | Start my usual | The one action widget: home screen to recording in one tap |
+| Energy | How much have I got left | The body battery all day, which Moment shows only at some moments |
 
 ### 2.1 Every widget has the same three sizes
 
@@ -59,13 +60,18 @@ same design). The launcher decides placement, so this is the only way the rule c
 | Steps | Edge | Bottom, a value | The moment's mood |
 | Recovery | Edge | Left, about earlier (this morning) | The moment's mood |
 | Start a workout | Edge | Right, toward Start | The moment's mood |
+| Energy | Edge | A level: fills across from the left to the value, as Today's Energy card (from the right in Arabic) | The moment's mood |
 
 Moods are spec 2.1: Day 100%, Evening 80%, Night 65% for glows and 80% for edge light. Hairlines stay at full
 strength at night.
 
+Energy's level light starts at the same side as Recovery's, but it fills across to the value rather than glowing at
+the edge, so the two read apart side by side. Every edge was taken by then.
+
 ### 2.3 Dropped
 
-- **Energy.** Moment leads with it at midday, in the workout window and in the evening. On its own it is a niche.
+- **Energy** (until 2026-11-06). Moment leads with it at midday, in the workout window and in the evening, so on its
+  own it looked a niche. It came back as its own widget (3.6) for people who check it all day.
 - **Strap.** Battery and sync matter only when something is wrong. Every widget carries the strap status button
   instead (5).
 - **4 × 1 strips** of any widget (2.1).
@@ -105,7 +111,7 @@ What each moment shows:
   | Moment | Leads with | When that widget is placed |
   |---|---|---|
   | Waking up | Recovery | Last night: sleep score and word, "Slept 7 h 40", Sleep colour lit from above. With a Sleep widget placed too: Energy, as at midday |
-  | Midday | Energy | No Energy widget exists, no change |
+  | Midday | Energy | No change: Energy is the last lead there is, even with an Energy widget placed (9, question 5) |
   | Workout window | Start | No change, the window's point is Start |
   | Evening, Night | A sentence | No change |
 
@@ -240,6 +246,24 @@ Last night's main sleep. Night mood always.
     is the day and the distance, else the sets, else how long ("Yesterday, 35 min"), and "None yet" before any.
   - This week counts Monday to now as Your week does, without the strap's "Activity" records ("No workouts yet").
 
+### 3.6 Energy
+
+| Size | Content |
+|---|---|
+| Small | "Energy". Energy now in dots, "left" under it. The battery bar, 8 dp |
+| Wide | Title row. Energy with "left", "At waking 84" on the right. The battery bar |
+| Large | The Wide plus two figures, Caption over Body: Recharged "+38", Drained "60", the amounts as the Energy detail writes them |
+
+- Energy now is the day's latest Charge from `RecoveryEngine` (`Recovery.ChargeDay.latest`, cut as `chargeShown`), the
+  same result Today and Moment read, so they show one number. At waking is `atWake`; after a night with the strap off
+  it reads "At start 82", as the Energy detail. Recharged and Drained are `recharged` and the three drains together.
+- The battery bar is the body, track white at 10%, filled in Energy's ink (`MetricColors.charge`) to the value, with a
+  cap at the full end. It fills from the right in Arabic, as Steps' goal bar.
+- Before the first night (`anchored` false) there's no number, only the title and "Energy starts after your first
+  night. Sleep is what fills it." (Today's Energy line). With no value yet, or Recovery not worked out, its "Energy
+  shows once the strap has a few hours of heart rate."
+- Refreshes with the others (7). The tap opens the Energy detail on today.
+
 ## 4. Taps
 
 Every tap opens `MainActivity` with an existing extra. The only new ones are the sync action, opening the sport
@@ -253,6 +277,7 @@ picker and opening the Strap page (`EXTRA_OPEN_STRAP`, step 6).
 | Sleep | The Sleep score detail for that night | `EXTRA_OPEN_METRIC`, `EXTRA_METRIC_DAY` |
 | Steps | The Steps detail | `EXTRA_OPEN_METRIC` |
 | Recovery | The Recovery detail | `EXTRA_OPEN_METRIC` |
+| Energy | The Energy detail for today | `EXTRA_OPEN_METRIC` ("Energy"), `EXTRA_METRIC_DAY` |
 | Start's play or a sport tile | Ready with that sport | `EXTRA_READY_SPORT` |
 | Start's All sports | Choose a sport | New: an extra that opens Ready with the picker open (`readyPicking`). `EXTRA_SHOW_WORKOUT` opens Ready with the last sport, not the picker |
 | The strap status button | Syncs in place, or the Strap page (5) | A Glance `actionRunCallback`, no activity, or `EXTRA_OPEN_STRAP` |
@@ -321,7 +346,7 @@ Any widget, any size, shows the strap's status in its top row when one of these 
 - Provider XML: `targetCellWidth="2" targetCellHeight="2"`, `minWidth`, `minHeight`, `minResizeWidth` and
   `minResizeHeight` 110 dp (two cells by the old formula, 70 × 2 − 30, which One UI still uses and which ignores
   `targetCell*`: anything larger places as 3 × 3), `maxResizeWidth` 480 and `maxResizeHeight` 400 dp,
-  `resizeMode="horizontal|vertical"`, the same on all five.
+  `resizeMode="horizontal|vertical"`, the same on all six.
 - `widgetCategory="home_screen"`. Lock screen and keyguard are out of scope.
 
 ### 6.2 What Glance can't draw
@@ -386,14 +411,14 @@ timer it doesn't need.
 
 | Trigger | Updates |
 |---|---|
-| A history sync ends (`HistorySync`) | All five |
+| A history sync ends (`HistorySync`) | All six |
 | A workout starts or ends (`WorkoutRecorder`, strap auto-detect) | Moment, Start |
 | The moment changes | Moment. An exact alarm at the next boundary: add `MomentResolver.nextChange(...)` returning the time the current moment ends |
-| Midnight | All five (new day, new goal bar) |
+| Midnight | All six (new day, new goal bar) |
 | Steps (`LiveSteps`) | Steps, at most every 15 minutes while the strap is connected. Moment shows no steps figure |
 | A widget is added or removed | Moment (the duplicate rule) |
-| Strap state changes (paired, battery crosses 15%, charging) | All five, for the status line |
-| The last sync turns 3 hours old | All five, for the status line (an alarm, step 6) |
+| Strap state changes (paired, battery crosses 15%, charging) | All six, for the status line |
+| The last sync turns 3 hours old | All six, for the status line (an alarm, step 6) |
 | Mood or settings change (goal, sport GPS) | The widgets that show them |
 
 - `updatePeriodMillis="0"`. No periodic updates from the system.
@@ -406,13 +431,14 @@ timer it doesn't need.
 ## 8. Copy
 
 All of v2 section 7: no `·`, `;` or `—`, a real minus sign, `Metric.format` for every number, en dashes only in time
-ranges. Widget picker names: "Moment", "Sleep", "Steps", "Recovery", "Start a workout". Descriptions:
+ranges. Widget picker names: "Moment", "Sleep", "Steps", "Recovery", "Start a workout", "Energy". Descriptions:
 
 - Moment: "What matters now, changing through your day"
 - Sleep: "Last night's score, time asleep and stages"
 - Steps: "Steps today and your goal"
 - Recovery: "This morning's recovery and what's behind it"
 - Start a workout: "Start your usual sport in one tap"
+- Energy: "Your energy now and what moved it today"
 
 The punctuation test (v2 8.2) also scans `widget/` and the widget XML.
 
@@ -426,6 +452,9 @@ The punctuation test (v2 8.2) also scans `widget/` and the widget XML.
    check in 10 needs a launcher that has them (Samsung One UI, or a test launcher).
 4. **Two Recovery widgets or two Moments**: allowed, both show the same. No rule needed unless the phone shows a
    problem.
+5. **Moment with an Energy widget placed.** The duplicate rule would have Moment give Energy up at midday and on
+   waking with Recovery and Sleep placed, but it has no lead after Energy. For now Moment keeps Energy (`momentLead`
+   unchanged). Decide whether it should lead with the moment's sentence instead.
 
 ## 10. Build
 

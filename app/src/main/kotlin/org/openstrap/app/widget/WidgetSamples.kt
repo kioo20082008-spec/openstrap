@@ -88,6 +88,15 @@ object WidgetSamples {
         return StartWidgetModel.from(history, emptyMap(), true, null, now, zone, locale)
     }
 
+    /** Energy on [today]: 62 now from 84 at waking, recharged 38 and drained 60, as Moment's midday. */
+    fun energy(today: LocalDate): EnergyWidgetModel = EnergyWidgetModel.from(
+        today,
+        Recovery.ChargeDay(
+            points = emptyList(), latest = 62f, atWake = 84f, recharged = 38f,
+            drainedExercise = 30f, drainedStress = 18f, drainedLiving = 12f, highest = 92f, lowest = 54f, anchored = true,
+        ),
+    )
+
     /** Midday on [today]: 62 energy left from 84 at waking, drained 60 and recharged 38, the day's heart so far. */
     fun moment(today: LocalDate, zone: ZoneId): MomentWidgetModel {
         val night = sleepNight(today, zone)

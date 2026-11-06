@@ -35,7 +35,7 @@ import org.openstrap.app.widget.widgets
  *     adb shell appwidget grantbind --package org.openstrap.app --user 0
  *     adb shell am start -n org.openstrap.app/.widget.debug.WidgetGalleryActivity --es widget steps --es mood night
  *
- * `widget` is the kind to host (moment, recovery, steps, sleep, start), Recovery without it. `mood` is day, evening, night or auto
+ * `widget` is the kind to host (moment, recovery, steps, sleep, start, energy), Recovery without it. `mood` is day, evening, night or auto
  * (the moment's). Sleep is always night and ignores it. `--es pin sleep` asks the launcher to pin a widget of that
  * kind to the home screen. `--es cells oneui` hosts at One UI's real cells (2 × 2 about 180 × 220, 4 × 2 about
  * 353 × 220, 4 × 3 about 353 × 330) instead of the three minimums, to see what people see; `--es cells min` goes
@@ -117,7 +117,7 @@ class WidgetGalleryActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    /** The kind named [name] ("steps", "recovery", "sleep", "start") that has a widget yet; null for none. */
+    /** The kind named [name] ("steps", "recovery", "sleep", "start", "energy") that has a widget yet; null for none. */
     private fun kindOf(name: String?): WidgetKind? =
         WidgetKind.entries.firstOrNull { it.name.equals(name, ignoreCase = true) }?.takeIf { widgets.registration(it) != null }
 

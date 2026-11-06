@@ -45,6 +45,7 @@ internal val WIDGETS: Map<WidgetKind, Registration> = mapOf(
     WidgetKind.Steps to Registration(StepsWidgetReceiver::class.java) { StepsWidget() },
     WidgetKind.Recovery to Registration(RecoveryWidgetReceiver::class.java) { RecoveryWidget() },
     WidgetKind.Start to Registration(StartWidgetReceiver::class.java) { StartWidget() },
+    WidgetKind.Energy to Registration(EnergyWidgetReceiver::class.java) { EnergyWidget() },
 )
 
 /** The widgets on the home screen, any page: a kind counts once its receiver has an id (spec 3.1). */

@@ -9,4 +9,7 @@ object DetailRoutes {
     const val RECOVERY = "Recovery"
     const val SLEEP = "Sleep"
     const val SLEEP_SCORE = "SleepScore"
+
+    /** The Energy detail, as Today's Energy card opens it. */
+    const val ENERGY = "Energy"
 }
