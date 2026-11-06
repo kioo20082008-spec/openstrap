@@ -74,9 +74,6 @@ class TabPlansTest {
         assertEquals(CardLook(Tier.Edge, Hue.HabitAge, Edge.Left), look(rec, RecoveryCard.HabitAge))
         assertEquals(RecoveryCard.HabitAge, rec.last().card)
         assertEquals(CardLook(Tier.List, Hue.Neutral), look(rec, RecoveryCard.BodySignals))
-        assertEquals(CardLook(Tier.Glow, Hue.Charge, shape = Shape.Tall), look(rec, RecoveryCard.Charge))
-        assertEquals(Edge.Bottom, look(rec, RecoveryCard.Recharged).edge)
-        assertEquals(Edge.Top, look(rec, RecoveryCard.Drained).edge)
         val sleep = sleepCards(SleepFacts(naps = true))
         assertEquals(Edge.Top, look(sleep, SleepCard.Regularity).edge)
         assertEquals(Edge.Bottom, look(sleep, SleepCard.Breathing).edge)
@@ -91,11 +88,8 @@ class TabPlansTest {
     @Test fun `sizes are back where the mock tags them`() {
         fun <C> sizes(slots: List<TabSlot<C>>) = slots.associate { it.card to it.size }
         val rec = recoveryCards()
-        assertEquals(listOf(RecoveryCard.Charge, RecoveryCard.Recharged, RecoveryCard.Drained), rec.subList(2, 5).map { it.card })
-        assertEquals(listOf(CardSize.Tall, CardSize.Small, CardSize.Small), rec.subList(2, 5).map { it.size })
-        // The Tall and its Smalls share a column on two columns.
-        assertEquals(1, rec.subList(2, 5).map { it.pane }.distinct().size)
-        assertTrue(packGrid(rec.map { it.size to it.card }).any { it is GridRow.TallPair })
+        // Charge moved to Today: the Recovery tab is the score, what drove it, body signals and Habit Age.
+        assertEquals(listOf(RecoveryCard.Hero, RecoveryCard.Drivers, RecoveryCard.BodySignals, RecoveryCard.HabitAge), rec.map { it.card })
         // Breathing disturbances and naps pair up only together; alone, either is a Wide.
         assertEquals(CardSize.Small, sizes(sleepCards(SleepFacts(breathing = true, naps = true)))[SleepCard.Breathing])
         assertEquals(CardSize.Small, sizes(sleepCards(SleepFacts(breathing = true, naps = true)))[SleepCard.Naps])
