@@ -38,7 +38,7 @@ object Recovery {
         val remMinutes: Int? = null,
         /** The strap's own sleep score, when it computed one. */
         val strapScore: Int? = null,
-        /** Mean RMSSD during the sleep, ms, of the samples [nightHrvSamples] keeps. */
+        /** Mean RMSSD during the sleep, ms, of the samples [nightHrv] keeps. */
         val hrv: Float? = null,
         /** Lowest 30-minute average heart rate during the sleep, bpm (`rhr_n`). */
         val restingHr: Float? = null,
@@ -46,7 +46,7 @@ object Recovery {
         val rhrMeanSleep: Float? = null,
         /** 10th percentile of the per-minute heart rate during the sleep, bpm (`rhr_p10`). */
         val rhrP10: Float? = null,
-        /** RMSSD samples behind [hrv], gated to [HRV_MIN_MS]..[HRV_MAX_MS] and without outliers ([nightHrvSamples]). */
+        /** RMSSD samples behind [hrv], gated to [HRV_MIN_MS]..[HRV_MAX_MS], outside awake stages and without outliers ([nightHrv]). */
         val hrvSamples: Int = 0,
         /** Minutes of heart rate in [HR_MIN_BPM]..[HR_MAX_BPM] during the sleep. */
         val hrMinutes: Int = 0,
@@ -677,6 +677,81 @@ object Recovery {
         val logs = rmssd.map { ln(it) }
         val night = baseline(logs, HRV_NIGHT_LN_SD_FLOOR, MIN_HRV_SAMPLES) ?: return rmssd
         return rmssd.filterIndexed { i, _ -> abs(night.z(logs[i])) <= HRV_OUTLIER_SCALES }
+    }
+
+    /**
+     * The RMSSD samples of one main sleep, (time, ms), that its HRV is the mean of: gated to [HRV_MIN_MS]..[HRV_MAX_MS],
+     * less those inside an awake stage of the sleep ([awake]), then without outliers ([nightHrvSamples]). Awake, the
+     * body moves and breathes differently, and a few raised samples there pull the night's mean up without being far
+     * enough out for the outlier rule. They're left out every night, not only on some, so the baseline holds one
+     * measure. A night that this leaves with fewer than [MIN_HRV_SAMPLES] keeps its awake samples, so it isn't lost.
+     */
+    fun nightHrv(samples: List<Pair<Long, Int>>, awake: List<LongRange>): List<Float> {
+        val gated = samples.filter { it.second in HRV_MIN_MS..HRV_MAX_MS }
+        val asleep = gated.filter { (t, _) -> awake.none { t in it } }
+        return nightHrvSamples((if (asleep.size >= MIN_HRV_SAMPLES) asleep else gated).map { it.second.toFloat() })
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // False steps
+    // ------------------------------------------------------------------------------------------------
+
+    /**
+     * A wrist strap counts arm movement as steps: typing, eating, a fidget at a desk. [falseStepMinutes] takes such a
+     * stretch off the day's steps only when every rule holds, so a real walk is never lost: each minute that stepped
+     * did 1 to [FALSE_STEPS_MAX] steps, no minute of [FALSE_STEPS_MAX] + 1 or more is within
+     * [FALSE_STEPS_MARGIN_MINUTES] of it, it lasts [FALSE_STEPS_MIN_MINUTES] or more with steps in at least
+     * [FALSE_STEPS_MIN_SHARE] of its minutes, and heart rate stayed at sitting level: a median under
+     * [FALSE_STEPS_MEDIAN_HRR] of reserve and never [FALSE_STEPS_MAX_HRR] or more. A slow walk at 30 steps a minute
+     * sits at about 25 % of reserve, so it stays.
+     */
+    const val FALSE_STEPS_MAX = 39
+    const val FALSE_STEPS_MARGIN_MINUTES = 3
+    const val FALSE_STEPS_MIN_MINUTES = 20
+    const val FALSE_STEPS_MIN_SHARE = 0.6f
+    const val FALSE_STEPS_MEDIAN_HRR = 0.10f
+    const val FALSE_STEPS_MAX_HRR = 0.20f
+
+    /** Minutes without steps in a row that a stretch of false steps carries over; a longer pause ends it. */
+    const val FALSE_STEPS_MAX_GAP_MINUTES = 5
+
+    /**
+     * The minutes of [steps] (minute start to steps, 0 to [MAX_MINUTE_STEPS]) whose steps are arm movement rather than
+     * walking, by the rules at [FALSE_STEPS_MAX], with the steps each counted. A stretch runs over minutes that
+     * stepped, awake ([asleep]) and outside workouts ([inWorkout]), each at most [FALSE_STEPS_MAX_GAP_MINUTES] still
+     * minutes after the one before; a sleep or workout minute ends it. Heart rate is [hr] (minute start to bpm) as
+     * reserve between [restingHr] and [maxHr]; a stretch with heart rate in fewer than half its minutes keeps its
+     * steps, as there is nothing to tell sitting by.
+     */
+    fun falseStepMinutes(
+        steps: Map<Long, Int>, hr: Map<Long, Int>, restingHr: Float, maxHr: Float,
+        asleep: (Long) -> Boolean, inWorkout: (Long) -> Boolean,
+    ): Map<Long, Int> {
+        if (maxHr <= restingHr) return emptyMap()
+        val walking = java.util.TreeSet(steps.filterValues { it > FALSE_STEPS_MAX }.keys)
+        val stepped = steps.filterValues { it > 0 }.keys.sorted()
+        fun candidate(t: Long) = steps.getValue(t) <= FALSE_STEPS_MAX && !asleep(t) && !inWorkout(t)
+        fun joins(a: Long, b: Long) = b - a <= (FALSE_STEPS_MAX_GAP_MINUTES + 1) * 60L &&
+            (a + 60L until b step 60L).none { asleep(it) || inWorkout(it) }
+        val out = HashMap<Long, Int>()
+        var i = 0
+        while (i < stepped.size) {
+            if (!candidate(stepped[i])) { i++; continue }
+            var j = i
+            while (j + 1 < stepped.size && candidate(stepped[j + 1]) && joins(stepped[j], stepped[j + 1])) j++
+            val first = stepped[i]
+            val last = stepped[j]
+            val span = ((last - first) / 60L + 1).toInt()
+            val lasts = span >= FALSE_STEPS_MIN_MINUTES && j - i + 1 >= FALSE_STEPS_MIN_SHARE * span
+            val margin = FALSE_STEPS_MARGIN_MINUTES * 60L
+            val apart = walking.subSet(first - margin, true, last + margin, true).isEmpty()
+            val reserve = (first..last step 60L).mapNotNull { t -> hr[t]?.let { hrr(it, restingHr, maxHr) } }
+            val sitting = reserve.size * 2 >= span && (Stats.median(reserve) ?: 1f) < FALSE_STEPS_MEDIAN_HRR &&
+                reserve.all { it < FALSE_STEPS_MAX_HRR }
+            if (lasts && apart && sitting) for (k in i..j) out[stepped[k]] = steps.getValue(stepped[k])
+            i = j + 1
+        }
+        return out
     }
 
     /** The [p]-th percentile (0-1) of [values] by linear interpolation; null when empty. */

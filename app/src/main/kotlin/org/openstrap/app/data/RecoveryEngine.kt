@@ -305,9 +305,11 @@ class RecoveryEngine(private val dao: HealthDao) {
         val napsByDay = sessions.filter { it.nap }.groupBy { napMorning(it, zone) }
             .mapValues { (_, v) -> v.sumOf { asleepMinutes(it) } }
         val nights = mains.map { (morning, s) ->
-            val stages = reads.stagesOf(s).map { Triple(it.start, it.end, it.stage) }
+            val sessionStages = reads.stagesOf(s)
+            val stages = sessionStages.map { Triple(it.start, it.end, it.stage) }
             val strapDay = SleepHistory.strapDay(s, zone).takeIf { strapOwners[it] == s }
-            night(morning, s, hr, reads.hrv, reads.skin, reads.breath, reads.sleepSpo2, strapDay?.let(osaByStrapDay::get)).copy(
+            val rmssd = nightRmssd(s, reads.hrv, sessionStages)
+            night(morning, s, hr, rmssd, reads.skin, reads.breath, reads.sleepSpo2, strapDay?.let(osaByStrapDay::get)).copy(
                 strapDay = strapDay,
                 strapHrv = strapDay?.let(strapNights::get)?.sleepHrv?.toFloat(),
                 strapRestingHr = strapDay?.let(strapNights::get)?.sleepRestingHr?.toFloat(),
@@ -455,14 +457,21 @@ class RecoveryEngine(private val dao: HealthDao) {
         val minuteSteps = reads.activity.within(weekFrom, to) { it.timestamp }.filter { it.steps in 0..Recovery.MAX_MINUTE_STEPS }
             .associate { it.timestamp / 60 * 60 to it.steps }
         val weekHr = base.hr.filter { it.first >= weekFrom }.toMap()
+        var todayFalse = emptyMap<Long, Int>()
         val activityDays = (ACTIVITY_DAYS - 1 downTo 0).map { back ->
             val w = DayWindow.of(date.minusDays(back.toLong()), zone)
+            val daySteps = minuteSteps.filterKeys { it in w.from..w.to }
+            val dayHr = weekHr.filterKeys { it in w.from..w.to }
+            // Arm movement at a desk counted as steps ([Recovery.falseStepMinutes]) counts for nothing, judged on the
+            // day's own minutes, as [calories] judges it.
+            val falseSteps = Recovery.falseStepMinutes(daySteps, dayHr, base.restingHr, base.maxHr, base.asleep, inWorkout::invoke)
+            if (back == 0) todayFalse = falseSteps
             // Minutes with any data; no row is missing, never zero.
-            val times = (minuteSteps.keys.filter { it in w.from..w.to } + weekHr.keys.filter { it in w.from..w.to }).toSortedSet()
+            val times = (daySteps.keys + dayHr.keys).toSortedSet()
             times.map { t ->
                 Activity.Minute(
-                    t, minuteSteps[t] ?: 0, weekHr[t]?.let { Recovery.hrr(it, base.restingHr, base.maxHr) }, base.asleep(t),
-                    inWorkout(t),
+                    t, if (t in falseSteps) 0 else daySteps[t] ?: 0, dayHr[t]?.let { Recovery.hrr(it, base.restingHr, base.maxHr) },
+                    base.asleep(t), inWorkout(t),
                 )
             }
         }
@@ -476,6 +485,7 @@ class RecoveryEngine(private val dao: HealthDao) {
             distanceMeters = Activity.distanceMeters(todayMinutes, profile.heightCm),
             stepGoal = Activity.defaultStepGoal(base.age),
             byDay = dayMvpa.mapIndexed { i, m -> date.minusDays(ACTIVITY_DAYS - 1L - i) to m }.toMap(),
+            falseSteps = todayFalse,
         )
     }
 
@@ -562,16 +572,23 @@ class RecoveryEngine(private val dao: HealthDao) {
         // or the charger, and a day mostly off the wrist would never read as partial.
         val minuteSteps = reads.activity
             .filter { it.steps in 0..Recovery.MAX_MINUTE_STEPS && !(it.steps == 0 && Recovery.offWrist(it.kind)) }
-            .associate { it.timestamp / 60 * 60 to it.steps }
+            .associateTo(HashMap()) { it.timestamp / 60 * 60 to it.steps }
         val minuteHr = minuteHeartRate(reads.heartRate, reads.activity).toMap()
         val sessions = reads.sessions
         val strap = reads.strapWorkouts
         val phone = HashMap<Long, Float>()
-        for (w in dao.appWorkoutsOnce(day.from, day.to)) {
+        val phoneWorkouts = dao.appWorkoutsOnce(day.from, day.to)
+        for (w in phoneWorkouts) {
             phoneWorkoutKcal(w, profile, age, restingHr, maxHr, vo2max, now)?.forEach { if (it.t in day.from..day.to) phone[it.t] = it.kcal }
         }
         val sleep = sessions.flatMap { s -> (maxOf(s.start, day.from) / 60 * 60 until minOf(s.end, day.to + 1) step 60).toList() }.toSet()
         val asleep = { t: Long -> t in sleep || sessions.any { t in it.start..it.end } }
+        // Arm movement at a desk ([Recovery.falseStepMinutes]) is sitting: its minutes keep their data but lose their
+        // steps. Workouts are those [activity] leaves alone (a phone one less its pauses), so the day's steps and kcal agree.
+        val inWorkout = Recovery.MinuteRanges(
+            phoneWorkouts.flatMap { Recovery.activeRanges(it, now) } + strap.map { it.start until it.end },
+        )
+        Recovery.falseStepMinutes(minuteSteps, minuteHr, restingHr, maxHr, asleep, inWorkout::invoke).keys.forEach { minuteSteps[it] = 0 }
         val times = (minuteSteps.keys.filter { it in day.from..day.to } + minuteHr.keys.filter { it in day.from..day.to } + sleep + phone.keys).toSortedSet()
         return EnergyExpenditure.day(
             times.map { t ->
@@ -618,8 +635,10 @@ class RecoveryEngine(private val dao: HealthDao) {
         val to = DayWindow.of(weekStart, zone).to
         val hr = minuteHeartRate(from, to)
         val hrv = dao.hrvOnce(from, to)
+        // Each night's stages too, as [compute] reads them: its HRV, and so whether it's valid, leaves out awake stages.
         val nights = mainsByMorning(sleepSource.sessionsOnce(from, to), zone).mapNotNull { (morning, s) ->
-            night(morning, s, hr, hrv, emptyList(), emptyList(), emptyList(), null).validRestingHr?.let { morning to it }
+            val rmssd = nightRmssd(s, hrv, sleepSource.stagesOnce(s))
+            night(morning, s, hr, rmssd, emptyList(), emptyList(), emptyList(), null).validRestingHr?.let { morning to it }
         }.toMap()
         return Vo2max.estimate(profile, profile.age(weekStart), nights, DayWindow.of(weekStart, zone).from).first?.value?.toFloat()
     }
@@ -700,11 +719,20 @@ class RecoveryEngine(private val dao: HealthDao) {
         return MaxHeartRate(bpm, source, Recovery.observedPeakDay(maxima).takeIf { source == MaxHeartRate.Source.Learned })
     }
 
+    /** The RMSSD samples during the sleep [s] that its HRV is the mean of, less those in its awake [stages] ([Recovery.nightHrv]). */
+    private fun nightRmssd(
+        s: SleepSession, hrv: List<org.openstrap.app.data.db.HrvSample>, stages: List<org.openstrap.app.data.db.SleepStage>,
+    ): List<Float> {
+        val awake = stages.filter { it.stage == org.openstrap.app.data.db.SleepStage.AWAKE }.map { it.start until it.end }
+        return Recovery.nightHrv(hrv.filter { it.timestamp in s.start..s.end }.map { it.timestamp to it.milliseconds }, awake)
+    }
+
     private fun night(
         morning: Long,
         s: SleepSession,
         hr: List<Pair<Long, Int>>,
-        hrv: List<org.openstrap.app.data.db.HrvSample>,
+        /** The sleep's RMSSD samples its HRV is the mean of ([nightRmssd]). */
+        rmssd: List<Float>,
         skin: List<org.openstrap.app.data.db.SkinTemperature>,
         breath: List<org.openstrap.app.data.db.BreathRate>,
         spo2: List<org.openstrap.app.data.db.SleepSpo2Sample>,
@@ -713,8 +741,6 @@ class RecoveryEngine(private val dao: HealthDao) {
         val inSleep = { t: Long -> t in s.start..s.end }
         val sleepHr = hr.filter { inSleep(it.first) && it.second in Recovery.HR_MIN_BPM..Recovery.HR_MAX_BPM }
         val sleepBpm = sleepHr.map { it.second.toFloat() }
-        val gated = hrv.filter { inSleep(it.timestamp) && it.milliseconds in Recovery.HRV_MIN_MS..Recovery.HRV_MAX_MS }
-        val rmssd = Recovery.nightHrvSamples(gated.map { it.milliseconds.toFloat() })
         val asleep = asleepMinutes(s)
         val skinValues = skin.filter { inSleep(it.timestamp) }.map { it.celsius }
         val spo2Values = spo2.filter { inSleep(it.timestamp) }.map { it.percent.toFloat() }

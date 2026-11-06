@@ -2,6 +2,7 @@ package org.openstrap.app.widget
 
 import android.util.Log
 import kotlinx.coroutines.flow.first
+import org.openstrap.app.data.Activity
 import org.openstrap.app.data.DailyMetric
 import org.openstrap.app.data.DayWindow
 import org.openstrap.app.data.HealthRepository
@@ -66,7 +67,10 @@ class WidgetData(
 /** The Steps widget's reads: the [goal], and the [day]'s steps, null when they failed. */
 class StepsRead(val goal: Result<Int>, val day: StepsToday?)
 
-/** Today's minutes, its steps with the strap's live total on top ([LiveSteps]) and this week's earlier days' totals. */
+/**
+ * Today's minutes, its steps with the strap's live total on top ([LiveSteps]), both less arm movement at a desk
+ * ([org.openstrap.app.data.Activity.Day.falseSteps]), and this week's earlier days' totals.
+ */
 class StepsToday(val minutes: List<ActivityMinute>, val steps: Int, val past: Map<LocalDate, Int>)
 
 /**
@@ -118,13 +122,15 @@ class WidgetSnapshot(
         val workouts = if (kinds.any { it in MOOD_KINDS }) catching { recentWorkouts(t) } else null
         val span = if (kinds.any { it in NIGHT_KINDS }) catching { sleepSpanSessions(today, zone) } else null
         val moment = workouts?.let { w -> catching { momentInputs(w.getOrThrow(), span?.getOrNull(), today, t, zone) } }
-        val profile = if (kinds.any { it in RECOVERY_KINDS }) catching { settings.profile.first() } else null
+        // Steps too: today's Recovery finds the arm movement at a desk that Today takes off its steps.
+        val profile = if (kinds.any { it in RECOVERY_KINDS || it in STEP_KINDS }) catching { settings.profile.first() } else null
         val rec = profile?.let { p ->
             catching { health.recovery(today, p.getOrThrow()) }.onFailure { logUnread("Recovery for $today", it) }.getOrNull()
         }
         val bedtime = if (bedtimeNeeded(kinds, rec)) usualBedtime(today) else null
         val goal = if (kinds.any { it in STEP_KINDS }) catching { settings.goals.first().steps } else null
-        val day = goal?.let { stepsToday(today, zone, past = WidgetKind.Steps in kinds) }
+        val falseSteps = rec?.takeIf { it.date == today }?.activity?.falseSteps.orEmpty()
+        val day = goal?.let { stepsToday(today, zone, past = WidgetKind.Steps in kinds, falseSteps) }
         val reads = Reads(today, t, zone, workouts, span, moment, rec, bedtime, goal, day)
         return WidgetData(
             kinds = kinds,
@@ -189,11 +195,16 @@ class WidgetSnapshot(
         )
     }
 
-    /** Today's minutes and steps as Today's Steps card counts them, and with [past] this week's earlier days. */
-    private suspend fun stepsToday(today: LocalDate, zone: ZoneId, past: Boolean): StepsToday? = catching {
+    /**
+     * Today's minutes and steps as Today's Steps card counts them, less [falseSteps] ([Activity.Day.falseSteps]), and
+     * with [past] this week's earlier days. The shared counter is given every minute's steps, as Today gives it, so
+     * the two keep one anchor.
+     */
+    private suspend fun stepsToday(today: LocalDate, zone: ZoneId, past: Boolean, falseSteps: Map<Long, Int>): StepsToday? = catching {
         val day = DayWindow.of(today, zone)
-        val minutes = dao.activityOnce(day.from, day.to)
-        val steps = liveSteps.today(today, Summaries.totalSteps(minutes), todaySteps())
+        val read = dao.activityOnce(day.from, day.to)
+        val steps = Activity.withoutFalseSteps(liveSteps.today(today, Summaries.totalSteps(read), todaySteps()), falseSteps)
+        val minutes = Activity.withoutFalseSteps(read, falseSteps)
         val weekStart = Weeks.start(today)
         val earlier = if (past && weekStart < today) {
             health.daily(DailyMetric.Steps, weekStart, today.minusDays(1), zone).first()

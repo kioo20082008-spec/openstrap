@@ -88,6 +88,23 @@ class DayViewModelUiStateTest {
         assertEquals(50f, s.hourlySteps[13])
     }
 
+    @Test fun `false steps come off the total, the minutes' sum and their hour`() {
+        val desk = (0 until 30).map { ActivityMinute(at(10) + it * 60L, 15, 10, 0, 66) }
+        val walk = (0 until 3).map { ActivityMinute(at(14) + it * 60L, 100, 40, 1, 110) }
+        // The strap's live count is ahead of the minutes; another day's minute is left alone.
+        val s = DayViewModel.toUiState(DayData(date, minutes = desk + walk, steps = 1000))
+        val off = desk.associate { it.timestamp to it.steps } + (at(10) - 86_400L to 15)
+        val shown = DayViewModel.withoutFalseSteps(s, off)
+        assertEquals(550, shown.steps)
+        assertEquals(300, shown.minuteSteps)
+        assertEquals(0f, shown.hourlySteps[10])
+        assertEquals(300f, shown.hourlySteps[14])
+        assertEquals(1, shown.activeHours)
+        // Nothing to take off leaves the day as it was, and the total never goes below nothing.
+        assertEquals(s, DayViewModel.withoutFalseSteps(s, emptyMap()))
+        assertEquals(0, DayViewModel.withoutFalseSteps(s.copy(steps = 100), off).steps)
+    }
+
     @Test fun `the trends carry their weekday labels, and today's resting value and flag come from the last day`() {
         val days = (6L downTo 0L).map { date.minusDays(it) }
         val data = DayData(

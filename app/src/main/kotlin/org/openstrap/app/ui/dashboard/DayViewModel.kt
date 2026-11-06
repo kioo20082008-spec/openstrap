@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.openstrap.app.data.Activity
 import org.openstrap.app.data.DayData
 import org.openstrap.app.data.DayRepository
 import org.openstrap.app.data.DayValue
@@ -43,7 +44,9 @@ import org.openstrap.app.presentation.ChartPoint
 import org.openstrap.app.presentation.StageSpan
 import org.openstrap.app.presentation.TrendPoint
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.TextStyle
 import java.util.Locale
 import org.openstrap.app.presentation.Range
@@ -211,10 +214,9 @@ class DayViewModel(
     val daysWithData: StateFlow<Set<LocalDate>> = repo.daysWithData()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptySet())
 
-    val state: StateFlow<DayUiState> = shown.flatMapLatest { (date, isToday) -> repo.day(date, isToday) }
+    /** The day's rows as the screens draw them, before the day's false steps come off ([state]). */
+    private val dayState: Flow<DayUiState> = shown.flatMapLatest { (date, isToday) -> repo.day(date, isToday) }
         .map(::toUiState)
-        .flowOn(work)
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DayUiState(date = Today.on(clock())))
 
     /** Bumped by [retryRecovery], so the same day and data are worked out again. */
     private val recoveryRetries = MutableStateFlow(0)
@@ -272,6 +274,17 @@ class DayViewModel(
     /** The day's Recovery failed to work out (spec 4.3), so the cards can say so instead of waiting forever. */
     val recoveryFailure: StateFlow<RecoveryFailure?> = recoveryOutcome.map { (it as? RecoveryOutcome.Failed)?.failure }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    /**
+     * The day as the screens draw it, less the steps its Recovery found were arm movement at a desk
+     * ([withoutFalseSteps]), so the Steps card, its line, the goal and the coach all count the same steps as the
+     * widgets. Until the day's Recovery is in, or when it fails, every step counts.
+     */
+    val state: StateFlow<DayUiState> = combine(dayState, recovery) { s, r ->
+        withoutFalseSteps(s, r?.takeIf { it.date == s.date }?.activity?.falseSteps.orEmpty())
+    }
+        .flowOn(work)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DayUiState(date = Today.on(clock())))
 
     /**
      * Yesterday's score for a failed [date]: from the last Recovery worked out when its week covers yesterday, else
@@ -391,6 +404,27 @@ class DayViewModel(
                 sleepSkinTemperature = data.sleepSkin.map { ChartPoint(it.timestamp, it.celsius) },
                 dayStart = data.day.from,
                 dayEnd = data.day.to,
+            )
+        }
+
+        /**
+         * [s] less [falseSteps], the day's minutes of arm movement at a desk ([Activity.Day.falseSteps]): the total
+         * shown ([Activity.withoutFalseSteps], which can be the strap's live count), the minutes' sum and each hour of
+         * the line, so they still add up. Minutes outside the day are another day's.
+         */
+        internal fun withoutFalseSteps(s: DayUiState, falseSteps: Map<Long, Int>, zone: ZoneId = ZoneId.systemDefault()): DayUiState {
+            val today = falseSteps.filterKeys { it in s.dayStart..s.dayEnd }
+            if (today.isEmpty()) return s
+            val hourly = s.hourlySteps.toFloatArray()
+            for ((t, n) in today) {
+                val h = Instant.ofEpochSecond(t).atZone(zone).hour
+                if (h in hourly.indices) hourly[h] = (hourly[h] - n).coerceAtLeast(0f)
+            }
+            return s.copy(
+                steps = Activity.withoutFalseSteps(s.steps, today),
+                minuteSteps = Activity.withoutFalseSteps(s.minuteSteps, today),
+                hourlySteps = hourly.toList(),
+                activeHours = Summaries.activeHours(hourly.toList()),
             )
         }
 

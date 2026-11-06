@@ -72,6 +72,17 @@ class WidgetSnapshotTest {
         assertEquals(2479, snapshot.gather(setOf(WidgetKind.Steps), now, zone).steps?.day?.steps)
     }
 
+    @Test fun `steps leave out arm movement at a desk, as Today's do`() = runBlocking {
+        // Half an hour at a desk at 15 steps a minute, at resting heart rate, then ten minutes' walk.
+        val desk = (0 until 30).map { ActivityMinute(midnight + 9 * 3600 + it * 60L, 15, 10, 0, 62) }
+        val walk = (0 until 10).map { ActivityMinute(midnight + 11 * 3600 + it * 60L, 100, 40, 0, 120) }
+        dao.insertActivity(desk + walk)
+        val day = requireNotNull(snapshot.gather(setOf(WidgetKind.Steps), now, zone).steps?.day)
+        assertEquals(1000, day.steps)
+        // The day's line adds up to it.
+        assertEquals(1000, day.minutes.sumOf { it.steps })
+    }
+
     @Test fun `with the day's minutes unread, Moment leaves out yesterday's last reading`() = runBlocking {
         // The steps read fails, so Moment falls back to the strap's reading, which came yesterday and stays as it was.
         val failing = object : org.openstrap.app.data.db.HealthDao by dao {

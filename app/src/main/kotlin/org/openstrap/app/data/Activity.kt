@@ -1,5 +1,6 @@
 package org.openstrap.app.data
 
+import org.openstrap.app.data.db.ActivityMinute
 
 /**
  * Steps, distance and moderate-to-vigorous activity (docs/algorithms/evidence-review.md, "Energy and activity").
@@ -100,7 +101,18 @@ object Activity {
      */
     fun defaultStepGoal(age: Int?): Int = if (age != null && age >= 60) 7_000 else 8_000
 
+    /**
+     * A day's step [total] as shown, less its [falseSteps] ([Day.falseSteps], arm movement at a desk) and never below 0.
+     * The total can be the strap's own live count, which counted those steps too.
+     */
+    fun withoutFalseSteps(total: Int, falseSteps: Map<Long, Int>): Int = (total - falseSteps.values.sum()).coerceAtLeast(0)
+
+    /** [minutes] with no steps in those of [falseSteps], for a line of the day's steps that adds up to the total shown. */
+    fun withoutFalseSteps(minutes: List<ActivityMinute>, falseSteps: Map<Long, Int>): List<ActivityMinute> =
+        if (falseSteps.isEmpty()) minutes else minutes.map { if (it.timestamp / 60L * 60L in falseSteps) it.copy(steps = 0) else it }
+
     data class Day(
+        /** The day's steps from its minutes, less [falseSteps]. */
         val steps: Int,
         val mvpa: Mvpa,
         /** MVPA-equivalent minutes over the 7 days ending today. */
@@ -109,5 +121,10 @@ object Activity {
         val stepGoal: Int,
         /** Each day's MVPA, worked out the same way, for the [RecoveryEngine.ACTIVITY_DAYS] ending on the day. */
         val byDay: Map<java.time.LocalDate, Mvpa> = emptyMap(),
+        /**
+         * The day's minutes whose steps were arm movement at a desk ([Recovery.falseStepMinutes]), with the steps each
+         * counted: left out of [steps] and [distanceMeters], and taken off the steps Today and the widgets show.
+         */
+        val falseSteps: Map<Long, Int> = emptyMap(),
     )
 }
