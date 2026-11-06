@@ -58,7 +58,8 @@ data class RecoveryFacts(val habitAge: Boolean = true, val learning: Boolean = f
 fun recoveryCards(facts: RecoveryFacts = RecoveryFacts()): List<TabSlot<RecoveryCard>> = listOfNotNull(
     TabSlot(RecoveryCard.Hero, glow(Hue.Recovery), Pane.Full),
     TabSlot(RecoveryCard.Drivers, ListLook, Pane.Left),
-    TabSlot(RecoveryCard.BodySignals, ListLook, Pane.Right),
+    // Lit from the right, so it doesn't read as a second What drove it now Charge no longer sits between them.
+    TabSlot(RecoveryCard.BodySignals, edge(Hue.Heart, Edge.Right), Pane.Right),
     TabSlot(RecoveryCard.HabitAge, edge(Hue.HabitAge, Edge.Left), Pane.Left).takeIf { facts.habitAge },
 )
 

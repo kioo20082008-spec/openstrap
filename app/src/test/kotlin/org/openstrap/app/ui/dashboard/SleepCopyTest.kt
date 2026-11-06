@@ -133,7 +133,7 @@ class SleepCopyTest {
 
     @Test fun `naps say how many and how long`() {
         assertEquals("One nap, 45 min.", SleepCopy.naps(1, 45 * 60L))
-        assertEquals("Two naps, 1 h 10 in all.", SleepCopy.naps(2, 70 * 60L))
+        assertEquals("2 naps, 1 h 10 in all.", SleepCopy.naps(2, 70 * 60L)) // a plural with the count, so Arabic gets its dual
         assertEquals("No naps" to "None recorded that day", SleepCopy.noNaps(today = false))
     }
 
