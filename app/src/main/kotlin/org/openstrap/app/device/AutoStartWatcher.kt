@@ -46,8 +46,13 @@ internal class AutoStartWatcher(
     private var idleSteps = listOf<Pair<Long, Int>>()
     /** Effort before this isn't offered: the end of the last workout. */
     var offerNotBefore = 0L
-    /** "Not now": quiet until the effort under way has ended. */
-    private var declined = false
+    /**
+     * "Not now": no offer before this, and the effort under way can't come back as one. It used to last only until
+     * the stretch broke, and a probe's gap or a dip breaks it within minutes, so a raised heart rate at rest (heat,
+     * coffee, a long call) asked again and again. Each "Not now" doubles the quiet, from [DECLINE_QUIET_S].
+     */
+    private var quietUntil = 0L
+    private var declines = 0
 
     /** "Record": the workout starts where the effort began, with the readings since. */
     fun recordOffer() {
@@ -62,7 +67,10 @@ internal class AutoStartWatcher(
     fun declineOffer() {
         if (_offer.value == null) return
         _offer.value = null
-        declined = true
+        val t = now()
+        declines = if (t - quietUntil > DECLINE_RESET_S) 1 else declines + 1
+        quietUntil = t + DECLINE_QUIET_S * (1L shl (declines - 1).coerceAtMost(3))
+        offerNotBefore = maxOf(offerNotBefore, t)
     }
 
     /** Watches for effort whenever auto-start is on, the strap is connected and nothing records. */
@@ -129,9 +137,8 @@ internal class AutoStartWatcher(
                 strap.setEffortWatch(stream)
                 val o = AutoStart.offer(snapshot, resting, maxHr, cadence, t, offerNotBefore)
                 if (o == null) {
-                    declined = false
                     if (_offer.value != null) { _offer.value = null; log("auto-start: effort ended before an answer") }
-                } else if (_offer.value == null && !declined) {
+                } else if (_offer.value == null && t >= quietUntil) {
                     _offer.value = o
                     log("auto-start: offering ${o.sportType} from ${o.start}, ${o.averageHeartRate} bpm")
                     if (!callRinging()) launch { catching { strap.buzz(WorkoutSession.OFFER_BUZZ) } }
@@ -161,6 +168,10 @@ internal class AutoStartWatcher(
         /** Long enough for an effort to be offered from its start. */
         const val WATCH_S = 2 * 3600L
         const val WATCH_TICK_MS = 5_000L
+        /** The first "Not now"'s quiet; the next ones double it, up to 8 times (45 min, 1.5 h, 3 h, 6 h). */
+        const val DECLINE_QUIET_S = 45 * 60L
+        /** This long past the last quiet, a "Not now" starts again from [DECLINE_QUIET_S]. */
+        const val DECLINE_RESET_S = 6 * 3600L
         /** Cadence reads the step totals of the last four minutes, and needs two at least a minute apart. */
         const val CADENCE_WINDOW_S = 240L
         const val MINUTE_S = 60L
