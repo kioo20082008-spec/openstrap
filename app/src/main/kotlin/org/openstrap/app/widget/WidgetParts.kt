@@ -600,8 +600,28 @@ internal fun WeekChart(bars: ImageProvider, description: String, letters: List<P
 /* ------------------------------------------- Redesign fonts ------------------------------------------- */
 
 /** Arabic widgets read right to left, whatever the phone's own language (the launcher lays widgets out in that). */
-internal val WidgetRtl: Boolean get() = java.util.Locale.getDefault().language == "ar" &&
-    android.content.res.Resources.getSystem().configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_LTR
+internal val WidgetRtl: Boolean get() = (WidgetHost.appArabic ?: (java.util.Locale.getDefault().language == "ar")) &&
+    !(WidgetHost.systemRtl ?: (android.content.res.Resources.getSystem().configuration.layoutDirection == android.view.View.LAYOUT_DIRECTION_RTL))
+
+/**
+ * The app's language and the launcher's direction, read once from the app's own context. With Arabic chosen for the
+ * app alone (Android's per-app language), the process's configuration, [java.util.Locale.getDefault] and even
+ * Resources.getSystem() can carry the app's Arabic, so they said the launcher was right to left when it wasn't, and the
+ * widgets weren't mirrored. The launcher lays widgets out in the phone's own language, which LocaleManager gives.
+ */
+internal object WidgetHost {
+    @Volatile var appArabic: Boolean? = null
+    @Volatile var systemRtl: Boolean? = null
+
+    fun init(context: android.content.Context) {
+        appArabic = context.resources.configuration.locales.let { it.size() > 0 && it[0].language == "ar" }
+        val system = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            context.getSystemService(android.app.LocaleManager::class.java)?.systemLocales
+        } else null
+        val first = (system ?: android.content.res.Resources.getSystem().configuration.locales).let { if (it.size() > 0) it[0] else null }
+        systemRtl = first?.let { android.text.TextUtils.getLayoutDirectionFromLocale(it) == android.view.View.LAYOUT_DIRECTION_RTL }
+    }
+}
 
 /** The app's fonts for widgets, which Glance can't use as text: Inter for numbers, Almarai for words. */
 private object WidgetFonts {
