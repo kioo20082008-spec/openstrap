@@ -41,7 +41,7 @@ private fun <C> small(card: C, h: Hue, e: Edge, pane: Pane) = TabSlot(card, Card
 
 /* ---------------------------------------------- Recovery -------------------------------------------- */
 
-enum class RecoveryCard { Hero, Drivers, Charge, Recharged, Drained, BodySignals, HabitAge }
+enum class RecoveryCard { Hero, Drivers, BodySignals, HabitAge }
 
 /**
  * What changes the Recovery tab. Only [habitAge] adds or removes a card; [learning] and [hasRecovery] change what
@@ -50,20 +50,14 @@ enum class RecoveryCard { Hero, Drivers, Charge, Recharged, Drained, BodySignals
 data class RecoveryFacts(val habitAge: Boolean = true, val learning: Boolean = false, val hasRecovery: Boolean = true)
 
 /**
- * Recovery (spec 5.1): the score glows, what drove it as a list, then Charge as a Tall battery glowing to its level
- * with Recharged (lit from below) and Drained (from above) as Smalls beside it, so the two differ. Body signals is a
- * plain list again: the Smalls sit between it and What drove it. Habit Age is about earlier (last week), lit from the
- * left, always last.
+ * Recovery (spec 5.1): the score glows, what drove it as a list, then Body signals. Habit Age is about earlier (last
+ * week), lit from the left, always last. Charge moved to Today, where the day's level is read.
  *
- * Wide: the hero spans both columns; What drove it and Habit Age on the left, the Charge battery and Body signals on
- * the right, so no two lists sit side by side.
+ * Wide: the hero spans both columns; What drove it and Habit Age on the left, Body signals on the right.
  */
 fun recoveryCards(facts: RecoveryFacts = RecoveryFacts()): List<TabSlot<RecoveryCard>> = listOfNotNull(
     TabSlot(RecoveryCard.Hero, glow(Hue.Recovery), Pane.Full),
     TabSlot(RecoveryCard.Drivers, ListLook, Pane.Left),
-    TabSlot(RecoveryCard.Charge, CardLook(Tier.Glow, Hue.Charge, shape = Shape.Tall), Pane.Right, CardSize.Wide),
-    small(RecoveryCard.Recharged, Hue.Charge, Edge.Bottom, Pane.Right),
-    small(RecoveryCard.Drained, Hue.Charge, Edge.Top, Pane.Right),
     TabSlot(RecoveryCard.BodySignals, ListLook, Pane.Right),
     TabSlot(RecoveryCard.HabitAge, edge(Hue.HabitAge, Edge.Left), Pane.Left).takeIf { facts.habitAge },
 )

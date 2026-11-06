@@ -97,19 +97,20 @@ fun todayCards(moment: Moment?, facts: TodayFacts, morning: Boolean = true): Lis
     val strip = { c: TodayCard -> TodaySlot(c, CardSize.Strip) }
     val list = { c: TodayCard -> TodaySlot(c, CardSize.List) }
     val small = { c: TodayCard -> TodaySlot(c, CardSize.Small) }
-    // Charge is always the screen's second glow: a level glow filling across to its value (spec 2.1).
+    // Charge is always the screen's second glow: a level glow filling across to its value (spec 2.1). It lives on
+    // Today at every moment now, not on the Recovery tab: it's how much you have left today, read through the day.
     val charge = TodaySlot(TodayCard.Charge, CardSize.Wide, secondGlow = true)
     val own = when (m) {
         Moment.Waking -> listOfNotNull(
             strip(TodayCard.CheckIn).takeIf { facts.isToday },
-            list(TodayCard.BodyMorning), wide(TodayCard.LastNight), wide(TodayCard.HeartRate), wide(TodayCard.Activity),
+            charge, list(TodayCard.BodyMorning), wide(TodayCard.LastNight), wide(TodayCard.HeartRate), wide(TodayCard.Activity),
         )
         Moment.Midday -> listOf(
-            strip(TodayCard.LastNight), wide(TodayCard.Activity), wide(TodayCard.HeartRate), list(TodayCard.RightNow),
+            charge, strip(TodayCard.LastNight), wide(TodayCard.Activity), wide(TodayCard.HeartRate), list(TodayCard.RightNow),
             wide(TodayCard.Recovery),
         )
         // During a workout the hero is the workout and its live heart rate, so the rest stays as midday without it.
-        Moment.During -> listOf(strip(TodayCard.LastNight), wide(TodayCard.Activity), list(TodayCard.RightNow), wide(TodayCard.Recovery))
+        Moment.During -> listOf(charge, strip(TodayCard.LastNight), wide(TodayCard.Activity), list(TodayCard.RightNow), wide(TodayCard.Recovery))
         Moment.WorkoutWindow -> listOf(
             charge, list(TodayCard.LoadToday), wide(TodayCard.Activity),
             strip(TodayCard.LastNight),
@@ -141,7 +142,6 @@ fun todayCards(moment: Moment?, facts: TodayFacts, morning: Boolean = true): Lis
 /** The card the hero of [moment] already is, so pinning it there would show it twice. */
 fun heroSubject(moment: Moment?): TodayCard? = when (moment) {
     Moment.Waking -> TodayCard.Recovery
-    Moment.Midday -> TodayCard.Charge
     else -> null
 }
 

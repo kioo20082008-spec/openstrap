@@ -113,12 +113,12 @@ fun metricIndex(
                         IndexTarget.Home(HomeTab.Recovery), waiting = status,
                     )
                 },
-                // Before the first night Charge is only the simulation's starting guess: a dash, as on the Recovery tab's battery.
+                // Before the first night Charge is only the simulation's starting guess: a dash, as on Today's Charge card.
                 row(
                     strings.get(R.string.glow_metrics_energy), MetricColors.charge,
                     rec?.charge?.takeIf { it.anchored }?.latest?.let(::chargeShown)?.toString(),
                     strings.get(if (state.date == today) R.string.glow_metrics_latest else R.string.glow_metrics_end_of_day),
-                    IndexTarget.Home(HomeTab.Recovery, charge = true),
+                    IndexTarget.Open(Detail.OfScore(org.openstrap.app.ui.dashboard.Score.Energy)),
                     waiting = org.openstrap.app.presentation.AFTER_FIRST_NIGHT.takeIf { rec?.charge?.anchored == false },
                 ),
                 row(
