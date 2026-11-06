@@ -445,7 +445,7 @@ private fun Hero(
         when (k) {
             HeroKind.Pair -> PairHero(pairing ?: PairStep.Ready, onPair, m)
             HeroKind.Stuck -> StuckHero(ctx, strap, onSyncNow, m)
-            // The redesign: the same dials and plan at every moment of the day, unless Recovery failed to work out.
+            // The redesign: the Energy flask and plan at every moment of the day, unless Recovery failed to work out.
             HeroKind.Waking, HeroKind.Midday, HeroKind.NoSleep, HeroKind.Window, HeroKind.After, HeroKind.Evening ->
                 if (ctx.recoveryFailure != null) WakingHero(ctx, lightAngle, { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) }, onRetryRecovery, m)
                 else DialsToday(ctx, bedtime, onOpenScore, onOtherSport, usualSteps, running != null)
@@ -454,7 +454,7 @@ private fun Hero(
     }
 }
 
-/** The dials and the day's plan ([DialsHero]), from what Today already knows. */
+/** The Energy flask and the day's plan ([DialsHero]), from what Today already knows. */
 @Composable
 private fun DialsToday(
     ctx: TodayContext, bedtime: LocalTime?, onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit, onOtherSport: () -> Unit,
@@ -498,15 +498,19 @@ private fun DialsToday(
         ))
     }
     Column {
+    // Energy leads: the flask, its level and Energy at waking. Recovery stays the plan's basis and one tap away.
+    val energy = flaskModel(ctx.rec?.charge)
     DialsHero(
-        recovery = score, sleep = ctx.state.sleep?.score, strain = ctx.rec?.strain,
-        hrv = (ctx.rec?.readiness?.contributors?.firstOrNull { it.factor == Recovery.Factor.HrvBalance }?.detail as? Recovery.Detail.Hrv)?.ms,
-        labels = Triple(stringResource(R.string.dials_sleep), stringResource(R.string.dials_recovery), stringResource(R.string.dials_load)),
+        energy = energy, recovery = score, sleep = ctx.state.sleep?.score,
+        labels = Triple(
+            stringResource(if (energy.atStart) R.string.dials_at_start else R.string.dials_at_waking),
+            stringResource(R.string.dials_recovery), stringResource(R.string.dials_sleep),
+        ),
         planTitle = stringResource(title), planNote = stringResource(note),
         planChip = score?.let { stringResource(R.string.dials_plan_chip, it) }, plan = plan,
-        onSleep = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Sleep) },
+        onEnergy = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Energy) },
         onRecovery = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) },
-        onLoad = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Load) },
+        onSleep = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Sleep) },
     )
     // The coach, read afresh with every reading: live heart rate, the stress minutes, steps, the battery.
     val (battery, charging) = LocalStrapBattery.current

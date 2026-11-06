@@ -6,6 +6,7 @@ import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import org.openstrap.app.ui.theme.FunnelDisplay
 import org.openstrap.app.ui.theme.FunnelSans
+import org.openstrap.app.ui.theme.NumberFamily
 
 /**
  * The type roles of the design system (spec 2.3): Funnel Display for display roles, Funnel Sans for the rest. Every
@@ -84,6 +85,12 @@ object GlowType {
      * Plain, since the card's dotted number is the heart rate's.
      */
     val goalValue get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 44.sp, letterSpacing = (-0.02).em, lineHeight = 44.sp, fontFeatureSettings = "tnum")
+
+    /** Energy's number under the flask on Today: the numerals' face at 200, 64 on 64, drawn tight, left to right. */
+    val flaskNumber get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.Ltr, fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 64.sp, lineHeight = 64.sp, letterSpacing = (-3).sp)
+
+    /** The small "%" raised beside [flaskNumber]: the numerals' face at 300, 18. */
+    val flaskUnit get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.Ltr, fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 18.sp)
 
     /** The smaller numbers beside a [goalValue] (the rest in "with 90 s rest between", the ×): Display 300, 26 on 28. */
     val goalValueMinor get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 26.sp, lineHeight = 28.sp, fontFeatureSettings = "tnum")

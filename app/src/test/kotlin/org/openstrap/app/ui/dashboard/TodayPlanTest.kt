@@ -35,9 +35,9 @@ class TodayPlanTest {
         assertEquals(listOf(Hero, CheckIn, BodyMorning, LastNight, HeartRate, Activity, Week, StartWorkout, EditToday), cards(Moment.Waking))
         assertEquals(listOf(Hero, LastNight, Activity, HeartRate, RightNow, Recovery, Week, StartWorkout, EditToday), cards(Moment.Midday))
         // The workout window's hero has Start, so no strip.
-        assertEquals(listOf(Hero, Charge, LoadToday, Activity, LastNight, Week, EditToday), cards(Moment.WorkoutWindow))
-        assertEquals(listOf(Hero, Workout, LoadToday, Recover, Charge, Activity, Week, StartWorkout, EditToday), cards(Moment.After, TodayFacts(workout = true)))
-        assertEquals(listOf(Hero, Charge, Activity, HeartRate, LastNight, Week, StartWorkout, EditToday), cards(Moment.Evening))
+        assertEquals(listOf(Hero, LoadToday, Activity, LastNight, Week, EditToday), cards(Moment.WorkoutWindow))
+        assertEquals(listOf(Hero, Workout, LoadToday, Recover, Activity, Week, StartWorkout, EditToday), cards(Moment.After, TodayFacts(workout = true)))
+        assertEquals(listOf(Hero, Activity, HeartRate, LastNight, Week, StartWorkout, EditToday), cards(Moment.Evening))
         assertEquals(cards(Moment.Evening), cards(Moment.Night))
         // During a workout the hero has the live heart rate, so the card leaves, and one is already under way; the
         // rest is midday's.
@@ -54,12 +54,6 @@ class TodayPlanTest {
         assertEquals(CardSize.Wide, waking[LastNight])
         // Past midday the night collapses to a strip.
         assertEquals(CardSize.Strip, todayCards(Moment.Midday, TodayFacts()).first { it.card == LastNight }.size)
-        // Charge is the second glow wherever it shows: before a workout, after it and in the evening.
-        for (m in listOf(Moment.WorkoutWindow, Moment.After, Moment.Evening, Moment.Night)) {
-            assertTrue("$m", todayCards(m, TodayFacts()).first { it.card == Charge }.secondGlow)
-        }
-        // Pinned where the moment doesn't have it, it's the second glow too.
-        assertTrue(applyEdits(todayCards(Moment.Waking, TodayFacts()), TodayEdits(pinned = listOf(Charge)), Moment.Waking).first { it.card == Charge }.secondGlow)
         // After a workout Load and time to recover are a Small pair; before one, a list.
         val after = todayCards(Moment.After, TodayFacts(workout = true)).associate { it.card to it.size }
         assertEquals(CardSize.Small, after[LoadToday])
@@ -126,9 +120,21 @@ class TodayPlanTest {
         assertEquals(CardSize.Strip, applyEdits(slots, TodayEdits(pinned = listOf(LastNight)), Moment.Midday).first { it.card == LastNight }.size)
     }
 
+    @Test fun `Energy is the hero, so Today has no Energy card, pinned or not`() {
+        for (m in Moment.entries) for (facts in listOf(TodayFacts(), TodayFacts(workout = true, offer = true, alerts = true))) {
+            assertFalse("$m", Charge in cards(m, facts))
+            // A pin saved before Energy became the hero is dropped, so the card never comes back under it.
+            assertFalse("$m pinned", Charge in applyEdits(todayCards(m, facts), TodayEdits(pinned = listOf(Charge)), m).map { it.card })
+        }
+        // Edit Today doesn't offer it: hiding or pinning it does nothing.
+        assertFalse(Charge.editable)
+        assertFalse(Charge.pinnable)
+        assertEquals(TodayEdits(), TodayEdits().togglePin(Charge))
+        assertEquals(TodayEdits(), TodayEdits().toggleHidden(Charge))
+        assertEquals(TodayEdits(), TodayEdits.parse(listOf("Charge"), listOf("Charge")))
+    }
+
     @Test fun `a pin the hero already shows stays where it is`() {
-        val slots = todayCards(Moment.Midday, TodayFacts())
-        assertEquals(slots, applyEdits(slots, TodayEdits(pinned = listOf(Charge)), Moment.Midday))
         val waking = todayCards(Moment.Waking, TodayFacts())
         assertFalse(Recovery in applyEdits(waking, TodayEdits(pinned = listOf(Recovery)), Moment.Waking).map { it.card })
     }

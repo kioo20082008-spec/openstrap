@@ -2,7 +2,8 @@
 <resources>
     <string name="dials_sleep">Sleep</string>
     <string name="dials_recovery">Recovery</string>
-    <string name="dials_load">Load</string>
+    <string name="dials_at_waking">At waking</string>
+    <string name="dials_at_start">At start</string>
     <string name="dials_plan_green_title">Ready to train</string>
     <string name="dials_plan_green_note">A green day. Your plan, built on last night\'s recovery.</string>
     <string name="dials_plan_yellow_title">Take it steady</string>

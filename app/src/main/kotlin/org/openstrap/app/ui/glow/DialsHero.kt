@@ -21,6 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.ui.res.stringResource
+import org.openstrap.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,72 +56,47 @@ private val PlanSurface = Color.White.copy(alpha = 0.055f)
 private val PlanEdge = Color.White.copy(alpha = 0.10f)
 
 /**
- * The redesign's Today hero: three dials (Sleep, Recovery, Load) with Recovery largest in the middle, then the day's
- * plan. Laid out start to end, so in Arabic Sleep sits on the right and Load on the left.
+ * The redesign's Today hero: Energy as a round flask ([EnergyFlask]) with its name and level word, the day's plan,
+ * then Energy at waking, Recovery and Sleep in one pane of glass, and the plan's card. Tapping the flask opens the
+ * Energy detail; Recovery opens from its figure. The figures are laid out start to end, so in Arabic Energy at waking
+ * sits on the right and Sleep on the left.
  */
 @Composable
 internal fun DialsHero(
-    recovery: Int?, sleep: Int?, strain: Float?,
+    energy: FlaskModel, recovery: Int?, sleep: Int?,
     labels: Triple<String, String, String>,
     planTitle: String, planNote: String, planChip: String?, plan: List<PlanItem>,
-    onSleep: () -> Unit, onRecovery: () -> Unit, onLoad: () -> Unit,
+    onEnergy: () -> Unit, onRecovery: () -> Unit, onSleep: () -> Unit,
     modifier: Modifier = Modifier,
-    hrv: Int? = null,
 ) {
-    val fill = androidx.compose.runtime.remember(recovery) { androidx.compose.animation.core.Animatable(0f) }
-    androidx.compose.runtime.LaunchedEffect(recovery) {
-        fill.animateTo((recovery ?: 0) / 100f, androidx.compose.animation.core.tween(1800, 300, androidx.compose.animation.core.CubicBezierEasing(0.16f, 1f, 0.3f, 1f)))
-    }
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // The gauge: a hairline half circle with fine ticks, filled in coral to amber, a glowing point at the score.
-        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onRecovery), contentAlignment = Alignment.TopCenter) {
-            Ltr {
-                Canvas(Modifier.fillMaxWidth().height(190.dp)) {
-                    val r = minOf(size.width / 2 - 22.dp.toPx(), size.height - 22.dp.toPx())
-                    val c = Offset(size.width / 2, r + 14.dp.toPx())
-                    for (k in 0..40) {
-                        val a = Math.PI * (1 - k / 40.0)
-                        val cos = kotlin.math.cos(a).toFloat(); val sin = kotlin.math.sin(a).toFloat()
-                        drawLine(Color.White.copy(alpha = 0.22f), Offset(c.x + (r - 8.dp.toPx()) * cos, c.y - (r - 8.dp.toPx()) * sin), Offset(c.x + (r - 3.dp.toPx()) * cos, c.y - (r - 3.dp.toPx()) * sin), 1.dp.toPx())
-                    }
-                    val box = androidx.compose.ui.geometry.Rect(c.x - r, c.y - r, c.x + r, c.y + r)
-                    drawArc(Color.White.copy(alpha = 0.12f), 180f, 180f, false, box.topLeft, box.size, style = Stroke(1.5.dp.toPx()))
-                    val sweep = 180f * fill.value
-                    if (sweep > 0f) drawArc(
-                        androidx.compose.ui.graphics.Brush.sweepGradient(0.5f to AppPalette.Coral, 1f to Color(0xFFFFC27A), center = c),
-                        180f, sweep, false, box.topLeft, box.size, style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round),
-                    )
-                    val a = Math.PI * (1 - fill.value)
-                    val p = Offset(c.x + r * kotlin.math.cos(a).toFloat(), c.y - r * kotlin.math.sin(a).toFloat())
-                    drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(Color(0xAAFFC27A), Color.Transparent), p, 14.dp.toPx()), 14.dp.toPx(), p)
-                    drawCircle(Color(0xFFFFF3E2), 4.5.dp.toPx(), p)
-                }
-            }
-            Ltr { Row(Modifier.padding(top = 64.dp), verticalAlignment = Alignment.Top) {
-                Text(
-                    recovery?.toString() ?: "–", color = AppPalette.Cream,
-                    style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 112.sp, lineHeight = 112.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
-                )
-                if (recovery != null) Text("%", Modifier.padding(top = 18.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
-            } }
+        // Room above the glass for its glow, inside the ripple's corners.
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 24.dp, bottom = 12.dp), contentAlignment = Alignment.TopCenter) {
+            EnergyFlask(energy)
         }
-        Text(labels.second, color = Muted, style = MaterialTheme.typography.labelLarge)
+        Text(
+            buildAnnotatedString {
+                append(stringResource(R.string.glow_today_energy_title))
+                energy.word?.let { withStyle(SpanStyle(color = AppPalette.Cream)) { append(" · "); append(it) } }
+            },
+            color = Muted, style = MaterialTheme.typography.labelLarge,
+        )
         Spacer(Modifier.height(4.dp))
         Text(planTitle, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(14.dp))
         Text(planNote, color = AppPalette.Cream.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp))
         Spacer(Modifier.height(20.dp))
-        // Three figures in one pane of glass, hairlines between.
+        // Three figures in one pane of glass, hairlines between: Energy at waking, Recovery, Sleep.
         val shape = RoundedCornerShape(24.dp)
         Row(Modifier.fillMaxWidth().clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(vertical = 14.dp)) {
             listOf(
-                Triple(labels.first, sleep?.let { "$it" }, onSleep),
-                Triple(labels.third, strain?.let { String.format(java.util.Locale.US, "%.1f", it) }, onLoad),
-                Triple("HRV", hrv?.let { "$it" }, onRecovery),
+                Triple(labels.first, energy.atWake?.let { "$it" }, onEnergy),
+                Triple(labels.second, recovery?.let { "$it" }, onRecovery),
+                Triple(labels.third, sleep?.let { "$it" }, onSleep),
             ).forEachIndexed { i, (k, v, open) ->
                 if (i > 0) Box(Modifier.width(1.dp).height(52.dp).background(PlanEdge))
                 Column(Modifier.weight(1f).clickable(onClick = open).padding(horizontal = 16.dp)) {
-                    Text(k, color = Muted, style = MaterialTheme.typography.labelMedium)
+                    Text(k, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
                     Spacer(Modifier.height(4.dp))
                     Text(v ?: "–", color = AppPalette.Cream, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
                 }

@@ -28,7 +28,11 @@ enum class TodayCard(@StringRes private val labelRes: Int?, val editable: Boolea
     HeartRate(R.string.day_card_heart_rate, pinnable = true),
     Activity(R.string.day_card_activity, pinnable = true),
     Recovery(R.string.day_card_recovery, pinnable = true),
-    Charge(R.string.day_card_charge, pinnable = true),
+    /**
+     * Energy as a card. Today's hero is Energy now (the flask), so Today no longer lays it out, and Edit Today neither
+     * lists nor pins it: it would only repeat the hero.
+     */
+    Charge(R.string.day_card_charge, editable = false),
     LoadToday(R.string.day_card_load, pinnable = true),
     /** Time to recover as a Small beside Load's after a workout: part of [LoadToday], hidden and pinned with it. */
     Recover(null, editable = false),
@@ -97,31 +101,29 @@ fun todayCards(moment: Moment?, facts: TodayFacts, morning: Boolean = true): Lis
     val strip = { c: TodayCard -> TodaySlot(c, CardSize.Strip) }
     val list = { c: TodayCard -> TodaySlot(c, CardSize.List) }
     val small = { c: TodayCard -> TodaySlot(c, CardSize.Small) }
-    // Charge is always the screen's second glow: a level glow filling across to its value (spec 2.1). It lives on
-    // Today at every moment now, not on the Recovery tab: it's how much you have left today, read through the day.
-    val charge = TodaySlot(TodayCard.Charge, CardSize.Wide, secondGlow = true)
+    // Energy is the hero at every moment (the flask), so it has no card of its own here.
     val own = when (m) {
         Moment.Waking -> listOfNotNull(
             strip(TodayCard.CheckIn).takeIf { facts.isToday },
-            charge, list(TodayCard.BodyMorning), wide(TodayCard.LastNight), wide(TodayCard.HeartRate), wide(TodayCard.Activity),
+            list(TodayCard.BodyMorning), wide(TodayCard.LastNight), wide(TodayCard.HeartRate), wide(TodayCard.Activity),
         )
         Moment.Midday -> listOf(
-            charge, strip(TodayCard.LastNight), wide(TodayCard.Activity), wide(TodayCard.HeartRate), list(TodayCard.RightNow),
+            strip(TodayCard.LastNight), wide(TodayCard.Activity), wide(TodayCard.HeartRate), list(TodayCard.RightNow),
             wide(TodayCard.Recovery),
         )
         // During a workout the hero is the workout and its live heart rate, so the rest stays as midday without it.
-        Moment.During -> listOf(charge, strip(TodayCard.LastNight), wide(TodayCard.Activity), list(TodayCard.RightNow), wide(TodayCard.Recovery))
+        Moment.During -> listOf(strip(TodayCard.LastNight), wide(TodayCard.Activity), list(TodayCard.RightNow), wide(TodayCard.Recovery))
         Moment.WorkoutWindow -> listOf(
-            charge, list(TodayCard.LoadToday), wide(TodayCard.Activity),
+            list(TodayCard.LoadToday), wide(TodayCard.Activity),
             strip(TodayCard.LastNight),
         )
-        // What the workout did as a Small pair, then Charge as the screen's second glow.
+        // What the workout did as a Small pair.
         Moment.After -> listOfNotNull(
             wide(TodayCard.Workout).takeIf { facts.workout }, small(TodayCard.LoadToday), small(TodayCard.Recover),
-            charge, wide(TodayCard.Activity),
+            wide(TodayCard.Activity),
         )
         Moment.Evening, Moment.Night -> listOf(
-            charge, wide(TodayCard.Activity), wide(TodayCard.HeartRate), strip(TodayCard.LastNight),
+            wide(TodayCard.Activity), wide(TodayCard.HeartRate), strip(TodayCard.LastNight),
         )
     }
     // Things that need an answer come straight under the hero; the week and Habit Age close the list, then Start a
@@ -188,7 +190,8 @@ data class TodayEdits(val hidden: Set<TodayCard> = emptySet(), val pinned: List<
  * Load) goes where it goes.
  */
 fun applyEdits(slots: List<TodaySlot>, edits: TodayEdits, moment: Moment?, unavailable: Set<TodayCard> = emptySet()): List<TodaySlot> {
-    val pins = edits.pinned.filter { it != heroSubject(moment) && it !in unavailable }
+    // A pin of a card that can no longer be pinned (Energy, now the hero) is dropped, as parse drops it.
+    val pins = edits.pinned.filter { it.pinnable && it != heroSubject(moment) && it !in unavailable }
     val pinned = pins.flatMap { card ->
         slots.filter { it.card.owner() == card }
             .ifEmpty { listOf(TodaySlot(card, pinnedSize(card), secondGlow = card == TodayCard.Charge)) }.map { it.copy(pinned = true) }

@@ -2,7 +2,8 @@
 <resources>
     <string name="dials_sleep">النوم</string>
     <string name="dials_recovery">الاستشفاء</string>
-    <string name="dials_load">الجهد</string>
+    <string name="dials_at_waking">عند الاستيقاظ</string>
+    <string name="dials_at_start">في البداية</string>
     <string name="dials_plan_green_title">جاهز للتمرين</string>
     <string name="dials_plan_green_note">يوم أخضر. هذه خطتك، مبنية على استشفاء الليلة الماضية.</string>
     <string name="dials_plan_yellow_title">تمرّن بهدوء</string>

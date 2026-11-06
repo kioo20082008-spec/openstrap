@@ -46,16 +46,10 @@ class TodayLooksTest {
         assertEquals(listOf(0 to 1), lookClashes(bars, wide = false))
     }
 
-    @Test fun `Charge as the second glow is a level glow across from the left, unlike the hero's glow`() {
-        val window = today(Moment.WorkoutWindow, TodayFacts())
-        assertEquals(TodayCard.Charge, window[1].card)
-        assertEquals(CardLook(Tier.Glow, Hue.Charge, Edge.Left), window[1].look)
-        assertEquals(true, window[1].secondGlow)
-        // After a workout and in the evening it's the same level glow, and the only glow besides the hero.
-        for (m in listOf(Moment.After, Moment.Evening, Moment.Night)) {
-            val out = today(m, TodayFacts(workout = true))
-            assertEquals("$m", CardLook(Tier.Glow, Hue.Charge, Edge.Left), out.first { it.card == TodayCard.Charge }.look)
-            assertEquals("$m", 2, out.count { it.look?.tier == Tier.Glow })
+    @Test fun `with Energy as the hero no card on Today glows besides it`() {
+        for (m in Moment.entries) for (wide in listOf(false, true)) {
+            val out = today(m, allFacts, wide = wide)
+            assertEquals("$m wide=$wide", listOf(Hero), out.filter { it.look?.tier == Tier.Glow }.map { it.card })
         }
     }
 
@@ -92,7 +86,7 @@ class TodayLooksTest {
 
     @Test fun `in the evening heart rate flips to the top under Activity`() {
         val evening = today(Moment.Evening, TodayFacts())
-        assertEquals(listOf(Hero, TodayCard.Charge, Activity, TodayCard.HeartRate, LastNight, Week, TodayCard.StartWorkout, EditToday), evening.map { it.card })
+        assertEquals(listOf(Hero, Activity, TodayCard.HeartRate, LastNight, Week, TodayCard.StartWorkout, EditToday), evening.map { it.card })
         assertEquals(Edge.Bottom, evening.first { it.card == Activity }.look?.edge)
         assertEquals(Edge.Top, evening.first { it.card == TodayCard.HeartRate }.look?.edge)
         // Live, it's lit from the right and needs no flip.
