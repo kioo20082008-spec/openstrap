@@ -41,5 +41,5 @@ jobs:
         run: |
           cp app/build/outputs/apk/debug/app-debug.apk "openstrap-$VERSION.apk"
           gh release create "v$VERSION" "openstrap-$VERSION.apk" --target "$GITHUB_SHA" \
-            --title "OpenStrap $VERSION" --notes "Redesign build $VERSION." \
+            --title "OpenStrap $VERSION" --notes-file RELEASE_NOTES.md \
             || gh release upload "v$VERSION" "openstrap-$VERSION.apk" --clobber

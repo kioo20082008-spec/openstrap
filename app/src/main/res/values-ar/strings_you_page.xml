@@ -98,9 +98,13 @@
     <string name="you_updates_all_releases">كل الإصدارات</string>
     <string name="you_updates_on_github">على GitHub</string>
     <string name="you_updates_whats_new">الجديد</string>
-    <string name="you_updates_in_your_version">في إصدارك</string>
+    <string name="you_updates_in_your_version">الجديد في إصدارك</string>
+    <string name="you_updates_version">الإصدار ⁨%1$s⁩</string>
+    <string name="you_updates_badge_yours">إصدارك</string>
+    <string name="you_updates_badge_newest">الأحدث</string>
+    <string name="you_updates_up_to_date">أنت على أحدث إصدار</string>
     <string name="you_updates_latest">أحدث إصدار</string>
-    <string name="you_updates_installed">لديك OpenStrap ⁨%1$s⁩.</string>
+    <string name="you_updates_installed">الإصدار المثبّت ⁨%1$s⁩</string>
     <string name="you_updates_no_notes">لا توجد ملاحظات لهذا الإصدار.</string>
     <string name="you_diagnostics_title">التشخيص</string>
     <string name="you_diagnostics_copy">نسخ</string>

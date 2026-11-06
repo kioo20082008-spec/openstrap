@@ -3,6 +3,8 @@ package org.openstrap.app.ui.device
 import androidx.activity.compose.BackHandler
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -108,13 +110,22 @@ fun UpdatesPage(
             PagePanel(title = title) {
                 shown.forEachIndexed { i, release ->
                     if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(AppColors.ink.copy(alpha = 0.08f)))
-                    ReleaseNotesView(release)
+                    ReleaseNotesView(
+                        release,
+                        badge = when {
+                            release === current -> R.string.you_updates_badge_yours
+                            release === state.releases.firstOrNull() -> R.string.you_updates_badge_newest
+                            else -> null
+                        },
+                    )
                 }
             }
         }
         item {
             Text(
-                stringResource(R.string.you_updates_installed, installed),
+                // On the newest release one clear line; a developer's build (no release of its own) says which it is.
+                if (newer.isEmpty() && current != null) stringResource(R.string.you_updates_up_to_date)
+                else stringResource(R.string.you_updates_installed, installed),
                 Modifier.fillMaxWidth().padding(top = 4.dp),
                 color = AppColors.ink.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
             )
@@ -124,16 +135,31 @@ fun UpdatesPage(
 
 /** One release: its version and date, then its notes as headings, bullets and paragraphs. */
 @Composable
-private fun ReleaseNotesView(release: Release) {
-    val blocks = remember(release.notes) { ReleaseNotes.parse(release.notes) }
+private fun ReleaseNotesView(release: Release, badge: Int?) {
+    // A build the CI published without notes says only "Redesign build N.": English, and nothing to read, so it shows none.
+    val generic = remember(release.notes) { GenericNotes.matches(release.notes) }
+    val blocks = remember(release.notes) { if (generic) emptyList() else ReleaseNotes.parse(release.notes) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        // The version on its own line at the start (the right in Arabic), its badge at the far side, the date under it:
+        // a Latin version beside the date used to run into it.
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(release.versionName, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Medium), modifier = Modifier.weight(1f))
-            release.publishedAt?.let {
-                Text(UpdateCopy.date(it), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
-            }
+            Text(
+                stringResource(R.string.you_updates_version, release.versionName), color = AppColors.ink,
+                style = GlowType.body.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f), textAlign = TextAlign.Start,
+            )
+            if (badge != null) Text(
+                stringResource(badge), color = AppColors.ink,
+                style = GlowType.secondary.copy(fontWeight = FontWeight.Medium),
+                modifier = Modifier.clip(CircleShape).background(AppColors.ink.copy(alpha = 0.10f)).padding(horizontal = 12.dp, vertical = 4.dp),
+            )
         }
-        if (blocks.isEmpty()) {
+        release.publishedAt?.let {
+            Text(
+                UpdateCopy.date(it), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Start,
+            )
+        }
+        if (blocks.isEmpty() && !generic) {
             Text(
                 stringResource(R.string.you_updates_no_notes), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
@@ -153,6 +179,11 @@ private fun ReleaseNotesView(release: Release) {
             }
         } }
     }
+}
+
+private object GenericNotes {
+    private val build = Regex("^\\s*Redesign build [0-9.]+\\.?\\s*$")
+    fun matches(notes: String): Boolean = build.matches(notes)
 }
 
 /** Bold runs in white at medium weight, the rest in the text's own colour. */
