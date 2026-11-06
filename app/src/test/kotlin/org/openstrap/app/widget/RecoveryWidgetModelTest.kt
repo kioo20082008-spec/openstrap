@@ -130,7 +130,8 @@ class RecoveryWidgetModelTest {
         val d = RecoveryDay.of(r, null)
         assertEquals(55f, d.restingHr)
         assertEquals(45f, d.hrv)
-        assertEquals(40, d.sleep)
+        // Sleep is OpenStrap's own score, never the strap's: none here, as Recovery didn't score the night.
+        assertNull(d.sleep)
         assertTrue(d.firstNights)
     }
 

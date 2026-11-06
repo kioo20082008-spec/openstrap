@@ -115,7 +115,7 @@ class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
         container.widgets.start()
         // The daily check for a new OpenStrap, unless it was turned off on the Updates page.
         container.updater.start()
-        org.openstrap.app.presentation.CoachWorker.schedule(this)
+        org.openstrap.app.device.CoachWorker.schedule(this)
         // Looks for the first morning of the week, for the weekly recap (workouts spec 3.4).
         org.openstrap.app.device.WeeklyRecap.schedule(this)
     }

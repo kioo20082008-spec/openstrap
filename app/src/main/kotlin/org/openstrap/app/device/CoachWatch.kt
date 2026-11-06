@@ -1,4 +1,4 @@
-package org.openstrap.app.presentation
+package org.openstrap.app.device
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.first
 import org.openstrap.app.MainActivity
 import org.openstrap.app.OpenStrapApp
 import org.openstrap.app.R
-import org.openstrap.app.device.ConnectionState
+import org.openstrap.app.presentation.ChartPoint
+import org.openstrap.app.presentation.Coach
 import org.openstrap.app.i18n.Strings
 import java.time.Instant
 import java.time.LocalDate
