@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.presentation.Units
 import org.openstrap.app.presentation.TimeOfDay
@@ -605,7 +606,7 @@ private fun ChargeHero(ctx: TodayContext, onOpen: () -> Unit, onRetry: () -> Uni
             // card (spec 7.1): a Partial day tag, or the no sleep sentence, already says the day is short of wear.
             if (c?.strapOffOvernight == true && !noSleep && ctx.partial == null) Text(
                 stringResource(R.string.glow_today_strap_off),
-                color = Color.White.copy(alpha = 0.7f), style = GlowType.secondary,
+                color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.secondary,
                 modifier = Modifier.padding(top = 8.dp)
                     .clickable(onClickLabel = stringResource(R.string.glow_today_about_energy)) { info = true },
             )
@@ -729,7 +730,7 @@ private fun EveningHero(ctx: TodayContext, lightAngle: Float?, bedtime: LocalTim
             // hidden in Edit Today does Energy come back here, last and full width, never a lone dash.
             val energy = ctx.charge?.takeIf { energyHidden }
             if (energy != null) Text(
-                stringResource(R.string.glow_today_energy_left, energy), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                stringResource(R.string.glow_today_energy_left, energy), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
                 maxLines = 1, modifier = Modifier.padding(top = 10.dp),
             )
@@ -774,8 +775,8 @@ private fun DuringHero(r: org.openstrap.app.device.WorkoutState.Recording, onOpe
                 Canvas(Modifier.size(8.dp)) { drawCircle(TrendGood) }
                 Spacer(Modifier.width(12.dp))
                 Column {
-                    Text(title, color = Color.White, style = GlowType.body)
-                    line?.let { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary) }
+                    Text(title, color = AppColors.ink, style = GlowType.body)
+                    line?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary) }
                 }
             }
         }
@@ -817,7 +818,7 @@ private fun StuckHero(ctx: TodayContext, strap: TodayStrap, onSyncNow: () -> Uni
         Column {
             GlowHeader(copy.title, trailing = lastTried(strap.record, ctx.zone))
             HeroSentence(copy.sentence)
-            Text(copy.line, color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
+            Text(copy.line, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
             Spacer(Modifier.height(28.dp))
             PageButton(
                 stringResource(R.string.glow_today_sync_now),

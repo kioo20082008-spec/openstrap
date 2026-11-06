@@ -40,6 +40,17 @@
     <!-- Section labels over the You page's panels, a few words in capitals' style. -->
     <string name="you_section_your_data">Your data</string>
     <string name="you_section_help">Help</string>
+    <!-- Section label over the app's own settings on the You page. -->
+    <string name="you_section_app">App</string>
+    <!-- The You page row that picks the app's colour theme; its value is the theme's name. Also the picker's title. -->
+    <string name="you_row_appearance">Appearance</string>
+    <!-- Under the picker's title. -->
+    <string name="you_appearance_note">Changes every page at once. Widgets keep their own look.</string>
+    <!-- The four colour themes, short names. OLED is a kind of phone screen, keep it as it is. -->
+    <string name="you_theme_navy">Navy</string>
+    <string name="you_theme_oled">OLED black</string>
+    <string name="you_theme_cream">Cream light</string>
+    <string name="you_theme_dusk">Warm dusk</string>
     <!-- Under the Goals and bests row: the weekly workout goal, then what else the page holds. -->
     <plurals name="you_goals_and_bests_line">
         <item quantity="one"><xliff:g id="count" example="3">%1$d</xliff:g> workout a week, personal bests and badges</item>

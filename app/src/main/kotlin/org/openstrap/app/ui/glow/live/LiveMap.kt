@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import androidx.compose.runtime.getValue
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.runtime.setValue
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -80,7 +81,7 @@ internal fun LiveMapScreen(
     val stretches = remember(route.size, readings.size / 10, heartZones) { Route.byZone(route, readings, r.maxHeartRate, heartZones) }
     val here = route.lastOrNull { it.accuracy <= Route.MAX_ACCURACY_M }
     val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding() + contentPadding.calculateTopPadding() + 8.dp
-    Box(Modifier.fillMaxSize().background(Color.Black)) {
+    Box(Modifier.fillMaxSize().background(AppColors.stage)) {
         // The map runs under the panel's rounded top, so no black shows at its corners.
         Box(Modifier.fillMaxWidth().fillMaxHeight().padding(bottom = (panel - PANEL_OVERLAP).coerceAtLeast(0.dp))) {
             WorkoutMap(
@@ -104,7 +105,7 @@ internal fun LiveMapScreen(
                 ) {
                     Box(Modifier.size(6.dp).clip(CircleShape).background(if (acc != null && acc <= Route.MAX_ACCURACY_M) TrendGood else TrendBad))
                     Spacer(Modifier.width(6.dp))
-                    Text(WorkoutCopy.gpsPill(acc), color = Color.White, style = GlowType.secondary, maxLines = 1)
+                    Text(WorkoutCopy.gpsPill(acc), color = AppColors.ink, style = GlowType.secondary, maxLines = 1)
                 }
             }
             // On its side the map is short, so the buttons hang under the GPS pill instead of rising into it.
@@ -124,7 +125,7 @@ internal fun LiveMapScreen(
         Column(
             Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                 .onSizeChanged { panel = with(density) { it.height.toDp() } }
-                .clip(org.openstrap.app.ui.glow.GlowLayout.SheetShape).background(Color.Black)
+                .clip(org.openstrap.app.ui.glow.GlowLayout.SheetShape).background(AppColors.stage)
                 .padding(start = 16.dp, end = 16.dp, top = 18.dp, bottom = contentPadding.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
@@ -147,12 +148,12 @@ internal fun LiveMapScreen(
 private val PANEL_OVERLAP = 28.dp
 
 /** Buttons and pills drawn over the map: near black, a little see-through. */
-private val OverMap = Color(0xD9141416)
+private val OverMap: Color get() = if (AppColors.light) AppColors.raised.copy(alpha = 0.88f) else Color(0xD9141416)
 
 /** A round button over the map, white while what it does is on ([lit]). */
 @Composable
 private fun MapButton(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, lit: Boolean, onClick: () -> Unit) =
-    RoundIcon(icon, label, onClick, surface = if (lit) Color.White else OverMap, ink = if (lit) Color.Black else Color.White, iconSize = 20.dp)
+    RoundIcon(icon, label, onClick, surface = if (lit) AppColors.ink else OverMap, ink = if (lit) AppColors.onInk else AppColors.ink, iconSize = 20.dp)
 
 /** The latest whole kilometre on a dark row with how long ago it ended, until the next; nothing before the first. */
 @Composable
@@ -166,7 +167,7 @@ private fun LastSplit(route: List<Route.Point>, readings: List<Pair<Long, Int>>,
     ) {
         Box(Modifier.size(8.dp).clip(CircleShape).background(MetricColors.steps))
         Spacer(Modifier.width(10.dp))
-        Text(line, color = Color.White, style = GlowType.body.copy(fontFeatureSettings = "tnum"), maxLines = 1, modifier = Modifier.weight(1f))
-        Text(ago, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        Text(line, color = AppColors.ink, style = GlowType.body.copy(fontFeatureSettings = "tnum"), maxLines = 1, modifier = Modifier.weight(1f))
+        Text(ago, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
     }
 }

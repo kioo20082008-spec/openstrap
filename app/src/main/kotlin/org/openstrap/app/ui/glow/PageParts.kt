@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.ui.res.stringResource
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import org.openstrap.app.presentation.TimeOfDay
 import androidx.compose.foundation.background
@@ -75,7 +76,6 @@ import org.openstrap.app.ui.components.pressClickable
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.app.ui.theme.AppIcons
 import java.time.ZoneId
-import org.openstrap.app.ui.theme.ControlSurface
 
 /*
  * The settings pages (the Strap page and what it opens, Profile, You) in the glow language's quiet tier: black, with
@@ -84,16 +84,16 @@ import org.openstrap.app.ui.theme.ControlSurface
  */
 
 private val PanelShape = GlowLayout.CardShape
-private val PanelSurface = ListSurface
-private val Hairline = Color.White.copy(alpha = 0.08f)
+private val PanelSurface get() = ListSurface
+private val Hairline: Color get() = AppColors.ink.copy(alpha = 0.08f)
 /** A [PageRow] whose page is open beside the list. */
-private val SelectedTint = Color.White.copy(alpha = 0.08f)
+private val SelectedTint: Color get() = AppColors.ink.copy(alpha = 0.08f)
 
 /**
  * The one row or button that can't be undone (Forget, Delete all, Delete workout): plain white at 72%, no colour, since
  * colour in the app means a metric or the strap's state (spec 2.2). The confirmation asks before anything goes.
  */
-val DestructiveInk = Color.White.copy(alpha = 0.72f)
+val DestructiveInk: Color get() = AppColors.ink.copy(alpha = 0.72f)
 
 /** The round back button of every page over a tab (spec 3.4). */
 val BackButtonSize = 44.dp
@@ -102,13 +102,13 @@ val BackButtonSize = 44.dp
 val PageHeaderHeight = 64.dp
 
 /**
- * A page's way back (spec 3.4): a [BackButtonSize] round button on the [ControlSurface] with a 20 dp arrow, dimmed
+ * A page's way back (spec 3.4): a [BackButtonSize] round button on the [AppColors.control] with a 20 dp arrow, dimmed
  * and still while not [enabled] (a firmware install running).
  */
 @Composable
 fun BackButton(onBack: () -> Unit, enabled: Boolean = true) =
     RoundIconButton(
-        AppIcons.ArrowLeft, stringResource(R.string.glow_back), onBack, size = BackButtonSize, surface = ControlSurface, iconSize = 20.dp,
+        AppIcons.ArrowLeft, stringResource(R.string.glow_back), onBack, size = BackButtonSize, surface = AppColors.control, iconSize = 20.dp,
         enabled = enabled,
     )
 
@@ -127,9 +127,9 @@ fun RoundIconButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 38.dp,
-    surface: Color = Color.White.copy(alpha = 0.10f),
+    surface: Color = AppColors.ink.copy(alpha = 0.10f),
     iconSize: Dp = size * ROUND_ICON_SHARE,
-    tint: Color = Color.White,
+    tint: Color = AppColors.ink,
     clickLabel: String = label,
     enabled: Boolean = true,
     dot: Boolean = false,
@@ -141,7 +141,7 @@ fun RoundIconButton(
             contentAlignment = Alignment.Center,
         ) { Icon(icon, label, Modifier.size(iconSize), tint = tint) }
         // On the circle's edge at its top right, ringed in the page's black so it reads apart from the button.
-        if (dot) NoticeDot(Modifier.align(Alignment.TopEnd), ring = Color.Black)
+        if (dot) NoticeDot(Modifier.align(Alignment.TopEnd), ring = AppColors.page)
     }
 }
 
@@ -169,13 +169,13 @@ fun PageHeader(
                     .let { if (onTitle != null) it.clickable(onClickLabel = switchLabel, role = Role.Button, onClick = onTitle) else it },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(title, color = Color.White, style = GlowType.pageTitle, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+                Text(title, color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
                 if (onTitle != null) {
                     Spacer(Modifier.width(6.dp))
-                    Icon(AppIcons.CaretDown, null, tint = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(16.dp))
+                    Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(16.dp))
                 }
             }
-            if (subtitle != null) Text(subtitle, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+            if (subtitle != null) Text(subtitle, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
         }
         if (trailing != null) {
             Spacer(Modifier.width(12.dp))
@@ -200,7 +200,7 @@ fun PagePanel(modifier: Modifier = Modifier, title: String? = null, note: String
 fun PageRows(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
         // Clipped, so a selected row's tint keeps to the panel's corners.
-        modifier.fillMaxWidth().clip(PanelShape).background(PanelSurface, PanelShape).border(1.dp, Color.White.copy(alpha = 0.06f), PanelShape)
+        modifier.fillMaxWidth().clip(PanelShape).background(PanelSurface, PanelShape).border(1.dp, AppColors.ink.copy(alpha = 0.06f), PanelShape)
             .padding(GlowLayout.ListPadding),
         content = content,
     )
@@ -223,7 +223,7 @@ fun PageRow(
     onClick: (() -> Unit)? = null,
     below: Boolean = false,
     divider: Boolean = true,
-    titleColor: Color = Color.White,
+    titleColor: Color = AppColors.ink,
     enabled: Boolean = true,
     icon: ImageVector? = null,
     selected: Boolean = false,
@@ -267,7 +267,7 @@ fun PageRow(
 @Composable
 private fun RowIcon(icon: ImageVector) {
     Box(Modifier.padding(end = 14.dp).width(20.dp), contentAlignment = Alignment.Center) {
-        Icon(icon, null, Modifier.size(20.dp), tint = Color.White.copy(alpha = 0.7f))
+        Icon(icon, null, Modifier.size(20.dp), tint = AppColors.ink.copy(alpha = 0.7f))
     }
 }
 
@@ -277,16 +277,16 @@ private fun RowIcon(icon: ImageVector) {
  */
 @Composable
 fun NoticeDot(modifier: Modifier = Modifier, ring: Color? = null) {
-    if (ring == null) Box(modifier.size(7.dp).background(Color.White, CircleShape))
-    else Box(modifier.size(11.dp).background(ring, CircleShape).padding(2.dp).background(Color.White, CircleShape))
+    if (ring == null) Box(modifier.size(7.dp).background(AppColors.ink, CircleShape))
+    else Box(modifier.size(11.dp).background(ring, CircleShape).padding(2.dp).background(AppColors.ink, CircleShape))
 }
 
 /** A row's value in Secondary, on the right or under the name. */
-private val RowValueColor = Color.White.copy(alpha = 0.6f)
+private val RowValueColor: Color get() = AppColors.ink.copy(alpha = 0.6f)
 
 /** A row's name in Body, on one line (spec 2.3): ellipsized only when it alone is wider than the row. */
 @Composable
-internal fun RowName(name: String, color: Color = Color.White) =
+internal fun RowName(name: String, color: Color = AppColors.ink) =
     Text(name, color = color, style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
 
 /** Between a row's name and the value on its right. */
@@ -373,29 +373,29 @@ fun <T> PageMenuRow(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val value = selected?.let(label)
-                Text(title, color = Color.White, style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+                Text(title, color = AppColors.ink, style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 if (value != null) {
                     Spacer(Modifier.width(RowValueGap))
                     Text(
                         value, style = GlowType.secondary, maxLines = 1,
-                        color = if (selected.let(quiet)) Color.White.copy(alpha = 0.4f) else RowValueColor,
+                        color = if (selected.let(quiet)) AppColors.ink.copy(alpha = 0.4f) else RowValueColor,
                     )
                 }
                 Spacer(Modifier.width(RowCaretGap))
-                Icon(AppIcons.CaretDown, null, tint = Color.White.copy(alpha = ROW_CARET_ALPHA), modifier = Modifier.size(CaretSize))
+                Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = ROW_CARET_ALPHA), modifier = Modifier.size(CaretSize))
             }
             Box(Modifier.align(Alignment.BottomEnd)) {
                 DropdownMenu(
                     expanded = open, onDismissRequest = { open = false },
                     offset = DpOffset(0.dp, 4.dp), shape = MenuShape, containerColor = MenuSurface,
-                    tonalElevation = 0.dp, shadowElevation = 12.dp, border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.10f)),
+                    tonalElevation = 0.dp, shadowElevation = 12.dp, border = androidx.compose.foundation.BorderStroke(1.dp, AppColors.ink.copy(alpha = 0.10f)),
                 ) {
                     options.forEach { o ->
                         val on = o == selected
                         DropdownMenuItem(
-                            text = { Text(label(o), style = GlowType.body, color = if (on) Color.White else RowValueColor) },
+                            text = { Text(label(o), style = GlowType.body, color = if (on) AppColors.ink else RowValueColor) },
                             onClick = { open = false; if (!on) onPick(o) },
-                            trailingIcon = if (on) ({ Icon(AppIcons.Tick02, null, tint = Color.White, modifier = Modifier.size(18.dp)) }) else null,
+                            trailingIcon = if (on) ({ Icon(AppIcons.Tick02, null, tint = AppColors.ink, modifier = Modifier.size(18.dp)) }) else null,
                             modifier = Modifier.widthIn(min = 180.dp).semantics { this.selected = on },
                         )
                     }
@@ -407,7 +407,7 @@ fun <T> PageMenuRow(
 }
 
 private val MenuShape = RoundedCornerShape(18.dp)
-private val MenuSurface = Color(0xFF243760)
+private val MenuSurface: Color get() = AppColors.raised
 
 /**
  * A row with a switch: the [title], an optional [subtitle] under it, and the switch on the right. A tap anywhere on
@@ -465,7 +465,7 @@ fun PageButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     primary: Boolean = false,
-    color: Color = if (primary) Color.Black else Color.White,
+    color: Color = if (primary) AppColors.onInk else AppColors.ink,
     icon: ImageVector? = null,
     size: ButtonSize = ButtonSize.Page,
     onCard: Boolean = false,
@@ -475,9 +475,9 @@ fun PageButton(
         modifier.height(size.height).alpha(if (enabled) 1f else 0.4f).clip(CircleShape)
             .let {
                 when {
-                    primary -> it.background(Color.White)
-                    onCard -> it.background(Color.White.copy(alpha = 0.08f)).border(1.dp, Color.White.copy(alpha = 0.12f), CircleShape)
-                    else -> it.background(ControlSurface)
+                    primary -> it.background(AppColors.ink)
+                    onCard -> it.background(AppColors.ink.copy(alpha = 0.08f)).border(1.dp, AppColors.ink.copy(alpha = 0.12f), CircleShape)
+                    else -> it.background(AppColors.control)
                 }
             }
             .let { if (enabled) it.pressClickable(onClick, CircleShape) else it }
@@ -486,12 +486,14 @@ fun PageButton(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        // A coloured label (Delete in amber) on the control surface, dark enough to read on the light theme.
+        val ink = if (primary) color else AppColors.readable(color)
         if (icon != null) {
-            Icon(icon, null, Modifier.size(size.icon), tint = color)
+            Icon(icon, null, Modifier.size(size.icon), tint = ink)
             Spacer(Modifier.width(8.dp))
         }
         val style = if (size == ButtonSize.Row) GlowType.secondary else GlowType.body
-        Text(text, color = color, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, color = ink, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -505,7 +507,7 @@ fun PageTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    color: Color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+    color: Color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
 ) {
     Box(
         modifier.heightIn(min = 44.dp).clip(CircleShape)
@@ -513,7 +515,7 @@ fun PageTextButton(
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, color = color, style = GlowType.body, maxLines = 1) }
+    ) { Text(text, color = AppColors.readable(color), style = GlowType.body, maxLines = 1) }
 }
 
 /**
@@ -535,27 +537,27 @@ fun PageField(
     trailing: (@Composable () -> Unit)? = null,
 ) {
     Column(modifier.alpha(if (enabled) 1f else 0.45f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        if (label != null) Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        if (label != null) Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         Row(
-            Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(ControlSurface)
+            Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
                 .let { if (error) it.border(1.dp, MetricColors.warn, GlowLayout.TileShape) else it }
                 .padding(start = 16.dp, end = if (trailing != null) 4.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(Modifier.weight(1f).padding(vertical = 14.dp)) {
                 if (value.isEmpty() && placeholder != null) {
-                    Text(placeholder, color = Color.White.copy(alpha = 0.3f), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(placeholder, color = AppColors.ink.copy(alpha = 0.3f), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 BasicTextField(
                     value, onValueChange, Modifier.fillMaxWidth(), enabled = enabled,
-                    textStyle = GlowType.body.copy(color = Color.White), singleLine = true,
+                    textStyle = GlowType.body.copy(color = AppColors.ink), singleLine = true,
                     keyboardOptions = keyboardOptions, visualTransformation = visualTransformation,
-                    cursorBrush = SolidColor(Color.White),
+                    cursorBrush = SolidColor(AppColors.ink),
                 )
             }
             if (unit != null) {
                 Spacer(Modifier.width(8.dp))
-                Text(unit, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                Text(unit, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
             }
             if (trailing != null) {
                 Spacer(Modifier.width(4.dp))
@@ -577,12 +579,12 @@ fun PageProgress(fraction: Float? = null, modifier: Modifier = Modifier.fillMaxW
     } else null
     Canvas(modifier.height(4.dp).clip(CircleShape)) {
         val r = CornerRadius(size.height / 2f)
-        drawRoundRect(Color.White.copy(alpha = 0.1f), cornerRadius = r)
+        drawRoundRect(AppColors.ink.copy(alpha = 0.1f), cornerRadius = r)
         if (fraction != null) {
-            drawRoundRect(Color.White, size = Size(size.width * fraction.coerceIn(0f, 1f), size.height), cornerRadius = r)
+            drawRoundRect(AppColors.ink, size = Size(size.width * fraction.coerceIn(0f, 1f), size.height), cornerRadius = r)
         } else if (slide != null) {
             val w = size.width / 3f
-            drawRoundRect(Color.White, topLeft = Offset(-w + (size.width + w) * slide.value, 0f), size = Size(w, size.height), cornerRadius = r)
+            drawRoundRect(AppColors.ink, topLeft = Offset(-w + (size.width + w) * slide.value, 0f), size = Size(w, size.height), cornerRadius = r)
         }
     }
 }
@@ -609,8 +611,8 @@ fun PageSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             if (title != null) Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(title, color = Color.White, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                if (note != null) Text(note, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+                Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (note != null) Text(note, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
             }
             content()
         }
@@ -633,7 +635,7 @@ fun PageConfirm(
     content: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     PageSheet(onDismiss, title) {
-        if (text != null) Text(text, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
+        if (text != null) Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
         content?.invoke(this)
         Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             PageButton(dismiss, onDismiss, Modifier.weight(1f))
@@ -660,8 +662,8 @@ fun PageChip(
 ) {
     Box(
         modifier.heightIn(min = 36.dp).clip(CircleShape)
-            .background(if (selected) Color.White else if (filled) ControlSurface else Color.Transparent)
-            .let { if (selected || filled) it else it.border(1.dp, Color.White.copy(alpha = 0.16f), CircleShape) }
+            .background(if (selected) AppColors.ink else if (filled) AppColors.control else Color.Transparent)
+            .let { if (selected || filled) it else it.border(1.dp, AppColors.ink.copy(alpha = 0.16f), CircleShape) }
             .alpha(if (enabled) 1f else 0.4f)
             .clickable(enabled = enabled, role = role, onClick = onClick)
             .semantics {
@@ -672,7 +674,7 @@ fun PageChip(
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text, color = if (selected) Color.Black else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            text, color = if (selected) AppColors.onInk else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary, maxLines = 1,
             modifier = if (description != null) Modifier.clearAndSetSemantics {} else Modifier,
         )
@@ -692,11 +694,11 @@ internal fun IconPill(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    tint: Color = Color.White,
+    tint: Color = AppColors.ink,
     dot: Color? = null,
     caret: Boolean = false,
     height: Dp = 44.dp,
-    surface: Color = ControlSurface,
+    surface: Color = AppColors.control,
     hairline: Boolean = false,
     description: String? = null,
     style: TextStyle = GlowType.body,
@@ -717,10 +719,10 @@ internal fun IconPill(
         if (dot != null) Box(Modifier.size(8.dp).background(dot, CircleShape))
         // Weighted only beside a caret, so a squeezed label gives way to it; a weight in a scrolling row would be zero wide.
         Text(
-            label, if (caret) Modifier.weight(1f, fill = false) else Modifier, color = Color.White, style = style, maxLines = 1,
+            label, if (caret) Modifier.weight(1f, fill = false) else Modifier, color = AppColors.ink, style = style, maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        if (caret) Icon(AppIcons.CaretDown, null, Modifier.size(14.dp), tint = Color.White)
+        if (caret) Icon(AppIcons.CaretDown, null, Modifier.size(14.dp), tint = AppColors.ink)
     }
 }
 
@@ -739,18 +741,18 @@ internal fun GlowSegments(
     modifier: Modifier = Modifier,
     role: Role = Role.RadioButton,
 ) {
-    Row(modifier.fillMaxWidth().clip(CircleShape).background(Color.White.copy(alpha = 0.06f)).padding(4.dp)) {
+    Row(modifier.fillMaxWidth().clip(CircleShape).background(AppColors.ink.copy(alpha = 0.06f)).padding(4.dp)) {
         options.forEachIndexed { i, label ->
             val on = i == selected
             Box(
                 Modifier.weight(1f).clip(CircleShape)
-                    .background(if (on) Color.White.copy(alpha = 0.16f) else Color.Transparent)
+                    .background(if (on) AppColors.ink.copy(alpha = 0.16f) else Color.Transparent)
                     .pressClickable({ onSelect(i) }, CircleShape, scale = 0.97f)
                     .semantics { this.role = role; this.selected = on }
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (on) Color.White else Color.White.copy(alpha = 0.6f), style = GlowType.body, maxLines = 1)
+                Text(label, color = if (on) AppColors.ink else AppColors.ink.copy(alpha = 0.6f), style = GlowType.body, maxLines = 1)
             }
         }
     }
@@ -763,7 +765,7 @@ internal fun GlowSegments(
 @Composable
 fun SectionLabel(text: String, modifier: Modifier = Modifier, inset: Dp = 4.dp) {
     Text(
-        text, modifier.padding(start = inset), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+        text, modifier.padding(start = inset), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
         maxLines = 1, overflow = TextOverflow.Ellipsis,
     )
 }
@@ -779,7 +781,7 @@ val PanelLabelInset = 18.dp
 internal fun StatusDot(text: String, dot: Color, modifier: Modifier = Modifier, dotAfter: Boolean = false) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (!dotAfter) Canvas(Modifier.size(6.dp)) { drawCircle(dot) }
-        Text(text, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+        Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
         if (dotAfter) Canvas(Modifier.size(6.dp)) { drawCircle(dot) }
     }
 }
@@ -791,13 +793,13 @@ internal fun StatusDot(text: String, dot: Color, modifier: Modifier = Modifier, 
 @Composable
 fun OptionButton(caption: String, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier.fillMaxWidth().clip(GlowLayout.TileShape).background(ControlSurface).pressClickable(onClick, GlowLayout.TileShape)
+        modifier.fillMaxWidth().clip(GlowLayout.TileShape).background(AppColors.control).pressClickable(onClick, GlowLayout.TileShape)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(caption, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
-            Text(label, color = Color.White, style = GlowType.body)
+            Text(caption, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+            Text(label, color = AppColors.ink, style = GlowType.body)
         }
         Spacer(Modifier.width(RowCaretGap))
         TapCaret(ROW_CARET_ALPHA)
@@ -831,8 +833,9 @@ private const val NUMBER_FIELD_LENGTH = 5
 
 /** A secondary line of explanation on a page. */
 @Composable
-fun PageNote(text: String, color: Color = Color.White.copy(alpha = 0.6f)) {
-    Text(text, color = color, style = GlowType.secondary)
+fun PageNote(text: String, color: Color = AppColors.ink.copy(alpha = 0.6f)) {
+    // A warning's amber taken dark enough to read on the light theme.
+    Text(text, color = AppColors.readable(color), style = GlowType.secondary)
 }
 
 /** A list row's divider: a 1 dp [color] line along its top, when [show] (every row but the first). */

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import kotlinx.coroutines.delay
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.runtime.produceState
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -153,7 +154,7 @@ internal fun LiveFrame(
                 RoundIcon(AppIcons.CaretDown, stringResource(R.string.workout_live_minimize), controls.onMinimize)
                 if (quiet) {
                     Text(
-                        title ?: Workouts.sportName(r.workout.sportType), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        title ?: Workouts.sportName(r.workout.sportType), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.cardTitle, textAlign = TextAlign.Center, maxLines = 1, modifier = Modifier.weight(1f),
                     )
                     // The minimise button's width again, so the name sits in the middle of the screen.
@@ -311,7 +312,7 @@ private fun ColumnScope.FrameControls(
             Row(Modifier.align(Alignment.CenterHorizontally).widthIn(max = 420.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 HoldPill(stringResource(R.string.workout_live_end_workout), Modifier.weight(1f), controls.onEnd)
                 WorkoutButton(
-                    stringResource(R.string.workout_live_resume), Color.White, Color.Black, controls.onResume, Modifier.weight(1f),
+                    stringResource(R.string.workout_live_resume), AppColors.ink, AppColors.onInk, controls.onResume, Modifier.weight(1f),
                     icon = AppIcons.PlayFill, height = 64.dp,
                 )
             }
@@ -324,7 +325,7 @@ private fun ColumnScope.FrameControls(
                 val label = stringResource(if (r.paused) R.string.workout_live_resume else R.string.workout_live_pause)
                 Labelled(label, true) {
                     FlatButton(Raised, 64.dp, onClick = if (r.paused) controls.onResume else controls.onPause) {
-                        Icon(if (r.paused) AppIcons.PlayFill else AppIcons.PauseFill, label, tint = Color.White, modifier = Modifier.size(20.dp))
+                        Icon(if (r.paused) AppIcons.PlayFill else AppIcons.PauseFill, label, tint = AppColors.ink, modifier = Modifier.size(20.dp))
                     }
                 }
                 Labelled(stringResource(R.string.workout_live_hold_to_end), true) { HoldToEnd(controls.onEnd) }
@@ -335,7 +336,7 @@ private fun ColumnScope.FrameControls(
         pillControls -> {
             Row(Modifier.align(Alignment.CenterHorizontally).widthIn(max = 420.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 WorkoutButton(
-                    stringResource(R.string.workout_live_pause), Raised, Color.White, controls.onPause, Modifier.weight(1f),
+                    stringResource(R.string.workout_live_pause), Raised, AppColors.ink, controls.onPause, Modifier.weight(1f),
                     icon = AppIcons.PauseFill, height = 52.dp,
                 )
                 HoldPill(stringResource(R.string.workout_live_hold_to_end), Modifier.weight(1f), controls.onEnd, height = 52.dp)
@@ -354,7 +355,7 @@ private fun ColumnScope.FrameControls(
 /** A line under the controls saying how to use them, centred. Quieter on the dimmed mind screen ([alpha]). */
 @Composable
 private fun ControlsHint(text: String, alpha: Float = 0.6f) = Text(
-    text, color = Color.White.copy(alpha = alpha), style = GlowType.secondary,
+    text, color = AppColors.ink.copy(alpha = alpha), style = GlowType.secondary,
     modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
 )
 
@@ -371,8 +372,8 @@ internal fun ControlsRow(r: WorkoutState.Recording, controls: LiveControls, lap:
         if (lap != null) lap() else Spacer(Modifier.size(64.dp))
         Spacer(Modifier.weight(1f))
         Labelled(pauseLabel, labelled) {
-            FlatButton(Color.White, 88.dp, onClick = if (r.paused) controls.onResume else controls.onPause) {
-                Icon(if (r.paused) AppIcons.PlayFill else AppIcons.PauseFill, pauseLabel, tint = Color.Black, modifier = Modifier.size(30.dp))
+            FlatButton(AppColors.ink, 88.dp, onClick = if (r.paused) controls.onResume else controls.onPause) {
+                Icon(if (r.paused) AppIcons.PlayFill else AppIcons.PauseFill, pauseLabel, tint = AppColors.onInk, modifier = Modifier.size(30.dp))
             }
         }
         Spacer(Modifier.weight(1f))
@@ -386,7 +387,7 @@ private fun Labelled(label: String, show: Boolean, button: @Composable () -> Uni
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         // Every button sits in Pause's height, so the row's buttons stay centred on one line and the labels on another.
         Box(Modifier.height(88.dp), contentAlignment = Alignment.Center) { button() }
-        if (show) Text(label, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        if (show) Text(label, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
     }
 }
 
@@ -396,7 +397,7 @@ internal fun LapButton(onLap: () -> Unit, label: Boolean = false, skip: Boolean 
     val text = stringResource(if (skip) R.string.workout_live_skip else R.string.workout_live_lap)
     Labelled(text, label) {
         FlatButton(Raised, 64.dp, onClick = onLap) {
-            Icon(if (skip) AppIcons.SkipFill else SportIcons.Lap, text, tint = Color.White, modifier = Modifier.size(22.dp))
+            Icon(if (skip) AppIcons.SkipFill else SportIcons.Lap, text, tint = AppColors.ink, modifier = Modifier.size(22.dp))
         }
     }
 }
@@ -435,7 +436,7 @@ private fun HoldPill(label: String, modifier: Modifier, onEnd: () -> Unit, heigh
     ) {
         Canvas(Modifier.size(10.dp)) { drawCircle(EndRed) }
         Spacer(Modifier.width(10.dp))
-        Text(label, color = Color.White, style = GlowType.body, maxLines = 1)
+        Text(label, color = AppColors.ink, style = GlowType.body, maxLines = 1)
     }
 }
 
@@ -497,7 +498,7 @@ internal fun PageDots(current: Int, count: Int, position: Float? = null, onSelec
                 contentAlignment = Alignment.Center,
             ) {
                 val lit = if (position != null) (1f - kotlin.math.abs(position - i)).coerceIn(0f, 1f) else if (i == current) 1f else 0f
-                Box(Modifier.size(7.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f + 0.7f * lit)))
+                Box(Modifier.size(7.dp).clip(CircleShape).background(AppColors.ink.copy(alpha = 0.3f + 0.7f * lit)))
             }
         }
     }
@@ -507,19 +508,19 @@ internal fun PageDots(current: Int, count: Int, position: Float? = null, onSelec
 internal fun LiveStat(label: String, modifier: Modifier = Modifier, value: @Composable () -> Unit) {
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         value()
-        Text(label, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary)
+        Text(label, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary)
     }
 }
 
 /** The thin rule between the live figures. */
 @Composable
-internal fun StatRule() = Box(Modifier.padding(vertical = 6.dp).width(1.dp).fillMaxHeight().background(Color.White.copy(alpha = 0.12f)))
+internal fun StatRule() = Box(Modifier.padding(vertical = 6.dp).width(1.dp).fillMaxHeight().background(AppColors.ink.copy(alpha = 0.12f)))
 
 /** Avg and Max in the same face and size as the moving time beside them, or the dim dash at the same height. */
 @Composable
 internal fun LiveValue(text: String?) =
     if (text == null) WaitingDash(Modifier.padding(vertical = 13.5.dp))
-    else Text(text, color = Color.White, style = LiveFigure)
+    else Text(text, color = AppColors.ink, style = LiveFigure)
 
 /**
  * A round button in the glow language: a small glow card lit from its rim in [color], its icon on the dark core.
@@ -546,9 +547,9 @@ internal fun StoppedPrompt(r: WorkoutState.Recording, at: Long, onEnd: () -> Uni
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(Modifier.weight(1f)) {
-                WorkoutButton(stringResource(R.string.workout_live_stopped_end_at, clock(at)), Color.White, Color.Black, onEnd)
+                WorkoutButton(stringResource(R.string.workout_live_stopped_end_at, clock(at)), AppColors.ink, AppColors.onInk, onEnd)
             }
-            Box(Modifier.weight(1f)) { WorkoutButton(stringResource(R.string.workout_live_keep_going), Raised, Color.White, onKeep) }
+            Box(Modifier.weight(1f)) { WorkoutButton(stringResource(R.string.workout_live_keep_going), Raised, AppColors.ink, onKeep) }
         }
     }
 }
@@ -595,7 +596,7 @@ private const val HOLD_MS = 2000
 /** A live clock in white, its own scope: the second it reads composes it again, not the screen around it. */
 @Composable
 internal fun ClockText(time: () -> Long, style: androidx.compose.ui.text.TextStyle, maxLines: Int = Int.MAX_VALUE) {
-    Text(workoutClock(time()), color = Color.White, style = style, maxLines = maxLines)
+    Text(workoutClock(time()), color = AppColors.ink, style = style, maxLines = maxLines)
 }
 
 /** Now in epoch seconds, ticking on each whole second: the clock every live screen counts from. */

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.activity.compose.BackHandler
@@ -65,21 +66,21 @@ internal fun BadgeArt(
         modifier.size(size).alpha(if (locked) 0.35f else 1f)
             .let { m ->
                 if (ring) m else m.background(
-                    if (locked) Brush.radialGradient(listOf(Color.White.copy(alpha = 0.06f), Color.White.copy(alpha = 0.02f)))
-                    else Brush.verticalGradient(listOf(Color.Black, color.copy(alpha = 0.55f))),
+                    if (locked) Brush.radialGradient(listOf(AppColors.ink.copy(alpha = 0.06f), AppColors.ink.copy(alpha = 0.02f)))
+                    else Brush.verticalGradient(listOf(AppColors.stage, color.copy(alpha = 0.55f))),
                     CircleShape,
                 )
             }
-            .border(if (ring) 2.dp else 1.dp, if (locked) Color.White.copy(alpha = if (ring) 0.5f else 0.12f) else color.copy(alpha = if (ring) 1f else 0.8f), CircleShape),
+            .border(if (ring) 2.dp else 1.dp, if (locked) AppColors.ink.copy(alpha = if (ring) 0.5f else 0.12f) else color.copy(alpha = if (ring) 1f else 0.8f), CircleShape),
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             if (dots) DotMatrixText(short, dot = DotSize.Hero)
             else Text(
-                short, color = if (ring && !locked) color else Color.White, maxLines = 1,
+                short, color = if (ring && !locked) AppColors.readable(color) else AppColors.ink, maxLines = 1,
                 style = if (size >= 80.dp) GlowType.pageTitle else GlowType.cardTitle,
             )
-            under?.let { Text(it, color = Color.White, style = GlowType.body, modifier = Modifier.padding(top = 6.dp)) }
+            under?.let { Text(it, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(top = 6.dp)) }
         }
     }
 }
@@ -103,7 +104,7 @@ fun BestCardScreen(best: Rewards.NewBest, sportName: String, contentPadding: Pad
     val now = System.currentTimeMillis() / 1000
     WorkoutPage(
         BestColor, contentPadding,
-        pinned = { WorkoutButton(stringResource(R.string.glow_continue), Color.White, Color.Black, onContinue) },
+        pinned = { WorkoutButton(stringResource(R.string.glow_continue), AppColors.ink, AppColors.onInk, onContinue) },
     ) {
         CloseRow(stringResource(R.string.glow_celebrate_personal_best), onContinue)
         Spacer(Modifier.height(24.dp))
@@ -112,10 +113,10 @@ fun BestCardScreen(best: Rewards.NewBest, sportName: String, contentPadding: Pad
             under = RewardsCopy.bestValue(best.best.kind, best.best.value),
         )
         Spacer(Modifier.height(12.dp))
-        Text(RewardsCopy.bestTitle(best.best.kind), color = Color.White, style = GlowType.pageTitle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        Text(RewardsCopy.beatLine(best, now), color = Color.White, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.bestTitle(best.best.kind), color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.beatLine(best, now), color = AppColors.ink, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Text(
-            RewardsCopy.whenSet(best.best.date, sportName), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+            RewardsCopy.whenSet(best.best.date, sportName), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
         )
     }
@@ -131,7 +132,7 @@ fun GoalMomentScreen(count: Int, goal: Int, inARow: Int, weekStarts: List<Long>,
     WorkoutPage(
         MetricColors.good, contentPadding,
         pinned = {
-            WorkoutButton(stringResource(R.string.glow_continue), Color.White, Color.Black, onContinue)
+            WorkoutButton(stringResource(R.string.glow_continue), AppColors.ink, AppColors.onInk, onContinue)
             PageTextButton(stringResource(R.string.glow_celebrate_settings), onSettings, Modifier.align(Alignment.CenterHorizontally))
         },
     ) {
@@ -141,10 +142,10 @@ fun GoalMomentScreen(count: Int, goal: Int, inARow: Int, weekStarts: List<Long>,
             dotFormat("%d/%d", count, goal), Modifier.align(Alignment.CenterHorizontally), dot = DotSize.Hero, color = MetricColors.good,
         )
         Text(
-            stringResource(R.string.glow_celebrate_goal_met), color = Color.White, style = GlowType.pageTitle, textAlign = TextAlign.Center,
+            stringResource(R.string.glow_celebrate_goal_met), color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         )
-        Text(RewardsCopy.momentLine(inARow), color = Color.White, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.momentLine(inARow), color = AppColors.ink, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         WeekDaysPanel(weekStarts, note = stringResource(R.string.glow_celebrate_goal_note))
     }
@@ -191,16 +192,16 @@ fun HistoryBadgesScreen(badges: List<Rewards.Badge>, contentPadding: PaddingValu
     BackHandler(onBack = onContinue)
     WorkoutPage(
         MetricColors.good, contentPadding,
-        pinned = { WorkoutButton(stringResource(R.string.glow_continue), Color.White, Color.Black, onContinue) },
+        pinned = { WorkoutButton(stringResource(R.string.glow_continue), AppColors.ink, AppColors.onInk, onContinue) },
     ) {
         CloseRow(null, onContinue)
         Text(
-            stringResource(R.string.glow_celebrate_history_title), color = Color.White, style = GlowType.pageTitle,
+            stringResource(R.string.glow_celebrate_history_title), color = AppColors.ink, style = GlowType.pageTitle,
             modifier = Modifier.padding(start = 4.dp, top = 8.dp),
         )
         Text(
             pluralStringResource(R.plurals.glow_celebrate_history_badges, badges.size, badges.size),
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(start = 4.dp),
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(start = 4.dp),
         )
         BadgeGrid(badges.map { it to null }, face = face)
     }
@@ -218,7 +219,7 @@ internal fun BadgeRow(badges: List<Pair<Rewards.Badge, String?>>, locked: (Rewar
             Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 BadgeArt(face(b), badgeColor(b.group), 64.dp, locked = dim, ring = true)
                 Text(
-                    if (dim && note != null) note else b.title, color = Color.White.copy(alpha = if (dim) 0.5f else 1f),
+                    if (dim && note != null) note else b.title, color = AppColors.ink.copy(alpha = if (dim) 0.5f else 1f),
                     style = GlowType.caption, textAlign = TextAlign.Center, maxLines = 2,
                 )
             }
@@ -239,8 +240,8 @@ internal fun BadgeGrid(badges: List<Pair<Rewards.Badge, String?>>, locked: (Rewa
                 row.forEach { (b, note) ->
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         BadgeArt(face(b), badgeColor(b.group), 64.dp, locked = locked(b))
-                        Text(b.title, color = Color.White, style = GlowType.secondary, textAlign = TextAlign.Center, maxLines = 2)
-                        note?.let { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption, textAlign = TextAlign.Center) }
+                        Text(b.title, color = AppColors.ink, style = GlowType.secondary, textAlign = TextAlign.Center, maxLines = 2)
+                        note?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption, textAlign = TextAlign.Center) }
                     }
                 }
                 repeat(3 - row.size) { Box(Modifier.weight(1f)) }

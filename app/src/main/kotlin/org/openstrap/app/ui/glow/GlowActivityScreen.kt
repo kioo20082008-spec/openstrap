@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Ranges
 import org.openstrap.app.presentation.LoadBand
 import org.openstrap.app.presentation.Units
@@ -89,7 +90,6 @@ import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.EdgeKind
 import org.openstrap.app.ui.glow.draw.DotSize
 import org.openstrap.app.ui.glow.draw.level
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.presentation.topSports
 
 /** Heart points' weekly aim: 100 or more over the last seven days. */
@@ -307,7 +307,7 @@ private fun HourPills(hourly: List<Float>, picked: Int?, onPick: (Int?) -> Unit)
         Ltr {
             Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 listOf("00", "06", "12", "18", "24").forEach {
-                    Text(it, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
+                    Text(it, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
                 }
             }
         }
@@ -455,7 +455,7 @@ private fun WorkoutsList(
 @Composable
 internal fun WorkoutDayHeader(text: String) {
     Text(
-        text, color = Color.White.copy(alpha = 0.5f), style = GlowType.secondary.copy(fontSize = 12.sp),
+        text, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary.copy(fontSize = 12.sp),
         modifier = Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 2.dp),
     )
 }
@@ -463,7 +463,7 @@ internal fun WorkoutDayHeader(text: String) {
 /** The effort light's tile, as the mock draws it: 38 dp, 12 dp corners, a shade above the panel. */
 private val EffortTile = 38.dp
 private val EffortShape = RoundedCornerShape(12.dp)
-private val EffortSurface = Color(0xFF172644)
+private val EffortSurface: Color get() = AppColors.inset
 private val EffortGap = 12.dp
 
 /**
@@ -491,7 +491,7 @@ internal fun WorkoutRow(a: WorkoutAnalysis, usual: Float?, divider: Boolean, onC
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        a.sportName, color = Color.White, style = GlowType.body,
+                        a.sportName, color = AppColors.ink, style = GlowType.body,
                         maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
                     )
                     if (!a.startedByYou) {
@@ -501,12 +501,12 @@ internal fun WorkoutRow(a: WorkoutAnalysis, usual: Float?, divider: Boolean, onC
                 }
                 Text(
                     TabCopy.workoutLine(fact, TimeOfDay.format(start.toLocalTime())),
-                    color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary,
+                    color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
             Spacer(Modifier.width(12.dp))
-            Text(workoutClock(a.activeSeconds), color = Color.White, style = GlowType.rowValue, maxLines = 1)
+            Text(workoutClock(a.activeSeconds), color = AppColors.ink, style = GlowType.rowValue, maxLines = 1)
             Spacer(Modifier.width(RowCaretGap))
             TapCaret(ROW_CARET_ALPHA)
         }
@@ -535,10 +535,10 @@ private fun EffortLight(icon: androidx.compose.ui.graphics.vector.ImageVector, e
                     ),
                 )
             }
-            .border(1.dp, Color.White.copy(alpha = 0.06f), EffortShape),
+            .border(1.dp, AppColors.ink.copy(alpha = 0.06f), EffortShape),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(RowIcon))
+        Icon(icon, null, tint = AppColors.ink.copy(alpha = 0.85f), modifier = Modifier.size(RowIcon))
     }
 }
 

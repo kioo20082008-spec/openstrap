@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.dashboard
 
 import androidx.compose.ui.res.stringResource
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
@@ -77,7 +78,7 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
         Column {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    month.format(DateTimeFormatter.ofPattern("MMMM yyyy")), color = Color.White, style = GlowType.cardTitle,
+                    month.format(DateTimeFormatter.ofPattern("MMMM yyyy")), color = AppColors.ink, style = GlowType.cardTitle,
                     maxLines = 1, modifier = Modifier.weight(1f),
                 )
                 RoundIconButton(
@@ -97,7 +98,7 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
                     Text(
                         org.openstrap.app.presentation.DayWords.weekdayTiny(firstDay.plus(i.toLong())).uppercase(),
                         Modifier.weight(1f).wrapContentWidth(Alignment.CenterHorizontally),
-                        color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA),
+                        color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA),
                         style = GlowType.caption,
                     )
                 }
@@ -137,10 +138,10 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
 }
 
 /** A day with data: a light grey disc, so the days that can be picked read as something to press. */
-private val DayFill = Color(0xFF243760)
+private val DayFill: Color get() = AppColors.raised
 
 /** The legend's words, quieter than the days. */
-private val LegendInk = Color.White.copy(alpha = 0.6f)
+private val LegendInk: Color get() = AppColors.ink.copy(alpha = 0.6f)
 
 @Composable
 private fun MonthGrid(
@@ -173,9 +174,9 @@ private fun MonthGrid(
 @Composable
 private fun DayCell(date: LocalDate, selected: Boolean, today: Boolean, enabled: Boolean, onPick: (LocalDate) -> Unit) {
     val text = when {
-        selected -> Color.Black
-        enabled -> Color.White
-        else -> Color.White.copy(alpha = 0.2f)
+        selected -> AppColors.onInk
+        enabled -> AppColors.ink
+        else -> AppColors.ink.copy(alpha = 0.2f)
     }
     Box(
         Modifier
@@ -183,7 +184,7 @@ private fun DayCell(date: LocalDate, selected: Boolean, today: Boolean, enabled:
             .clip(CircleShape)
             .then(
                 when {
-                    selected -> Modifier.background(Color.White)
+                    selected -> Modifier.background(AppColors.ink)
                     enabled -> Modifier.background(DayFill)
                     else -> Modifier
                 },

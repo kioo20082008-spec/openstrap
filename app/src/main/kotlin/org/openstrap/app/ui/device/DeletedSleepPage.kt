@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.device
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -8,7 +9,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.R
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.data.SleepEdits
 import org.openstrap.app.data.db.SleepSession
@@ -43,9 +43,9 @@ fun DeletedSleepPage(
     fun clock(t: Long) = TimeOfDay.format(t, zone)
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item { PageHeader(stringResource(R.string.you_deleted_sleep_title), onBack) }
-        item { Text(SleepCopy.DELETED_INTRO, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
+        item { Text(SleepCopy.DELETED_INTRO, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
         // Once the last one is restored the page stays open, saying so, with no empty panel under it.
-        if (deleted.isEmpty()) item { Text(SleepCopy.DELETED_NONE, color = Color.White, style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
+        if (deleted.isEmpty()) item { Text(SleepCopy.DELETED_NONE, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
         else item {
             PageRows {
                 deleted.forEachIndexed { i, r ->

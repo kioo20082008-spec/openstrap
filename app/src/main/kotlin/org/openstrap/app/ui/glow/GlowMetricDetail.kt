@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.presentation.Ranges
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.TimeOfDay
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.Units
@@ -78,7 +79,6 @@ import org.openstrap.app.ui.dashboard.SleepCopy
 import org.openstrap.app.ui.dashboard.siblingsOf
 import java.time.LocalDate
 import org.openstrap.app.ui.glow.draw.DotSize
-import org.openstrap.app.ui.theme.ControlSurface
 
 /* ------------------------------------------- Shared pieces ------------------------------------------ */
 
@@ -163,7 +163,7 @@ internal fun DetailTemplate(
                     ) {
                         gauge()
                         Text(
-                            shown.label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                            shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                             style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp),
                         )
                         if (shown.word != null && shown.value != null) StatusWord(shown.word, color, Modifier.padding(top = 12.dp))
@@ -173,17 +173,17 @@ internal fun DetailTemplate(
                                 // No number: the state in words, large in the value's place, as a Small does.
                                 shown.value == null -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                     Text(
-                                        shown.word ?: stringResource(R.string.glow_no_reading), color = Color.White,
+                                        shown.word ?: stringResource(R.string.glow_no_reading), color = AppColors.ink,
                                         style = GlowType.pageTitle,
                                     )
                                     Text(
-                                        shown.label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                                        shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                                     )
                                 }
                                 else -> Row(verticalAlignment = Alignment.Bottom) {
                                     DotMatrixText(shown.value, Modifier.detailNumber(shown.value), dot = DotSize.Detail)
                                     Text(
-                                        shown.label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                                        shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                                         style = GlowType.secondary, modifier = Modifier.padding(start = 10.dp, bottom = 2.dp),
                                     )
                                 }
@@ -225,12 +225,12 @@ private fun DetailHero(color: Color, gutter: Dp, content: @Composable () -> Unit
             .detailSurface(hero = true, shape)
             .clip(shape)
             .drawBehind {
-                drawRect(Brush.verticalGradient(listOf(lerp(Color.Black, color, 0.2f), Color.Black)))
+                drawRect(Brush.verticalGradient(listOf(lerp(AppColors.shade, color, 0.2f), AppColors.shade)))
                 drawRect(Brush.radialGradient(listOf(color.copy(alpha = 0.4f), Color.Transparent), Offset(size.width / 2, -size.height * 0.1f), size.width * 0.7f))
                 // The hairline along the foot; its top is above the clip, so only the foot and its corners show.
                 val r = GlowLayout.CardCorner.toPx()
                 drawRoundRect(
-                    Color.White.copy(alpha = 0.07f), Offset(0.5f, -r), Size(size.width - 1f, size.height + r - 0.5f), CornerRadius(r),
+                    AppColors.ink.copy(alpha = 0.07f), Offset(0.5f, -r), Size(size.width - 1f, size.height + r - 0.5f), CornerRadius(r),
                     style = Stroke(1.dp.toPx()),
                 )
             }
@@ -253,7 +253,7 @@ private fun DetailNav(title: String, switchable: Boolean, onBack: () -> Unit, on
 @Composable
 private fun StatusWord(word: String, color: Color, modifier: Modifier = Modifier) {
     Text(
-        word, modifier = modifier, color = lerp(color, Color.White, 0.25f),
+        word, modifier = modifier, color = AppColors.readable(lerp(color, AppColors.ink, 0.25f)),
         style = GlowType.cardTitle.copy(shadow = Shadow(color.copy(alpha = 0.8f), blurRadius = 16f)), maxLines = 1,
     )
 }
@@ -266,13 +266,13 @@ private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (Loc
             val show = stringResource(R.string.glow_metrics_show_day, d.label)
             Column(
                 Modifier.width(40.dp).clip(RoundedCornerShape(14.dp))
-                    .background(if (d.selected) Color.White.copy(alpha = 0.10f) else Color.Transparent)
+                    .background(if (d.selected) AppColors.ink.copy(alpha = 0.10f) else Color.Transparent)
                     .clickable(onClickLabel = show, role = Role.Button) { onDay(d.date) }
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(d.label, color = if (d.selected) Color.White else Color.White.copy(alpha = 0.5f), style = GlowType.secondary, maxLines = 1)
+                Text(d.label, color = if (d.selected) AppColors.ink else AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary, maxLines = 1)
                 Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))
             }
         }
@@ -286,7 +286,7 @@ private fun SwitcherSheet(siblings: List<DetailSibling>, color: Color, onDismiss
         ListPanel {
             siblings.forEachIndexed { i, s ->
                 ListRow(
-                    s.title, if (s.current) color else Color.White.copy(alpha = 0.3f), null,
+                    s.title, if (s.current) color else AppColors.ink.copy(alpha = 0.3f), null,
                     if (s.current) stringResource(R.string.glow_metrics_showing) else null,
                     onClick = { onDismiss(); s.open() }, divider = i > 0, dash = false, icon = s.icon,
                 )
@@ -298,7 +298,7 @@ private fun SwitcherSheet(siblings: List<DetailSibling>, color: Color, onDismiss
 /** The one time-aware sentence under the chart. */
 @Composable
 internal fun DetailSentence(text: String) {
-    Text(text, color = Color.White, style = GlowType.sentence, modifier = Modifier.padding(top = 4.dp))
+    Text(text, color = AppColors.ink, style = GlowType.sentence, modifier = Modifier.padding(top = 4.dp))
 }
 
 /**
@@ -323,12 +323,12 @@ internal fun DetailFigures(
                 verticalArrangement = Arrangement.spacedBy(gap),
             ) {
                 when {
-                    value != null -> Text(value, color = Color.White, style = valueStyle, maxLines = 1)
-                    missing != null -> Text(missing, color = Color.White.copy(alpha = 0.3f), style = valueStyle, maxLines = 1)
+                    value != null -> Text(value, color = AppColors.ink, style = valueStyle, maxLines = 1)
+                    missing != null -> Text(missing, color = AppColors.ink.copy(alpha = 0.3f), style = valueStyle, maxLines = 1)
                     // As tall as a Row value line, so a missing figure keeps its label level with the others.
                     else -> WaitingDash(Modifier.padding(vertical = 10.5.dp))
                 }
-                Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
             }
         }
     }
@@ -337,7 +337,7 @@ internal fun DetailFigures(
 /** What a chart says while there's nothing to draw. */
 @Composable
 internal fun DetailEmpty(text: String) {
-    Text(text, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, modifier = Modifier.padding(vertical = 24.dp))
+    Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, modifier = Modifier.padding(vertical = 24.dp))
 }
 
 /* ------------------------------------------- Metric detail ------------------------------------------ */
@@ -679,7 +679,7 @@ private fun HistoryChart(
     )
     if (normal == null) Text(
         DetailCopy.learningNormal(stats.count { it.date in end.minusDays(History.NORMAL_DAYS - 1L)..end }, nightly),
-        color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary,
+        color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary,
     )
 }
 

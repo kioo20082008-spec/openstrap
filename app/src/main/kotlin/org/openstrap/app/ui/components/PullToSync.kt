@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.components
 
 import androidx.compose.ui.res.stringResource
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
@@ -149,7 +150,7 @@ fun PullSyncReveal() {
             Icon(
                 AppIcons.Refresh04, null,
                 Modifier.size(18.dp).graphicsLayer { rotationZ = if (syncing) turn else pull.fraction() * 180f },
-                tint = if (ready || syncing) Color.White else HintInk,
+                tint = if (ready || syncing) AppColors.ink else HintInk,
             )
             Spacer(Modifier.width(8.dp))
             val label = stringResource(
@@ -173,7 +174,7 @@ fun PullSyncReveal() {
 
 private val REVEAL = 48.dp
 /** The arrows and the line until a pull is far enough to sync: quiet, then white once letting go syncs. */
-private val HintInk = Color.White.copy(alpha = 0.6f)
+private val HintInk: Color get() = AppColors.ink.copy(alpha = 0.6f)
 /** Each half of the label's crossfade: out, then in. */
 internal const val LABEL_FADE_MS = 120
 private const val START_GRACE_MS = 3_000L

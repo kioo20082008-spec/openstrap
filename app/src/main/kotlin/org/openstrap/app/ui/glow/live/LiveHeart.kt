@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import androidx.compose.foundation.Canvas
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -125,7 +126,7 @@ fun GlowWorkoutLiveScreen(
         // way, so what a screen saves outlives a turn of the phone.
         val landscape = !split && maxWidth > maxHeight
         val cutout = if (!landscape) Modifier
-        else Modifier.background(Color.Black).windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
+        else Modifier.background(AppColors.stage).windowInsetsPadding(WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal))
         CompositionLocalProvider(LocalLiveLandscape provides landscape) {
             Box(Modifier.fillMaxSize().then(cutout)) {
                 when {
@@ -183,7 +184,7 @@ internal fun KmSplitLine(
         }
     }
     if (line != null || keepRoom) Text(
-        line?.text.orEmpty(), color = Color.White, style = MediumBody.copy(fontFeatureSettings = "tnum"),
+        line?.text.orEmpty(), color = AppColors.ink, style = MediumBody.copy(fontFeatureSettings = "tnum"),
         modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
     )
 }
@@ -218,9 +219,9 @@ internal fun ZoneArc(bpm: Int?, maxHr: Int, modifier: Modifier) {
         if (bpm != null) {
             val a = Math.toRadians((ARC_START + WorkoutRecorder.zonePosition(bpm, maxHr, heartZones) * ARC_SWEEP).toDouble())
             val at = Offset(center.x + r * cos(a).toFloat(), center.y + r * sin(a).toFloat())
-            val dot = zone?.let { ZONE_COLORS[it] } ?: Color.White
+            val dot = zone?.let { ZONE_COLORS[it] } ?: AppColors.ink
             drawCircle(dot.copy(alpha = 0.3f), radius = halo, center = at)
-            drawCircle(Color.White, radius = 5.dp.toPx(), center = at)
+            drawCircle(AppColors.ink, radius = 5.dp.toPx(), center = at)
         }
     }
 }
@@ -272,12 +273,12 @@ internal fun WorkoutHeartCard(
                         DotMatrixText(bpm.toString(), dot = DotSize.Live, scale = scale)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            stringResource(R.string.workout_live_heart_behind), color = Color.White.copy(alpha = 0.75f),
+                            stringResource(R.string.workout_live_heart_behind), color = AppColors.ink.copy(alpha = 0.75f),
                             style = GlowType.secondary,
                         )
                     } else Text(
                         WorkoutCopy.noHeartRate(r.paused, connected),
-                        color = Color.White, style = GlowType.sentence,
+                        color = AppColors.ink, style = GlowType.sentence,
                     )
                 }
             }
@@ -285,11 +286,11 @@ internal fun WorkoutHeartCard(
                 if (zone != null) {
                     // "Zone 3, aerobic": two text elements, the name a step quieter.
                     val (name, word) = WorkoutCopy.zoneTitle(zone)
-                    Text(name, color = Color.White, style = GlowType.sentence)
+                    Text(name, color = AppColors.ink, style = GlowType.sentence)
                     Spacer(Modifier.width(6.dp))
-                    Text(word, color = Color.White.copy(alpha = 0.75f), style = GlowType.sentence, modifier = Modifier.weight(1f))
-                    Text(zoneRange(zone, r.maxHeartRate), color = Color.White.copy(alpha = 0.85f), style = GlowType.secondary)
-                } else Text(WorkoutCopy.noZone(r.paused), color = Color.White, style = GlowType.sentence)
+                    Text(word, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.sentence, modifier = Modifier.weight(1f))
+                    Text(zoneRange(zone, r.maxHeartRate), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary)
+                } else Text(WorkoutCopy.noZone(r.paused), color = AppColors.ink, style = GlowType.sentence)
             }
             if (zoneBar) {
                 Spacer(Modifier.height(12.dp))
@@ -346,7 +347,7 @@ fun GlowWorkoutGlance(
 ) {
     val connected = connection is ConnectionState.Connected
     val active = activeSecondsState(r)
-    Box(modifier.background(Color.Black).statusBarsPadding().padding(horizontal = GlowLayout.Gutter, vertical = 12.dp)) {
+    Box(modifier.background(AppColors.stage).statusBarsPadding().padding(horizontal = GlowLayout.Gutter, vertical = 12.dp)) {
         WorkoutHeartCard(
             r, liveHeartRate, recent, zoneSeconds, connected, { active.value }, Modifier.fillMaxSize(), fill = true, kcal = kcal?.active,
         )

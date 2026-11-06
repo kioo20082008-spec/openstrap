@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.data.Weeks
 import org.openstrap.app.i18n.Strings
 import androidx.compose.ui.res.pluralStringResource
@@ -282,7 +283,7 @@ private fun SentenceCard(title: String, sentence: String) {
     QuietPanel {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             GlowHeader(title)
-            Text(sentence, color = Color.White.copy(alpha = 0.85f), style = GlowType.body)
+            Text(sentence, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
         }
     }
 }
@@ -300,20 +301,20 @@ private fun SetsCard(groups: List<ExerciseSets>, maxHr: Int) {
         var i = 0
         groups.forEachIndexed { gi, g ->
             if (g.name != null) Text(
-                g.name, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
+                g.name, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
                 modifier = Modifier.padding(top = if (gi == 0) 10.dp else 8.dp, bottom = 2.dp),
             ) else if (gi == 0) Spacer(Modifier.height(8.dp))
             g.sets.forEach { s ->
                 val share = shares[i++]
                 Row(Modifier.fillMaxWidth().height(24.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        "${s.number}", color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.secondary, maxLines = 1,
+                        "${s.number}", color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.secondary, maxLines = 1,
                         modifier = Modifier.width(22.dp),
                     )
-                    Text(s.text, color = Color.White, style = GlowType.secondary, maxLines = 1, modifier = Modifier.width(100.dp))
+                    Text(s.text, color = AppColors.ink, style = GlowType.secondary, maxLines = 1, modifier = Modifier.width(100.dp))
                     Text(
                         s.peak?.let { stringResource(R.string.glow_summary_set_peak, it) }.orEmpty(),
-                        color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
+                        color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
                         modifier = Modifier.width(72.dp),
                     )
                     Box(Modifier.weight(1f).height(6.dp)) {
@@ -352,30 +353,30 @@ private fun RoundsCard(lines: List<RoundLine>, title: String, maxHr: Int) {
             lines.forEachIndexed { i, r ->
                 Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     if (labelled && r.peak != null) Text(
-                        "${r.peak}", color = Color.White, maxLines = 1,
+                        "${r.peak}", color = AppColors.ink, maxLines = 1,
                         style = if (i == hardest) GlowType.caption.copy(fontWeight = FontWeight.SemiBold) else GlowType.caption,
                     )
                     shares[i]?.let { share ->
                         Box(
                             Modifier.fillMaxWidth().height(RoundColumnHeight * share).clip(shape)
                                 .background(zoneColor(r.peak, maxHr, heartZones))
-                                .let { if (i == hardest) it.border(2.dp, Color.White, shape) else it },
+                                .let { if (i == hardest) it.border(2.dp, AppColors.ink, shape) else it },
                         )
                     }
                 }
             }
         }
         if (labelled && lines.any { it.drop != null }) {
-            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(1.dp).background(Color.White.copy(alpha = 0.1f)))
+            Box(Modifier.fillMaxWidth().padding(top = 8.dp).height(1.dp).background(AppColors.ink.copy(alpha = 0.1f)))
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(gap)) {
                 lines.forEach { r ->
                     Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                         if (r.drop != null) {
                             Text(
                                 stringResource(R.string.glow_summary_round_down),
-                                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption, maxLines = 1,
+                                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption, maxLines = 1,
                             )
-                            Text("${r.drop}", color = Color.White, style = GlowType.body, maxLines = 1)
+                            Text("${r.drop}", color = AppColors.ink, style = GlowType.body, maxLines = 1)
                         }
                     }
                 }
@@ -403,14 +404,14 @@ private fun RepTimesCard(times: List<Long>) {
                 val share = if (t > 0) (fastest.toFloat() / t).coerceIn(0.3f, 1f) else 0.3f
                 Box(
                     Modifier.weight(1f).height(RoundColumnHeight * share).clip(shape).background(if (i == best) color else color.copy(alpha = 0.45f))
-                        .let { if (i == best) it.border(2.dp, Color.White, shape) else it },
+                        .let { if (i == best) it.border(2.dp, AppColors.ink, shape) else it },
                 )
             }
         }
         if (labelled) Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(gap)) {
             times.forEachIndexed { i, t ->
                 Text(
-                    workoutClock(t), color = if (i == best) Color.White else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), maxLines = 1,
+                    workoutClock(t), color = if (i == best) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), maxLines = 1,
                     style = if (i == best) GlowType.caption.copy(fontWeight = FontWeight.SemiBold) else GlowType.caption,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.weight(1f),
                 )
@@ -445,10 +446,10 @@ private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
         periods.forEachIndexed { i, p ->
             Column(Modifier.fillMaxWidth().padding(top = if (i == 0) 14.dp else 12.dp)) {
                 Row(Modifier.fillMaxWidth()) {
-                    Text(p.name, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1, modifier = Modifier.weight(1f))
+                    Text(p.name, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1, modifier = Modifier.weight(1f))
                     Text(
                         pluralStringResource(R.plurals.glow_summary_hard_efforts, p.hardEfforts, p.hardEfforts),
-                        color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary, maxLines = 1,
                     )
                 }
@@ -459,16 +460,16 @@ private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
                         }
                     }
                     p.averageBpm?.let {
-                        Text("$it", color = Color.White, style = GlowType.rowValue, maxLines = 1, modifier = Modifier.padding(start = 12.dp))
+                        Text("$it", color = AppColors.ink, style = GlowType.rowValue, maxLines = 1, modifier = Modifier.padding(start = 12.dp))
                         Text(
-                            stringResource(R.string.glow_summary_period_avg), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                            stringResource(R.string.glow_summary_period_avg), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                             style = GlowType.secondary, maxLines = 1,
                         )
                     }
                 }
             }
         }
-        read?.let { Text(it, color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(top = 14.dp)) }
+        read?.let { Text(it, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(top = 14.dp)) }
     }
 }
 
@@ -515,10 +516,10 @@ private fun ZonesEdgeCard(zones: ZoneSeconds) {
                     Box(Modifier.size(8.dp).background(ZONE_COLORS[z], CircleShape))
                     Text(
                         stringResource(R.string.glow_summary_zone_name, z + 1, ZONE_NAMES[z].lowercase()),
-                        color = Color.White, style = style, maxLines = 1, modifier = Modifier.weight(1f).padding(start = 10.dp),
+                        color = AppColors.ink, style = style, maxLines = 1, modifier = Modifier.weight(1f).padding(start = 10.dp),
                     )
                     Text(
-                        stringResource(R.string.glow_summary_minutes, minutes[z]), color = Color.White,
+                        stringResource(R.string.glow_summary_minutes, minutes[z]), color = AppColors.ink,
                         style = style.copy(fontFeatureSettings = "tnum"), maxLines = 1,
                     )
                 }
@@ -546,10 +547,10 @@ private fun IndoorHeartCard(readings: List<Pair<Long, Int>>, target: Pair<String
         target?.let { (text, reached) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
-                    Modifier.size(20.dp).background((if (reached) MetricColors.good else Color.White).copy(alpha = 0.16f), CircleShape),
+                    Modifier.size(20.dp).background((if (reached) MetricColors.good else AppColors.ink).copy(alpha = 0.16f), CircleShape),
                     contentAlignment = Alignment.Center,
-                ) { Icon(if (reached) AppIcons.Tick02 else AppIcons.Target, null, tint = if (reached) MetricColors.good else Color.White, modifier = Modifier.size(12.dp)) }
-                Text(text, color = Color.White, style = GlowType.secondary, modifier = Modifier.padding(start = 8.dp))
+                ) { Icon(if (reached) AppIcons.Tick02 else AppIcons.Target, null, tint = if (reached) MetricColors.good else AppColors.ink, modifier = Modifier.size(12.dp)) }
+                Text(text, color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.padding(start = 8.dp))
             }
         }
     }
@@ -562,10 +563,10 @@ private fun VersusLast(line: String) {
     val versus = stringResource(R.string.glow_summary_vs_last)
     Text(
         buildAnnotatedString {
-            withStyle(SpanStyle(color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))) { append(versus) }
+            withStyle(SpanStyle(color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))) { append(versus) }
             append(line)
         },
-        color = Color.White, style = GlowType.secondary, modifier = Modifier.padding(horizontal = 4.dp),
+        color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.padding(horizontal = 4.dp),
     )
 }
 
@@ -589,17 +590,17 @@ private fun HeartLineCard(readings: List<Pair<Long, Int>>, color: Color, settled
         if (chart) PlainLine(values, color, 74.dp, Modifier.padding(top = 14.dp), dots = LineDots.Ends)
         if (settled != null) Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             Column(Modifier.weight(1f)) {
-                Text("${settled.first}", color = Color.White, style = GlowType.rowValue)
+                Text("${settled.first}", color = AppColors.ink, style = GlowType.rowValue)
                 Text(
                     stringResource(R.string.glow_summary_at_start),
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("${settled.second}", color = Color.White, style = GlowType.rowValue)
+                Text("${settled.second}", color = AppColors.ink, style = GlowType.rowValue)
                 Text(
                     stringResource(R.string.glow_summary_at_end),
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                 )
             }
         }
@@ -619,7 +620,7 @@ internal fun goalWeekStarts(workouts: List<WorkoutAnalysis>): List<Long> =
  * in [color], today ringed, and the [note] under them.
  */
 @Composable
-internal fun WeekDaysPanel(weekStarts: List<Long>, note: String? = null, day: LocalDate = LocalDate.now(), color: Color = Color.White) {
+internal fun WeekDaysPanel(weekStarts: List<Long>, note: String? = null, day: LocalDate = LocalDate.now(), color: Color = AppColors.ink) {
     val firstDay = remember { Weeks.firstDay() }
     val days = remember(weekStarts, day) { FamilySummary.weekDays(weekStarts, day, firstDay) }
     val today = LocalDate.now()
@@ -633,7 +634,7 @@ internal fun WeekDaysPanel(weekStarts: List<Long>, note: String? = null, day: Lo
         val n = days.count { it.second }
         val daysLine = if (thisWeek) R.plurals.glow_summary_week_days_this else R.plurals.glow_summary_week_days_that
         val text = note ?: pluralStringResource(daysLine, n, n)
-        Text(text, color = Color.White, style = GlowType.body)
+        Text(text, color = AppColors.ink, style = GlowType.body)
     }
 }
 
@@ -643,7 +644,7 @@ internal fun WeekDaysPanel(weekStarts: List<Long>, note: String? = null, day: Lo
  */
 @Composable
 internal fun WeekDots(
-    days: List<Pair<String, Boolean>>, color: Color = Color.White, modifier: Modifier = Modifier, today: Int? = null, ticks: Boolean = true, dot: Dp = 28.dp,
+    days: List<Pair<String, Boolean>>, color: Color = AppColors.ink, modifier: Modifier = Modifier, today: Int? = null, ticks: Boolean = true, dot: Dp = 28.dp,
 ) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
         days.forEachIndexed { i, (letter, on) ->
@@ -651,12 +652,12 @@ internal fun WeekDots(
                 Box(
                     Modifier.size(dot)
                         // Today's ring sits just outside the mark, so it keeps its size.
-                        .let { if (i == today) it.drawBehind { drawCircle((if (on) color else Color.White).copy(alpha = 0.3f), radius = size.minDimension / 2 + 3.dp.toPx()) } else it }
-                        .background(if (on) color else Color.White.copy(alpha = 0.08f), CircleShape),
+                        .let { if (i == today) it.drawBehind { drawCircle((if (on) color else AppColors.ink).copy(alpha = 0.3f), radius = size.minDimension / 2 + 3.dp.toPx()) } else it }
+                        .background(if (on) color else AppColors.ink.copy(alpha = 0.08f), CircleShape),
                     contentAlignment = Alignment.Center,
                 ) { if (on && ticks) Icon(AppIcons.Tick02, null, tint = Color.Black, modifier = Modifier.size(16.dp)) }
                 Text(
-                    letter, color = if (i == today) Color.White else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption,
+                    letter, color = if (i == today) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption,
                     textAlign = TextAlign.Center,
                 )
             }
@@ -679,7 +680,7 @@ internal fun EarnedChips(lines: List<EarnedLine>) {
                 val (icon, color) = when (l.kind) {
                     EarnedLine.Kind.Best -> AppIcons.FlagCheckered to MetricColors.calories
                     EarnedLine.Kind.Badge -> AppIcons.CheckCircle to MetricColors.good
-                    EarnedLine.Kind.Goal -> AppIcons.Target to if (l.met) MetricColors.good else Color.White
+                    EarnedLine.Kind.Goal -> AppIcons.Target to if (l.met) MetricColors.good else AppColors.ink
                 }
                 val text = l.value?.let { stringResource(R.string.glow_summary_join, l.text, it) } ?: l.text
                 IconPill(text, null, icon = icon, tint = color, height = 36.dp, style = GlowType.secondary)

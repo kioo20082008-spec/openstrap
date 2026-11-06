@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.background
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -104,7 +105,7 @@ internal fun ContributorRow(
     name: String, color: Color, word: String, fraction: Float, offNormal: Boolean = false, divider: Boolean = true,
     detail: String? = null, onClick: (() -> Unit)? = null,
 ) {
-    val accent = if (offNormal) color else Color.White.copy(alpha = 0.7f)
+    val accent = if (offNormal) AppColors.readable(color) else AppColors.ink.copy(alpha = 0.7f)
     // Tapped, the row grows into what it opens (spec 3.5).
     val opening = cardOpening(onClick)
     Row(
@@ -116,18 +117,18 @@ internal fun ContributorRow(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(name, color = Color.White, style = GlowType.body, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+            Text(name, color = AppColors.ink, style = GlowType.body, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             if (detail != null) Text(
-                detail, color = Color.White.copy(alpha = 0.5f), style = GlowType.secondary.copy(fontSize = 11.5.sp), maxLines = 2,
+                detail, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary.copy(fontSize = 11.5.sp), maxLines = 2,
                 modifier = Modifier.padding(top = 2.dp),
             )
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 val shape = RoundedCornerShape(3.dp)
-                Box(Modifier.weight(1f).height(6.dp).background(Color.White.copy(alpha = 0.07f), shape)) {
+                Box(Modifier.weight(1f).height(6.dp).background(AppColors.ink.copy(alpha = 0.07f), shape)) {
                     Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).height(6.dp).background(accent, shape))
                 }
                 Spacer(Modifier.width(12.dp))
-                Text(word, color = if (offNormal) color else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                Text(word, color = if (offNormal) accent else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
             }
         }
         if (onClick != null) {
@@ -143,7 +144,7 @@ internal fun CaveatLine(text: String, color: Color, modifier: Modifier = Modifie
     Row(modifier.padding(top = 10.dp), verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(6.dp).background(color, CircleShape))
         Spacer(Modifier.width(8.dp))
-        Text(text, color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary)
+        Text(text, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary)
     }
 }
 

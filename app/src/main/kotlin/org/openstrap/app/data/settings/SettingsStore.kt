@@ -589,6 +589,15 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         store.edit { it[buzzNotifications] = enabled }
     }
 
+    private val appThemeKey = stringPreferencesKey(SettingsKeys.APP_THEME)
+
+    /** The colour theme, Navy until one is picked. */
+    val appTheme: Flow<AppTheme> = read { AppTheme.fromKey(it[appThemeKey]) }
+
+    suspend fun setAppTheme(theme: AppTheme) {
+        store.edit { it[appThemeKey] = theme.key }
+    }
+
     private val quietOn = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.QUIET_HOURS)
     private val quietFrom = androidx.datastore.preferences.core.intPreferencesKey(SettingsKeys.QUIET_FROM_MINUTES)
     private val quietTo = androidx.datastore.preferences.core.intPreferencesKey(SettingsKeys.QUIET_TO_MINUTES)
@@ -856,6 +865,7 @@ object SettingsKeys {
     const val UPDATE_NOTIFIED_TAG = "update_notified_tag"
     const val UPDATE_INSTALLING_TAG = "update_installing_tag"
     const val UPDATE_SEEN_TAG = "update_seen_tag"
+    const val APP_THEME = "app_theme"
 
     /** Before a type, the keys of [SettingsStore.lastSync]. */
     const val LAST_SYNC_PREFIX = "last_sync_"

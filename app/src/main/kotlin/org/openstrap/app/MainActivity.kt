@@ -30,6 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
+import androidx.lifecycle.lifecycleScope
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,17 +128,33 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Dark bars (light icons) whatever the system mode, to match the always-dark theme.
-        enableEdgeToEdge(
-            statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
-        )
         val container = (application as OpenStrapApp).container
+        // The stored theme before the first frame, so a light theme never opens on a navy flash with the wrong bar icons.
+        // One small read of the settings file, which the app root reads straight after anyway.
+        AppColors.theme = runBlocking { container.settings.appTheme.first() }
+        applyBarIcons(AppColors.light)
+        // A theme picked on the You page applies at once: the colours are snapshot state, the bars follow here.
+        lifecycleScope.launch {
+            container.settings.appTheme.collect { theme ->
+                AppColors.theme = theme
+                applyBarIcons(AppColors.of(theme).light)
+            }
+        }
         setContent {
             OpenStrapTheme {
                 AppRoot(container, navRequests, previews, pendingStrap)
             }
         }
+    }
+
+    /**
+     * See-through bars whatever the system's light mode, their icons set by the theme: light icons over the dark themes,
+     * dark ones over Cream light. Called again on a switch.
+     */
+    private fun applyBarIcons(light: Boolean) {
+        val transparent = android.graphics.Color.TRANSPARENT
+        val style = if (light) SystemBarStyle.light(transparent, transparent) else SystemBarStyle.dark(transparent)
+        enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
     }
 
     override fun onStart() {

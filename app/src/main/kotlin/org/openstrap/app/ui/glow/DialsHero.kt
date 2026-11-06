@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.Canvas
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -50,10 +51,11 @@ import org.openstrap.app.ui.theme.NumberFamily
 @androidx.compose.runtime.Immutable
 internal data class PlanItem(val title: String, val note: String, val done: Boolean, val onClick: (() -> Unit)? = null)
 
-private val Track = Color(0xFF2E3B5C)
-private val Muted = Color(0xFFA9ADB9)
-private val PlanSurface = Color.White.copy(alpha = 0.055f)
-private val PlanEdge = Color.White.copy(alpha = 0.10f)
+// The theme's colours ([AppColors]), read on each use so a theme switch shows at once.
+private val Track: Color get() = AppColors.ink.copy(alpha = 0.15f)
+private val Muted: Color get() = AppColors.muted
+private val PlanSurface: Color get() = AppColors.glass
+private val PlanEdge: Color get() = AppColors.hairline
 
 /**
  * The redesign's Today hero: Energy as a round flask ([EnergyFlask]) with its name and level word, the day's plan,
@@ -77,14 +79,14 @@ internal fun DialsHero(
         Text(
             buildAnnotatedString {
                 append(stringResource(R.string.glow_today_energy_title))
-                energy.word?.let { withStyle(SpanStyle(color = AppPalette.Cream)) { append(" · "); append(it) } }
+                energy.word?.let { withStyle(SpanStyle(color = AppColors.ink)) { append(" · "); append(it) } }
             },
             color = Muted, style = MaterialTheme.typography.labelLarge,
         )
         Spacer(Modifier.height(4.dp))
-        Text(planTitle, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+        Text(planTitle, color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(14.dp))
-        Text(planNote, color = AppPalette.Cream.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp))
+        Text(planNote, color = AppColors.ink.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp))
         Spacer(Modifier.height(20.dp))
         // Three figures in one pane of glass, hairlines between: Energy at waking, Recovery, Sleep.
         val shape = RoundedCornerShape(24.dp)
@@ -98,7 +100,7 @@ internal fun DialsHero(
                 Column(Modifier.weight(1f).clickable(onClick = open).padding(horizontal = 16.dp)) {
                     Text(k, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
                     Spacer(Modifier.height(4.dp))
-                    Text(v ?: "–", color = AppPalette.Cream, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
+                    Text(v ?: "–", color = AppColors.ink, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
                 }
             }
         }
@@ -119,19 +121,19 @@ private fun Dial(label: String, value: String?, unit: String?, share: Float, col
                 val tl = Offset(w / 2, w / 2)
                 drawArc(Track, 0f, 360f, false, tl, arc, style = Stroke(w))
                 val sweep = 360f * share.coerceIn(0f, 1f)
-                if (sweep > 0f) drawArc(color, -90f, sweep, false, tl, arc, style = Stroke(w, cap = StrokeCap.Round))
+                if (sweep > 0f) drawArc(AppColors.readable(color), -90f, sweep, false, tl, arc, style = Stroke(w, cap = StrokeCap.Round))
             }
             Text(
                 buildAnnotatedString {
                     append(value ?: "–")
                     if (value != null && unit != null) withStyle(SpanStyle(fontSize = number * 0.4f, color = Muted, fontWeight = FontWeight.Bold)) { append(unit) }
                 },
-                color = AppPalette.Cream, maxLines = 1,
+                color = AppColors.ink, maxLines = 1,
                 style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = number, textDirection = TextDirection.Ltr),
             )
         }
         Spacer(Modifier.height(10.dp))
-        Text(label, color = AppPalette.Cream, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+        Text(label, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
     }
 }
 
@@ -140,14 +142,14 @@ private fun PlanCard(title: String, note: String, chip: String?, items: List<Pla
     val shape = RoundedCornerShape(26.dp)
     Column(Modifier.fillMaxWidth().clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(horizontal = 20.dp, vertical = 18.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(title, Modifier.weight(1f), color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+            Text(title, Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
             if (chip != null) Row(
-                Modifier.clip(CircleShape).background(AppPalette.NavyHigh).padding(horizontal = 12.dp, vertical = 6.dp),
+                Modifier.clip(CircleShape).background(AppColors.raised).padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(AppPalette.Cream))
+                Box(Modifier.size(8.dp).clip(CircleShape).background(AppColors.ink))
                 Spacer(Modifier.width(8.dp))
-                Text(chip, color = AppPalette.Cream, style = MaterialTheme.typography.labelLarge)
+                Text(chip, color = AppColors.ink, style = MaterialTheme.typography.labelLarge)
             }
         }
         Spacer(Modifier.height(6.dp))
@@ -161,7 +163,7 @@ private fun PlanCard(title: String, note: String, chip: String?, items: List<Pla
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        item.title, color = if (item.done) Muted else AppPalette.Cream,
+                        item.title, color = if (item.done) Muted else AppColors.ink,
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, textDecoration = if (item.done) TextDecoration.LineThrough else null),
                     )
                     Text(item.note, color = Muted, style = MaterialTheme.typography.bodyMedium)
@@ -185,7 +187,7 @@ private fun Tick(done: Boolean) {
                 lineTo(size.width * 0.71f, size.height * 0.38f)
             }
             drawPath(p, AppPalette.Navy, style = Stroke(2.6.dp.toPx(), cap = StrokeCap.Round))
-        } else drawCircle(Color(0xFF6B7591), r - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
+        } else drawCircle(AppColors.ink.copy(alpha = 0.4f), r - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
     }
 }
 
@@ -205,7 +207,7 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
     val shape = RoundedCornerShape(26.dp)
     Column(Modifier.fillMaxWidth().padding(top = 14.dp).clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(horizontal = 20.dp, vertical = 16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_title), Modifier.weight(1f), color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_title), Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
             if (live) {
                 val blink = androidx.compose.animation.core.rememberInfiniteTransition(label = "live")
                 val a by blink.animateFloat(1f, 0.25f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse), label = "a")
@@ -231,7 +233,7 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
                 Box(Modifier.padding(top = 7.dp).size(9.dp).clip(CircleShape).background(tone))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(t.title, color = AppPalette.Cream, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Text(t.title, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                     Spacer(Modifier.height(3.dp))
                     Text(t.body, color = Muted, style = MaterialTheme.typography.bodyMedium)
                     val action = when (t.action) {

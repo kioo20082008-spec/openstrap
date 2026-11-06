@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.Units
 import androidx.compose.ui.res.stringResource
@@ -81,7 +82,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.data.HeartZones
 import org.openstrap.app.ui.dashboard.LocalHeartZones
 import androidx.compose.runtime.ReadOnlyComposable
@@ -92,7 +92,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 internal val PausedColor = Color(WorkoutColors.PAUSED_GREY)
 
 /** The Control surface (spec 2.2): round buttons, chips, pills, tiles and fields on the workout pages. */
-internal val Raised = ControlSurface
+internal val Raised: Color get() = AppColors.control
 
 /** A button's label: Body (spec 2.3), a step heavier so it reads as the thing to press. */
 private val ButtonText = GlowType.body.copy(fontWeight = FontWeight.SemiBold)
@@ -161,7 +161,7 @@ internal fun WorkoutButton(
 }
 
 /**
- * A workout screen: black, with the workout's colour glowing softly from the top, scrolling if it must but filling
+ * A workout screen: the theme's stage (black on Navy), with the workout's colour glowing softly from the top, scrolling if it must but filling
  * the height so the controls sit at the bottom. [pinned] (Start, Done) stays on the bottom edge while the rest
  * scrolls under it, behind the pinned buttons' fade ([pinnedFade], spec 6.3), and the content ends clear of it.
  */
@@ -173,7 +173,7 @@ internal fun WorkoutPage(
     backdrop: Brush? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    BoxWithConstraints(Modifier.fillMaxSize().background(Color.Black)) {
+    BoxWithConstraints(Modifier.fillMaxSize().background(AppColors.stage)) {
         val width = constraints.maxWidth.toFloat()
         val density = LocalDensity.current
         var pinnedHeight by remember { mutableStateOf(0.dp) }
@@ -237,7 +237,7 @@ internal fun SuggestionPanel(
             Icon(AppIcons.Heartbeat, null, tint = ZONE_COLORS[s.zone], modifier = Modifier.padding(top = 2.dp).size(20.dp))
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(stringResource(R.string.glow_workout_suggestion_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+                Text(stringResource(R.string.glow_workout_suggestion_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
                 val day = dayName(Instant.ofEpochSecond(s.start).atZone(ZoneId.systemDefault()).toLocalDate())
                 val times = Ranges.times(s.start, s.end)
                 PageNote(stringResource(R.string.glow_workout_suggestion_text, day, times, s.zone + 1, s.averageHeartRate))
@@ -246,8 +246,8 @@ internal fun SuggestionPanel(
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             val save = stringResource(R.string.glow_workout_suggestion_save)
             val dismiss = stringResource(R.string.glow_workout_suggestion_dismiss)
-            Box(Modifier.weight(1f)) { WorkoutButton(save, Color.White, Color.Black, onSave, height = 48.dp) }
-            Box(Modifier.weight(1f)) { WorkoutButton(dismiss, Raised, Color.White, onDismiss, height = 48.dp) }
+            Box(Modifier.weight(1f)) { WorkoutButton(save, AppColors.ink, AppColors.onInk, onSave, height = 48.dp) }
+            Box(Modifier.weight(1f)) { WorkoutButton(dismiss, Raised, AppColors.ink, onDismiss, height = 48.dp) }
         }
     }
 }
@@ -263,7 +263,7 @@ internal fun OfferPanel(o: org.openstrap.app.data.AutoStart.Offer, onRecord: () 
             Icon(SportIcons.of(o.sportType), null, tint = MetricColors.heart, modifier = Modifier.padding(top = 2.dp).size(20.dp))
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(stringResource(R.string.glow_workout_offer_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+                Text(stringResource(R.string.glow_workout_offer_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
                 PageNote(
                     stringResource(
                         R.string.glow_workout_offer_text, clock(o.start), o.averageHeartRate, Workouts.sportName(o.sportType).lowercase(),
@@ -275,7 +275,7 @@ internal fun OfferPanel(o: org.openstrap.app.data.AutoStart.Offer, onRecord: () 
             val record = stringResource(R.string.glow_workout_offer_record)
             val decline = stringResource(R.string.glow_workout_offer_decline)
             Box(Modifier.weight(1f)) { WorkoutButton(record, MetricColors.heart, Color.Black, onRecord, height = 48.dp) }
-            Box(Modifier.weight(1f)) { WorkoutButton(decline, Raised, Color.White, onDecline, height = 48.dp) }
+            Box(Modifier.weight(1f)) { WorkoutButton(decline, Raised, AppColors.ink, onDecline, height = 48.dp) }
         }
     }
 }
@@ -309,7 +309,7 @@ fun GlowAddWorkoutScreen(
     }
     BackHandler(onBack = onBack)
     val choose = stringResource(R.string.glow_workout_add_choose_sport)
-    WorkoutPage(Color.Transparent, contentPadding, pinned = { WorkoutButton(choose, Color.White, Color.Black, { picking = true }) }) {
+    WorkoutPage(Color.Transparent, contentPadding, pinned = { WorkoutButton(choose, AppColors.ink, AppColors.onInk, { picking = true }) }) {
         PageHeader(stringResource(R.string.glow_workout_add_title), onBack, subtitle = dayName(date))
         if (minuteHr == null) {
             QuietPanel { PageNote(stringResource(R.string.glow_workout_loading)) }
@@ -388,8 +388,8 @@ private fun RangeChart(series: List<Pair<Long, Int>>, first: Long, last: Long, f
         }
         listOf(f, t).forEach { time ->
             val hx = x(time)
-            drawLine(Color.White, Offset(hx, 0f), Offset(hx, size.height), strokeWidth = 2.dp.toPx())
-            drawCircle(Color.White, radius = 7.dp.toPx(), center = Offset(hx, size.height / 2))
+            drawLine(AppColors.ink, Offset(hx, 0f), Offset(hx, size.height), strokeWidth = 2.dp.toPx())
+            drawCircle(AppColors.ink, radius = 7.dp.toPx(), center = Offset(hx, size.height / 2))
         }
     }
 }
@@ -399,7 +399,7 @@ private fun RangeChart(series: List<Pair<Long, Int>>, first: Long, last: Long, f
 /** Done right after the end, and Delete workout behind a question. */
 @Composable
 internal fun ColumnScope.SummaryActions(justEnded: Boolean, onDone: () -> Unit, onDelete: () -> Unit) {
-    if (justEnded) WorkoutButton(stringResource(R.string.glow_done), Color.White, Color.Black, onDone)
+    if (justEnded) WorkoutButton(stringResource(R.string.glow_done), AppColors.ink, AppColors.onInk, onDone)
     DeleteWorkout(stringResource(R.string.glow_workout_delete_phone), onDelete, Modifier.align(Alignment.CenterHorizontally))
 }
 
@@ -409,7 +409,7 @@ internal fun DeleteWorkout(what: String, onDelete: () -> Unit, modifier: Modifie
     var confirmDelete by rememberSaveable { mutableStateOf(false) }
     PageButton(
         stringResource(R.string.glow_workout_delete), { confirmDelete = true }, modifier.fillMaxWidth(),
-        color = MetricColors.warn, icon = AppIcons.Trash,
+        color = AppColors.readable(MetricColors.warn), icon = AppIcons.Trash,
     )
     if (confirmDelete) {
         PageConfirm(
@@ -470,7 +470,7 @@ internal fun TrimButton(onClick: () -> Unit) =
 internal fun TrimNote(summary: PhoneSummary, onUndo: () -> Unit, modifier: Modifier = Modifier, onCard: Boolean = true) {
     val text = trimNote(summary) ?: return
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(text, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.weight(1f))
+        Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.weight(1f))
         PageButton(
             stringResource(R.string.glow_workout_undo), onUndo, size = ButtonSize.Row, icon = AppIcons.ArrowCounterClockwise,
             onCard = onCard,
@@ -528,14 +528,14 @@ internal fun WorkoutTrimBar(summary: PhoneSummary, onSave: (Long, Long) -> Unit,
         org.openstrap.app.data.Summaries.bucketMeans(summary.recorded, n, { ((it.timestamp - first) / step).toInt() }, { it.bpm.toFloat() })
     }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(SummaryCopy.trimHeader(clock(from), clock(to), to - from), color = Color.White, style = GlowType.body)
+        Text(SummaryCopy.trimHeader(clock(from), clock(to), to - from), color = AppColors.ink, style = GlowType.body)
         // Recorded is all it can reach for now: the core and the reach are one, so the bar only trims.
         TrimBar(
             points, core = first..last, reach = first..last, from = from, to = to,
             colorOf = { v -> WorkoutRecorder.liveZone(v.toInt(), a.maxHeartRate, heartZones)?.let { ZONE_COLORS[it] } },
             onChange = { f, t -> from = f; to = t },
         )
-        Text(SummaryCopy.TRIM_HINT, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        Text(SummaryCopy.TRIM_HINT, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             PageButton(stringResource(R.string.glow_cancel), onCancel, Modifier.weight(1f))
             PageButton(stringResource(R.string.glow_save), { onSave(from, to) }, Modifier.weight(1f), primary = true)

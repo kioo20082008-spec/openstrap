@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.DayWords
@@ -21,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
@@ -149,7 +149,7 @@ fun HabitAgeEdgeCard(state: Healthspan.Outcome?, onClick: (() -> Unit)?, onOpenP
         }
         r?.let {
             Text(
-                TabCopy.habitAgeUpdated(dateOf(it.asOf)), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                TabCopy.habitAgeUpdated(dateOf(it.asOf)), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary, maxLines = 1,
             )
         }
@@ -165,7 +165,7 @@ fun HabitAgeEdgeCard(state: Healthspan.Outcome?, onClick: (() -> Unit)?, onOpenP
         EdgeValue(
             shown?.toString(), shown?.let { stringResource(R.string.glow_healthspan_years) },
             line?.text ?: if (shown != null) TabCopy.habitAgeForNow(waiting) else waiting,
-            if (line?.moved == true) Orchid else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            if (line?.moved == true) Orchid else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             waiting = shown != null,
         )
         if (r != null) {
@@ -196,17 +196,17 @@ internal fun AgeScale(age: Int, low: Int, high: Int, estimate: Float) {
         val pad = 8.dp
         fun f(a: Float) = (a.coerceIn(from.toFloat(), to.toFloat()) - from) / (to - from)
         fun x(a: Float) = pad + (w - pad * 2) * f(a)
-        val label = Color.White.copy(alpha = 0.6f)
+        val label = AppColors.ink.copy(alpha = 0.6f)
         Column {
             // Your age over its hairline, the range under its band, as in the kit, so the two never overlap.
             Box(Modifier.fillMaxWidth().height(16.dp)) { ScaleLabel(TabCopy.yourAge(age), x(age.toFloat()) / w, label) }
             Canvas(Modifier.fillMaxWidth().height(30.dp)) {
                 val y = size.height / 2
                 fun px(a: Float) = x(a).toPx()
-                drawLine(Color.White.copy(alpha = 0.15f), Offset(px(from.toFloat()), y), Offset(px(to.toFloat()), y), 6.dp.toPx(), StrokeCap.Round)
+                drawLine(AppColors.ink.copy(alpha = 0.15f), Offset(px(from.toFloat()), y), Offset(px(to.toFloat()), y), 6.dp.toPx(), StrokeCap.Round)
                 drawLine(Orchid.copy(alpha = 0.5f), Offset(px(low.toFloat()), y), Offset(px(high.toFloat()), y), 12.dp.toPx(), StrokeCap.Round)
-                drawLine(Color.White.copy(alpha = 0.6f), Offset(px(age.toFloat()), 0f), Offset(px(age.toFloat()), size.height), 1.dp.toPx())
-                drawCircle(Color.White, 7.dp.toPx(), Offset(px(estimate), y))
+                drawLine(AppColors.ink.copy(alpha = 0.6f), Offset(px(age.toFloat()), 0f), Offset(px(age.toFloat()), size.height), 1.dp.toPx())
+                drawCircle(AppColors.ink, 7.dp.toPx(), Offset(px(estimate), y))
             }
             Box(Modifier.fillMaxWidth().height(16.dp)) { ScaleLabel(TabCopy.ageRange(low, high), x((low + high) / 2f) / w, label) }
         }

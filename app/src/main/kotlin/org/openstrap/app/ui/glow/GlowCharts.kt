@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.Canvas
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -76,16 +77,16 @@ import org.openstrap.app.presentation.DetailCopy
  * guides and bars are solid (spec 2.7). Only the digits are made of dots.
  */
 
-private val Ink = Color.White
-private val Muted = Color.White.copy(alpha = 0.55f)
-/** Grid rows and stage guides: solid, white at 8%, 1 dp. */
-private val Grid = ChartInk.Grid
+private val Ink: Color get() = AppColors.ink
+private val Muted: Color get() = AppColors.ink.copy(alpha = 0.55f)
+/** Grid rows and stage guides: solid, the theme's ink at 8%, 1 dp. ([ChartInk] keeps the widgets' white.) */
+private val Grid: Color get() = AppColors.ink.copy(alpha = ChartInk.Grid.alpha)
 /** A target, goal or average across a chart: solid, white at 40%, 1 dp. */
-private val Target = ChartInk.Target
+private val Target: Color get() = AppColors.ink.copy(alpha = ChartInk.Target.alpha)
 
 private val axisText get() = TextStyle(color = Muted, fontSize = 10.sp, fontFamily = FunnelSans)
 private val valueText get() = TextStyle(color = Ink, fontSize = 11.sp, fontFamily = FunnelSans)
-private val readoutText = TextStyle(color = Ink, fontSize = 12.sp, fontFamily = FunnelSans)
+private val readoutText get() = TextStyle(color = Ink, fontSize = 12.sp, fontFamily = FunnelSans)
 
 /** A solid horizontal hairline across the chart: a grid row by default, or a target in [color]. */
 private fun DrawScope.gridLine(y: Float, color: Color = Grid, x0: Float = 0f, x1: Float = size.width) = chartHairline(y, color, x0, x1)
@@ -111,13 +112,13 @@ private fun DrawScope.text(r: TextLayoutResult, x: Float, y: Float, align: Float
 }
 
 /** The average's label: the axis text a touch brighter. */
-private val averageText = axisText.copy(color = Ink.copy(alpha = 0.8f))
+private val averageText get() = axisText.copy(color = Ink.copy(alpha = 0.8f))
 /** Today's day name and value on a [GlowTrend], and the other days' values. */
-private val todayAxisText = axisText.copy(color = Ink)
-private val todayValueText = valueText.copy(color = Ink)
-private val pastValueText = valueText.copy(color = Ink.copy(alpha = 0.75f))
+private val todayAxisText get() = axisText.copy(color = Ink)
+private val todayValueText get() = valueText.copy(color = Ink)
+private val pastValueText get() = valueText.copy(color = Ink.copy(alpha = 0.75f))
 /** A [NormalTrend]'s band label and day labels. */
-private val trendLabelText = axisText.copy(fontSize = 12.sp)
+private val trendLabelText get() = axisText.copy(fontSize = 12.sp)
 
 /** The touch readout: a dark glass pill with white text, above [anchorY] when there's room, else below. */
 private fun DrawScope.readout(m: TextMeasurer, s: String, x: Float, anchorY: Float) {
@@ -126,7 +127,8 @@ private fun DrawScope.readout(m: TextMeasurer, s: String, x: Float, anchorY: Flo
     val bh = r.size.height + 10.dp.toPx()
     val bx = (x - bw / 2).coerceIn(0f, (size.width - bw).coerceAtLeast(0f))
     val by = (anchorY - bh - 12.dp.toPx()).let { if (it < 0f) anchorY + 12.dp.toPx() else it }
-    drawRoundRect(Color.Black.copy(alpha = 0.72f), Offset(bx, by), Size(bw, bh), CornerRadius(bh / 2))
+    // A dark glass pill on a dark theme; on the light one a white pill, the ink reading on it.
+    drawRoundRect(if (AppColors.light) AppColors.raised.copy(alpha = 0.94f) else Color.Black.copy(alpha = 0.72f), Offset(bx, by), Size(bw, bh), CornerRadius(bh / 2))
     drawRoundRect(Ink.copy(alpha = 0.18f), Offset(bx, by), Size(bw, bh), CornerRadius(bh / 2), style = Stroke(1.dp.toPx()))
     drawText(r, topLeft = Offset(bx + 9.dp.toPx(), by + 5.dp.toPx()))
 }
@@ -179,6 +181,8 @@ fun GlowLineChart(
     /** Text for the touch readout at a reading; null turns scrubbing off. */
     describe: ((index: Int, value: Float) -> String)? = null,
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val m = rememberTextMeasurer()
     // Read while drawing: the average is only known there.
     val resources = LocalResources.current
@@ -232,7 +236,7 @@ fun GlowLineChart(
                         if (i != null) {
                             val p = Offset(g.xOf(i), g.yOf(values[i]!!))
                             guide(p.x, h)
-                            drawCircle(Color.Black.copy(alpha = 0.6f), 6.dp.toPx(), p)
+                            drawCircle(AppColors.shade.copy(alpha = 0.6f), 6.dp.toPx(), p)
                             drawCircle(color, 4.dp.toPx(), p)
                             if (describe != null) readout(m, describe(i, values[i]!!), p.x, p.y)
                         }
@@ -272,6 +276,8 @@ fun GlowBars(
     /** Scrubbing that moves the headline instead of a readout (spec 2.7): the column under the finger, or null on release. */
     onScrub: ((Int?) -> Unit)? = null,
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val accent = AppColors.readable(accent)
     val m = rememberTextMeasurer()
     var touchX by remember { mutableStateOf<Float?>(null) }
     var width by remember { mutableStateOf(0f) }
@@ -385,6 +391,8 @@ fun ArcGauge(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val shown = rememberGaugeProgress(progress, key)
     val tint = lerp(Ink, color, ARC_TINT)
     BoxWithConstraints(modifier) {
@@ -434,6 +442,8 @@ fun HorizonArc(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val shown = rememberGaugeProgress(progress, key)
     val tint = lerp(Ink, color, HORIZON_TINT)
     BoxWithConstraints(modifier) {
@@ -588,7 +598,7 @@ fun GlowHypnogram(
                 }
                 drawHypnogramBands(g, rowColors)
                 if (kept != null) {
-                    val dim = Color.Black.copy(alpha = 0.65f)
+                    val dim = AppColors.shade.copy(alpha = 0.65f)
                     val a = g.xOf(kept.start.coerceIn(0f, 1f))
                     val b = g.xOf(kept.endInclusive.coerceIn(0f, 1f))
                     if (a > nameW) drawRect(dim, Offset(nameW, 0f), Size(a - nameW, h))
@@ -622,6 +632,8 @@ fun GlowHypnogram(
  */
 @Composable
 fun GhostLine(today: List<Float?>, color: Color, max: Float, modifier: Modifier = Modifier, usual: List<Float>? = null, height: Dp = 56.dp) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     Spacer(
         modifier.fillMaxWidth().height(height).drawWithCache {
             // The shared ghost line geometry ([ghostLineGeometry]), as a widget's chart draws it.
@@ -685,6 +697,8 @@ internal fun NormalTrend(
     bandLabel: String? = null,
     onScrub: ((Int?) -> Unit)? = null,
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val m = rememberTextMeasurer()
     var touchX by remember { mutableStateOf<Float?>(null) }
     var width by remember { mutableStateOf(0f) }
@@ -727,7 +741,7 @@ internal fun NormalTrend(
                 fun yOf(v: Float) = top + (h - top) * (1f - (v - lo) / (hi - lo))
                 val pts = values.mapIndexedNotNull { i, v -> v?.let { i to Offset(xOf(i), yOf(it)) } }
                 val stroke = 2.4.dp.toPx() * (0.6f + 0.4f * scale)
-                val dim = lerp(color, Color.Black, 0.5f)
+                val dim = lerp(color, AppColors.shade, 0.5f)
                 val perDay = labels.size == values.size
                 val dayLabels = m.measureAll(labels, if (perDay) trendLabelText else axisText)
                 onDrawBehind {
@@ -752,7 +766,7 @@ internal fun NormalTrend(
                             org.openstrap.app.presentation.DetailCopy.Level.Above,
                             org.openstrap.app.presentation.DetailCopy.Level.Below,
                             -> {
-                                val lit = lerp(color, Color.White, 0.3f)
+                                val lit = lerp(color, AppColors.ink, 0.3f)
                                 drawCircle(lit.copy(alpha = 0.35f), 14.dp.toPx() * scale, p)
                                 drawCircle(lit, 7.dp.toPx() * scale, p)
                             }
@@ -771,7 +785,7 @@ internal fun NormalTrend(
                         nearestReading(values, tx, size.width, inset)?.let { i ->
                             val p = Offset(xOf(i), yOf(values[i]!!))
                             guide(p.x, h)
-                            drawCircle(Color.Black.copy(alpha = 0.6f), 8.dp.toPx(), p)
+                            drawCircle(AppColors.shade.copy(alpha = 0.6f), 8.dp.toPx(), p)
                             drawCircle(Ink, 5.dp.toPx(), p)
                         }
                     }
@@ -885,6 +899,8 @@ fun Legend(
  */
 @Composable
 fun FillBar(share: Float, color: Color, modifier: Modifier = Modifier, height: Dp = 4.dp) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val shape = androidx.compose.foundation.shape.RoundedCornerShape(height / 2)
     Box(modifier.fillMaxWidth().height(height).background(Ink.copy(alpha = FILL_TRACK_ALPHA), shape)) {
         Box(Modifier.fillMaxWidth(share.coerceIn(0f, 1f)).fillMaxHeight().background(color, shape))
@@ -901,6 +917,8 @@ private const val FILL_TRACK_ALPHA = 0.08f
  */
 @Composable
 fun ProgressRing(share: () -> Float, color: Color, modifier: Modifier = Modifier, stroke: Dp = 8.dp, track: Float = RING_TRACK_ALPHA) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     Canvas(modifier) {
         val w = stroke.toPx()
         val at = Offset(w / 2, w / 2)
@@ -938,6 +956,8 @@ fun PlainLine(
     dots: LineDots = LineDots.None,
     stroke: Dp = 2.5.dp,
 ) {
+    // A metric hue drawn as a mark on the light theme: taken dark enough to read on cream ([AppColors.readable]).
+    @Suppress("NAME_SHADOWING") val color = AppColors.readable(color)
     val points = values.withIndex().mapNotNull { (i, v) -> v?.let { i to it } }
     if (points.size < 2) return
     Spacer(

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.presentation.DayWords
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Ranges
 import org.openstrap.app.presentation.Units
 import androidx.activity.compose.BackHandler
@@ -26,7 +27,6 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import java.time.Instant
 import java.time.LocalDate
@@ -79,7 +79,7 @@ private fun GoalWeekCard(
     GlowCard(style, Modifier.fillMaxWidth()) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(title, color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
                 trailing?.invoke()
             }
             HeroValue(
@@ -88,10 +88,10 @@ private fun GoalWeekCard(
             // The week's workouts against the goal as a bar of [goal] parts, [count] of them white.
             val described = stringResource(R.string.glow_goals_count_of_goal, count, goal)
             if (bar) SegmentBar(
-                List(goal.coerceIn(1, MAX_GOAL_SHOWN)) { i -> Segment(1f, Color.White.copy(alpha = if (i < count) 1f else 0.2f)) },
+                List(goal.coerceIn(1, MAX_GOAL_SHOWN)) { i -> Segment(1f, AppColors.ink.copy(alpha = if (i < count) 1f else 0.2f)) },
                 Modifier.padding(top = 18.dp).semantics { contentDescription = described }, height = 8.dp, gap = 6.dp,
-            ) else WeekDots(dots, Color.White, Modifier.padding(top = 18.dp))
-            Text(line, color = Color.White, style = GlowType.body, modifier = Modifier.padding(top = 14.dp))
+            ) else WeekDots(dots, AppColors.ink, Modifier.padding(top = 18.dp))
+            Text(line, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(top = 14.dp))
         }
     }
 }
@@ -194,7 +194,7 @@ fun GoalsAndBestsPage(
                 ListPanel(title = stringResource(R.string.glow_goals_personal_bests)) {
                     val shown = view.bests.sortedBy { order(it.kind) }
                     if (shown.isEmpty()) Text(
-                        stringResource(R.string.glow_goals_no_bests), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        stringResource(R.string.glow_goals_no_bests), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary, modifier = Modifier.padding(vertical = 10.dp),
                     )
                     shown.forEachIndexed { i, b ->
@@ -212,7 +212,7 @@ fun GoalsAndBestsPage(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
                     stringResource(R.string.glow_goals_badges_count, view.earned.size, Rewards.BADGES.size),
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                     modifier = Modifier.padding(start = 4.dp, top = 6.dp),
                 )
                 // The last three earned and the next one, so the row is always four.
@@ -272,7 +272,7 @@ fun AllBadgesPage(view: RewardsView?, contentPadding: PaddingValues, onBack: () 
                                 Rewards.Group.Kinds -> R.string.glow_goals_group_kinds
                             },
                         ),
-                        color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(start = 4.dp, top = 6.dp),
+                        color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(start = 4.dp, top = 6.dp),
                     )
                     BadgeGrid(
                         Rewards.BADGES.filter { it.group == group }.map { b ->

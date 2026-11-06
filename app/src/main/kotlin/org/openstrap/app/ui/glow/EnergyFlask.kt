@@ -44,7 +44,7 @@ import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.TabCopy
 import org.openstrap.app.presentation.chargeShown
 import org.openstrap.app.ui.dashboard.Narrative
-import org.openstrap.app.ui.theme.AppPalette
+import org.openstrap.app.ui.theme.AppColors
 import kotlin.math.PI
 import kotlin.math.sin
 
@@ -98,7 +98,7 @@ private val WaveFront = Color(0xFFFFB067)
 private val WaveBack = Color(0xFFFF8A5B).copy(alpha = 0.7f)
 /** Energy's warm hue for the glow around the glass. */
 private val FlaskGlow = Color(0xFFFF8A5B)
-private val Faint = AppPalette.Cream.copy(alpha = 0.55f)
+private val Faint: Color get() = AppColors.muted
 
 /** How long each wave takes to travel one wavelength, the front one way and the back the other, seconds. */
 private const val WAVE_FRONT_S = 3f
@@ -161,23 +161,28 @@ internal fun EnergyFlask(model: FlaskModel, modifier: Modifier = Modifier) {
             Canvas(Modifier.size(FLASK_DP.dp).clip(CircleShape)) {
                 val w = size.width
                 val h = size.height
-                drawRect(Brush.radialGradient(listOf(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.02f)), Offset(w * 0.35f, h * 0.30f), w * 0.955f))
+                // Read while drawing, so a theme switch redraws the glass. On the light theme the glass is a touch of white
+                // fading to a navy tint at its rim, so it reads as a sphere on cream and its white shine still shows.
+                val light = AppColors.light
+                val body = if (light) listOf(Color.White.copy(alpha = 0.55f), AppColors.ink.copy(alpha = 0.05f))
+                else listOf(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.02f))
+                drawRect(Brush.radialGradient(body, Offset(w * 0.35f, h * 0.30f), w * 0.955f))
                 if (liquid) drawLiquid(fill.value, seconds.floatValue)
                 // The shine, top left, tilted with the glass.
                 val shineTopLeft = Offset(w * 34f / FLASK_DP, h * 26f / FLASK_DP)
                 val shineSize = Size(w * 46f / FLASK_DP, h * 24f / FLASK_DP)
                 rotate(-30f, shineTopLeft + Offset(shineSize.width / 2, shineSize.height / 2)) {
-                    drawOval(Color.White.copy(alpha = 0.14f), shineTopLeft, shineSize)
+                    drawOval(Color.White.copy(alpha = if (light) 0.7f else 0.14f), shineTopLeft, shineSize)
                 }
                 val stroke = 1.5.dp.toPx()
-                drawCircle(AppPalette.Cream.copy(alpha = 0.3f), w / 2 - stroke / 2, style = Stroke(stroke))
+                drawCircle(AppColors.ring, w / 2 - stroke / 2, style = Stroke(stroke))
             }
         }
         if (model.level != null) {
             Spacer(Modifier.height(8.dp))
             Ltr {
                 Row(verticalAlignment = Alignment.Top) {
-                    Text(model.level.toString(), color = AppPalette.Cream, style = GlowType.flaskNumber)
+                    Text(model.level.toString(), color = AppColors.ink, style = GlowType.flaskNumber)
                     Text("%", Modifier.padding(top = 6.dp), color = Faint, style = GlowType.flaskUnit)
                 }
             }

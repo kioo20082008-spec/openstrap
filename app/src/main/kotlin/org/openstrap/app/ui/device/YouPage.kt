@@ -1,20 +1,25 @@
 package org.openstrap.app.ui.device
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.BuildConfig
 import org.openstrap.app.R
+import org.openstrap.app.data.settings.AppTheme
 import org.openstrap.app.data.settings.BackupState
 import org.openstrap.app.data.settings.Goals
 import org.openstrap.app.data.settings.HealthConnectAuto
@@ -140,8 +145,13 @@ fun YouPage(
     onBack: () -> Unit,
     /** The row whose page is open beside the list on a wide screen, by its key in [PageRowKeys], or null. */
     selected: String? = null,
+    /** The colour theme, said on the Appearance row, which opens the picker; a pick applies at once. */
+    appTheme: AppTheme = AppTheme.Default,
+    onAppTheme: (AppTheme) -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
+    var pickingTheme by rememberSaveable { mutableStateOf(false) }
+    if (pickingTheme) AppearanceSheet(appTheme, onAppTheme, onDismiss = { pickingTheme = false })
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item { PageHeader(stringResource(R.string.you_title), onBack) }
         item {
@@ -191,6 +201,15 @@ fun YouPage(
                 )
             }
         }
+        item { SectionLabel(stringResource(R.string.you_section_app), Modifier.padding(top = 4.dp), PanelLabelInset) }
+        item {
+            PageRows {
+                PageRow(
+                    stringResource(R.string.you_row_appearance), themeName(appTheme), onClick = { pickingTheme = true }, below = true,
+                    divider = false, icon = AppIcons.Image,
+                )
+            }
+        }
         item { SectionLabel(stringResource(R.string.you_section_help), Modifier.padding(top = 4.dp), PanelLabelInset) }
         item {
             PageRows {
@@ -215,7 +234,7 @@ fun YouPage(
             Text(
                 stringResource(R.string.you_footer, BuildConfig.VERSION_NAME),
                 Modifier.fillMaxWidth().padding(top = 4.dp),
-                color = Color.White.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
+                color = AppColors.ink.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
             )
         }
     }

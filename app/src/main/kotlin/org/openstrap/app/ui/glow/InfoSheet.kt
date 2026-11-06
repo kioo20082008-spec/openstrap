@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.animation.AnimatedVisibility
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -61,19 +62,19 @@ fun InfoSheet(
     PageSheet(onDismiss) {
         // One block, so the sheet's gap between blocks leaves this one's own spacing alone.
         Column {
-            Text(info.name, color = Color.White.copy(alpha = 0.5f), style = GlowType.secondary)
+            Text(info.name, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary)
             Text(
-                info.meaning, color = Color.White, modifier = Modifier.padding(top = 6.dp),
+                info.meaning, color = AppColors.ink, modifier = Modifier.padding(top = 6.dp),
                 style = GlowType.sentence,
             )
             // Some numbers have no scale to place them on (naps, breathing disturbances, whose only words are apnea bands).
             if (info.scale.isNotEmpty()) Scale(info.scale, color, here, Modifier.padding(top = 22.dp))
             if (hereLine != null) Text(
-                hereLine, color = Color.White, style = GlowType.secondary,
+                hereLine, color = AppColors.ink, style = GlowType.secondary,
                 modifier = Modifier.padding(top = if (info.scale.isEmpty()) 16.dp else 10.dp),
             )
             Column(
-                Modifier.padding(top = 24.dp).fillMaxWidth().background(Color(0xFF172644), GlowLayout.CardShape).padding(horizontal = 18.dp),
+                Modifier.padding(top = 24.dp).fillMaxWidth().background(AppColors.inset, GlowLayout.CardShape).padding(horizontal = 18.dp),
             ) {
                 val folds = rows ?: listOf(
                     stringResource(R.string.glow_info_how) to info.how,
@@ -108,7 +109,7 @@ private fun Scale(labels: List<String>, color: Color, here: Int?, modifier: Modi
                             .background(if (on) color else color.copy(alpha = 0.18f + 0.12f * i / (labels.size - 1).coerceAtLeast(1)), CircleShape),
                     )
                     Text(
-                        label, color = if (on) Color.White else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        label, color = if (on) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = style.copy(fontWeight = if (on) FontWeight.Medium else FontWeight.Normal),
                     )
                 }
@@ -142,12 +143,12 @@ private fun Fold(title: String, text: String, divider: Boolean = true) {
             Modifier.fillMaxWidth().clickable(onClickLabel = clickLabel) { open = !open }.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(title, color = Color.White, style = GlowType.body, modifier = Modifier.weight(1f))
+            Text(title, color = AppColors.ink, style = GlowType.body, modifier = Modifier.weight(1f))
             Spacer(Modifier.size(12.dp))
-            Icon(AppIcons.CaretDown, null, tint = Color.White.copy(alpha = 0.6f), modifier = Modifier.size(16.dp).rotate(turn))
+            Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = 0.6f), modifier = Modifier.size(16.dp).rotate(turn))
         }
         AnimatedVisibility(open) {
-            Text(text, color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(bottom = 16.dp))
+            Text(text, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(bottom = 16.dp))
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.components
 
 import androidx.compose.animation.core.Animatable
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Box
@@ -140,8 +141,8 @@ fun GrowFromButton(
     from: Rect?,
     modifier: Modifier = Modifier,
     progress: GrowProgress = rememberGrowProgress(visible),
-    buttonColor: Color = Color(0xFF1C2C50),
-    pageColor: Color = Color.Black,
+    buttonColor: Color = AppColors.control,
+    pageColor: Color = AppColors.page,
     cornerRadius: Dp = 28.dp,
     content: @Composable (closing: Boolean) -> Unit,
 ) {
@@ -157,7 +158,7 @@ fun GrowFromButton(
     val self = remember { arrayOf(Rect.Zero) }
     val origin by rememberUpdatedState(from)
     Box(modifier.onGloballyPositioned { self[0] = it.boundsInRoot() }) {
-        Box(Modifier.matchParentSize().drawBehind { drawRect(Color.Black, alpha = GrowMotion.scrim(anim.value)) })
+        Box(Modifier.matchParentSize().drawBehind { drawRect(AppColors.scrim.copy(alpha = 1f), alpha = GrowMotion.scrim(anim.value)) })
         Box(
             Modifier.fillMaxSize().graphicsLayer {
                 val p = anim.value

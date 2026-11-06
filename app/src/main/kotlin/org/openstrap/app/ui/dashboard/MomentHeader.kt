@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.dashboard
 
 import androidx.compose.ui.res.stringResource
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.snap
@@ -186,11 +187,11 @@ private fun DaySwitcher(
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
-                dateLine(date), color = Color.White.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
+                dateLine(date), color = AppColors.ink.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                title, color = Color.White, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
+                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
         }
@@ -209,7 +210,7 @@ private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
 private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = CircleShape
     Row(
-        modifier.clip(shape).background(ChipSurface).border(1.dp, Color.White.copy(alpha = 0.07f), shape)
+        modifier.clip(shape).background(ChipSurface).border(1.dp, AppColors.ink.copy(alpha = 0.07f), shape)
             .clickable(onClickLabel = stringResource(R.string.day_header_open_strap), onClick = onClick)
             .semantics { contentDescription = chip.description }
             .padding(horizontal = 12.dp, vertical = 8.dp),
@@ -220,7 +221,7 @@ private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modi
             Spacer(Modifier.width(7.dp))
             Text(
                 chip.text, maxLines = 1, softWrap = false,
-                color = if (chip.dot == StrapChip.Dot.Warn) MetricColors.warn else Color.White,
+                color = if (chip.dot == StrapChip.Dot.Warn) AppColors.readable(MetricColors.warn) else AppColors.ink,
                 style = GlowType.secondary,
             )
         }
@@ -232,9 +233,9 @@ private fun chipDotColor(dot: StrapChip.Dot): Color = when (dot) {
     StrapChip.Dot.Low -> MetricColors.battery(StrapChip.LOW_BATTERY)
     StrapChip.Dot.Charging -> MetricColors.good
     StrapChip.Dot.Warn -> MetricColors.warn
-    StrapChip.Dot.Quiet -> Color.White.copy(alpha = 0.3f)
+    StrapChip.Dot.Quiet -> AppColors.ink.copy(alpha = 0.3f)
 }
 
-private val Avatar = Color(0xFF1C2C50)
-private val ChipSurface = Color(0xFF172644)
+private val Avatar: Color get() = AppColors.control
+private val ChipSurface: Color get() = if (AppColors.light) AppColors.glass else androidx.compose.ui.graphics.lerp(AppColors.page, AppColors.control, 0.3f)
 private val PeekWidth = 34.dp

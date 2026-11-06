@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.zepp
 
 import android.annotation.SuppressLint
+import org.openstrap.app.ui.theme.AppColors
 import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebStorage
@@ -36,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontFamily
@@ -52,7 +52,6 @@ import org.openstrap.app.OpenStrapApp
 import org.openstrap.app.data.catching
 import org.openstrap.app.device.StrapManager
 import org.openstrap.app.ui.device.ErrorCopy
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
@@ -137,19 +136,19 @@ fun ZeppSignInDialog(
 
     Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
         // Black to the screen's edges, the page itself in one centred column like every other page (spec 2.4).
-        Box(Modifier.fillMaxSize().background(Color.Black), contentAlignment = Alignment.TopCenter) {
+        Box(Modifier.fillMaxSize().background(AppColors.stage), contentAlignment = Alignment.TopCenter) {
             Column(Modifier.widthIn(max = GlowLayout.PageMaxWidth).fillMaxSize()) {
                 // A page's top: the round button (a close, since this sits over the page it came from) and the title.
                 val close = stringResource(R.string.you_zepp_close)
                 Row(Modifier.fillMaxWidth().height(60.dp).padding(horizontal = GlowLayout.Gutter), verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        Modifier.size(44.dp).clip(CircleShape).background(ControlSurface)
+                        Modifier.size(44.dp).clip(CircleShape).background(AppColors.control)
                             .clickable(onClickLabel = close, onClick = onDismiss),
                         contentAlignment = Alignment.Center,
-                    ) { Icon(AppIcons.X, close, Modifier.size(20.dp), tint = Color.White) }
+                    ) { Icon(AppIcons.X, close, Modifier.size(20.dp), tint = AppColors.ink) }
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        stringResource(R.string.you_zepp_sign_in_title), color = Color.White, style = GlowType.pageTitle, maxLines = 1,
+                        stringResource(R.string.you_zepp_sign_in_title), color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1,
                         modifier = Modifier.weight(1f),
                     )
                     if (step is SignInStep.SignIn) {
@@ -159,7 +158,7 @@ fun ZeppSignInDialog(
                 when (val s = step) {
                     SignInStep.SignIn -> {
                         Column(Modifier.padding(horizontal = GlowLayout.Gutter, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Text(stringResource(R.string.you_zepp_sign_in_text), color = Color.White, style = GlowType.body)
+                            Text(stringResource(R.string.you_zepp_sign_in_text), color = AppColors.ink, style = GlowType.body)
                             PageNote(stringResource(R.string.you_zepp_sign_in_note))
                         }
                         key(attempt) {
@@ -171,7 +170,7 @@ fun ZeppSignInDialog(
                     SignInStep.Fetching -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             PageProgress(modifier = Modifier.width(160.dp))
-                            Text(stringResource(R.string.you_zepp_fetching), color = Color.White, style = GlowType.body)
+                            Text(stringResource(R.string.you_zepp_fetching), color = AppColors.ink, style = GlowType.body)
                         }
                     }
                     is SignInStep.Failed, is SignInStep.ThirdParty -> Column(
@@ -184,7 +183,7 @@ fun ZeppSignInDialog(
                                 Icon(AppIcons.WarningCircle, null, Modifier.size(20.dp), tint = MetricColors.warn)
                                 Text(
                                     stringResource(if (thirdParty) R.string.you_zepp_use_email else R.string.you_zepp_no_devices),
-                                    color = Color.White, style = GlowType.cardTitle, maxLines = 1,
+                                    color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
                                 )
                             }
                             Text(
@@ -192,7 +191,7 @@ fun ZeppSignInDialog(
                                     is SignInStep.ThirdParty -> stringResource(R.string.you_zepp_third_party, s.provider)
                                     else -> (s as SignInStep.Failed).message
                                 },
-                                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body,
+                                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body,
                             )
                         }
                         PageButton(
@@ -233,13 +232,13 @@ private fun FoundStrap(
                     } else {
                         pluralStringResource(R.plurals.you_zepp_account_other_devices, listing.devices.size, listing.devices.size)
                     },
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body,
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body,
                 )
             } else {
                 Line(stringResource(R.string.you_pair_address), strap.macAddress)
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        stringResource(R.string.you_pair_key), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        stringResource(R.string.you_pair_key), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.body, modifier = Modifier.weight(1f),
                     )
                     Text(
@@ -248,7 +247,7 @@ private fun FoundStrap(
                             showKey -> strap.authKey
                             else -> "•".repeat(8) + strap.authKey.takeLast(4)
                         },
-                        color = Color.White, style = GlowType.body.copy(fontFamily = FontFamily.Monospace),
+                        color = AppColors.ink, style = GlowType.body.copy(fontFamily = FontFamily.Monospace),
                     )
                     if (strap.authKey != null) {
                         PageTextButton(
@@ -285,9 +284,9 @@ private fun FoundStrap(
 private fun Line(label: String, value: String) {
     // The label is measured first and keeps to one line (spec 2.3), and the value takes what's left, ellipsized last.
     Row(Modifier.fillMaxWidth()) {
-        Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, maxLines = 1, modifier = Modifier.padding(end = 12.dp))
+        Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, maxLines = 1, modifier = Modifier.padding(end = 12.dp))
         Text(
-            value, color = Color.White, style = GlowType.body, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+            value, color = AppColors.ink, style = GlowType.body, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             textAlign = androidx.compose.ui.text.style.TextAlign.End, modifier = Modifier.weight(1f),
         )
     }

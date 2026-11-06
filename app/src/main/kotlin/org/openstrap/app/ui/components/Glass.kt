@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.components
 
-import org.openstrap.app.ui.theme.AppPalette
+import org.openstrap.app.data.settings.AppTheme
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,27 +46,37 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import kotlinx.coroutines.launch
 
-/** The nav bar's glass: near-black, see-through, with a lit top edge. Popups use it over a blurred screen. */
-val GlassTint = Color(0xFF0E1830)
-val GlassEdge = BorderStroke(
-    1.dp, Brush.verticalGradient(0f to Color.White.copy(alpha = 0.2f), 0.5f to Color.White.copy(alpha = 0.05f), 1f to Color.Black.copy(alpha = 0.4f)),
-)
+/** The nav bar's glass in the theme's colours ([AppColors.sheet]), see-through, with a lit top edge. Popups use it over a blurred screen. */
+val GlassTint: Color get() = AppColors.sheet
 
-/** The screen's cards go OLED black with a faint hairline instead of grey fills, matching the glow tabs. */
+/** The glass's edge, one per theme: lit along the top, in shade along the bottom (on the light theme, a navy shade). */
+val GlassEdge: BorderStroke get() = glassEdges.getValue(AppColors.theme)
+
+private val glassEdges = AppTheme.entries.associateWith { theme ->
+    val t = AppColors.of(theme)
+    BorderStroke(
+        1.dp,
+        if (t.light) Brush.verticalGradient(0f to Color.White, 0.5f to t.ink.copy(alpha = 0.05f), 1f to t.ink.copy(alpha = 0.14f))
+        else Brush.verticalGradient(0f to t.ink.copy(alpha = 0.2f), 0.5f to t.ink.copy(alpha = 0.05f), 1f to Color.Black.copy(alpha = 0.4f)),
+    )
+}
+
+/** The screen's cards go flat on the page with a faint hairline instead of grey fills, matching the glow tabs. */
 @Composable
 fun OledSurfaces(content: @Composable () -> Unit) {
     val c = MaterialTheme.colorScheme
+    val page = AppColors.page
     MaterialTheme(
         colorScheme = c.copy(
-            background = AppPalette.Navy,
-            surface = AppPalette.Navy,
-            surfaceContainerLowest = AppPalette.Navy,
-            surfaceContainerLow = AppPalette.Navy,
-            surfaceContainer = AppPalette.Navy,
-            surfaceContainerHigh = Color(0xFF0E1830),
-            surfaceContainerHighest = Color(0xFF1C2C50),
-            outline = Color.White.copy(alpha = 0.16f),
-            outlineVariant = Color.White.copy(alpha = 0.12f),
+            background = page,
+            surface = page,
+            surfaceContainerLowest = page,
+            surfaceContainerLow = page,
+            surfaceContainer = page,
+            surfaceContainerHigh = AppColors.current.skyLow,
+            surfaceContainerHighest = AppColors.control,
+            outline = AppColors.ink.copy(alpha = 0.16f),
+            outlineVariant = AppColors.ink.copy(alpha = 0.12f),
         ),
         typography = MaterialTheme.typography,
         shapes = MaterialTheme.shapes,
@@ -105,12 +116,17 @@ private fun GlassPortal(host: GlassHost, sheet: Boolean, onDismiss: () -> Unit, 
     }
 }
 
-/** The page behind a popup: blurred and darkened, the nav bar's glass spread across the screen. */
-private val BackdropBlur = dev.chrisbanes.haze.blur.HazeBlurStyle {
-    blurRadius(28.dp)
-    backgroundColor(AppPalette.Navy)
-    colorEffects(listOf(dev.chrisbanes.haze.blur.HazeColorEffect.tint(Color.Black.copy(alpha = 0.45f))))
-    fallbackColorEffect(dev.chrisbanes.haze.blur.HazeColorEffect.tint(Color.Black.copy(alpha = 0.8f)))
+/** The page behind a popup: blurred and darkened (on the light theme, dimmed a little), one per theme. */
+private val BackdropBlur: dev.chrisbanes.haze.blur.HazeBlurStyle get() = backdropBlurs.getValue(AppColors.theme)
+
+private val backdropBlurs = AppTheme.entries.associateWith { theme ->
+    val t = AppColors.of(theme)
+    dev.chrisbanes.haze.blur.HazeBlurStyle {
+        blurRadius(28.dp)
+        backgroundColor(t.page)
+        colorEffects(listOf(dev.chrisbanes.haze.blur.HazeColorEffect.tint(t.scrim)))
+        fallbackColorEffect(dev.chrisbanes.haze.blur.HazeColorEffect.tint(t.scrim.copy(alpha = if (t.light) 0.6f else 0.8f)))
+    }
 }
 
 /** Draws the registered popups; place it last at the root, over everything, with the pages' [haze]. */
@@ -148,7 +164,7 @@ fun GlassOverlay(host: GlassHost, haze: dev.chrisbanes.haze.HazeState) {
 /** The glass panel a popup sits on: see-through dark over the blurred page, with a lit top edge. */
 @Composable
 fun GlassPanel(modifier: Modifier = Modifier, shape: androidx.compose.ui.graphics.Shape = org.openstrap.app.ui.glow.GlowLayout.CardShape, content: @Composable () -> Unit) {
-    Surface(shape = shape, color = GlassTint.copy(alpha = 0.72f), border = GlassEdge, contentColor = Color.White, modifier = modifier, content = content)
+    Surface(shape = shape, color = GlassTint, border = GlassEdge, contentColor = AppColors.ink, modifier = modifier, content = content)
 }
 
 /**
@@ -206,7 +222,7 @@ fun GlassSheet(onDismiss: () -> Unit, content: @Composable () -> Unit) {
         ) {
             Column {
                 Box(Modifier.fillMaxWidth().padding(top = 12.dp, bottom = 8.dp), contentAlignment = Alignment.Center) {
-                    Box(Modifier.size(width = 36.dp, height = 4.dp).background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(2.dp)))
+                    Box(Modifier.size(width = 36.dp, height = 4.dp).background(AppColors.ink.copy(alpha = 0.3f), RoundedCornerShape(2.dp)))
                 }
                 content()
             }

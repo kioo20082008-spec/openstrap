@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import android.graphics.Matrix
+import org.openstrap.app.ui.theme.AppColors
 import android.graphics.SweepGradient
 import android.provider.Settings
 import androidx.compose.runtime.Composable
@@ -61,7 +62,7 @@ fun Modifier.movingBorder(color: Color, periodMillis: Int = MOVING_BORDER_PERIOD
         val cx = size.width / 2f
         val cy = size.height / 2f
         // The tail fades in over the last third of the turn to the white-hot head; the rest of the border is dark.
-        val head = lerp(color, Color.White, 0.7f)
+        val head = lerp(color, AppColors.ink, 0.7f)
         val stops = floatArrayOf(0f, 0.68f, 0.88f, 0.97f, 0.995f, 1f)
         val colors = intArrayOf(
             Color.Transparent.toArgb(), color.copy(alpha = 0f).toArgb(), color.copy(alpha = 0.55f).toArgb(),

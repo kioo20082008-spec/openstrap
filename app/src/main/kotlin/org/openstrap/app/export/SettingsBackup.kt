@@ -55,6 +55,7 @@ object SettingsBackup {
             QUIET_FROM_MINUTES to Type.INT,
             QUIET_TO_MINUTES to Type.INT,
             QUIET_CALLS to Type.BOOLEAN,
+            APP_THEME to Type.STRING,
         )
     }
 

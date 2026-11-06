@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.background
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -44,8 +45,8 @@ import org.openstrap.app.ui.components.cardOpening
  * for lists of things (workouts, contributors, settings). No glow at all, so the cards above it keep the light.
  */
 
-internal val ListSurface = Color.White.copy(alpha = 0.045f)
-internal val RowHairline = Color.White.copy(alpha = GlowLayout.DividerAlpha)
+internal val ListSurface: Color get() = AppColors.list
+internal val RowHairline: Color get() = AppColors.ink.copy(alpha = GlowLayout.DividerAlpha)
 
 /**
  * A grouped list: a dark panel with a title row ([title] left, an optional [note] right) over its rows, usually
@@ -73,7 +74,7 @@ fun ListPanel(
             start = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        title.orEmpty(), color = Color.White, style = GlowType.cardTitle, maxLines = 1,
+                        title.orEmpty(), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
                     )
                     if (marked) TitleMark(marker, tag, Modifier.padding(start = 8.dp))
@@ -124,7 +125,7 @@ private fun ListNote(note: String, onNote: (() -> Unit)?) {
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(note, color = Color.White, style = GlowType.secondary, maxLines = 1)
+        Text(note, color = AppColors.ink, style = GlowType.secondary, maxLines = 1)
         Spacer(Modifier.width(6.dp))
         TapCaret(CARD_CARET_ALPHA)
     }
@@ -155,7 +156,7 @@ fun ListRow(
     ring: Float? = null,
 ) {
     val waiting = value == null && dash
-    val accent = if (offNormal && !waiting) color else Color.White
+    val accent = if (offNormal && !waiting) AppColors.readable(color) else AppColors.ink
     // Tapped, the row grows into what it opens (spec 3.5).
     val opening = cardOpening(onClick)
     val bleed = LocalRowBleed.current
@@ -183,9 +184,9 @@ fun ListRow(
             if (status != null) Text(
                 status,
                 color = when {
-                    waiting -> Color.White.copy(alpha = 0.45f)
-                    offNormal -> color
-                    else -> Color.White.copy(alpha = 0.6f)
+                    waiting -> AppColors.ink.copy(alpha = 0.45f)
+                    offNormal -> AppColors.readable(color)
+                    else -> AppColors.ink.copy(alpha = 0.6f)
                 },
                 style = GlowType.secondary,
             )
@@ -208,7 +209,7 @@ internal val RowIconGap = 14.dp
 /** From a row's value to its tap caret. */
 internal val RowCaretGap = 8.dp
 /** A row icon that isn't a metric's (a workout's sport): white at 72% (spec 2.8). */
-internal val SportIconTint = Color.White.copy(alpha = 0.72f)
+internal val SportIconTint: Color get() = AppColors.ink.copy(alpha = 0.72f)
 /** A waiting row's icon is dimmed to this. */
 private const val WAITING_ICON_ALPHA = 0.3f
 
@@ -261,7 +262,7 @@ fun WaitingDash(modifier: Modifier = Modifier) {
     Box(
         modifier
             .size(14.dp, 3.dp)
-            .background(Color.White.copy(alpha = 0.3f), RoundedCornerShape(2.dp))
+            .background(AppColors.ink.copy(alpha = 0.3f), RoundedCornerShape(2.dp))
             .semantics { contentDescription = described },
     )
 }

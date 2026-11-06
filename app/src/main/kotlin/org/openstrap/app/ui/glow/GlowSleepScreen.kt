@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalResources
 import org.openstrap.app.presentation.dotFormat
@@ -305,7 +306,7 @@ private fun RegularityCard(state: DayUiState, reg: org.openstrap.app.data.SleepR
             w.usual?.let { u ->
                 Text(
                     TabCopy.usualTimes(SleepHistory.clockMinutes(u.bedtime), SleepHistory.clockMinutes(u.wake)),
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp),
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp),
                 )
             }
             Spacer(Modifier.height(12.dp))

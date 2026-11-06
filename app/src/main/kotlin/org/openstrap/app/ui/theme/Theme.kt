@@ -3,8 +3,11 @@ package org.openstrap.app.ui.theme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.Font
@@ -58,7 +61,7 @@ object MetricColors {
     }
 }
 
-/** The OpenStrap palette: navy pages, cream ink, one coral accent. */
+/** The OpenStrap palette: navy pages, cream ink, one coral accent. The app draws through [AppColors]; widgets keep these. */
 object AppPalette {
     val Navy = Color(0xFF14213D)
     val NavyRaised = Color(0xFF1C2C50)
@@ -67,35 +70,67 @@ object AppPalette {
     val Coral = Color(0xFFFF6B5B)
 }
 
-private val Dark = darkColorScheme(
-    // Coral is the one accent: switches, primary buttons and progress. Containers are raised navies.
-    primary = AppPalette.Coral,
-    onPrimary = AppPalette.Navy,
-    primaryContainer = AppPalette.NavyHigh,
-    onPrimaryContainer = AppPalette.Cream,
-    secondary = AppPalette.Cream,
-    onSecondary = AppPalette.Navy,
-    secondaryContainer = AppPalette.NavyHigh,
-    onSecondaryContainer = AppPalette.Cream,
-    tertiary = AppPalette.Cream,
-    onTertiary = AppPalette.Navy,
-    tertiaryContainer = AppPalette.NavyHigh,
-    onTertiaryContainer = AppPalette.Cream,
-    surfaceTint = Color.Transparent,
-    background = AppPalette.Navy,
-    onBackground = AppPalette.Cream,
-    surface = AppPalette.Navy,
-    onSurface = AppPalette.Cream,
-    surfaceContainerLowest = AppPalette.Navy,
-    surfaceContainerLow = Color(0xFF172644),
-    surfaceContainer = AppPalette.NavyRaised,
-    surfaceContainerHigh = Color(0xFF20325A),
-    surfaceContainerHighest = AppPalette.NavyHigh,
-    onSurfaceVariant = Color(0xFFA9ADB9),
-    outline = Color(0xFF2E4069),
-    outlineVariant = Color(0xFF24365E),
-    error = Color(0xFFFF6B6B),
-)
+/** Material's colours for one theme, for what Material draws itself (menus, pickers, dialogs, text selection). */
+private fun schemeOf(t: ThemeColors) = if (t.light) {
+    lightColorScheme(
+        primary = AppPalette.Coral,
+        onPrimary = Color.White,
+        primaryContainer = t.control,
+        onPrimaryContainer = t.ink,
+        secondary = t.ink,
+        onSecondary = t.page,
+        secondaryContainer = t.control,
+        onSecondaryContainer = t.ink,
+        tertiary = t.ink,
+        onTertiary = t.page,
+        tertiaryContainer = t.control,
+        onTertiaryContainer = t.ink,
+        surfaceTint = Color.Transparent,
+        background = t.page,
+        onBackground = t.ink,
+        surface = t.page,
+        onSurface = t.ink,
+        surfaceContainerLowest = Color.White,
+        surfaceContainerLow = t.skyTop,
+        surfaceContainer = t.raised,
+        surfaceContainerHigh = t.raised,
+        surfaceContainerHighest = t.control,
+        onSurfaceVariant = t.ink.copy(alpha = 0.65f),
+        outline = t.ink.copy(alpha = 0.22f),
+        outlineVariant = t.ink.copy(alpha = 0.12f),
+        error = Color(0xFFD64545),
+    )
+} else {
+    darkColorScheme(
+        // Coral is the one accent: switches, primary buttons and progress. Containers are the raised surfaces.
+        primary = AppPalette.Coral,
+        onPrimary = t.page,
+        primaryContainer = t.raised,
+        onPrimaryContainer = t.ink,
+        secondary = t.ink,
+        onSecondary = t.page,
+        secondaryContainer = t.raised,
+        onSecondaryContainer = t.ink,
+        tertiary = t.ink,
+        onTertiary = t.page,
+        tertiaryContainer = t.raised,
+        onTertiaryContainer = t.ink,
+        surfaceTint = Color.Transparent,
+        background = t.page,
+        onBackground = t.ink,
+        surface = t.page,
+        onSurface = t.ink,
+        surfaceContainerLowest = t.page,
+        surfaceContainerLow = lerp(t.page, t.control, 0.3f),
+        surfaceContainer = t.control,
+        surfaceContainerHigh = lerp(t.control, t.raised, 0.5f),
+        surfaceContainerHighest = t.raised,
+        onSurfaceVariant = t.ink.copy(alpha = 0.65f),
+        outline = t.ink.copy(alpha = 0.2f),
+        outlineVariant = t.ink.copy(alpha = 0.14f),
+        error = Color(0xFFFF6B6B),
+    )
+}
 
 private fun inter(weight: Int) = Font(
     R.font.inter,
@@ -151,11 +186,16 @@ private val AppTypography get() = Typography(
     labelSmall = text(Base.labelSmall),
 )
 
-/** Always dark: navy pages with cream ink, whatever the system light mode. */
+/**
+ * The theme picked on the You page ([AppColors.theme]), whatever the system's light mode: Navy, OLED black and Warm
+ * dusk are dark, Cream light is light. Read here, so switching composes the app again in the new colours.
+ */
 @Composable
 fun OpenStrapTheme(content: @Composable () -> Unit) {
+    val colors = AppColors.current
+    val scheme = remember(colors) { schemeOf(colors) }
     MaterialTheme(
-        colorScheme = Dark,
+        colorScheme = scheme,
         typography = AppTypography,
         content = content,
     )

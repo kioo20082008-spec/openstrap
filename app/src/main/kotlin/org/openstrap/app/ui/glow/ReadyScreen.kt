@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import android.content.Intent
+import org.openstrap.app.ui.theme.AppColors
 import android.provider.Settings
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -220,7 +221,7 @@ fun GlowWorkoutReadyScreen(
     WorkoutPage(
         Color.Transparent, contentPadding,
         // While a goal is typed the keyboard has the bottom of the screen.
-        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), Color.White, Color.Black, start, icon = AppIcons.PlayFill, height = 64.dp) }),
+        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), AppColors.ink, AppColors.onInk, start, icon = AppIcons.PlayFill, height = 64.dp) }),
     ) {
         Box(Modifier.fillMaxWidth()) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack, Modifier.align(Alignment.CenterStart))
@@ -313,7 +314,7 @@ private val GoalDraftSaver = androidx.compose.runtime.saveable.listSaver<GoalDra
 @Composable
 internal fun RoundIcon(
     icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier,
-    size: Dp = 44.dp, surface: Color = Raised, ink: Color = Color.White, iconSize: Dp = 18.dp,
+    size: Dp = 44.dp, surface: Color = Raised, ink: Color = AppColors.ink, iconSize: Dp = 18.dp,
 ) {
     Box(
         modifier.size(size).clip(CircleShape).background(surface).pressClickable(onClick, CircleShape),

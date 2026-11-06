@@ -27,7 +27,7 @@ import org.robolectric.annotation.GraphicsMode
 class PageButtonTest {
     @get:Rule val rules = ComposeRules()
 
-    /** The red of the pill on black, beside its label, for a primary button [enabled] or not. */
+    /** The red of the pill on black, beside its label, for a primary button [enabled] or not (Navy's cream ink). */
     private fun pill(enabled: Boolean): Float {
         rules.compose.setContent {
             Box(Modifier.background(Color.Black)) {
@@ -38,8 +38,8 @@ class PageButtonTest {
         return pixels[pixels.width / 10, pixels.height / 2].red
     }
 
-    @Test fun `an enabled primary button's pill is white`() {
-        assertEquals(1f, pill(enabled = true), 0.02f)
+    @Test fun `an enabled primary button's pill is the theme's ink`() {
+        assertEquals(org.openstrap.app.ui.theme.AppColors.ink.red, pill(enabled = true), 0.02f)
     }
 
     @Test fun `a disabled primary button's pill dims with its label`() {

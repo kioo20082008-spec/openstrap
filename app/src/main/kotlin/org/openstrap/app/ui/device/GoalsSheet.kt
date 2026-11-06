@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.device
 
 import androidx.compose.foundation.background
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -26,7 +27,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
@@ -40,7 +40,6 @@ import org.openstrap.app.data.settings.CalorieGoal
 import org.openstrap.app.data.settings.Goals
 import org.openstrap.app.presentation.GoalCopy
 import org.openstrap.app.presentation.Units
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
@@ -79,7 +78,7 @@ fun GoalsSheet(goals: Goals, onSave: (Goals) -> Unit, onDismiss: () -> Unit, sug
         CalorieGoalField(calories, { calories = it }, suggestedCalories)
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(
-                stringResource(R.string.you_goals_sleep_label), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                stringResource(R.string.you_goals_sleep_label), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -122,7 +121,7 @@ fun GoalsSheet(goals: Goals, onSave: (Goals) -> Unit, onDismiss: () -> Unit, sug
 internal fun WorkoutGoalField(value: Int, onChange: (Int) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
-            stringResource(R.string.you_goals_workouts_label), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.you_goals_workouts_label), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary,
         )
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -130,9 +129,9 @@ internal fun WorkoutGoalField(value: Int, onChange: (Int) -> Unit) {
                 AppIcons.Minus, stringResource(R.string.you_goals_workouts_fewer),
                 { onChange((value - 1).coerceIn(Goals.WORKOUTS_PER_WEEK)) }, size = 44.dp,
             )
-            Box(Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(ControlSurface), contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(AppColors.control), contentAlignment = Alignment.Center) {
                 Text(
-                    pluralStringResource(R.plurals.you_goals_workouts_value, value, value), color = Color.White, style = GlowType.body,
+                    pluralStringResource(R.plurals.you_goals_workouts_value, value, value), color = AppColors.ink, style = GlowType.body,
                     maxLines = 1,
                 )
             }
@@ -169,7 +168,7 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
     val typeLabel = stringResource(R.string.you_goals_calories_type)
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(
-            stringResource(R.string.you_goals_calories_label), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.you_goals_calories_label), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary,
         )
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -179,7 +178,7 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
                 size = 44.dp,
             )
             Box(
-                Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(ControlSurface)
+                Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
                     .let {
                         if (typing) it
                         else it.clickable(onClickLabel = typeLabel, role = Role.Button) {
@@ -192,15 +191,15 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
                     BasicTextField(
                         text, { t -> text = t.filter { it.isDigit() }.take(4) },
                         Modifier.fillMaxWidth().focusRequester(focus).onFocusChanged { if (it.isFocused) focused = true else if (focused) commit() },
-                        textStyle = GlowType.body.copy(color = Color.White, textAlign = TextAlign.Center), singleLine = true,
+                        textStyle = GlowType.body.copy(color = AppColors.ink, textAlign = TextAlign.Center), singleLine = true,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = { commit() }),
-                        cursorBrush = SolidColor(Color.White),
+                        cursorBrush = SolidColor(AppColors.ink),
                     )
                     LaunchedEffect(Unit) { focus.requestFocus() }
                 } else {
                     Text(
-                        stringResource(R.string.you_goals_active_kcal, Units.count(value.toLong())), color = Color.White,
+                        stringResource(R.string.you_goals_active_kcal, Units.count(value.toLong())), color = AppColors.ink,
                         style = GlowType.body, maxLines = 1,
                     )
                 }

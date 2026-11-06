@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import org.openstrap.app.presentation.Units
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Pace
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -253,7 +254,7 @@ private fun RepPage(
                 org.openstrap.app.ui.workout.StartCopy.structureName(structure),
                 org.openstrap.app.ui.workout.StartCopy.restText(structure.rest),
             ),
-            color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1,
+            color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1,
         )
         val underWay = structure.meters?.let { meters -> m.metersLeft?.let { 1f - it / meters } }
         RoundBar(m, structure.seconds, underWay)
@@ -265,7 +266,7 @@ private fun RepPage(
                     org.openstrap.app.data.Phase.WarmUp -> stringResource(R.string.workout_live_warm_up)
                     org.openstrap.app.data.Phase.Done -> stringResource(R.string.workout_live_all_reps_done, m.rounds)
                 },
-                color = Color.White, style = MediumBody, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = MediumBody, maxLines = 1, modifier = Modifier.weight(1f),
             )
             val next = when (m.phase) {
                 is org.openstrap.app.data.Phase.Work ->
@@ -275,7 +276,7 @@ private fun RepPage(
                 org.openstrap.app.data.Phase.WarmUp -> stringResource(R.string.workout_live_reps_after, m.rounds)
                 org.openstrap.app.data.Phase.Done -> ""
             }
-            Text(next, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+            Text(next, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
         }
         Column(
             Modifier.fillMaxWidth().then(if (shortLandscape(compact)) Modifier else Modifier.weight(1f)),
@@ -291,7 +292,7 @@ private fun RepPage(
                     m.phase == org.openstrap.app.data.Phase.WarmUp -> stringResource(R.string.workout_live_phase_warming_up)
                     else -> stringResource(R.string.workout_live_phase_done)
                 },
-                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             )
             val (value, unit) = when {
                 work && m.metersLeft != null -> "${m.metersLeft.toInt()}" to stringResource(R.string.workout_live_unit_m_to_go)
@@ -302,7 +303,7 @@ private fun RepPage(
             }
             if (value != null) {
                 DotMatrixText(value, dot = DotSize.Live, scale = 1.2f)
-                Text(unit, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
+                Text(unit, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
             }
             val line = when {
                 work -> Route.currentPace(route)?.let { pace ->
@@ -314,7 +315,7 @@ private fun RepPage(
                 m.phase == org.openstrap.app.data.Phase.Done -> stringResource(R.string.workout_live_end_or_keep)
                 else -> null
             }
-            if (line != null) Text(line, color = Color.White, style = GlowType.sentence, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+            if (line != null) Text(line, color = AppColors.ink, style = GlowType.sentence, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
         }
         LitHeartPill(bpm, r.maxHeartRate, color, r.paused, 56.dp, Modifier.fillMaxWidth())
         val done = r.rounds.filter { it.workEnd != null }
@@ -329,10 +330,10 @@ private fun RepPage(
                 ) {
                     Text(
                         stringResource(R.string.workout_live_rep_chip, round.index + 1),
-                        color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
+                        color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text(workoutClock(round.workEnd!! - round.workStart), color = Color.White, style = MediumBody, maxLines = 1)
+                    Text(workoutClock(round.workEnd!! - round.workStart), color = AppColors.ink, style = MediumBody, maxLines = 1)
                 }
             }
         }
@@ -366,7 +367,7 @@ private fun PaceCard(pace: Double?, averagePace: () -> Double?, splits: List<Rou
     EdgeCard(MetricColors.steps, modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth()) {
             Text(
-                stringResource(if (speed) R.string.workout_live_speed_title else R.string.workout_live_pace_title), color = Color.White,
+                stringResource(if (speed) R.string.workout_live_speed_title else R.string.workout_live_pace_title), color = AppColors.ink,
                 style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
             )
             AveragePace(averagePace, speed)
@@ -384,7 +385,7 @@ private fun PaceCard(pace: Double?, averagePace: () -> Double?, splits: List<Rou
                 Spacer(Modifier.width(8.dp))
                 Text(
                     stringResource(if (speed) R.string.workout_live_unit_kmh else R.string.workout_live_unit_per_km),
-                    color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, maxLines = 1,
+                    color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, maxLines = 1,
                 )
             }
         }
@@ -400,7 +401,7 @@ private fun PaceCard(pace: Double?, averagePace: () -> Double?, splits: List<Rou
 private fun AveragePace(averagePace: () -> Double?, speed: Boolean) {
     val average = averagePace()
     val avg = (if (speed) speedText(average) else Pace.clock(average))?.let { stringResource(R.string.workout_live_avg, it) }
-    if (avg != null) Text(avg, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+    if (avg != null) Text(avg, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
 }
 
 /**
@@ -448,7 +449,7 @@ private fun KmSplitBars(splits: List<Route.Split>) {
                 }
                 Text(
                     if (underWay) stringResource(R.string.workout_live_split_km, s.index + 1) else workoutClock(s.seconds),
-                    color = if (best) Color.White else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                    color = if (best) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.caption.copy(fontWeight = if (best) FontWeight.SemiBold else null), maxLines = 1,
                 )
             }

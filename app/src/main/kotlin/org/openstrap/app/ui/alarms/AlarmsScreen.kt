@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.alarms
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import org.openstrap.app.ui.glow.DestructiveInk
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.ui.glow.PageButton
 import org.openstrap.app.ui.glow.PageChip
 import org.openstrap.app.ui.glow.PageConfirm
@@ -202,13 +202,13 @@ private fun AlarmsPanel(
         state.alarms.forEach { a ->
             Row(Modifier.fillMaxWidth().clickable(enabled = !state.busy) { onEdit(a) }.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    val ink = if (a.enabled) Color.White else Color.White.copy(alpha = 0.45f)
+                    val ink = if (a.enabled) AppColors.ink else AppColors.ink.copy(alpha = 0.45f)
                     val (digits, marker) = dotClock(a.hour, a.minute)
                     Row(verticalAlignment = Alignment.Bottom) {
                         org.openstrap.app.ui.glow.DotMatrixText(digits, dot = org.openstrap.app.ui.glow.draw.DotSize.Edge, color = ink)
                         marker?.let { Text(it, style = GlowType.secondary, color = ink, modifier = Modifier.padding(start = 6.dp)) }
                     }
-                    Text(daysLabel(a.days), style = GlowType.secondary, color = Color.White.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
+                    Text(daysLabel(a.days), style = GlowType.secondary, color = AppColors.ink.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
                 }
                 org.openstrap.app.ui.glow.GlowSwitch(a.enabled, { onToggle(a, it) }, enabled = !state.busy)
             }
@@ -312,13 +312,13 @@ private fun AlarmSheet(alarm: Alarm, isNew: Boolean, onSave: (Alarm) -> Unit, on
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AlarmClockColors() = TimePickerDefaults.colors(
-    clockDialColor = ControlSurface,
-    clockDialSelectedContentColor = Color.Black,
-    clockDialUnselectedContentColor = Color.White,
-    selectorColor = Color.White,
+    clockDialColor = AppColors.control,
+    clockDialSelectedContentColor = AppColors.onInk,
+    clockDialUnselectedContentColor = AppColors.ink,
+    selectorColor = AppColors.ink,
     containerColor = Color.Transparent,
-    timeSelectorSelectedContainerColor = Color.White,
-    timeSelectorUnselectedContainerColor = ControlSurface,
-    timeSelectorSelectedContentColor = Color.Black,
-    timeSelectorUnselectedContentColor = Color.White,
+    timeSelectorSelectedContainerColor = AppColors.ink,
+    timeSelectorUnselectedContainerColor = AppColors.control,
+    timeSelectorSelectedContentColor = AppColors.onInk,
+    timeSelectorUnselectedContentColor = AppColors.ink,
 )

@@ -33,6 +33,7 @@ import org.openstrap.app.data.SportSettings
 import org.openstrap.app.data.WorkoutAnalysis
 import org.openstrap.app.data.catching
 import org.openstrap.app.data.db.HealthDao
+import org.openstrap.app.data.settings.AppTheme
 import org.openstrap.app.data.settings.Goals
 import org.openstrap.app.data.settings.SettingsStore
 import org.openstrap.app.device.ConnectionState
@@ -233,6 +234,9 @@ class AppRootViewModel(
     fun setWorkoutLiveView(view: Int) = write("live view") { settings.setWorkoutLiveView(view) }
 
     fun setGoalMoment(on: Boolean) = write("goal moment") { settings.setGoalMoment(on) }
+
+    /** The colour theme; the activity applies it as the store changes, so the switch is live. */
+    fun setAppTheme(theme: AppTheme) = write("app theme") { settings.setAppTheme(theme) }
 
     fun setWeeklyRecap(on: Boolean) = write("weekly recap") { settings.setWeeklyRecap(on) }
 

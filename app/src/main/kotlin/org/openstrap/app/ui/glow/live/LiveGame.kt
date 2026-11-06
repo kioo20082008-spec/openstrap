@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import androidx.compose.foundation.layout.Arrangement
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -13,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -95,10 +95,10 @@ internal fun LiveGameScreen(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
                     if (bpm != null) HeroValue("$bpm", stringResource(R.string.workout_live_unit_bpm), dot = DotSize.Detail)
-                    else Text(WorkoutCopy.noHeartRate(r.paused, connected), color = Color.White, style = GlowType.sentence)
+                    else Text(WorkoutCopy.noHeartRate(r.paused, connected), color = AppColors.ink, style = GlowType.sentence)
                     Spacer(Modifier.weight(1f))
                     WorkoutRecorder.liveZone(bpm, r.maxHeartRate, heartZones)?.let { z ->
-                        Text(WorkoutCopy.zoneLine(z), color = Color.White, style = GlowType.secondary)
+                        Text(WorkoutCopy.zoneLine(z), color = AppColors.ink, style = GlowType.secondary)
                     }
                 }
                 EffortBar(effort)
@@ -106,10 +106,10 @@ internal fun LiveGameScreen(
         }
         LiveFigures(figures)
         Spacer(Modifier.weight(1f))
-        if (periods != null && phase is Phase.Work) WorkoutButton(StartCopy.breakName(periods.rounds), Color.White, Color.Black, onHalfTime, icon = AppIcons.PauseFill, height = 64.dp)
+        if (periods != null && phase is Phase.Work) WorkoutButton(StartCopy.breakName(periods.rounds), AppColors.ink, AppColors.onInk, onHalfTime, icon = AppIcons.PauseFill, height = 64.dp)
         if (periods != null && phase is Phase.Rest) WorkoutButton(
             stringResource(R.string.workout_live_game_start_period, StartCopy.periodName(phase.round + 1, periods.rounds).lowercase()),
-            Color.White, Color.Black, onHalfTime, icon = AppIcons.PlayFill, height = 64.dp,
+            AppColors.ink, AppColors.onInk, onHalfTime, icon = AppIcons.PlayFill, height = 64.dp,
         )
     }
 }
@@ -128,8 +128,8 @@ private fun PeriodRow(r: WorkoutState.Recording, periods: Structure.Periods, pha
         else -> stringResource(R.string.workout_live_game_full_time) to workoutClock(active())
     }
     Row(Modifier.fillMaxWidth()) {
-        Text(title, color = Color.White, style = GlowType.pageTitle, modifier = Modifier.weight(1f))
-        Text(clock, color = Color.White, style = GlowType.pageTitle.copy(fontFeatureSettings = "tnum"))
+        Text(title, color = AppColors.ink, style = GlowType.pageTitle, modifier = Modifier.weight(1f))
+        Text(clock, color = AppColors.ink, style = GlowType.pageTitle.copy(fontFeatureSettings = "tnum"))
     }
 }
 
@@ -140,11 +140,11 @@ internal fun EffortBar(effort: Int?) {
     val described = of ?: stringResource(R.string.workout_live_effort_none)
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         SegmentBar(
-            List(5) { i -> Segment(1f, if (effort != null && i < effort) ZONE_COLORS[i] else Color.Black.copy(alpha = 0.35f)) },
+            List(5) { i -> Segment(1f, if (effort != null && i < effort) ZONE_COLORS[i] else AppColors.well(0.35f)) },
             Modifier.weight(1f).semantics { contentDescription = described },
             height = 8.dp, gap = 4.dp,
         )
         Spacer(Modifier.width(12.dp))
-        Text(of ?: stringResource(R.string.workout_live_effort), color = Color.White, style = GlowType.secondary)
+        Text(of ?: stringResource(R.string.workout_live_effort), color = AppColors.ink, style = GlowType.secondary)
     }
 }

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.data.Weeks
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Units
 import org.openstrap.app.presentation.LoadBand
 import org.openstrap.app.presentation.Vo2maxCopy
@@ -223,7 +224,7 @@ private fun dayOnDay(values: List<Float>): List<List<Float>> {
 
 /** The day bars' colours: the oldest day's part darker at the foot of every bar, the [last] bar (today) lit. */
 private fun dayOnDayColor(color: Color, last: Int): (bar: Int, part: Int) -> Color = { bar, part ->
-    val main = if (bar == last) lerp(color, Color.White, TODAY_LIFT) else color
+    val main = if (bar == last) lerp(color, AppColors.ink, TODAY_LIFT) else color
     if (part == 0) lerp(main, Color.Black, OLDEST_SHADE) else main
 }
 
@@ -613,7 +614,7 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
                 Column(Modifier.padding(top = 8.dp)) {
                     FillBar(CaloriesCopy.share(active, goal), color)
                     Text(
-                        CaloriesCopy.toGoal(active, goal), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        CaloriesCopy.toGoal(active, goal), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp),
                     )
                 }
@@ -695,7 +696,7 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
 
 /** The hours' colours: workouts in the ink, walking in its darker shade, everyday moving in white at 40%. */
 private val WalkingKcal = MetricColors.caloriesShade
-private val EverydayKcal = Color.White.copy(alpha = 0.4f)
+private val EverydayKcal: Color get() = AppColors.ink.copy(alpha = 0.4f)
 
 /**
  * By the hour: the day's 24 hours as bars split by where the kcal came from (workouts at the foot, then walking, then
@@ -811,7 +812,7 @@ private fun StackedBars(
             val slot = size.width / stacks.size.coerceAtLeast(1)
             val w = (slot * 0.6f).coerceAtMost(widest.toPx())
             val r = CornerRadius(minOf(4.dp.toPx(), w / 2))
-            drawLine(Color.White.copy(alpha = 0.08f), Offset(0f, size.height - 0.5.dp.toPx()), Offset(size.width, size.height - 0.5.dp.toPx()), 1.dp.toPx())
+            drawLine(AppColors.ink.copy(alpha = 0.08f), Offset(0f, size.height - 0.5.dp.toPx()), Offset(size.width, size.height - 0.5.dp.toPx()), 1.dp.toPx())
             stacks.forEachIndexed { i, parts ->
                 val sum = sums[i]
                 if (sum <= 0f) return@forEachIndexed
@@ -830,7 +831,7 @@ private fun StackedBars(
                     }
                 }
             }
-            goal?.let { g -> val y = yOf(g); drawLine(Color.White.copy(alpha = 0.4f), Offset(0f, y), Offset(size.width, y), 1.dp.toPx()) }
+            goal?.let { g -> val y = yOf(g); drawLine(AppColors.ink.copy(alpha = 0.4f), Offset(0f, y), Offset(size.width, y), 1.dp.toPx()) }
         }
         Ltr {
         androidx.compose.foundation.layout.Row(
@@ -839,7 +840,7 @@ private fun StackedBars(
         ) {
             labels.forEach { l ->
                 Text(
-                    l, color = Color.White.copy(alpha = 0.55f), style = GlowType.secondary, maxLines = 1,
+                    l, color = AppColors.ink.copy(alpha = 0.55f), style = GlowType.secondary, maxLines = 1,
                     modifier = if (spread) Modifier else Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }

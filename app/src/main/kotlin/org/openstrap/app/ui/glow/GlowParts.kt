@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.material3.ripple
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.draw.clip
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
@@ -48,14 +49,15 @@ fun DotMatrixText(
     text: String,
     modifier: Modifier = Modifier,
     dot: DotSize,
-    color: Color = Color.White,
+    color: Color = AppColors.ink,
     /** Shrinks the dots below [dot] where the number must fit a space (the live workout's arc), 0..1. */
     scale: Float = 1f,
 ) {
     // The redesign draws numbers as bold Inter rather than dots, at the height the dots took.
     val size = (dot.dot.value * scale * 9f).sp
     Text(
-        text, modifier.semantics { contentDescription = text }, color = color, maxLines = 1, softWrap = false,
+        // A metric's hue as a big number: taken dark enough to read on the light theme.
+        text, modifier.semantics { contentDescription = text }, color = AppColors.readable(color), maxLines = 1, softWrap = false,
         style = TextStyle(
             fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = if (dot.dot.value >= 3.6f) androidx.compose.ui.text.font.FontWeight.ExtraLight else androidx.compose.ui.text.font.FontWeight.Light,
             fontSize = size, lineHeight = size, letterSpacing = (-0.02f).em,
@@ -74,10 +76,10 @@ fun DotMatrixText(
  */
 @Composable
 fun GlowSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true, accent: Color? = null) {
-    val onTrack = accent?.let { lerp(it, Color.Black, 0.25f) } ?: Color.White
-    val track by animateColorAsState(if (checked) onTrack else Color.White.copy(alpha = 0.12f), label = "glow switch track")
+    val onTrack = accent?.let { lerp(it, Color.Black, 0.25f) } ?: AppColors.ink
+    val track by animateColorAsState(if (checked) onTrack else AppColors.ink.copy(alpha = 0.12f), label = "glow switch track")
     val knobColor by animateColorAsState(
-        if (!checked) Color.White.copy(alpha = 0.6f) else if (accent != null) Color.White else Color.Black,
+        if (!checked) AppColors.ink.copy(alpha = 0.6f) else if (accent != null) Color.White else AppColors.onInk,
         label = "glow switch knob colour",
     )
     val knob by animateDpAsState(if (checked) 26.dp else 0.dp, spring(dampingRatio = 0.6f, stiffness = 500f), label = "glow switch knob")
@@ -122,7 +124,7 @@ internal fun HeroValue(
     modifier: Modifier = Modifier,
     dot: DotSize = DotSize.Hero,
     gap: Dp = 8.dp,
-    color: Color = Color.White,
+    color: Color = AppColors.ink,
     unitStyle: TextStyle = GlowType.body,
     maxWidth: Dp = Dp.Infinity,
 ) {
@@ -130,7 +132,7 @@ internal fun HeroValue(
         DotMatrixText(value, dot = dot, color = color, scale = dotFitScale(value, dot, maxWidth))
         if (unit.isNotBlank()) Text(
             unit, Modifier.padding(start = gap).weight(1f, fill = false),
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = unitStyle,
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = unitStyle,
         )
     }
 }

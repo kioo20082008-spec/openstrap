@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.TimeOfDay
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.data.Route
@@ -301,7 +301,7 @@ private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
             EdgeValue(w.averageHeartRate?.toString(), stringResource(R.string.glow_workout_unit_bpm_average), range, waiting = false)
         }
         if (a.heartRate.isEmpty()) Text(
-            stringResource(R.string.glow_workout_heart_none), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.glow_workout_heart_none), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary, modifier = Modifier.padding(top = 10.dp),
         ) else {
             ZoneHeartLine(values, first, a.end, a.maxHeartRate, a.historyRanges, scrubbed, { scrubbed = it }, Modifier.padding(top = 16.dp))
@@ -317,7 +317,7 @@ private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
                 stringResource(
                     R.string.glow_workout_heart_dimmed, a.historyRanges.joinToString(", ") { Ranges.times(it.first, it.last + 1) },
                 ),
-                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                 modifier = Modifier.padding(top = 8.dp),
             )
         }
@@ -351,21 +351,21 @@ private fun ZoneHeartLine(
         val dx = size.width / (values.size - 1).coerceAtLeast(1)
         fun y(v: Float) = size.height - (v - lo) / (hi - lo) * size.height
         if (endIndex in 1 until values.lastIndex) drawLine(
-            Color.White.copy(alpha = 0.35f), Offset(endIndex * dx, 0f), Offset(endIndex * dx, size.height), strokeWidth = 1.dp.toPx(),
+            AppColors.ink.copy(alpha = 0.35f), Offset(endIndex * dx, 0f), Offset(endIndex * dx, size.height), strokeWidth = 1.dp.toPx(),
         )
         drawZoneLine(values.size, 2.5.dp.toPx(), at = { i -> values[i]?.let { Offset(i * dx, y(it)) } }) { i ->
             val v = values[i] ?: return@drawZoneLine null
             val t = first + i * HeartStep
-            val color = if (i >= endIndex) Color.White.copy(alpha = 0.55f) else zoneColor(v.roundToInt(), maxHr, heartZones)
+            val color = if (i >= endIndex) AppColors.ink.copy(alpha = 0.55f) else zoneColor(v.roundToInt(), maxHr, heartZones)
             // The strap's history, filled in after: the same line, dimmed (spec 2.7, no dashes).
             if (history.any { t in it }) color.copy(alpha = color.alpha * 0.45f) else color
         }
         scrubbed?.let { i ->
             val v = values.getOrNull(i) ?: return@let
             val p = Offset(i * dx, y(v))
-            drawLine(Color.White.copy(alpha = 0.4f), Offset(p.x, 0f), Offset(p.x, size.height), strokeWidth = 1.dp.toPx())
-            drawCircle(Color.Black.copy(alpha = 0.6f), 6.dp.toPx(), p)
-            drawCircle(Color.White, 4.dp.toPx(), p)
+            drawLine(AppColors.ink.copy(alpha = 0.4f), Offset(p.x, 0f), Offset(p.x, size.height), strokeWidth = 1.dp.toPx())
+            drawCircle(AppColors.shade.copy(alpha = 0.6f), 6.dp.toPx(), p)
+            drawCircle(AppColors.ink, 4.dp.toPx(), p)
         }
     }
 }
@@ -378,7 +378,7 @@ private fun ZoneHeartLine(
 private fun InYourDayCard(text: String, onOpen: (() -> Unit)?) {
     EdgeCard(MetricColors.calories, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier, onClick = onOpen) {
         EdgeTitle(stringResource(R.string.glow_workout_in_your_day), null)
-        Text(text, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
+        Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
     }
 }
 

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.device
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -107,7 +107,7 @@ fun UpdatesPage(
             )
             PagePanel(title = title) {
                 shown.forEachIndexed { i, release ->
-                    if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.08f)))
+                    if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(AppColors.ink.copy(alpha = 0.08f)))
                     ReleaseNotesView(release)
                 }
             }
@@ -116,7 +116,7 @@ fun UpdatesPage(
             Text(
                 stringResource(R.string.you_updates_installed, installed),
                 Modifier.fillMaxWidth().padding(top = 4.dp),
-                color = Color.White.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
+                color = AppColors.ink.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
             )
         }
     }
@@ -128,28 +128,28 @@ private fun ReleaseNotesView(release: Release) {
     val blocks = remember(release.notes) { ReleaseNotes.parse(release.notes) }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(release.versionName, color = Color.White, style = GlowType.body.copy(fontWeight = FontWeight.Medium), modifier = Modifier.weight(1f))
+            Text(release.versionName, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Medium), modifier = Modifier.weight(1f))
             release.publishedAt?.let {
-                Text(UpdateCopy.date(it), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+                Text(UpdateCopy.date(it), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
             }
         }
         if (blocks.isEmpty()) {
             Text(
-                stringResource(R.string.you_updates_no_notes), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                stringResource(R.string.you_updates_no_notes), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
             )
         }
         blocks.forEachIndexed { i, block -> when (block) {
             is NoteBlock.Heading -> Text(
-                spans(block.spans), color = Color.White, style = GlowType.body.copy(fontWeight = FontWeight.Medium), modifier = Modifier.padding(top = 6.dp),
+                spans(block.spans), color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Medium), modifier = Modifier.padding(top = 6.dp),
             )
             // The opening paragraph leads, larger; any later one reads like the bullets.
             is NoteBlock.Paragraph ->
-                if (i == 0) Text(spans(block.spans), color = Color.White.copy(alpha = 0.85f), style = GlowType.body)
-                else Text(spans(block.spans), color = Color.White.copy(alpha = 0.75f), style = GlowType.secondary)
+                if (i == 0) Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
+                else Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.secondary)
             is NoteBlock.Bullet -> Row {
-                Text("•", color = Color.White.copy(alpha = 0.5f), style = GlowType.body, modifier = Modifier.width(16.dp))
-                Text(spans(block.spans), color = Color.White.copy(alpha = 0.75f), style = GlowType.secondary, modifier = Modifier.padding(top = 1.dp))
+                Text("•", color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.body, modifier = Modifier.width(16.dp))
+                Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.secondary, modifier = Modifier.padding(top = 1.dp))
             }
         } }
     }
@@ -158,6 +158,6 @@ private fun ReleaseNotesView(release: Release) {
 /** Bold runs in white at medium weight, the rest in the text's own colour. */
 private fun spans(spans: List<NoteSpan>): AnnotatedString = buildAnnotatedString {
     for (s in spans) {
-        if (s.bold) withStyle(SpanStyle(fontWeight = FontWeight.Medium, color = Color.White)) { append(s.text) } else append(s.text)
+        if (s.bold) withStyle(SpanStyle(fontWeight = FontWeight.Medium, color = AppColors.ink)) { append(s.text) } else append(s.text)
     }
 }

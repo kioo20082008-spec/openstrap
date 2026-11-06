@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -69,7 +69,7 @@ fun HeartZonesScreen(
                 }
             }
         }
-        item { Text(HeartZonesCopy.NOTE, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(horizontal = 4.dp)) }
+        item { Text(HeartZonesCopy.NOTE, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(horizontal = 4.dp)) }
         if (!zones.standard) item {
             PageButton(HeartZonesCopy.RESET, { onZones(HeartZones.STANDARD) }, Modifier.fillMaxWidth(), icon = AppIcons.ArrowCounterClockwise)
         }
@@ -87,12 +87,12 @@ private fun MaxHero(max: MaxHeartRate?, onSet: () -> Unit) {
         lightCenter = { Offset(0f, it.height / 2) }, reach = { Size(it.width * HERO_LIGHT_REACH, it.width * HERO_LIGHT_REACH) },
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(HeartZonesCopy.MAX_TITLE, color = Color.White.copy(alpha = 0.8f), style = GlowType.body)
+        Text(HeartZonesCopy.MAX_TITLE, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.body)
         HeroValue(
             max?.bpm?.toString() ?: "0", stringResource(R.string.glow_unit_bpm),
-            color = if (max != null) Color.White else Color.White.copy(alpha = 0.2f),
+            color = if (max != null) AppColors.ink else AppColors.ink.copy(alpha = 0.2f),
         )
-        if (max != null) Text(HeartZonesCopy.source(max), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        if (max != null) Text(HeartZonesCopy.source(max), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         PageButton(HeartZonesCopy.SET_IT, onSet, enabled = max != null, icon = AppIcons.PencilEdit)
     }
 }
@@ -116,9 +116,9 @@ private fun ZoneRow(zone: Int, bpm: String, divider: Boolean, onClick: () -> Uni
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
             RowName(HeartZonesCopy.zoneName(zone))
-            Text(ZONE_NAMES[zone], color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary)
+            Text(ZONE_NAMES[zone], color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary)
         }
-        Text(bpm, color = Color.White.copy(alpha = 0.85f), style = GlowType.body)
+        Text(bpm, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
         Spacer(Modifier.width(RowCaretGap))
         TapCaret(ROW_CARET_ALPHA)
     }
@@ -141,10 +141,10 @@ private fun ZoneSheet(zone: Int, zones: HeartZones, maxHr: Int, onZones: (HeartZ
 @Composable
 private fun BpmStepper(label: String, bpm: Int, onLess: () -> Unit, onMore: () -> Unit) {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, color = Color.White, style = GlowType.body, modifier = Modifier.weight(1f))
+        Text(label, color = AppColors.ink, style = GlowType.body, modifier = Modifier.weight(1f))
         RoundIcon(AppIcons.Minus, stringResource(R.string.glow_metrics_zone_lower, label), onLess)
         Text(
-            stringResource(R.string.glow_metrics_zone_bpm, bpm), color = Color.White, style = GlowType.sentence,
+            stringResource(R.string.glow_metrics_zone_bpm, bpm), color = AppColors.ink, style = GlowType.sentence,
             modifier = Modifier.width(110.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )

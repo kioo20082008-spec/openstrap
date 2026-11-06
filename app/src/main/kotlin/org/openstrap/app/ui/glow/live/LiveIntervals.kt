@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import org.openstrap.app.presentation.WorkoutColors
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.dotFormat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -158,7 +159,7 @@ internal fun LiveIntervalsScreen(
                 // Folded, +10 s sits beside the seconds: the half has no room for a row of its own.
                 action = {
                     val more = stringResource(R.string.workout_live_add_10_s)
-                    WorkoutButton(more, OverGlow, Color.White, onAddRest, Modifier.width(120.dp), height = 44.dp)
+                    WorkoutButton(more, OverGlow, AppColors.ink, onAddRest, Modifier.width(120.dp), height = 44.dp)
                 },
             )
             Phase.WarmUp -> PhaseFigure(
@@ -176,16 +177,16 @@ internal fun LiveIntervalsScreen(
         val tall = if (compact) 48.dp else 64.dp
         when (m.phase) {
             Phase.WarmUp -> WorkoutButton(
-                stringResource(R.string.workout_live_start_rounds), Color.White, Color.Black, onSkip, icon = AppIcons.PlayFill,
+                stringResource(R.string.workout_live_start_rounds), AppColors.ink, AppColors.onInk, onSkip, icon = AppIcons.PlayFill,
                 height = tall,
             )
             // A pill as high as the heart rate strip and, like it, no wider than its words need.
             is Phase.Rest -> if (!compact) WorkoutButton(
-                stringResource(R.string.workout_live_add_10_s), OverGlow, Color.White, onAddRest,
+                stringResource(R.string.workout_live_add_10_s), OverGlow, AppColors.ink, onAddRest,
                 Modifier.align(Alignment.CenterHorizontally).width(140.dp), height = 52.dp,
             )
             is Phase.Work -> if (m.everyMinute) WorkoutButton(
-                stringResource(R.string.workout_live_done_button), Color.White, Color.Black, onSkip, icon = AppIcons.Tick02, height = tall,
+                stringResource(R.string.workout_live_done_button), AppColors.ink, AppColors.onInk, onSkip, icon = AppIcons.Tick02, height = tall,
             )
             Phase.Done -> Unit
         }
@@ -193,7 +194,7 @@ internal fun LiveIntervalsScreen(
 }
 
 /** A see-through button colour that reads both on the phase's light and on black. */
-private val OverGlow = Color.White.copy(alpha = 0.16f)
+private val OverGlow: Color get() = AppColors.ink.copy(alpha = 0.16f)
 
 /**
  * The phase's light over the whole screen (boards HiitWork and HiitRest): work rises from the bottom, rest falls from
@@ -219,10 +220,10 @@ private fun SkipButton(label: String, done: Boolean, onSkip: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Box(Modifier.height(88.dp), contentAlignment = Alignment.Center) {
             FlatButton(OverGlow, 64.dp, onClick = onSkip) {
-                Icon(if (done) AppIcons.Tick02 else AppIcons.SkipFill, label, tint = Color.White, modifier = Modifier.size(20.dp))
+                Icon(if (done) AppIcons.Tick02 else AppIcons.SkipFill, label, tint = AppColors.ink, modifier = Modifier.size(20.dp))
             }
         }
-        Text(label, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        Text(label, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
     }
 }
 
@@ -245,7 +246,7 @@ internal fun RoundBar(m: IntervalMoment, workLength: Long?, underWay: Float? = n
     val described = stringResource(R.string.workout_live_rounds_done_description, done, m.rounds)
     SegmentBar(
         List(m.rounds.coerceIn(1, MAX_ROUNDS_SHOWN)) { i ->
-            Segment(1f, Color.White.copy(alpha = if (i < done) 1f else 0.25f), filled = if (i == done) under else 0f, fill = Color.White)
+            Segment(1f, AppColors.ink.copy(alpha = if (i < done) 1f else 0.25f), filled = if (i == done) under else 0f, fill = AppColors.ink)
         },
         Modifier.semantics { contentDescription = described }, height = 6.dp, gap = 6.dp,
     )
@@ -264,40 +265,40 @@ private fun ColumnScope.PhaseFigure(
     where: String, next: String, word: String, seconds: String?, line: String, compact: Boolean = false, action: (@Composable () -> Unit)? = null,
 ) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
-        Text(where, color = Color.White, style = GlowType.body, modifier = Modifier.weight(1f))
-        Text(next, color = Color.White.copy(alpha = 0.8f), style = GlowType.secondary)
+        Text(where, color = AppColors.ink, style = GlowType.body, modifier = Modifier.weight(1f))
+        Text(next, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary)
     }
     if (compact) {
         Row(Modifier.fillMaxWidth().then(if (shortLandscape(compact)) Modifier else Modifier.weight(1f)), horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
-            Text(word.uppercase(), color = Color.White, style = GlowType.phaseWord, maxLines = 1)
+            Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord, maxLines = 1)
             if (seconds != null) DotMatrixText(seconds, dot = DotSize.Detail)
             action?.invoke()
         }
         return
     }
     Column(Modifier.fillMaxWidth().weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-        Text(word.uppercase(), color = Color.White, style = GlowType.phaseWord)
+        Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord)
         if (seconds != null) DotMatrixText(seconds, dot = DotSize.Live, scale = 1.4f)
-        if (line.isNotEmpty()) Text(line, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, textAlign = TextAlign.Center)
+        if (line.isNotEmpty()) Text(line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, textAlign = TextAlign.Center)
     }
 }
 
-/** The heart rate on a black pill as wide as its words, with the zone's dot and name: the phase's colour is all around it. */
+/** The heart rate on a black pill (white on the light theme) as wide as its words, with the zone's dot and name: the phase's colour is all around it. */
 @Composable
 private fun HeartStripDark(bpm: Int?, maxHr: Int, paused: Boolean, modifier: Modifier = Modifier) {
     val heartZones = LocalHeartZones.current
     Row(
-        modifier.height(52.dp).clip(CircleShape).background(Color.Black).padding(horizontal = 18.dp),
+        modifier.height(52.dp).clip(CircleShape).background(if (AppColors.light) AppColors.raised else Color.Black).padding(horizontal = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val zone = WorkoutRecorder.liveZone(bpm, maxHr, heartZones)
-        Canvas(Modifier.size(8.dp)) { drawCircle(zone?.let { ZONE_COLORS[it] } ?: Color.White) }
+        Canvas(Modifier.size(8.dp)) { drawCircle(zone?.let { ZONE_COLORS[it] } ?: AppColors.ink) }
         Spacer(Modifier.width(10.dp))
         Text(
-            bpm?.let { stringResource(R.string.workout_live_bpm, it) } ?: WorkoutCopy.noHeartRate(paused), color = Color.White,
+            bpm?.let { stringResource(R.string.workout_live_bpm, it) } ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink,
             style = GlowType.body,
         )
-        zone?.let { Spacer(Modifier.width(16.dp)); Text(WorkoutCopy.zoneLine(it), color = Color.White, style = GlowType.secondary, maxLines = 1) }
+        zone?.let { Spacer(Modifier.width(16.dp)); Text(WorkoutCopy.zoneLine(it), color = AppColors.ink, style = GlowType.secondary, maxLines = 1) }
     }
 }
 
@@ -312,7 +313,7 @@ private fun RoundPeaks(rounds: List<AppWorkoutRound>, total: Int) {
     val shown = peaks.filterNotNull().joinToString(", ")
     val described = stringResource(R.string.workout_live_peaks_description, shown)
     EdgeCard(WorkRed, Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.workout_live_peaks_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+        Text(stringResource(R.string.workout_live_peaks_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
         Spacer(Modifier.height(12.dp))
         PeakBars(
             peaks, { MetricColors.heart },
@@ -321,7 +322,7 @@ private fun RoundPeaks(rounds: List<AppWorkoutRound>, total: Int) {
         )
         Spacer(Modifier.height(6.dp))
         Text(
-            stringResource(R.string.workout_live_peaks_bpm, shown), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.workout_live_peaks_bpm, shown), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary,
         )
     }
@@ -345,11 +346,11 @@ internal fun RepCard(r: WorkoutState.Recording, route: List<Route.Point>, readin
                     Phase.WarmUp -> stringResource(R.string.workout_live_warm_up)
                     Phase.Done -> stringResource(R.string.workout_live_all_reps_done, m.rounds)
                 },
-                color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
             )
             val pace = if (m.phase is Phase.Work) org.openstrap.app.presentation.Pace.clock(Route.currentPace(route)) else null
             if (pace != null) Text(
-                stringResource(R.string.workout_live_pace_now, pace), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                stringResource(R.string.workout_live_pace_now, pace), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
             )
         }
@@ -363,7 +364,7 @@ internal fun RepCard(r: WorkoutState.Recording, route: List<Route.Point>, readin
         }
         if (value != null) HeroValue(value, unit, dot = DotSize.Detail)
         else Text(
-            if (m.phase == Phase.WarmUp) stringResource(R.string.workout_live_reps_start_hint) else "", color = Color.White,
+            if (m.phase == Phase.WarmUp) stringResource(R.string.workout_live_reps_start_hint) else "", color = AppColors.ink,
             style = GlowType.body,
         )
         val done = r.rounds.filter { it.workEnd != null }
@@ -371,7 +372,7 @@ internal fun RepCard(r: WorkoutState.Recording, route: List<Route.Point>, readin
             Spacer(Modifier.height(12.dp))
             Text(
                 done.takeLast(6).joinToString(", ") { "${it.index + 1}: ${workoutClock(it.workEnd!! - it.workStart)}" },
-                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             )
         }
     }

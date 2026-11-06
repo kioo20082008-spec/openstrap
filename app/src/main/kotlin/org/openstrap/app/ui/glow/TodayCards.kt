@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.runtime.ReadOnlyComposable
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
@@ -78,7 +79,7 @@ internal fun Modifier.gridSize(size: CardSize): Modifier = GlowGrid.height(size)
 /** The hero's sentence, the answer the card leads with. */
 @Composable
 internal fun HeroSentence(text: String, modifier: Modifier = Modifier) =
-    Text(text, color = Color.White, style = GlowType.sentence, modifier = modifier.padding(top = 14.dp))
+    Text(text, color = AppColors.ink, style = GlowType.sentence, modifier = modifier.padding(top = 14.dp))
 
 /** A number on the hero: dot-matrix digits, or the dim dash while there's none, with a [label] under it. */
 @Composable
@@ -95,7 +96,7 @@ internal fun HeroFigure(
             dot = dot,
         )
         else WaitingDash(Modifier.padding(vertical = 8.dp))
-        Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = labelLines)
+        Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = labelLines)
     }
 }
 
@@ -112,7 +113,7 @@ internal fun HeroNumber(value: String?, lines: List<String>, modifier: Modifier 
             Spacer(Modifier.width(12.dp))
         }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            lines.forEach { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1) }
+            lines.forEach { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1) }
         }
     }
 }
@@ -166,10 +167,10 @@ internal fun CheckInStrip(feeling: Int?, onCheckIn: (Int?) -> Unit, modifier: Mo
     TodayStrip(EdgeNeutral, EdgeKind.Value, modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
-                stringResource(R.string.glow_today_check_in_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1,
+                stringResource(R.string.glow_today_check_in_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
-            if (feeling != null) Text(CheckIn.label(feeling), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+            if (feeling != null) Text(CheckIn.label(feeling), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         }
         Spacer(Modifier.height(10.dp))
         // Tapping the chosen one again takes the answer back.
@@ -189,15 +190,15 @@ internal fun StartWorkoutStrip(sport: Int, onStart: (Int) -> Unit, modifier: Mod
     TodayStrip(MetricColors.heart, EdgeKind.Value, modifier.movingBorder(MetricColors.heart), onClick = { onStart(sport) }) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(stringResource(R.string.glow_today_start_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+                Text(stringResource(R.string.glow_today_start_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
                 Text(
-                    stringResource(R.string.glow_today_start_usual, name), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                    stringResource(R.string.glow_today_start_usual, name), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, maxLines = 1,
                 )
             }
             Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(44.dp).clip(CircleShape).background(Color.White), contentAlignment = Alignment.Center) {
-                Icon(AppIcons.PlayFill, null, tint = Color.Black, modifier = Modifier.size(18.dp))
+            Box(Modifier.size(44.dp).clip(CircleShape).background(AppColors.ink), contentAlignment = Alignment.Center) {
+                Icon(AppIcons.PlayFill, null, tint = AppColors.onInk, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -234,10 +235,10 @@ internal fun AlertsStrip(alerts: List<HealthAlertRow>, onOpenMetric: (Metric) ->
             } else {
                 stringResource(R.string.glow_today_alert_line, alertText(newest))
             },
-            color = Color.White.copy(alpha = 0.85f), style = GlowType.secondary,
+            color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary,
         )
         Text(
-            org.openstrap.app.data.BodySignalsCopy.DISCLAIMER, color = Color.White.copy(alpha = 0.5f), style = GlowType.secondary,
+            org.openstrap.app.data.BodySignalsCopy.DISCLAIMER, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary,
             modifier = Modifier.padding(top = 4.dp),
         )
     }
@@ -275,7 +276,7 @@ internal fun EdgeTitle(
 /** An edge card's number and the line under it; a dim dash and [status] while there's no number. */
 @Composable
 internal fun EdgeValue(
-    value: String?, unit: String?, status: String?, statusColor: Color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+    value: String?, unit: String?, status: String?, statusColor: Color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
     /** Whether a missing [value] shows the waiting dash; false where the [status] says all there is. */
     waiting: Boolean = true,
     /** An edge card's size; the second glow passes [DotSize.Second]. */
@@ -283,7 +284,7 @@ internal fun EdgeValue(
 ) {
     if (value != null || waiting) Row(Modifier.padding(top = 14.dp), verticalAlignment = Alignment.Bottom) {
         if (value != null) DotMatrixText(value, Modifier.cardNumber(value), dot = dot) else WaitingDash(Modifier.padding(vertical = 8.dp))
-        if (unit != null && value != null) Text(unit, color = Color.White.copy(alpha = 0.7f), style = GlowType.secondary, modifier = Modifier.padding(start = 8.dp))
+        if (unit != null && value != null) Text(unit, color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.secondary, modifier = Modifier.padding(start = 8.dp))
     }
     if (status != null) Text(status, color = statusColor, style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis)
 }
@@ -362,7 +363,7 @@ internal fun HeartCard(
                 band = restingRange?.let { it.low..it.high }, onScrub = { picked = it },
             )
             Text(
-                TodayCopy.heartLineNote(restingRange != null), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                TodayCopy.heartLineNote(restingRange != null), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp),
             )
         }
@@ -403,7 +404,7 @@ internal fun ActivityCard(
         )
         val sentence = org.openstrap.app.presentation.ActivityCopy.activityLine(state.steps, goal, pace, isToday)
         if (count) EdgeValue(Units.count(state.steps, Units.DOT_LOCALE), stringResource(R.string.glow_today_steps), sentence)
-        else Text(sentence, color = Color.White, style = GlowType.body, modifier = Modifier.padding(top = 10.dp), maxLines = 2, overflow = TextOverflow.Ellipsis)
+        else Text(sentence, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(top = 10.dp), maxLines = 2, overflow = TextOverflow.Ellipsis)
         if (chart) {
             Spacer(Modifier.height(10.dp))
             GhostLine(
@@ -437,7 +438,7 @@ internal fun RecoveryFailed(failure: RecoveryFailure, onRetry: () -> Unit) {
     failure.yesterday?.let { y ->
         Column(Modifier.alpha(FAILED_ALPHA)) { EdgeValue(y.toString(), stringResource(R.string.glow_today_yesterday), null) }
     }
-    Text(RECOVERY_FAILED, color = Color.White.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
+    Text(RECOVERY_FAILED, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
     PageButton(TRY_AGAIN, onRetry, Modifier.padding(top = 12.dp), size = ButtonSize.Hero, onCard = true)
 }
 
@@ -463,11 +464,11 @@ internal fun ChargeWideCard(
         GlowCard(GlowStyle.Ember.copy(lightLevel = (now ?: 0) / 100f, lightAngle = LightAngle.Left, second = true), m, onClick = onClick) {
             Column {
                 GlowHeader(stringResource(R.string.glow_today_energy_title), marker = upTo, tag = tag)
-                if (soFar == null || soFar.count { it != null } < 2) EdgeValue(now?.toString(), null, status, Color.White.copy(alpha = 0.8f), dot = DotSize.Second)
+                if (soFar == null || soFar.count { it != null } < 2) EdgeValue(now?.toString(), null, status, AppColors.ink.copy(alpha = 0.8f), dot = DotSize.Second)
                 else Row(verticalAlignment = Alignment.Bottom) {
-                    Column(Modifier.weight(1f)) { EdgeValue(now?.toString(), null, status, Color.White.copy(alpha = 0.8f), dot = DotSize.Second) }
+                    Column(Modifier.weight(1f)) { EdgeValue(now?.toString(), null, status, AppColors.ink.copy(alpha = 0.8f), dot = DotSize.Second) }
                     Spacer(Modifier.width(14.dp))
-                    GhostLine(soFar, Color.White, 100f, Modifier.weight(1f), height = 52.dp)
+                    GhostLine(soFar, AppColors.ink, 100f, Modifier.weight(1f), height = 52.dp)
                 }
             }
         }
@@ -540,12 +541,12 @@ internal fun WeekCard(
         val workoutsDone = pluralStringResource(R.plurals.glow_today_week_workouts, done, done)
         Text(
             if (night != null) stringResource(R.string.glow_today_week_line, night, workoutsDone) else workoutsDone,
-            color = Color.White, style = GlowType.body, modifier = Modifier.padding(top = 8.dp),
+            color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(top = 8.dp),
         )
         val stepsBefore = stepsAvg(start.minusDays(7), start.minusDays(1))
         Text(
             TodayCopy.weekStepsLine(stepsNow, stepsBefore) ?: TodayCopy.WEEK_FIRST,
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 10.dp),
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 10.dp),
         )
     }
 }
@@ -559,7 +560,7 @@ internal fun WeekCard(
 @Composable
 internal fun SmallCard(
     color: Color, title: String, value: String?, unit: String?, status: String?, modifier: Modifier = Modifier,
-    kind: EdgeKind = EdgeKind.Value, edgeStatus: EdgeStatus = EdgeStatus.Usual, statusColor: Color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+    kind: EdgeKind = EdgeKind.Value, edgeStatus: EdgeStatus = EdgeStatus.Usual, statusColor: Color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
     onClick: (() -> Unit)? = null, extra: (@Composable () -> Unit)? = null,
     /** Waiting for its first value: the dim dash with [status] under it, rather than the word in its place. */
     waiting: Boolean = false,
@@ -573,16 +574,16 @@ internal fun SmallCard(
         Spacer(Modifier.weight(1f))
         if (value == null && status != null && !waiting) {
             extra?.invoke()
-            Text(status, color = Color.White, style = GlowType.body, maxLines = 2, overflow = TextOverflow.Ellipsis)
+            Text(status, color = AppColors.ink, style = GlowType.body, maxLines = 2, overflow = TextOverflow.Ellipsis)
             return@EdgeCard
         }
         Row(verticalAlignment = Alignment.Bottom) {
             when {
                 value == null -> WaitingDash(Modifier.padding(vertical = 8.dp))
-                plain -> Text(value, Modifier.cardNumber(value), color = Color.White, style = GlowType.smallValue, maxLines = 1)
+                plain -> Text(value, Modifier.cardNumber(value), color = AppColors.ink, style = GlowType.smallValue, maxLines = 1)
                 else -> DotMatrixText(value, Modifier.cardNumber(value), dot = DotSize.Edge)
             }
-            if (unit != null && value != null) Text(unit, color = Color.White.copy(alpha = 0.7f), style = GlowType.secondary, modifier = Modifier.padding(start = 6.dp))
+            if (unit != null && value != null) Text(unit, color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.secondary, modifier = Modifier.padding(start = 6.dp))
         }
         extra?.invoke()
         if (status != null) Text(status, color = statusColor, style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp), maxLines = 2, overflow = TextOverflow.Ellipsis)
@@ -647,9 +648,9 @@ internal fun EditTodayButton(onClick: () -> Unit, modifier: Modifier = Modifier)
             Modifier.glass(CircleShape, onClick, scale = 0.97f).padding(horizontal = 16.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(AppIcons.SlidersHorizontal, null, tint = Color.White, modifier = Modifier.size(14.dp))
+            Icon(AppIcons.SlidersHorizontal, null, tint = AppColors.ink, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(8.dp))
-            Text(stringResource(R.string.glow_today_edit), color = Color.White, style = GlowType.body)
+            Text(stringResource(R.string.glow_today_edit), color = AppColors.ink, style = GlowType.body)
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import org.openstrap.app.presentation.WorkoutColors
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -156,16 +157,16 @@ internal fun LiveStrengthScreen(
         Spacer(Modifier.weight(1f))
         when {
             r.inSet -> WorkoutButton(
-                stringResource(R.string.workout_live_sets_set_done), Color.White, Color.Black,
+                stringResource(R.string.workout_live_sets_set_done), AppColors.ink, AppColors.onInk,
                 { haptics.perform(HapticEvent.SetDone); onSetDone() }, icon = AppIcons.Tick02, height = tall,
             )
             else -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (r.resting) Box(Modifier.width(108.dp)) {
-                    WorkoutButton(stringResource(R.string.workout_live_sets_add_30_s), Raised, Color.White, onExtendRest, height = tall)
+                    WorkoutButton(stringResource(R.string.workout_live_sets_add_30_s), Raised, AppColors.ink, onExtendRest, height = tall)
                 }
                 Box(Modifier.weight(1f)) {
                     WorkoutButton(
-                        stringResource(R.string.workout_live_sets_start_set, moment.setNumber), Color.White, Color.Black, onStartSet,
+                        stringResource(R.string.workout_live_sets_start_set, moment.setNumber), AppColors.ink, AppColors.onInk, onStartSet,
                         icon = AppIcons.PlayFill, height = tall,
                     )
                 }
@@ -174,7 +175,7 @@ internal fun LiveStrengthScreen(
         val target = r.workout.setsTarget
         if (!compact && target != null && moment.done >= target && !r.inSet) {
             Text(
-                stringResource(R.string.workout_live_sets_all_done, target), color = Color.White.copy(alpha = 0.6f),
+                stringResource(R.string.workout_live_sets_all_done, target), color = AppColors.ink.copy(alpha = 0.6f),
                 style = GlowType.secondary, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             )
         }
@@ -195,13 +196,13 @@ private fun SetCard(r: WorkoutState.Recording, number: Int, seconds: () -> Long,
     GlowCard(style, Modifier.fillMaxWidth()) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(WorkoutCopy.setOf(number, r.workout.setsTarget), color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(WorkoutCopy.setOf(number, r.workout.setsTarget), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
                 ExercisePill(r.exercise, onName)
             }
             Column(Modifier.fillMaxWidth().padding(top = 34.dp, bottom = 26.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 DotClock({ dotClock(seconds()) }, DotSize.Live)
                 Spacer(Modifier.height(14.dp))
-                Text(stringResource(R.string.workout_live_sets_in_this_set), color = Color.White.copy(alpha = 0.8f), style = GlowType.body)
+                Text(stringResource(R.string.workout_live_sets_in_this_set), color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.body)
             }
             SetDots(r.sets.count { it.end != null }, r.workout.setsTarget, inSet = true, Modifier.align(Alignment.CenterHorizontally))
             Spacer(Modifier.height(22.dp))
@@ -233,7 +234,7 @@ private fun CompactCard(
     EdgeCard(color, Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(title, color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
                 ExercisePill(r.exercise, onName)
             }
             if (clock != null) DotClock(clock, DotSize.Detail)
@@ -248,14 +249,14 @@ private fun ReadyCard(r: WorkoutState.Recording, number: Int, color: Color, onNa
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(if (number == 1) R.string.workout_live_sets_ready_first else R.string.workout_live_sets_rest_over),
-                color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
             )
             ExercisePill(r.exercise, onName)
         }
         Spacer(Modifier.height(10.dp))
         Text(
             stringResource(R.string.workout_live_sets_next_tap_start, WorkoutCopy.setOf(number, r.workout.setsTarget)),
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
         )
         Spacer(Modifier.height(14.dp))
         SetDots(r.sets.count { it.end != null }, r.workout.setsTarget, inSet = false, Modifier.align(Alignment.CenterHorizontally))
@@ -273,12 +274,12 @@ private fun RestCard(r: WorkoutState.Recording, left: () -> Long, done: Int, bpm
     OutlineCard(horizontalAlignment = Alignment.CenterHorizontally) {
         Row {
             Text(
-                stringResource(R.string.workout_live_sets_rest_title), color = Color.White, style = GlowType.cardTitle, maxLines = 1,
+                stringResource(R.string.workout_live_sets_rest_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
                 modifier = Modifier.weight(1f),
             )
             Text(
                 stringResource(R.string.workout_live_sets_after, WorkoutCopy.setOf(done, r.workout.setsTarget).lowercase()),
-                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             )
         }
         Spacer(Modifier.height(10.dp))
@@ -295,10 +296,10 @@ private fun RestCard(r: WorkoutState.Recording, left: () -> Long, done: Int, bpm
             if (bpm != null) Text(
                 drop?.takeIf { it > 0 }?.let { stringResource(R.string.workout_live_bpm_down, bpm, it) }
                     ?: stringResource(R.string.workout_live_bpm, bpm),
-                color = Color.White, style = GlowType.sentence,
+                color = AppColors.ink, style = GlowType.sentence,
             )
             Spacer(Modifier.height(4.dp))
-            Text(WorkoutCopy.restRule(rule.belowBpm), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+            Text(WorkoutCopy.restRule(rule.belowBpm), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         }
     }
 }
@@ -311,7 +312,7 @@ internal fun RestRing(left: () -> Long, total: Long) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             DotClock({ dotClock(left()) }, DotSize.Detail)
             Spacer(Modifier.height(10.dp))
-            Text(stringResource(R.string.workout_live_unit_left), color = Color.White.copy(alpha = 0.75f), style = GlowType.body)
+            Text(stringResource(R.string.workout_live_unit_left), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body)
         }
     }
 }
@@ -325,14 +326,14 @@ private fun DotClock(text: () -> String, dot: DotSize) = DotMatrixText(text(), d
 private fun NextLine(number: Int, exercise: String?, load: String?) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 14.dp)) {
         Text(
-            stringResource(R.string.workout_live_sets_next), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.workout_live_sets_next), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.body, modifier = Modifier.weight(1f),
         )
         Text(
             exercise?.lowercase()?.let { e -> listOfNotNull(e, load).joinToString(" ") }
                 ?.let { stringResource(R.string.workout_live_sets_next_set_exercise, number, it) }
                 ?: stringResource(R.string.workout_live_sets_next_set, number),
-            color = Color.White, style = GlowType.body,
+            color = AppColors.ink, style = GlowType.body,
         )
     }
 }
@@ -349,7 +350,7 @@ private fun FallingHeart(readings: List<Pair<Long, Int>>, level: Int?) {
     Canvas(Modifier.fillMaxWidth().height(56.dp).semantics { contentDescription = described }) {
         fun x(t: Long) = (t - from).toFloat() / (to - from) * size.width
         fun y(v: Int) = size.height - (v - lo).toFloat() / (hi - lo) * size.height
-        if (level != null) drawLine(Color.White.copy(alpha = 0.35f), Offset(0f, y(level)), Offset(size.width, y(level)), 1.dp.toPx())
+        if (level != null) drawLine(AppColors.ink.copy(alpha = 0.35f), Offset(0f, y(level)), Offset(size.width, y(level)), 1.dp.toPx())
         val path = Path().apply {
             readings.forEachIndexed { i, (t, v) -> if (i == 0) moveTo(x(t), y(v)) else lineTo(x(t), y(v)) }
         }
@@ -372,8 +373,8 @@ private fun SetDots(done: Int, target: Int?, inSet: Boolean, modifier: Modifier 
             val now = inSet && i == done
             // The set under way has a soft ring round it.
             Box(Modifier.size(22.dp), contentAlignment = Alignment.Center) {
-                if (now) Box(Modifier.size(22.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.3f)))
-                Box(Modifier.size(14.dp).clip(CircleShape).background(if (i < done || now) Color.White else Color.Black.copy(alpha = 0.35f)))
+                if (now) Box(Modifier.size(22.dp).clip(CircleShape).background(AppColors.ink.copy(alpha = 0.3f)))
+                Box(Modifier.size(14.dp).clip(CircleShape).background(if (i < done || now) AppColors.ink else AppColors.well(0.35f)))
             }
         }
     }
@@ -384,16 +385,16 @@ private fun SetDots(done: Int, target: Int?, inSet: Boolean, modifier: Modifier 
 private fun HeartLine(bpm: Int?, maxHr: Int, paused: Boolean) {
     val heartZones = LocalHeartZones.current
     Row(verticalAlignment = Alignment.Bottom) {
-        Text(bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = Color.White, style = GlowType.sentence)
+        Text(bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink, style = GlowType.sentence)
         if (bpm != null) {
             Spacer(Modifier.width(6.dp))
             Text(
-                stringResource(R.string.workout_live_unit_bpm), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                stringResource(R.string.workout_live_unit_bpm), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                 style = GlowType.secondary,
             )
             Spacer(Modifier.weight(1f))
             WorkoutRecorder.liveZone(bpm, maxHr, heartZones)?.let { z ->
-                Text(WorkoutCopy.zoneLine(z), color = Color.White, style = GlowType.secondary, maxLines = 1)
+                Text(WorkoutCopy.zoneLine(z), color = AppColors.ink, style = GlowType.secondary, maxLines = 1)
             }
         }
     }
@@ -404,9 +405,9 @@ private fun HeartLine(bpm: Int?, maxHr: Int, paused: Boolean) {
 private fun ExercisePill(name: String?, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
     Text(
-        name ?: stringResource(R.string.workout_live_sets_name_it), color = Color.White, style = MediumBody, maxLines = 1,
+        name ?: stringResource(R.string.workout_live_sets_name_it), color = AppColors.ink, style = MediumBody, maxLines = 1,
         overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.clip(shape).background(Color.Black.copy(alpha = 0.35f)).pressClickable(onClick, shape)
+        modifier = Modifier.clip(shape).background(AppColors.well(0.35f)).pressClickable(onClick, shape)
             .padding(horizontal = 14.dp, vertical = 8.dp),
     )
 }
@@ -423,11 +424,11 @@ private fun DoneSets(sets: List<AppWorkoutSet>, history: List<Pair<Long, Int>>) 
             SetRule()
             Row(Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 14.dp)) {
                 Text(
-                    stringResource(R.string.workout_live_sets_row, s.index + 1), color = Color.White, style = GlowType.body,
+                    stringResource(R.string.workout_live_sets_row, s.index + 1), color = AppColors.ink, style = GlowType.body,
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    lines[i], color = Color.White.copy(alpha = 0.72f), style = GlowType.body, maxLines = 1,
+                    lines[i], color = AppColors.ink.copy(alpha = 0.72f), style = GlowType.body, maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
@@ -438,7 +439,7 @@ private fun DoneSets(sets: List<AppWorkoutSet>, history: List<Pair<Long, Int>>) 
 
 /** The line between the rows under the card, plain enough to read as a break between sets. */
 @Composable
-private fun SetRule() = Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.18f)))
+private fun SetRule() = Box(Modifier.fillMaxWidth().height(1.dp).background(AppColors.ink.copy(alpha = 0.18f)))
 
 /**
  * The log card after a set (board StrengthLog): the set done with its time and peak, its exercise, reps and kg
@@ -463,7 +464,7 @@ private fun LogCard(
         else -> stringResource(R.string.workout_live_log_note, time)
     }
     PageSheet(onSkip, stringResource(R.string.workout_live_log_title, set.index + 1), note = note) {
-        Text(set.exercise ?: stringResource(R.string.workout_live_log_numbered_set), color = Color.White, style = GlowType.body)
+        Text(set.exercise ?: stringResource(R.string.workout_live_log_numbered_set), color = AppColors.ink, style = GlowType.body)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             LogStepper(
                 stringResource(R.string.workout_live_log_reps), reps.toString(), stringResource(R.string.workout_live_log_fewer_reps),
@@ -477,7 +478,7 @@ private fun LogCard(
             )
         }
         Text(
-            stringResource(R.string.workout_live_log_filled), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.workout_live_log_filled), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary,
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -495,9 +496,9 @@ private fun LogCard(
 @Composable
 private fun LogStepper(label: String, value: String, less: String, more: String, modifier: Modifier, onLess: () -> Unit, onMore: () -> Unit) {
     Column(modifier.clip(GlowLayout.CardShape).background(org.openstrap.app.ui.glow.ListSurface).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         MinusPlus(less, more, onLess, onMore) {
-            Text(value, color = Color.White, style = GlowType.pageTitle, textAlign = TextAlign.Center)
+            Text(value, color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center)
         }
     }
 }
@@ -512,7 +513,7 @@ private fun ExerciseSheet(current: String?, used: List<String>, onPick: (String?
     PageSheet(onDismiss, stringResource(R.string.workout_live_exercise_title), note = stringResource(R.string.workout_live_exercise_note)) {
         BasicTextField(
             typed, { typed = it }, Modifier.fillMaxWidth(), singleLine = true,
-            textStyle = GlowType.body.copy(color = Color.White), cursorBrush = SolidColor(Color.White),
+            textStyle = GlowType.body.copy(color = AppColors.ink), cursorBrush = SolidColor(AppColors.ink),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = { if (typed.isNotBlank()) onPick(typed) }),
             decorationBox = { field ->
@@ -522,13 +523,13 @@ private fun ExerciseSheet(current: String?, used: List<String>, onPick: (String?
                 ) {
                     Box(Modifier.weight(1f)) {
                         if (typed.isEmpty()) Text(
-                            stringResource(R.string.workout_live_exercise_type), color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA),
+                            stringResource(R.string.workout_live_exercise_type), color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA),
                             style = GlowType.body,
                         )
                         field()
                     }
                     if (typed.isNotBlank()) Icon(
-                        AppIcons.Tick02, stringResource(R.string.workout_live_exercise_use), tint = Color.White,
+                        AppIcons.Tick02, stringResource(R.string.workout_live_exercise_use), tint = AppColors.ink,
                         modifier = Modifier.size(28.dp).clip(CircleShape).pressClickable({ onPick(typed) }, CircleShape).padding(4.dp),
                     )
                 }

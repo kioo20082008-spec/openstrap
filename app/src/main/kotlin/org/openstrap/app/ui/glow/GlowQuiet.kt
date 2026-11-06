@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.ui.graphics.Shape
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.border
 import org.openstrap.app.ui.theme.MetricColors
 import androidx.compose.foundation.background
@@ -56,7 +57,7 @@ internal fun OutlineCard(
 ) {
     Column(
         modifier.fillMaxWidth().clip(GlowLayout.CardShape)
-            .border(1.5.dp, Color.White.copy(alpha = 0.2f), GlowLayout.CardShape).padding(20.dp),
+            .border(1.5.dp, AppColors.ink.copy(alpha = 0.2f), GlowLayout.CardShape).padding(20.dp),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         content = content,
@@ -69,12 +70,12 @@ internal fun OutlineCard(
  * presses like the rest of the glow controls.
  */
 fun Modifier.glass(shape: Shape, onClick: (() -> Unit)? = null, scale: Float = 0.98f): Modifier =
-    background(Color.White.copy(alpha = 0.08f), shape)
-        .border(1.dp, Color.White.copy(alpha = 0.12f), shape)
+    background(AppColors.ink.copy(alpha = 0.08f), shape)
+        .border(1.dp, AppColors.ink.copy(alpha = 0.12f), shape)
         .let { if (onClick != null) it.pressClickable(onClick, shape, scale) else it }
 
 /** A change for the better, or a GPS fix good enough: the app's good green. */
-internal val TrendGood = MetricColors.good
+internal val TrendGood: Color get() = AppColors.readable(MetricColors.good)
 
 /** A change for the worse, or a GPS fix too poor: the app's warning amber. */
-internal val TrendBad = MetricColors.warn
+internal val TrendBad: Color get() = AppColors.readable(MetricColors.warn)

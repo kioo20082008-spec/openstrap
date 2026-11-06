@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.border
+import org.openstrap.app.ui.theme.AppColors
 import android.graphics.Paint
 import android.graphics.RectF
 import android.provider.Settings
@@ -96,8 +97,8 @@ val LocalGlowPaused = staticCompositionLocalOf<() -> Boolean> { { false } }
  */
 /** The redesign: cards are flat navy panels with a hairline, no glow. */
 internal const val FlatCards = true
-internal val FlatSurface = Color.White.copy(alpha = 0.055f)
-internal val FlatHairline = Color.White.copy(alpha = 0.10f)
+internal val FlatSurface: Color get() = AppColors.glass
+internal val FlatHairline: Color get() = AppColors.hairline
 
 val LocalGlowPagePaused = staticCompositionLocalOf<() -> Boolean> { { false } }
 

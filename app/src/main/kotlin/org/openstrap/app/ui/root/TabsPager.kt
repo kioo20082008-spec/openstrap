@@ -20,7 +20,6 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventDispatcherOwner
@@ -76,7 +75,7 @@ import org.openstrap.app.ui.workout.WorkoutsViewModel
 /** Each tab's place in the bar: its label, icons and the capsule's colour while it shows (spec 3.2). */
 fun tabItems(): List<NavItem> = Tab.entries.map { tab ->
     when (tab) {
-        Tab.Today -> NavItem(tab.label, AppIcons.HouseSimple, AppIcons.HouseSimpleFill, Color.White)
+        Tab.Today -> NavItem(tab.label, AppIcons.HouseSimple, AppIcons.HouseSimpleFill)
         Tab.Recovery -> NavItem(tab.label, AppIcons.Plant, AppIcons.PlantFill, MetricColors.readiness)
         Tab.Sleep -> NavItem(tab.label, AppIcons.Moon, AppIcons.MoonFill, MetricColors.sleepDeep)
         Tab.Activity -> NavItem(tab.label, AppIcons.SneakerMove, AppIcons.SneakerMoveFill, MetricColors.steps)

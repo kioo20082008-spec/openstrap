@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import androidx.compose.animation.core.animateFloatAsState
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -108,7 +109,7 @@ internal fun LiveMindScreen(
                     first?.minus(b)?.takeIf { it > 0 }?.let { stringResource(R.string.workout_live_mind_heart_down, b, it) }
                         ?: stringResource(R.string.workout_live_mind_heart, b)
                 } ?: WorkoutCopy.noHeartRate(r.paused, connected),
-                color = Color.White.copy(alpha = 0.8f), style = GlowType.body,
+                color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.body,
                 modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center,
             )
             Spacer(Modifier.weight(0.6f))
@@ -140,12 +141,12 @@ internal fun MindRing(time: () -> Long, length: Long?, ring: Boolean = true) {
 private fun MindClock(time: () -> Long, length: Long?) {
     val active = time()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(workoutClock(active), color = Color.White.copy(alpha = 0.9f), style = GlowType.mindClock, maxLines = 1)
+        Text(workoutClock(active), color = AppColors.ink.copy(alpha = 0.9f), style = GlowType.mindClock, maxLines = 1)
         Text(
             length?.let {
                 stringResource(if (active >= it) R.string.workout_live_mind_length_up else R.string.workout_live_mind_length, it / 60)
             } ?: stringResource(R.string.workout_live_mind_open),
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, textAlign = TextAlign.Center,
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, textAlign = TextAlign.Center,
         )
     }
 }

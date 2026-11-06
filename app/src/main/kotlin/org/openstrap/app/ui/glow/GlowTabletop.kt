@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.layout.Arrangement
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -50,7 +50,7 @@ fun GlowTabletopHeart(
                         {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
-                                    stringResource(R.string.glow_tabletop_live), color = Color.White.copy(alpha = 0.85f),
+                                    stringResource(R.string.glow_tabletop_live), color = AppColors.ink.copy(alpha = 0.85f),
                                     style = GlowType.secondary,
                                 )
                                 Spacer(Modifier.width(8.dp))
@@ -63,13 +63,13 @@ fun GlowTabletopHeart(
                     DotMatrixText(now?.toString() ?: "-", dot = DotSize.Live)
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
                         Text(
-                            stringResource(R.string.glow_unit_bpm), color = Color.White.copy(alpha = 0.7f), style = GlowType.cardTitle,
+                            stringResource(R.string.glow_unit_bpm), color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.cardTitle,
                             maxLines = 1,
                         )
                     }
                     state.restingHeartRate?.let {
                         Text(
-                            stringResource(R.string.glow_tabletop_resting, it), color = Color.White.copy(alpha = 0.85f),
+                            stringResource(R.string.glow_tabletop_resting, it), color = AppColors.ink.copy(alpha = 0.85f),
                             style = GlowType.body,
                         )
                     }

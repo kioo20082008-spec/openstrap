@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.alarms
 
 import android.Manifest
+import org.openstrap.app.ui.theme.AppColors
 import android.content.ComponentName
 import android.content.Intent
 import android.provider.Settings
@@ -47,7 +48,6 @@ import org.openstrap.app.ui.glow.PageRow
 import org.openstrap.app.ui.glow.PageSheet
 import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageSwitchRow
-import androidx.compose.ui.graphics.Color
 import org.openstrap.app.ui.glow.GlowSegments
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.app.presentation.ClockSetting
@@ -145,7 +145,7 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                 }
                 if (calls && callPermission) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(stringResource(R.string.you_phone_call_buzz), style = GlowType.body, color = Color.White)
+                        Text(stringResource(R.string.you_phone_call_buzz), style = GlowType.body, color = AppColors.ink)
                         // Picking one plays it for a few seconds, so the two can be compared on the wrist.
                         GlowSegments(CallBuzz.entries.map { it.label }, callStyle.ordinal, { i -> vm.pickCallBuzz(CallBuzz.entries[i]) })
                         callPreviewError?.let { PageNote(it, color = MetricColors.warn) }
@@ -165,7 +165,7 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                 }
                 if (notifications && notificationAccess) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text(stringResource(R.string.you_phone_pattern), style = GlowType.body, color = Color.White)
+                        Text(stringResource(R.string.you_phone_pattern), style = GlowType.body, color = AppColors.ink)
                         // Picking a pattern plays it once, so it can be felt before the next notification.
                         GlowSegments(BuzzPattern.entries.map { it.label }, pattern.ordinal, { i -> vm.pickPattern(BuzzPattern.entries[i]) })
                         previewError?.let { PageNote(it, color = MetricColors.warn) }

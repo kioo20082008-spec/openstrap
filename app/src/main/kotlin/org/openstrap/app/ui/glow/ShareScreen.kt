@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import android.content.ClipData
 import android.content.ContentValues
@@ -189,9 +190,9 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
                         null -> R.string.glow_save
                     },
                 )
-                WorkoutButton(saveLabel, Raised, Color.White, { if (export == null) save() }, Modifier.weight(1f), icon = if (saved == true) AppIcons.Tick02 else AppIcons.DownloadSimple)
+                WorkoutButton(saveLabel, Raised, AppColors.ink, { if (export == null) save() }, Modifier.weight(1f), icon = if (saved == true) AppIcons.Tick02 else AppIcons.DownloadSimple)
                 WorkoutButton(
-                    stringResource(R.string.glow_share), Color.White, Color.Black, { if (export == null) export = Export.Share },
+                    stringResource(R.string.glow_share), AppColors.ink, AppColors.onInk, { if (export == null) export = Export.Share },
                     Modifier.weight(1f), icon = AppIcons.UploadSimple,
                 )
             }
@@ -201,7 +202,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
         Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.Center) {
             val close = stringResource(R.string.glow_close)
             Box(Modifier.align(Alignment.CenterStart)) { RoundIconButton(AppIcons.X, close, onClose, size = 44.dp) }
-            Text(stringResource(R.string.glow_share), color = Color.White, style = GlowType.cardTitle, maxLines = 1)
+            Text(stringResource(R.string.glow_share), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
             // The picture for Save and Share: the same card at 1080 by 1920, recorded but never drawn on screen.
             if (export != null) Box(
                 Modifier.layout { measurable, _ ->
@@ -239,7 +240,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
         if (hasRoute) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    stringResource(R.string.glow_share_route), color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary,
+                    stringResource(R.string.glow_share_route), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary,
                     maxLines = 1, modifier = Modifier.width(84.dp),
                 )
                 val routes = StoryRoute.entries

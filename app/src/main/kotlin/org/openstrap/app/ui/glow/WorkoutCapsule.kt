@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.presentation.WorkoutColors
 import androidx.compose.animation.core.RepeatMode
@@ -56,7 +57,6 @@ import org.openstrap.app.ui.glow.draw.LightAngle
 import org.openstrap.app.ui.glow.draw.GlowMotion
 import org.openstrap.app.ui.glow.draw.heroStyle
 import org.openstrap.app.ui.glow.draw.DotSize
-import org.openstrap.app.ui.theme.ControlSurface
 
 /* ------------------------------------- Rest of the app meanwhile ------------------------------------- */
 
@@ -102,9 +102,9 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
             PulseDot(color, glance.bpm, 12.dp)
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(glance.line1, color = Color.White, style = MediumBody.copy(fontFeatureSettings = "tnum"), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(glance.line1, color = AppColors.ink, style = MediumBody.copy(fontFeatureSettings = "tnum"), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 glance.line2?.let {
-                    Text(it, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(it, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             if (glance.action == GlanceAction.Pause) {
@@ -132,7 +132,7 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
         // A goal fills along the bottom edge, inside the bar's curve.
         glance.progress?.let { p ->
             Canvas(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(3.dp).padding(horizontal = 28.dp)) {
-                drawRect(Color.White.copy(alpha = 0.12f))
+                drawRect(AppColors.ink.copy(alpha = 0.12f))
                 drawRect(color, size = size.copy(width = size.width * p.fraction))
             }
         }
@@ -144,19 +144,19 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
 private fun BarPill(label: String, primary: Boolean, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, endDot: Boolean = false, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
     Row(
-        Modifier.height(44.dp).clip(shape).background(if (primary) Color.White else ControlSurface).pressClickable(onClick, shape)
+        Modifier.height(44.dp).clip(shape).background(if (primary) AppColors.ink else AppColors.control).pressClickable(onClick, shape)
             .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
-            Icon(icon, null, tint = if (primary) Color.Black else Color.White, modifier = Modifier.size(14.dp))
+            Icon(icon, null, tint = if (primary) AppColors.onInk else AppColors.ink, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(6.dp))
         }
         if (endDot) {
             Canvas(Modifier.size(8.dp)) { drawCircle(MetricColors.heart) }
             Spacer(Modifier.width(6.dp))
         }
-        Text(label, color = if (primary) Color.Black else Color.White, style = MediumBody, maxLines = 1)
+        Text(label, color = if (primary) AppColors.onInk else AppColors.ink, style = MediumBody, maxLines = 1)
     }
 }
 
@@ -176,8 +176,8 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Canvas(Modifier.size(8.dp)) { drawCircle(color) }
                 Spacer(Modifier.width(8.dp))
-                Text(Workouts.sportName(sportType), color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
-                Text(clock, color = Color.White, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
+                Text(Workouts.sportName(sportType), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(clock, color = AppColors.ink, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
             }
             Spacer(Modifier.height(18.dp))
             if (glance.figure != null) HeroValue(glance.figure, glance.unit.orEmpty(), gap = 10.dp, unitStyle = GlowType.sentence)
@@ -185,25 +185,25 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                 WaitingDash(Modifier.padding(vertical = 12.dp))
                 glance.unit?.let {
                     Spacer(Modifier.width(10.dp))
-                    Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.sentence)
+                    Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.sentence)
                 }
             }
             if (glance.line1.isNotEmpty() && glance.tint in setOf(GlanceTint.Paused, GlanceTint.Asking)) {
                 Spacer(Modifier.height(8.dp))
                 val lines = glance.line2?.let { stringResource(R.string.glow_workout_capsule_lines, glance.line1, it) } ?: glance.line1
-                Text(lines, color = Color.White, style = GlowType.body)
+                Text(lines, color = AppColors.ink, style = GlowType.body)
             }
             glance.progress?.let { p ->
                 Spacer(Modifier.height(16.dp))
-                Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)).background(Color.Black.copy(alpha = 0.4f))) {
-                    Box(Modifier.fillMaxWidth(p.fraction).height(6.dp).clip(RoundedCornerShape(50)).background(Color.White))
+                Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)).background(AppColors.well())) {
+                    Box(Modifier.fillMaxWidth(p.fraction).height(6.dp).clip(RoundedCornerShape(50)).background(AppColors.ink))
                 }
             }
             if (glance.goal != null || glance.toGo != null) {
                 Spacer(Modifier.height(8.dp))
                 Row {
-                    glance.goal?.let { Text(it, color = Color.White, style = GlowType.secondary, modifier = Modifier.weight(1f)) }
-                    glance.toGo?.let { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary) }
+                    glance.goal?.let { Text(it, color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.weight(1f)) }
+                    glance.toGo?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary) }
                 }
             }
             if (glance.figures.isNotEmpty()) {
@@ -211,21 +211,21 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                 Row(Modifier.fillMaxWidth()) {
                     glance.figures.forEach { (value, label) ->
                         Column(Modifier.weight(1f)) {
-                            if (value != null) Text(value, color = Color.White, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
+                            if (value != null) Text(value, color = AppColors.ink, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
                             else WaitingDash(Modifier.padding(vertical = 8.dp))
-                            Text(label, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                            Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
                         }
                     }
                 }
             }
             glance.next?.let { next ->
                 Spacer(Modifier.height(16.dp))
-                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Color.Black.copy(alpha = 0.4f)).padding(14.dp)) {
+                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(AppColors.well()).padding(14.dp)) {
                     Text(
-                        stringResource(R.string.glow_workout_capsule_next), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        stringResource(R.string.glow_workout_capsule_next), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary,
                     )
-                    Text(next, color = Color.White, style = GlowType.body)
+                    Text(next, color = AppColors.ink, style = GlowType.body)
                 }
             }
             Spacer(Modifier.height(22.dp))
@@ -236,13 +236,13 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                     val label = glance.secondLabel.takeIf { a == glance.second }
                     Box(
                         Modifier.height(52.dp).then(if (label == null) Modifier.size(52.dp) else Modifier).clip(RoundedCornerShape(50))
-                            .background(Color.Black.copy(alpha = 0.45f)).pressClickable({ onAction(a) }, RoundedCornerShape(50))
+                            .background(AppColors.well(0.45f)).pressClickable({ onAction(a) }, RoundedCornerShape(50))
                             .padding(horizontal = if (label == null) 0.dp else 18.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (label != null) Text(label, color = Color.White, style = GlowType.body, maxLines = 1)
+                        if (label != null) Text(label, color = AppColors.ink, style = GlowType.body, maxLines = 1)
                         else Icon(
-                            actionIcon(a), stringResource(R.string.glow_workout_capsule_pause), tint = Color.White,
+                            actionIcon(a), stringResource(R.string.glow_workout_capsule_pause), tint = AppColors.ink,
                             modifier = Modifier.size(18.dp),
                         )
                     }
@@ -294,7 +294,7 @@ fun WorkoutMorph(
             !minimized, Modifier.fillMaxSize(),
             enter = androidx.compose.animation.slideInVertically(move) { it / 4 } + fadeIn,
             exit = androidx.compose.animation.slideOutVertically(move) { it / 4 } + fadeOut,
-        ) { Box(Modifier.fillMaxSize().background(Color.Black)) { full() } }
+        ) { Box(Modifier.fillMaxSize().background(AppColors.stage)) { full() } }
         androidx.compose.animation.AnimatedVisibility(
             minimized && !capsuleHidden, Modifier.align(Alignment.BottomCenter),
             enter = androidx.compose.animation.slideInVertically(move) { it / 2 } + fadeIn,

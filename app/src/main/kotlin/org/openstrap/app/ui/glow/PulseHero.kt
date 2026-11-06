@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.animation.core.Animatable
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -56,7 +57,7 @@ import org.openstrap.app.ui.theme.NumberFamily
 
 private val Amber = Color(0xFFF5B657)
 private val Mint = Color(0xFF5FD3A6)
-private val Muted = Color(0xFFA9ADB9)
+private val Muted: Color get() = AppColors.muted
 
 /** The zone colour for a Recovery score: rest, steady, ready. */
 internal fun zoneColor(score: Int) = when {
@@ -120,7 +121,7 @@ internal fun PulseHero(
                     val head = len * 1.4f * trace
                     val seg = Path()
                     measure.getSegment((head - len * 0.4f).coerceAtLeast(0f), head.coerceAtMost(len), seg, true)
-                    drawPath(seg, Color(0xFFFFB59A).copy(alpha = 0.3f), style = Stroke(1.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+                    drawPath(seg, AppColors.readable(Color(0xFFFFB59A)).copy(alpha = 0.3f), style = Stroke(1.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
                 }
             }
             Box(Modifier.align(Alignment.TopEnd)) { info() }
@@ -128,22 +129,22 @@ internal fun PulseHero(
                 listOf(ripple1, ripple2).forEach { state ->
                     Box(
                         Modifier.size(64.dp).graphicsLayer { val r = state.value; scaleX = 0.6f + 1.4f * r; scaleY = 0.6f + 1.4f * r; alpha = 0.45f * (1f - r) }
-                            .border(1.dp, Color(0xFFFFB59A), CircleShape),
+                            .border(1.dp, AppColors.readable(Color(0xFFFFB59A)), CircleShape),
                     )
                 }
-                Icon(AppIcons.Heart, null, tint = Color(0xFFFFB59A), modifier = Modifier.size(30.dp).graphicsLayer { scaleX = beat; scaleY = beat })
+                Icon(AppIcons.Heart, null, tint = AppColors.readable(Color(0xFFFFB59A)), modifier = Modifier.size(30.dp).graphicsLayer { scaleX = beat; scaleY = beat })
             }
         }
         Ltr {
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
-                shown.value.toInt().toString(), color = AppPalette.Cream,
+                shown.value.toInt().toString(), color = AppColors.ink,
                 style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 108.sp, lineHeight = 108.sp, letterSpacing = (-5).sp, textDirection = TextDirection.Ltr),
             )
             Text("%", Modifier.padding(bottom = 64.dp), color = Muted, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 24.sp))
         }
         }
-        Text(word, color = AppPalette.Cream, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+        Text(word, color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(6.dp))
         Text(line, color = Muted, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
         Spacer(Modifier.height(18.dp))
@@ -153,11 +154,11 @@ internal fun PulseHero(
                 val full = maxWidth
                 Row(Modifier.fillMaxWidth().padding(top = 6.dp), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     listOf(0 until 34 to AppPalette.Coral, 34 until 67 to Amber, 67..100 to Mint).forEach { (range, c) ->
-                        Box(Modifier.weight(1f).padding(top = 4.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(if (score in range) c else Color.White.copy(alpha = 0.16f)))
+                        Box(Modifier.weight(1f).padding(top = 4.dp).height(2.dp).clip(RoundedCornerShape(1.dp)).background(if (score in range) c else AppColors.ink.copy(alpha = 0.16f)))
                     }
                 }
                 Box(
-                    Modifier.offset(x = (full - 10.dp) * marker.value, y = 2.dp).size(10.dp).clip(CircleShape).background(Color(0xFFFFF3E2)),
+                    Modifier.offset(x = (full - 10.dp) * marker.value, y = 2.dp).size(10.dp).clip(CircleShape).background(if (AppColors.light) AppColors.ink else Color(0xFFFFF3E2)),
                 )
             }
         }
@@ -170,7 +171,7 @@ internal fun PulseHero(
         }
         if (sentence != null) {
             Spacer(Modifier.height(16.dp))
-            Text(sentence, color = Color(0xFFC9CCD6), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 8.dp))
+            Text(sentence, color = AppColors.ink.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 8.dp))
         }
         Spacer(Modifier.height(8.dp))
     }

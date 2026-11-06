@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.ui.res.stringResource
+import org.openstrap.app.ui.theme.AppColors
 import kotlinx.coroutines.flow.collectLatest
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -116,8 +117,8 @@ internal fun ReadyHeartCard(connection: ConnectionState, liveHeartRate: Int?, co
     ) {
         if (bpm != null) HeroValue(bpm.toString(), stringResource(R.string.glow_ready_bpm_live), gap = 14.dp)
         else Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(hero.title, color = Color.White, style = GlowType.sentence)
-            Text(hero.line, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+            Text(hero.title, color = AppColors.ink, style = GlowType.sentence)
+            Text(hero.line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         }
     }
 }
@@ -193,7 +194,7 @@ private fun PlaceRow(icon: ImageVector, tint: Color, title: String, note: String
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
             RowName(title)
-            Text(note, color = Color.White.copy(alpha = 0.65f), style = GlowType.secondary)
+            Text(note, color = AppColors.ink.copy(alpha = 0.65f), style = GlowType.secondary)
         }
         if (trailing != null) {
             Spacer(Modifier.width(12.dp))
@@ -287,7 +288,7 @@ private fun ReadyPlanCard(
     onTyping: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Text(StartCopy.planTitle(family), color = Color.White.copy(alpha = 0.6f), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp))
+    Text(StartCopy.planTitle(family), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp))
     val inView = remember { BringIntoViewRequester() }
     val ime = WindowInsets.ime
     val density = LocalDensity.current
@@ -362,10 +363,10 @@ private fun KindRow(icon: ImageVector, label: String, note: String, on: Boolean,
         Box(
             Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(if (on) TypingLime.copy(alpha = 0.14f) else Raised),
             contentAlignment = Alignment.Center,
-        ) { Icon(icon, null, tint = if (on) TypingLime else Color.White, modifier = Modifier.size(20.dp)) }
+        ) { Icon(icon, null, tint = if (on) TypingLime else AppColors.ink, modifier = Modifier.size(20.dp)) }
         Column(Modifier.weight(1f)) {
-            Text(label, color = Color.White, style = GlowType.body)
-            Text(note, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp))
+            Text(label, color = AppColors.ink, style = GlowType.body)
+            Text(note, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp))
         }
         if (on) Icon(AppIcons.CheckCircle, null, tint = TypingLime, modifier = Modifier.size(20.dp))
     }
@@ -374,7 +375,7 @@ private fun KindRow(icon: ImageVector, label: String, note: String, on: Boolean,
 /** The line under a goal: what the strap will do. */
 @Composable
 internal fun GoalNote(text: String) =
-    Text(text, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
 
 /** A row of presets under a value, each as wide as the others, on a hairline; the one matching the value ([on]) in white. */
 @Composable
@@ -383,10 +384,10 @@ internal fun <T> Presets(presets: List<Pair<T, String>>, on: T?, onPick: (T) -> 
         presets.forEach { (v, label) ->
             val chosen = v == on
             Box(
-                Modifier.weight(1f).height(34.dp).clip(CircleShape).border(1.dp, if (chosen) Color.White else Color.White.copy(alpha = 0.15f), CircleShape)
+                Modifier.weight(1f).height(34.dp).clip(CircleShape).border(1.dp, if (chosen) AppColors.ink else AppColors.ink.copy(alpha = 0.15f), CircleShape)
                     .pressClickable({ onPick(v) }, CircleShape).semantics { role = Role.Button; selected = chosen },
                 contentAlignment = Alignment.Center,
-            ) { Text(label, color = if (chosen) Color.White else Color.White.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1) }
+            ) { Text(label, color = if (chosen) AppColors.ink else AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1) }
         }
     }
 }
@@ -406,12 +407,12 @@ private fun TapValue(parts: List<Pair<String, String>>, hint: String?, onClick: 
         Row {
             parts.forEachIndexed { i, (n, unit) ->
                 if (i > 0) Spacer(Modifier.width(6.dp))
-                Text(n, color = Color.White, style = GlowType.goalValue, modifier = Modifier.alignByBaseline())
+                Text(n, color = AppColors.ink, style = GlowType.goalValue, modifier = Modifier.alignByBaseline())
                 Spacer(Modifier.width(4.dp))
-                Text(unit, color = Color.White.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
+                Text(unit, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
             }
         }
-        if (hint != null) Text(hint, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, modifier = Modifier.padding(top = 4.dp))
+        if (hint != null) Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, modifier = Modifier.padding(top = 4.dp))
     }
 }
 
@@ -435,18 +436,18 @@ private fun TypedNumber(
     Row(
         modifier.drawBehind {
             val y = size.height - 1.dp.toPx()
-            drawLine(if (focused) TypingLime else Color.White.copy(alpha = 0.2f), Offset(0f, y), Offset(size.width, y), 2.dp.toPx())
+            drawLine(if (focused) TypingLime else AppColors.ink.copy(alpha = 0.2f), Offset(0f, y), Offset(size.width, y), 2.dp.toPx())
         }.padding(start = 6.dp, end = 6.dp, bottom = 6.dp),
     ) {
         BasicTextField(
             value, onValue, field.width(IntrinsicSize.Min).widthIn(min = 18.dp).alignByBaseline(),
-            textStyle = style.copy(color = Color.White), cursorBrush = SolidColor(TypingLime), singleLine = true,
+            textStyle = style.copy(color = AppColors.ink), cursorBrush = SolidColor(TypingLime), singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = keyboard, imeAction = ime),
             keyboardActions = KeyboardActions(onDone = { onIme() }, onNext = { onIme() }),
         )
         if (unit != null) {
             Spacer(Modifier.width(4.dp))
-            Text(unit, color = Color.White.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
+            Text(unit, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
         }
     }
 }
@@ -581,8 +582,8 @@ private fun selectedText(v: TextFieldValue): String = v.text.substring(v.selecti
 @Composable
 private fun ZoneGoal(goal: WorkoutTarget.Zones, onGoal: (WorkoutTarget.Zones) -> Unit, zones: HeartZones, maxHr: Int?, onYourZones: () -> Unit) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Text(goal.label, color = Color.White, style = GlowType.smallValue)
-        if (maxHr != null) Text(StartCopy.zoneRangeLine(goal, zones, maxHr), color = Color.White.copy(alpha = 0.7f), style = GlowType.body, textAlign = TextAlign.Center)
+        Text(goal.label, color = AppColors.ink, style = GlowType.smallValue)
+        if (maxHr != null) Text(StartCopy.zoneRangeLine(goal, zones, maxHr), color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.body, textAlign = TextAlign.Center)
     }
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         (0 until Workouts.ZONES).forEach { z ->
@@ -596,7 +597,7 @@ private fun ZoneGoal(goal: WorkoutTarget.Zones, onGoal: (WorkoutTarget.Zones) ->
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
             ) {
-                val ink = if (on) Color.Black else Color.White.copy(alpha = 0.75f)
+                val ink = if (on) Color.Black else AppColors.ink.copy(alpha = 0.75f)
                 Text("Z${z + 1}", color = ink, style = GlowType.body.copy(fontWeight = FontWeight.SemiBold))
                 if (maxHr != null) Text("${zones.startBpm(z, maxHr)}", color = ink.copy(alpha = ink.alpha * 0.75f), style = GlowType.caption)
             }
@@ -609,7 +610,7 @@ private fun ZoneGoal(goal: WorkoutTarget.Zones, onGoal: (WorkoutTarget.Zones) ->
 }
 
 /** A zone button not chosen: dark, with its colour along the bottom. */
-private val ZoneOff = Color(0xFF1C2C50)
+private val ZoneOff: Color get() = AppColors.control
 
 /**
  * Intervals: "6 × 400 m" over "with 90 s rest between". Any number taps to type, then on to the next: how many, each
@@ -655,7 +656,7 @@ private fun IntervalsGoal(
             ValueWords(stringResource(R.string.glow_ready_rest_between))
         }
         if (focused == 1) Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-            Text(StartCopy.EACH_REP_IN, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary)
+            Text(StartCopy.EACH_REP_IN, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary)
             Spacer(Modifier.width(10.dp))
             StartCopy.RepUnit.entries.forEach { e ->
                 PageChip(e.label, e == unit, { unit = e }, role = Role.RadioButton, filled = true)
@@ -762,19 +763,19 @@ internal fun TypedValue(
     }
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(if (typing) 10.dp else 8.dp)) {
         TypedValueScope(texts.map { it.text }.takeIf { typing }, focused.takeIf { typing }, number).lines()
-        if (!typing && hint != null) Text(hint, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
+        if (!typing && hint != null) Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
     }
 }
 
 /** Words between a typed value's numbers, on their baseline. */
 @Composable
 internal fun RowScope.ValueWords(text: String) =
-    Text(text, color = Color.White.copy(alpha = 0.7f), style = GlowType.body, modifier = Modifier.alignByBaseline())
+    Text(text, color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.body, modifier = Modifier.alignByBaseline())
 
 /** The × between a count and what's counted: "6 × 400 m". */
 @Composable
 internal fun RowScope.Times() =
-    Text("×", color = Color.White.copy(alpha = 0.5f), style = GlowType.goalValueMinor, modifier = Modifier.alignByBaseline().padding(horizontal = 4.dp))
+    Text("×", color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.goalValueMinor, modifier = Modifier.alignByBaseline().padding(horizontal = 4.dp))
 
 private const val SAVE = 0
 private const val SAVED = 1
@@ -783,10 +784,10 @@ private const val SAVED = 1
 @Composable
 internal fun RowScope.TapNumber(n: String, unit: String?, style: TextStyle, onClick: () -> Unit) {
     Row(Modifier.alignByBaseline().clip(RoundedCornerShape(10.dp)).clickable(onClickLabel = StartCopy.TAP_TO_TYPE, onClick = onClick).padding(horizontal = 4.dp)) {
-        Text(n, color = Color.White, style = style, modifier = Modifier.alignByBaseline())
+        Text(n, color = AppColors.ink, style = style, modifier = Modifier.alignByBaseline())
         if (unit != null) {
             Spacer(Modifier.width(4.dp))
-            Text(unit, color = Color.White.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
+            Text(unit, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body, modifier = Modifier.alignByBaseline())
         }
     }
 }

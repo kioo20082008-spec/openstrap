@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.firmware
 
 import android.app.Activity
+import org.openstrap.app.ui.theme.AppColors
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -38,7 +39,6 @@ import org.openstrap.app.data.settings.ZeppAccount
 import org.openstrap.app.device.ConnectionState
 import org.openstrap.app.firmware.UpdateCheck
 import org.openstrap.app.presentation.Units
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import org.openstrap.app.ui.glow.CardTitle
 import org.openstrap.app.ui.glow.DestructiveInk
@@ -343,25 +343,25 @@ private fun ConfirmInstall(image: ReadyImage, blockers: List<String>, onDismiss:
 @Composable
 private fun Busy(label: String, fraction: Float?) {
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(label, style = GlowType.body, color = Color.White, modifier = Modifier.weight(1f))
+        Text(label, style = GlowType.body, color = AppColors.ink, modifier = Modifier.weight(1f))
         fraction?.let {
-            Text(stringResource(R.string.you_firmware_percent, (it * 100).toInt()), style = GlowType.body, color = Color.White)
+            Text(stringResource(R.string.you_firmware_percent, (it * 100).toInt()), style = GlowType.body, color = AppColors.ink)
         }
     }
     PageProgress(fraction)
 }
 
 @Composable
-private fun Body(text: String) = Text(text, style = GlowType.body, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))
+private fun Body(text: String) = Text(text, style = GlowType.body, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
 
 /** One line of the privacy card: icon, short title, one sentence. */
 @Composable
 private fun Point(icon: ImageVector, title: String, body: String) {
     Row(verticalAlignment = Alignment.Top) {
-        Icon(icon, null, Modifier.padding(top = 2.dp).size(20.dp), tint = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))
+        Icon(icon, null, Modifier.padding(top = 2.dp).size(20.dp), tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
         Spacer(Modifier.width(12.dp))
         Column {
-            Text(title, style = GlowType.body, color = Color.White)
+            Text(title, style = GlowType.body, color = AppColors.ink)
             PageNote(body)
         }
     }
@@ -370,8 +370,8 @@ private fun Point(icon: ImageVector, title: String, body: String) {
 @Composable
 private fun InfoLine(label: String, value: String) {
     Row(Modifier.fillMaxWidth()) {
-        Text(label, style = GlowType.body, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.weight(1f))
-        Text(value, style = GlowType.body, color = Color.White)
+        Text(label, style = GlowType.body, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.weight(1f))
+        Text(value, style = GlowType.body, color = AppColors.ink)
     }
 }
 
@@ -379,7 +379,7 @@ private fun InfoLine(label: String, value: String) {
 private fun Warning(text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(AppIcons.Warning, null, tint = MetricColors.warn, modifier = Modifier.size(20.dp))
-        Text(text, style = GlowType.secondary, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))
+        Text(text, style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
     }
 }
 

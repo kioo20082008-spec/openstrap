@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.dashboard
 
 import androidx.compose.foundation.Canvas
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -147,8 +148,8 @@ internal fun SleepWindows(
     selected: java.time.LocalDate? = null, onNight: ((java.time.LocalDate) -> Unit)? = null, height: androidx.compose.ui.unit.Dp = 110.dp,
 ) {
     val measurer = rememberTextMeasurer()
-    val axis = TextStyle(color = Color.White.copy(alpha = 0.5f), fontSize = 10.sp)
-    val today = axis.copy(color = Color.White)
+    val axis = TextStyle(color = AppColors.ink.copy(alpha = 0.5f), fontSize = 10.sp)
+    val today = axis.copy(color = AppColors.ink)
 
     // Minutes since the noon before each night, so a night never wraps.
     fun sinceNoon(epoch: Long, wake: Boolean): Int {
@@ -187,13 +188,13 @@ internal fun SleepWindows(
             drawText(label, topLeft = Offset(cx - label.size.width / 2, chartBottom + 3.dp.toPx()))
             val span = spans[i]
             if (span == null) {
-                drawCircle(Color.White.copy(alpha = 0.25f), 2.5.dp.toPx(), Offset(cx, chartBottom / 2))
+                drawCircle(AppColors.ink.copy(alpha = 0.25f), 2.5.dp.toPx(), Offset(cx, chartBottom / 2))
                 return@forEachIndexed
             }
             val y0 = yOf(span.first)
             val y1 = yOf(span.second)
             drawRoundRect(
-                if (last) Color.White else MetricColors.sleepLight,
+                if (last) AppColors.ink else MetricColors.sleepLight,
                 Offset(cx - width / 2, y0), Size(width, (y1 - y0).coerceAtLeast(width)), CornerRadius(width / 2),
             )
         }

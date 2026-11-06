@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import androidx.compose.foundation.layout.Arrangement
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -13,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.data.Workouts
@@ -39,7 +39,7 @@ internal fun ColumnScope.LivePaused(r: WorkoutState.Recording, liveHeartRate: In
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(
-            stringResource(R.string.workout_live_paused_for), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.workout_live_paused_for), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary,
         )
         DotMatrixText(dotClock((now - at).coerceAtLeast(0)), dot = DotSize.Detail)
@@ -48,10 +48,10 @@ internal fun ColumnScope.LivePaused(r: WorkoutState.Recording, liveHeartRate: In
         if (liveHeartRate != null) Text(
             drop?.takeIf { it > 0 }?.let { stringResource(R.string.workout_live_paused_heart_down, liveHeartRate, it) }
                 ?: stringResource(R.string.workout_live_paused_heart, liveHeartRate),
-            color = Color.White, style = GlowType.sentence, textAlign = TextAlign.Center,
+            color = AppColors.ink, style = GlowType.sentence, textAlign = TextAlign.Center,
         )
         Text(
-            stringResource(R.string.workout_live_paused_note), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            stringResource(R.string.workout_live_paused_note), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary, textAlign = TextAlign.Center,
         )
     }

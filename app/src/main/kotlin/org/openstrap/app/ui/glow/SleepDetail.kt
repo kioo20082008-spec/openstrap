@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.platform.LocalResources
 import org.openstrap.app.presentation.dotFormat
@@ -100,19 +101,19 @@ private fun sleepDays(state: DayUiState, history: DailyHistory): Set<LocalDate> 
 /** The lines in a detail's body that aren't the one sentence: a reading's caption, a chart's title. */
 @Composable
 private fun Caption(text: String, modifier: Modifier = Modifier) =
-    Text(text, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, modifier = modifier)
+    Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, modifier = modifier)
 
 /** A chart's title inside a detail's body, with an optional [note] on the right. */
 @Composable
 private fun ChartTitle(title: String, note: String?, modifier: Modifier = Modifier, scrubbed: DetailHeadline? = null) {
     Row(modifier.fillMaxWidth().padding(top = 18.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = Color.White, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+        Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
         // While the line is scrubbed, its reading takes the note's place, in white so it reads as the live value.
         if (scrubbed != null) Text(
-            stringResource(R.string.glow_sleep_scrubbed, scrubbed.value.toString(), scrubbed.label), color = Color.White,
+            stringResource(R.string.glow_sleep_scrubbed, scrubbed.value.toString(), scrubbed.label), color = AppColors.ink,
             style = GlowType.secondary, maxLines = 1,
         )
-        else if (note != null) Text(note, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        else if (note != null) Text(note, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
     }
 }
 
@@ -304,7 +305,7 @@ private fun SleepEditActions(note: String?, onAdjust: () -> Unit, onDelete: () -
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             PageButton(stringResource(R.string.glow_sleep_adjust_times), onAdjust, Modifier.weight(1f), icon = AppIcons.PencilEdit)
             PageButton(
-                stringResource(R.string.glow_delete), onDelete, Modifier.weight(1f), color = MetricColors.warn, icon = AppIcons.Trash,
+                stringResource(R.string.glow_delete), onDelete, Modifier.weight(1f), color = AppColors.readable(MetricColors.warn), icon = AppIcons.Trash,
             )
         }
     }
@@ -318,14 +319,14 @@ private fun SleepEditActions(note: String?, onAdjust: () -> Unit, onDelete: () -
 private fun DeleteSleepSheet(title: String, times: String, onDelete: () -> Unit, onDismiss: () -> Unit) {
     PageSheet(onDismiss, title) {
         Text(
-            stringResource(R.string.glow_sleep_delete_text, times, SleepCopy.DELETE_WHAT), color = Color.White.copy(alpha = 0.8f),
+            stringResource(R.string.glow_sleep_delete_text, times, SleepCopy.DELETE_WHAT), color = AppColors.ink.copy(alpha = 0.8f),
             style = GlowType.body,
         )
         PageNote(SleepCopy.DELETE_RESTORE)
         Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             PageButton(stringResource(R.string.glow_cancel), onDismiss, Modifier.weight(1f))
             PageButton(
-                stringResource(R.string.glow_delete), onDelete, Modifier.weight(1f), color = MetricColors.warn, icon = AppIcons.Trash,
+                stringResource(R.string.glow_delete), onDelete, Modifier.weight(1f), color = AppColors.readable(MetricColors.warn), icon = AppIcons.Trash,
             )
         }
     }
@@ -335,8 +336,8 @@ private fun DeleteSleepSheet(title: String, times: String, onDelete: () -> Unit,
 @Composable
 private fun DeletedNight(text: String, onRestore: () -> Unit) {
     OutlineCard(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Text(SleepCopy.NO_SLEEP_TITLE, color = Color.White, style = GlowType.cardTitle, maxLines = 1)
-        Text(text, color = Color.White.copy(alpha = 0.75f), style = GlowType.body)
+        Text(SleepCopy.NO_SLEEP_TITLE, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+        Text(text, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body)
         PageButton(
             stringResource(R.string.glow_sleep_restore), onRestore, Modifier.padding(top = 4.dp), icon = AppIcons.ArrowCounterClockwise,
         )
@@ -361,15 +362,15 @@ private fun UndoHost(message: String?, contentPadding: PaddingValues, onUndo: ()
                     .fillMaxWidth().height(56.dp).background(SnackbarSurface, CircleShape).padding(start = 22.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(message, color = Color.Black, style = GlowType.body, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(message, color = AppColors.onInk, style = GlowType.body, maxLines = 1, modifier = Modifier.weight(1f))
                 Row(
-                    Modifier.height(40.dp).clip(CircleShape).background(Color.Black).pressClickable(onUndo, CircleShape)
+                    Modifier.height(40.dp).clip(CircleShape).background(AppColors.onInk).pressClickable(onUndo, CircleShape)
                         .semantics { role = Role.Button }.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    androidx.compose.material3.Icon(AppIcons.ArrowCounterClockwise, null, Modifier.size(16.dp), tint = Color.White)
+                    androidx.compose.material3.Icon(AppIcons.ArrowCounterClockwise, null, Modifier.size(16.dp), tint = AppColors.ink)
                     Text(
-                        stringResource(R.string.glow_sleep_undo), color = Color.White, style = GlowType.body,
+                        stringResource(R.string.glow_sleep_undo), color = AppColors.ink, style = GlowType.body,
                         modifier = Modifier.padding(start = 6.dp),
                     )
                 }
@@ -381,7 +382,8 @@ private fun UndoHost(message: String?, contentPadding: PaddingValues, onUndo: ()
 /** How long a delete's Undo shows. */
 private const val UNDO_MS = 8_000L
 
-private val SnackbarSurface = Color(0xFFF2F2F4)
+/** The undo bar: the theme's ink as a pill, its words in the page's colour, so it stands out on any theme. */
+private val SnackbarSurface: Color get() = AppColors.ink
 
 /** "Your times. The strap saw 23:20 to 07:21." on the list surface, with a pencil. */
 @Composable
@@ -390,8 +392,8 @@ private fun EditedNote(text: String) {
         Modifier.fillMaxWidth().background(ListSurface, RoundedCornerShape(16.dp)).padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        androidx.compose.material3.Icon(AppIcons.PencilEdit, null, Modifier.size(16.dp), tint = Color.White.copy(alpha = 0.7f))
-        Text(text, color = Color.White, style = GlowType.secondary, modifier = Modifier.padding(start = 10.dp).weight(1f))
+        androidx.compose.material3.Icon(AppIcons.PencilEdit, null, Modifier.size(16.dp), tint = AppColors.ink.copy(alpha = 0.7f))
+        Text(text, color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.padding(start = 10.dp).weight(1f))
     }
 }
 
@@ -410,10 +412,10 @@ private fun StageBars(b: Summaries.SleepBreakdown, modifier: Modifier = Modifier
         order.forEach { st ->
             val secs = b.byStage[st] ?: 0L
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(SLEEP_NAMES[st].orEmpty(), color = Color.White.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.width(56.dp))
+                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.width(56.dp))
                 FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f), height = 10.dp)
                 Text(
-                    Units.duration(secs), color = Color.White, style = GlowType.secondary,
+                    Units.duration(secs), color = AppColors.ink, style = GlowType.secondary,
                     modifier = Modifier.padding(start = 12.dp).width(56.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
                 )
             }
@@ -699,7 +701,7 @@ internal fun SleepTrim(
     val changed = start != shown.start || end != shown.end
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // As the workout's trim: the times and length above the bar.
-        Text(SleepCopy.trimLine(detected.nap, clock(start), clock(end), end - start), color = Color.White, style = GlowType.body)
+        Text(SleepCopy.trimLine(detected.nap, clock(start), clock(end), end - start), color = AppColors.ink, style = GlowType.body)
         // Sleep's heart rate sits below zone 2, so the bars are zone 1's colour.
         TrimBar(
             points, core = detected.start..detected.end, reach = reach, from = start, to = end,
@@ -709,7 +711,7 @@ internal fun SleepTrim(
             else SleepEdits.SLEEP_MIN_SECONDS..SleepEdits.SLEEP_MAX_SECONDS,
         )
         if (problem != null) PageNote(problem, color = MetricColors.warn)
-        else Text(SleepCopy.TIMES_HINT, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        else Text(SleepCopy.TIMES_HINT, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             PageButton(stringResource(R.string.glow_cancel), onCancel, Modifier.weight(1f))
             PageButton(

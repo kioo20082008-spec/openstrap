@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -107,7 +108,7 @@ fun GlowChooseScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack)
             Spacer(Modifier.width(12.dp))
-            Text(stringResource(R.string.glow_choose_title), color = Color.White, style = GlowType.pageTitle, maxLines = 1)
+            Text(stringResource(R.string.glow_choose_title), color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1)
         }
     }
     val choose: @Composable ColumnScope.() -> Unit = {
@@ -163,15 +164,15 @@ private fun UsualRow(s: ChooseSport, onStart: () -> Unit, onOpen: () -> Unit) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
                     Text(
-                        stringResource(R.string.glow_choose_your_usual), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                        stringResource(R.string.glow_choose_your_usual), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary,
                     )
                     Text(
-                        Workouts.sportName(s.type), color = Color.White, style = GlowType.headerDate, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        Workouts.sportName(s.type), color = AppColors.ink, style = GlowType.headerDate, maxLines = 1, overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(top = 2.dp),
                     )
                     if (s.line.isNotEmpty()) Text(
-                        s.line, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                        s.line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                         maxLines = 1, overflow = TextOverflow.Ellipsis,
                     )
                 }
@@ -187,7 +188,7 @@ private fun UsualRow(s: ChooseSport, onStart: () -> Unit, onOpen: () -> Unit) {
 }
 
 /** Choose's quiet chips, a step off black so the usual's glow stays the one lit thing. */
-private val QuietCard = ListSurface
+private val QuietCard get() = ListSurface
 
 /** A Recent chip: the sport's icon in its colour and a name, a sport's or a saved workout's, on a quiet pill. */
 @Composable
@@ -217,10 +218,10 @@ internal fun SportTile(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            Modifier.size(SportTileSize).clip(GlowLayout.TileShape).background(if (selected) Color.White else Raised),
+            Modifier.size(SportTileSize).clip(GlowLayout.TileShape).background(if (selected) AppColors.ink else Raised),
             contentAlignment = Alignment.Center,
         ) {
-            val ink = if (selected) Color.Black else Color.White
+            val ink = if (selected) AppColors.onInk else AppColors.ink
             Icon(icon, null, tint = ink, modifier = Modifier.size(24.dp))
             if (outdoor) Icon(
                 SportIcons.Location, stringResource(R.string.glow_choose_outdoors), tint = ink.copy(alpha = 0.7f),
@@ -230,7 +231,7 @@ internal fun SportTile(
         Spacer(Modifier.height(6.dp))
         // Two lines, so a long name in More sports' search isn't cut short.
         Text(
-            name, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 2,
+            name, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 2,
             textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis,
         )
     }
@@ -314,7 +315,7 @@ private fun SearchResults(query: String, selected: Int, onPick: (Int) -> Unit) {
     val focus = LocalFocusManager.current
     val pick: (Int) -> Unit = { keyboard?.hide(); focus.clearFocus(); onPick(it) }
     if (found.isEmpty()) Text(
-        stringResource(R.string.glow_choose_no_match, query.trim()), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+        stringResource(R.string.glow_choose_no_match, query.trim()), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
         style = GlowType.secondary, modifier = Modifier.padding(start = 4.dp, top = 8.dp),
     )
     else SportTiles(null, found, { if (it in Workouts.EVERYDAY) Workouts.shortName(it) else Workouts.sportName(it) }, { it == selected }, pick)
@@ -328,9 +329,9 @@ private fun SearchEntry(hint: String, onClick: () -> Unit) {
             .pressClickable(onClick, GlowLayout.TileShape).semantics { role = Role.Button }.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(SportIcons.Search, null, tint = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
+        Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(10.dp))
-        Text(hint, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
+        Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
     }
 }
 
@@ -374,7 +375,7 @@ private fun SearchPage(contentPadding: PaddingValues, onPick: (Int) -> Unit, onB
                     found.isEmpty() -> stringResource(R.string.glow_choose_no_match, query.trim())
                     else -> pluralStringResource(R.plurals.glow_choose_sports_count, found.size, found.size)
                 },
-                color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(start = 4.dp),
+                color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(start = 4.dp),
             )
         }
         if (found.isNotEmpty()) item {
@@ -410,8 +411,8 @@ private fun SearchField(query: String, hint: String, modifier: Modifier = Modifi
     val keyboard = LocalSoftwareKeyboardController.current
     BasicTextField(
         query, onChange, modifier.fillMaxWidth(), singleLine = true,
-        textStyle = GlowType.body.copy(color = Color.White),
-        cursorBrush = SolidColor(Color.White),
+        textStyle = GlowType.body.copy(color = AppColors.ink),
+        cursorBrush = SolidColor(AppColors.ink),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
         decorationBox = { field ->
@@ -419,14 +420,14 @@ private fun SearchField(query: String, hint: String, modifier: Modifier = Modifi
                 Modifier.fillMaxWidth().height(48.dp).clip(GlowLayout.TileShape).background(Raised).padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Icon(SportIcons.Search, null, tint = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
+                Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(10.dp))
                 Box(Modifier.weight(1f)) {
-                    if (query.isEmpty()) Text(hint, color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
+                    if (query.isEmpty()) Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
                     field()
                 }
                 if (query.isNotEmpty()) Icon(
-                    AppIcons.X, stringResource(R.string.glow_choose_clear), tint = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                    AppIcons.X, stringResource(R.string.glow_choose_clear), tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     modifier = Modifier.size(28.dp).clip(CircleShape).clickable { onChange("") }.padding(6.dp),
                 )
             }

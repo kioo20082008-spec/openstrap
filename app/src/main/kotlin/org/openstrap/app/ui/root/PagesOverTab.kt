@@ -6,6 +6,7 @@
 package org.openstrap.app.ui.root
 
 import android.net.Uri
+import org.openstrap.app.ui.theme.AppColors
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -307,6 +308,9 @@ private fun YouPageHost(
         onSampleData = if (SampleData.AVAILABLE) ({ deviceVm.loadSampleData() }) else null,
         onBack = onBack,
         selected = selected?.row,
+        // The theme applied now, which is the stored one: the root keeps the two in step.
+        appTheme = AppColors.theme,
+        onAppTheme = hooks.rootVm::setAppTheme,
     )
 }
 

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -211,7 +212,7 @@ private fun RecoveryHero(
                         Spacer(Modifier.width(16.dp))
                         Column(Modifier.weight(1f)) {
                             TrendDots(week)
-                            Text(TabCopy.LAST_7_DAYS, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary)
+                            Text(TabCopy.LAST_7_DAYS, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary)
                         }
                     }
                 }

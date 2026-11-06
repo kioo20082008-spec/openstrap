@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.live
 
 import org.openstrap.app.presentation.Units
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Arrangement
 import org.openstrap.app.ui.glow.draw.DotSize
 import org.openstrap.app.ui.glow.HeroValue
@@ -20,7 +21,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
@@ -112,8 +112,8 @@ internal fun ZoneTimeBar(zoneSeconds: ZoneSeconds, current: Int?) {
     val described = stringResource(R.string.workout_live_zone_times_description, each)
     val segments = zoneSeconds.mapIndexed { z, s ->
         val color = when {
-            z == current -> Color.White
-            s == 0 -> Color.White.copy(alpha = 0.18f)
+            z == current -> AppColors.ink
+            s == 0 -> AppColors.ink.copy(alpha = 0.18f)
             else -> ZONE_COLORS[z]
         }
         Segment(maxOf(s.toFloat() / total, 0.04f), color)
@@ -138,11 +138,11 @@ private fun CompactHeartCard(
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.Bottom) {
                 if (bpm != null) HeroValue("$bpm", stringResource(R.string.workout_live_unit_bpm), dot = DotSize.Detail)
-                else Text(WorkoutCopy.noHeartRate(r.paused, connected), color = Color.White, style = GlowType.sentence)
+                else Text(WorkoutCopy.noHeartRate(r.paused, connected), color = AppColors.ink, style = GlowType.sentence)
                 Spacer(Modifier.weight(1f))
                 Text(
                     zone?.let { WorkoutCopy.zoneLine(it) } ?: WorkoutCopy.noZone(r.paused),
-                    color = Color.White, style = GlowType.secondary, maxLines = 1,
+                    color = AppColors.ink, style = GlowType.secondary, maxLines = 1,
                 )
             }
             ZoneTimeBar(zoneSeconds, zone)

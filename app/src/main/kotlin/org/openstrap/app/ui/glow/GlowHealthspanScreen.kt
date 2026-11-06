@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.runtime.ReadOnlyComposable
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.pluralStringResource
@@ -113,7 +114,7 @@ private fun ScaleTrack(modifier: Modifier = Modifier, marks: DrawScope.(x0: Floa
     Canvas(modifier.fillMaxWidth().height(12.dp)) {
         val y = size.height / 2
         val r = 5.dp.toPx()
-        drawLine(Color.White.copy(alpha = 0.10f), Offset(r, y), Offset(size.width - r, y), 2.dp.toPx(), StrokeCap.Round)
+        drawLine(AppColors.ink.copy(alpha = 0.10f), Offset(r, y), Offset(size.width - r, y), 2.dp.toPx(), StrokeCap.Round)
         marks(r, size.width - r, y)
     }
 }
@@ -122,7 +123,7 @@ private fun ScaleTrack(modifier: Modifier = Modifier, marks: DrawScope.(x0: Floa
 private fun DrawScope.glowDot(at: Offset, color: Color) {
     drawCircle(color.copy(alpha = 0.30f), 5.dp.toPx(), at)
     drawCircle(color, 3.dp.toPx(), at)
-    drawCircle(Color.White, 1.2.dp.toPx(), at)
+    drawCircle(AppColors.ink, 1.2.dp.toPx(), at)
 }
 
 /**
@@ -147,7 +148,7 @@ private fun TermsPanel(r: Healthspan.Result) {
         }
         if (r.fitnessCapped) Text(
             stringResource(R.string.glow_healthspan_fitness_capped),
-            color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+            color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             modifier = Modifier.padding(bottom = GlowLayout.RowPadding),
         )
     }
@@ -167,16 +168,16 @@ private fun habitIcon(h: Healthspan.Habit): Pair<androidx.compose.ui.graphics.ve
 private fun ScaleLabels(start: String, middle: String, end: String, modifier: Modifier = Modifier) {
     Box(modifier.fillMaxWidth()) {
         ScaleLabel(start, 0f)
-        ScaleLabel(middle, at = 0.5f, color = Color.White)
+        ScaleLabel(middle, at = 0.5f, color = AppColors.ink)
         ScaleLabel(end, 1f)
     }
 }
 
 /** A scale's label in Caption, centred on [at] (0 to 1) across the scale and kept inside it. */
 @Composable
-internal fun BoxScope.ScaleLabel(text: String, at: Float, color: Color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA)) {
+internal fun BoxScope.ScaleLabel(text: String, at: Float, color: Color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA)) {
     // Centred on its point by aligning a share of the way across, as BiasAlignment does.
-    Text(text, color = color, style = GlowType.caption, modifier = Modifier.align(androidx.compose.ui.BiasAbsoluteAlignment((at * 2f - 1f).coerceIn(-1f, 1f), 0f)))
+    Text(text, color = AppColors.readable(color), style = GlowType.caption, modifier = Modifier.align(androidx.compose.ui.BiasAbsoluteAlignment((at * 2f - 1f).coerceIn(-1f, 1f), 0f)))
 }
 
 /**
@@ -188,7 +189,7 @@ internal fun BoxScope.ScaleLabel(text: String, at: Float, color: Color = Color.W
 private fun EffectBar(years: Float, modifier: Modifier = Modifier) {
     ScaleTrack(modifier) { x0, _, y ->
         val mid = size.width / 2
-        drawLine(Color.White.copy(alpha = 0.35f), Offset(mid, y - 5.dp.toPx()), Offset(mid, y + 5.dp.toPx()), 1.5.dp.toPx(), StrokeCap.Round)
+        drawLine(AppColors.ink.copy(alpha = 0.35f), Offset(mid, y - 5.dp.toPx()), Offset(mid, y + 5.dp.toPx()), 1.5.dp.toPx(), StrokeCap.Round)
         if (abs(years) < 0.05f) return@ScaleTrack
         // Habit Age's own ink either way: the side of the centre says better or worse, never green or amber.
         val color = MetricColors.habitAge

@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.animation.core.LinearEasing
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -47,7 +48,7 @@ internal fun StrapDrawing(led: Color, lit: Boolean, syncing: Boolean, modifier: 
             // Drawn on a 120 by 150 grid, the card slot's shape.
             val k = size.width / 120f
             fun o(x: Float, y: Float) = Offset(x * k, y * k)
-            val white = Color.White
+            val white = AppColors.ink
             val edge = Brush.verticalGradient(
                 0f to white.copy(alpha = 0f), 0.22f to white.copy(alpha = 0.55f),
                 0.78f to white.copy(alpha = 0.55f), 1f to white.copy(alpha = 0f),

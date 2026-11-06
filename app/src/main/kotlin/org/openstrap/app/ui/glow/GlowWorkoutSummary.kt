@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import org.openstrap.app.R
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Units
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -157,16 +158,16 @@ fun GlowWorkoutSummaryScreen(
         Color.Transparent, contentPadding,
         pinned = {
             if (a != null && hero != null) SummaryButtons(onShare = { sharing = true }, onDone = done)
-            else WorkoutButton(stringResource(R.string.glow_done), Color.White, Color.Black, onDone)
+            else WorkoutButton(stringResource(R.string.glow_done), AppColors.ink, AppColors.onInk, onDone)
         },
     ) {
         // The sport, then when, with Done beside them (board SummaryRun).
         Row(Modifier.padding(start = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 val title = a?.sportName ?: stringResource(R.string.glow_workout_untitled)
-                Text(title, color = Color.White, style = GlowType.pageTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1)
                 if (a != null) Text(
-                    FamilySummary.whenLine(a.shownStart, System.currentTimeMillis() / 1000), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                    FamilySummary.whenLine(a.shownStart, System.currentTimeMillis() / 1000), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp),
                 )
             }
@@ -240,7 +241,7 @@ internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swe
         Column {
             HeroValue(hero.value, hero.unit)
             hero.sentence?.let { HeroSentence(it) }
-            hero.line?.let { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp)) }
+            hero.line?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp)) }
             if (hero.figures.isNotEmpty()) {
                 DetailFigures(hero.figures, Modifier.padding(top = 18.dp), valueStyle = GlowType.rowValue, missing = null, gap = 0.dp)
             }
@@ -301,7 +302,7 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
             fun x(t: Long) = (t - first) / span * size.width
             fun y(v: Int) = size.height - (v - lo) / (hi - lo) * size.height
             val endX = x(end)
-            drawLine(Color.White.copy(alpha = 0.35f), Offset(endX, 0f), Offset(endX, size.height), strokeWidth = 1.dp.toPx())
+            drawLine(AppColors.ink.copy(alpha = 0.35f), Offset(endX, 0f), Offset(endX, size.height), strokeWidth = 1.dp.toPx())
             fun stroke(part: List<Pair<Long, Int>>, color: Color) {
                 if (part.size < 2) return
                 val path = Path()
@@ -310,8 +311,8 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
                 }
                 drawPath(path, color, style = Stroke(2.5.dp.toPx(), cap = StrokeCap.Round))
             }
-            stroke(readings.filter { it.first <= end }, Color.White.copy(alpha = 0.45f))
-            stroke(readings.filter { it.first >= end }, Color.White)
+            stroke(readings.filter { it.first <= end }, AppColors.ink.copy(alpha = 0.45f))
+            stroke(readings.filter { it.first >= end }, AppColors.ink)
         }
         Spacer(Modifier.height(6.dp))
         Ltr {
@@ -365,12 +366,12 @@ internal fun WorkoutLoadCard(a: WorkoutAnalysis, usual: Float?, drop: String? = 
         }
         if (load != null) EdgeValue(
             load.toString(), null, SummaryCopy.loadLine(load, usual),
-            if (edge != EdgeStatus.Usual) MetricColors.load else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+            if (edge != EdgeStatus.Usual) MetricColors.load else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
         ) else EdgeValue(null, null, stringResource(R.string.glow_summary_load_none), waiting = false)
         SummaryCopy.timeToRecover(a.recoveryMinutes, a.ownRecoveryMinutes, a.workout.sportType)?.let {
-            Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp))
+            Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp))
         }
-        drop?.let { Text(it, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp)) }
+        drop?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp)) }
     }
 }
 
@@ -467,16 +468,16 @@ private fun SplitTimeBars(rows: List<SplitRow>, fastest: Int?) {
     val bar = familyColor(Workouts.Family.Distance).copy(alpha = 0.5f)
     rows.forEachIndexed { i, r ->
         val lit = i == fastest
-        val text = if (lit) Color.White else Color.White.copy(alpha = GlowType.SECONDARY_ALPHA)
+        val text = if (lit) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA)
         val style = if (lit) GlowType.secondary.copy(fontWeight = FontWeight.SemiBold) else GlowType.secondary
         Row(Modifier.fillMaxWidth().padding(vertical = 7.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(r.name, color = text, style = style, maxLines = 1, modifier = Modifier.widthIn(min = 56.dp).padding(end = 8.dp))
             Box(Modifier.weight(1f).height(10.dp)) {
                 if (best != null && r.kind == SplitRow.Kind.Whole && seconds[i] > 0) Box(
-                    Modifier.fillMaxWidth(best.toFloat() / seconds[i]).fillMaxHeight().clip(CircleShape).background(if (lit) Color.White else bar),
+                    Modifier.fillMaxWidth(best.toFloat() / seconds[i]).fillMaxHeight().clip(CircleShape).background(if (lit) AppColors.ink else bar),
                 )
             }
-            Text(r.time, color = Color.White, style = GlowType.secondary.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, modifier = Modifier.padding(start = 14.dp))
+            Text(r.time, color = AppColors.ink, style = GlowType.secondary.copy(fontWeight = FontWeight.SemiBold), maxLines = 1, modifier = Modifier.padding(start = 14.dp))
         }
     }
 }
@@ -485,8 +486,8 @@ private fun SplitTimeBars(rows: List<SplitRow>, fastest: Int?) {
 @Composable
 internal fun SummaryButtons(onShare: () -> Unit, onDone: () -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        WorkoutButton(stringResource(R.string.glow_share), Raised, Color.White, onShare, Modifier.weight(1f), icon = AppIcons.UploadSimple)
-        WorkoutButton(stringResource(R.string.glow_done), Color.White, Color.Black, onDone, Modifier.weight(1f), icon = AppIcons.Tick02)
+        WorkoutButton(stringResource(R.string.glow_share), Raised, AppColors.ink, onShare, Modifier.weight(1f), icon = AppIcons.UploadSimple)
+        WorkoutButton(stringResource(R.string.glow_done), AppColors.ink, AppColors.onInk, onDone, Modifier.weight(1f), icon = AppIcons.Tick02)
     }
 }
 

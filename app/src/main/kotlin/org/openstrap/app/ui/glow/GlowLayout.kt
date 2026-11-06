@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.background
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +23,6 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
@@ -309,7 +309,7 @@ val LocalCardOpens = compositionLocalOf { false }
 /** The tap caret (spec 2.5): 14 dp, at [alpha] white, 50% after a card's title and 30% at a row's end. */
 @Composable
 internal fun TapCaret(alpha: Float, modifier: Modifier = Modifier) =
-    Icon(AppIcons.TapCaret, null, tint = Color.White.copy(alpha = alpha), modifier = modifier.size(CaretSize))
+    Icon(AppIcons.TapCaret, null, tint = AppColors.ink.copy(alpha = alpha), modifier = modifier.size(CaretSize))
 
 internal val CaretSize = 14.dp
 
@@ -320,7 +320,7 @@ internal val CaretSize = 14.dp
 @Composable
 internal fun InfoButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) = RoundIconButton(
     AppIcons.Info, label, onClick, modifier, size = InfoButtonSize, iconSize = 16.dp,
-    tint = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+    tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
 )
 
 internal val InfoButtonSize = 32.dp
@@ -337,12 +337,12 @@ internal const val ROW_CARET_ALPHA = 0.3f
 @Composable
 internal fun CardTitle(title: String, modifier: Modifier = Modifier) {
     if (!LocalCardOpens.current) {
-        Text(title, modifier, color = Color.White, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(title, modifier, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
         return
     }
     Layout(
         content = {
-            Text(title, color = Color.White, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
             TapCaret(CARD_CARET_ALPHA)
         },
         modifier = modifier,
@@ -463,7 +463,7 @@ fun GlowHeader(
 /** A title row's note, in Secondary on one line. */
 @Composable
 internal fun NoteText(text: String) =
-    Text(text, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+    Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
 
 /**
  * A small sync marker next to a card's title, "Up to 09:40" (spec 4.3): amber, as the strap chip, since it's about
@@ -471,7 +471,7 @@ internal fun NoteText(text: String) =
  */
 @Composable
 internal fun StateMarker(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier, color = MetricColors.warn, style = GlowType.caption, maxLines = 1)
+    Text(text, modifier, color = AppColors.readable(MetricColors.warn), style = GlowType.caption, maxLines = 1)
 }
 
 /**
@@ -498,9 +498,9 @@ internal fun OutlineTag(text: String, modifier: Modifier = Modifier, onClick: ((
     val about = stringResource(R.string.glow_tag_about, text.lowercase())
     Text(
         text,
-        modifier.clip(shape).border(1.dp, Color.White.copy(alpha = 0.22f), shape)
+        modifier.clip(shape).border(1.dp, AppColors.ink.copy(alpha = 0.22f), shape)
             .let { if (onClick != null) it.clickable(onClickLabel = about, onClick = onClick) else it }
             .padding(horizontal = 8.dp, vertical = 2.dp),
-        color = Color.White.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, maxLines = 1,
+        color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, maxLines = 1,
     )
 }

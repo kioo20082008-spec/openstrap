@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.Canvas
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -224,12 +225,12 @@ internal fun TrimBar(
                 addRoundRect(RoundRect(fx - inset, 0f, tx + inset, h, CornerRadius(10.dp.toPx())))
                 addRoundRect(RoundRect(fx, edge, tx, h - edge, CornerRadius(4.dp.toPx())))
             }
-            drawPath(frame, Color.White)
+            drawPath(frame, AppColors.ink)
             if (marked) {
                 val y = h + MarkRoom.toPx() / 2
                 val mark = 2.dp.toPx()
                 drawLine(
-                    Color.White.copy(alpha = 0.35f),
+                    AppColors.ink.copy(alpha = 0.35f),
                     Offset(x(core.first.coerceIn(first, last)), y), Offset(x(core.last.coerceIn(first, last)), y),
                     strokeWidth = mark, cap = androidx.compose.ui.graphics.StrokeCap.Round,
                 )
@@ -237,7 +238,7 @@ internal fun TrimBar(
             val grip = 2.dp.toPx()
             listOf(fx - inset / 2, tx + inset / 2).forEach { gx ->
                 drawRoundRect(
-                    Color.Black.copy(alpha = 0.55f), Offset(gx - grip / 2, h / 2 - 8.dp.toPx()), Size(grip, 16.dp.toPx()),
+                    AppColors.onInk.copy(alpha = 0.55f), Offset(gx - grip / 2, h / 2 - 8.dp.toPx()), Size(grip, 16.dp.toPx()),
                     CornerRadius(grip / 2),
                 )
             }

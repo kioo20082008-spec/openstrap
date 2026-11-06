@@ -21,6 +21,13 @@
     <string name="you_row_sample_data_note">في نسخ التطوير فقط</string>
     <string name="you_section_your_data">بياناتك</string>
     <string name="you_section_help">المساعدة</string>
+    <string name="you_section_app">التطبيق</string>
+    <string name="you_row_appearance">المظهر</string>
+    <string name="you_appearance_note">يتغيّر في كل الصفحات فوراً، وتبقى أدوات الشاشة الرئيسية على مظهرها.</string>
+    <string name="you_theme_navy">كحلي</string>
+    <string name="you_theme_oled">أسود OLED</string>
+    <string name="you_theme_cream">كريمي فاتح</string>
+    <string name="you_theme_dusk">غسق دافئ</string>
     <plurals name="you_goals_and_bests_line"><item quantity="zero">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="one">تمرين واحد أسبوعياً، أرقامك القياسية والشارات</item><item quantity="two">تمرينان أسبوعياً، أرقامك القياسية والشارات</item><item quantity="few">⁨%1$d⁩ تمارين أسبوعياً، أرقامك القياسية والشارات</item><item quantity="many">⁨%1$d⁩ تمريناً أسبوعياً، أرقامك القياسية والشارات</item><item quantity="other">⁨%1$d⁩ تمرين أسبوعياً، أرقامك القياسية والشارات</item></plurals>
     <plurals name="you_diagnostics_line"><item quantity="zero">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="one">سطر واحد، لبلاغات الأخطاء</item><item quantity="two">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="few">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="many">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item><item quantity="other">⁨%1$d⁩ سطر، لبلاغات الأخطاء</item></plurals>
     <string name="you_footer">‏OpenStrap ⁨%1$s⁩. كل بياناتك تبقى على هذا الجوال.</string>

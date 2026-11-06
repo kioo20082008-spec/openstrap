@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.glow.draw
 
 import androidx.compose.ui.geometry.CornerRadius
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -55,7 +56,7 @@ fun DrawScope.drawDots(layout: DotLayout, color: Color) {
 }
 
 /** A solid hairline across at [y], from [x0] to [x1]. */
-fun DrawScope.chartHairline(y: Float, color: Color = ChartInk.Grid, x0: Float = 0f, x1: Float = size.width) =
+fun DrawScope.chartHairline(y: Float, color: Color = AppColors.ink.copy(alpha = ChartInk.Grid.alpha), x0: Float = 0f, x1: Float = size.width) =
     drawLine(color, Offset(x0, y), Offset(x1, y), strokeWidth = ChartInk.HAIRLINE_DP * density)
 
 /**
@@ -115,7 +116,7 @@ fun ghostLinePaths(g: GhostLineGeometry, density: Float) = GhostLinePaths(
 
 /** The ghost line: your usual by now in white at 35%, today in [color] ending in a dot, from its [paths]. */
 fun DrawScope.drawGhostLine(g: GhostLineGeometry, paths: GhostLinePaths, color: Color) {
-    paths.usual?.let { drawPath(it, Color.White.copy(alpha = GhostLineLook.USUAL_ALPHA), style = paths.usualStroke) }
+    paths.usual?.let { drawPath(it, AppColors.ink.copy(alpha = GhostLineLook.USUAL_ALPHA), style = paths.usualStroke) }
     if (g.today.isEmpty()) return
     paths.today?.let { drawPath(it, color, style = paths.todayStroke) }
     drawCircle(color, g.endDot, g.today.last())
@@ -126,10 +127,10 @@ fun DrawScope.drawGhostLine(g: GhostLineGeometry, paths: GhostLinePaths, color: 
  * deeper, joined by thin lines, when it's null.
  */
 fun DrawScope.drawHypnogramBands(g: HypnogramGeometry, rowColors: List<Color>?) {
-    if (rowColors == null) g.joins.forEach { j -> drawLine(Color.White.copy(alpha = HypnogramLook.JOIN_ALPHA), j.from, j.to, ChartInk.HAIRLINE_DP * density) }
+    if (rowColors == null) g.joins.forEach { j -> drawLine(AppColors.ink.copy(alpha = HypnogramLook.JOIN_ALPHA), j.from, j.to, ChartInk.HAIRLINE_DP * density) }
     g.bands.forEach { b ->
         drawRoundRect(
-            rowColors?.getOrNull(b.stage.row) ?: Color.White.copy(alpha = b.whiteAlpha),
+            rowColors?.getOrNull(b.stage.row) ?: AppColors.ink.copy(alpha = b.whiteAlpha),
             topLeft = b.topLeft,
             size = b.size,
             cornerRadius = CornerRadius(b.corner),
@@ -144,5 +145,5 @@ fun DrawScope.drawPillBar(bar: PillBar, color: Color) =
 /** Hour pills: the baseline, then each bar, the lit one white, the rest white at 45%. */
 fun DrawScope.drawHourPills(g: HourPillsGeometry) {
     chartHairline(g.baselineY)
-    g.bars.forEach { (bar, lit) -> drawPillBar(bar, if (lit) Color.White else Color.White.copy(alpha = HourPillsLook.DIM_ALPHA)) }
+    g.bars.forEach { (bar, lit) -> drawPillBar(bar, if (lit) AppColors.ink else AppColors.ink.copy(alpha = HourPillsLook.DIM_ALPHA)) }
 }

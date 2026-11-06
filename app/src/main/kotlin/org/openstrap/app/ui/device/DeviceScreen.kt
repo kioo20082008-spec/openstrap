@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.device
 
 import android.content.ClipData
+import org.openstrap.app.ui.theme.AppColors
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
@@ -360,7 +361,7 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
         connected != null && sync is SyncState.Failed -> MetricColors.warn
         connected != null -> StrapLight
         connection is ConnectionState.Failed -> MetricColors.warn
-        else -> Color.White.copy(alpha = 0.25f)
+        else -> AppColors.ink.copy(alpha = 0.25f)
     }
     // A clock that moves on, so "Synced 2 min ago" stays true while the page is open.
     val now by androidx.compose.runtime.produceState(System.currentTimeMillis() / 1000) {
@@ -369,9 +370,9 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
     GlowCard(StrapGlow, Modifier.fillMaxWidth()) {
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.fillMaxWidth().padding(end = 112.dp)) {
-                Text(name, color = Color.White, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(name, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(
-                    strapStateLine(connection, sync, lastSeen, now), color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                    strapStateLine(connection, sync, lastSeen, now), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp),
                 )
             }
@@ -382,24 +383,24 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
                 if (battery != null) HeroValue("$battery%", stringResource(R.string.you_firmware_battery))
                 if (sync is SyncState.Running) {
                     PageProgress()
-                    Text(sync.step, style = GlowType.secondary, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA))
+                    Text(sync.step, style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
                 }
                 when {
                     connection is ConnectionState.Failed && !connection.keyRejected -> {
-                        Text(connection.reason, color = MetricColors.warn, style = GlowType.secondary)
+                        Text(connection.reason, color = AppColors.readable(MetricColors.warn), style = GlowType.secondary)
                         Text(
                             stringResource(R.string.you_strap_retrying),
-                            style = GlowType.secondary, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                            style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         )
                     }
                     sync is SyncState.Failed -> {
                         Text(
-                            stringResource(R.string.you_strap_sync_stopped, sync.reason), color = MetricColors.warn,
+                            stringResource(R.string.you_strap_sync_stopped, sync.reason), color = AppColors.readable(MetricColors.warn),
                             style = GlowType.secondary,
                         )
                         Text(
                             stringResource(R.string.you_strap_sync_retry, DATA_ON_STRAP),
-                            style = GlowType.secondary, color = Color.White.copy(alpha = GlowType.SECONDARY_ALPHA),
+                            style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         )
                     }
                 }
@@ -444,13 +445,13 @@ fun DiagnosticsScreen(lines: List<String>, contentPadding: PaddingValues, onBack
                 note = pluralStringResource(R.plurals.you_diagnostics_lines, lines.size, lines.size),
             ) {
                 Box(
-                    Modifier.fillMaxWidth().heightIn(max = 520.dp).clip(RoundedCornerShape(12.dp)).background(Color.Black)
+                    Modifier.fillMaxWidth().heightIn(max = 520.dp).clip(RoundedCornerShape(12.dp)).background(if (AppColors.light) AppColors.control else Color.Black)
                         .verticalScroll(rememberScrollState()).horizontalScroll(rememberScrollState()).padding(12.dp),
                 ) {
                     Text(
                         if (lines.isEmpty()) stringResource(R.string.you_diagnostics_empty) else lines.joinToString("\n"),
                         style = GlowType.caption.copy(fontFamily = FontFamily.Monospace),
-                        color = Color.White.copy(alpha = 0.7f), textAlign = TextAlign.Start,
+                        color = AppColors.ink.copy(alpha = 0.7f), textAlign = TextAlign.Start,
                     )
                 }
             }
@@ -505,13 +506,13 @@ private fun PairPanel(vm: DeviceViewModel, scan: ScanUiState, onRequestBluetooth
 internal fun PairStep(number: Int, title: String, content: @Composable () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Box(
-            Modifier.size(28.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f)),
+            Modifier.size(28.dp).clip(CircleShape).background(AppColors.ink.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center,
         ) {
-            Text("$number", style = GlowType.secondary, color = Color.White)
+            Text("$number", style = GlowType.secondary, color = AppColors.ink)
         }
         Column(Modifier.weight(1f).padding(top = 3.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            Text(title, style = GlowType.body, color = Color.White)
+            Text(title, style = GlowType.body, color = AppColors.ink)
             content()
         }
     }
@@ -519,7 +520,7 @@ internal fun PairStep(number: Int, title: String, content: @Composable () -> Uni
 
 @Composable
 private fun StepText(text: String, muted: Boolean = false) {
-    Text(text, style = GlowType.secondary, color = Color.White.copy(alpha = if (muted) 0.6f else GlowType.SECONDARY_ALPHA))
+    Text(text, style = GlowType.secondary, color = AppColors.ink.copy(alpha = if (muted) 0.6f else GlowType.SECONDARY_ALPHA))
 }
 
 /** For keys read on a computer or from an earlier pairing: scan for the address, paste the key, pair. */
