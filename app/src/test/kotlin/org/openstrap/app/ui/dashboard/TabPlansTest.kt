@@ -73,7 +73,7 @@ class TabPlansTest {
         val rec = recoveryCards()
         assertEquals(CardLook(Tier.Edge, Hue.HabitAge, Edge.Left), look(rec, RecoveryCard.HabitAge))
         assertEquals(RecoveryCard.HabitAge, rec.last().card)
-        assertEquals(CardLook(Tier.List, Hue.Neutral), look(rec, RecoveryCard.BodySignals))
+        assertEquals(CardLook(Tier.Edge, Hue.Heart, Edge.Right), look(rec, RecoveryCard.BodySignals)) // apart from What drove it
         val sleep = sleepCards(SleepFacts(naps = true))
         assertEquals(Edge.Top, look(sleep, SleepCard.Regularity).edge)
         assertEquals(Edge.Bottom, look(sleep, SleepCard.Breathing).edge)
