@@ -96,12 +96,15 @@ class CoachWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
     companion object {
         private const val CHANNEL = "coach"
         private const val ID = 7400
-        private const val WORK = "coach-watch"
+        /** A new name since the worker moved package: the old request names a class that's gone, so it's cancelled. */
+        private const val WORK = "coach-watch-device"
+        private const val OLD_WORK = "coach-watch"
         /** Two short pulses: gentle enough for a tip, distinct from a call. */
         private val BUZZ = listOf(180, 160, 180)
         private val Watched = setOf(Coach.Kind.Stress, Coach.Kind.Charge, Coach.Kind.Bedtime)
 
         fun schedule(context: Context) {
+            WorkManager.getInstance(context).cancelUniqueWork(OLD_WORK)
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK, ExistingPeriodicWorkPolicy.KEEP, PeriodicWorkRequestBuilder<CoachWorker>(15, TimeUnit.MINUTES).build(),
             )
