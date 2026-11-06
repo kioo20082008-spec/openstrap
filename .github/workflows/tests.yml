@@ -23,7 +23,7 @@ jobs:
       - name: Install Android SDK packages
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;36.0.0" > /dev/null
       - name: Measurement tests
-        run: ./gradlew :app:testDebugUnitTest --tests 'org.openstrap.app.data.*' --tests 'org.openstrap.app.widget.*' --tests 'org.openstrap.app.presentation.*' --tests '*DayViewModel*' --continue
+        run: ./gradlew :app:testDebugUnitTest --tests 'org.openstrap.app.data.*' --tests 'org.openstrap.app.widget.*' --tests 'org.openstrap.app.presentation.*' --tests '*DayViewModel*' --tests 'org.openstrap.app.ui.dashboard.*' --tests '*EnergyFlask*' --continue
       - name: Failed tests
         if: failure()
         run: |
