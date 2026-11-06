@@ -22,7 +22,7 @@ Each contributor compares the night that ended this morning with the user's own 
 
 ### Valid nights and baselines
 
-* **Validity rule** (`Night.valid`): main sleep ≥ 3 h, ≥ `MIN_HRV_SAMPLES` = 6 RMSSD samples in 5–200 ms, and ≥ `MIN_HR_MINUTES` = 120 minutes of heart rate in 30–220 bpm. Only valid nights enter the HRV and resting-HR baselines.
+* **Validity rule** (`Night.valid`): main sleep ≥ 3 h, ≥ `MIN_HRV_SAMPLES` = 6 RMSSD samples in 5–200 ms that aren't outliers (`nightHrvSamples`), and ≥ `MIN_HR_MINUTES` = 120 minutes of heart rate in 30–220 bpm. Only valid nights enter the HRV and resting-HR baselines.
 * **Baseline** (`baseline`): centre = median over the prior ≤ `BASELINE_NIGHTS` = 60 valid nights; scale = max(`MAD_SCALE`·MAD, floor), `MAD_SCALE` = 1.4826. A mean and SD let one bad stretch (illness, alcohol, artefacts) become "normal"; the median and MAD don't.
 * **Floors:** ln HRV `HRV_LN_SD_FLOOR` = 0.05, resting HR `RHR_SD_FLOOR` = 2 bpm (above device error of about 1–1.8 bpm), breathing `BREATH_SD_FLOOR` = 0.5 /min, skin temperature `TEMP_SD_FLOOR` = 0.15 °C, SpO2 `SPO2_SD_FLOOR` = 0.5 %.
 * **Phases** (`phase`, by valid nights; they replace the old 4 / 14 nights):
@@ -52,7 +52,7 @@ Most contributors are z-scores (deviation from the baseline centre in units of i
 ### Contributors
 
 **HRV balance** (weight 0.30)
-* Input: `hrv_n` = ln(mean of the night's gated RMSSD samples) on a valid night. This definition never changes inside a baseline.
+* Input: `hrv_n` = ln(mean of the night's gated RMSSD samples) on a valid night, without the night's outliers: `nightHrvSamples` drops a sample more than `HRV_OUTLIER_SCALES` = 3 robust SDs (1.4826·MAD of ln RMSSD, floored at `HRV_NIGHT_LN_SD_FLOOR` = 0.15) from the night's median (a Hampel filter), as artefacts only push PPG RMSSD up and a mean of a few samples follows one of them. Nights with fewer than `MIN_HRV_SAMPLES` samples are left as they are. This definition never changes inside a baseline: every night is worked out again from its samples, so the whole baseline moves with it.
 * `hrv_7` = mean of `hrv_n` over the last 7 nights, needing ≥ `HRV_WEEK_MIN_NIGHTS` = 3 valid nights; "thin" below `HRV_WEEK_FULL_NIGHTS` = 5.
 * Score: `HRV_NIGHT_WEIGHT` = 0.4·z(tonight) + `HRV_WEEK_WEIGHT` = 0.6·z(`hrv_7`), through the dead zone. Weighted towards the week because nightly wearable HRV error (6–16 % MAPE) is larger than the ~3 % smallest worthwhile change. Without `hrv_7`, tonight alone.
 * Normal-range state (`hrvRange`): `hrv_7` against centre ± `HRV_RANGE_SCALE` = 0.5·scale gives below / within / above, the band the HRV-guided training trials used.
@@ -76,7 +76,7 @@ Most contributors are z-scores (deviation from the baseline centre in units of i
 * **Need** (`sleepNeed`): 480 min for ages 18–64, `SLEEP_NEED_65_MINUTES` = 450 from 65 (NSF 7–9 h and 7–8 h, above the AASM ≥ 7 h floor). The user can set their own, `SLEEP_NEED_MIN`–`SLEEP_NEED_MAX` = 420–540 min, in the profile (individual optimal sleep ran 7.3–9.3 h, Kitamura et al. 2016). The optional personal need learnt from unconstrained nights is not implemented yet.
 
 **Sleep balance** (weight 0.12)
-* Input: sleep debt (`sleepDebtMinutes`) over the last `SLEEP_DEBT_NIGHTS` = 14 nights, oldest to newest; missing nights are skipped and naps count toward total sleep. λ = `SLEEP_DEBT_DECAY` = 0.5^(1/7) ≈ 0.906 (half-life 7 nights). With d = need − TST: d ≥ 0 gives debt = debt·λ + d; d < 0 gives debt = max(0, debt·λ − min(0.5·|d|, 60 min)).
+* Input: sleep debt (`sleepDebtMinutes`) over the last `SLEEP_DEBT_NIGHTS` = 14 nights, oldest to newest; missing nights are skipped and naps count toward total sleep: one that ended before noon (`NAP_NEXT_NIGHT_HOUR`) on the night it continues, a later one on the next night (`napMorning`), so a morning's score doesn't change with a nap that afternoon. λ = `SLEEP_DEBT_DECAY` = 0.5^(1/7) ≈ 0.906 (half-life 7 nights). With d = need − TST: d ≥ 0 gives debt = debt·λ + d; d < 0 gives debt = max(0, debt·λ − min(0.5·|d|, 60 min)).
 * Score: 100 − `SLEEP_DEBT_POINTS_PER_HOUR` = 25 points per hour of debt, so 1 h ≈ 75 and 2 h ≈ 50. Withheld with fewer than `SLEEP_DEBT_MIN_NIGHTS` = 7 of 14 nights.
 * The debt is cumulative, so it saturates fast: 30 min short every night for two weeks is about 4 h of debt, a score of 0. Worth checking at the review.
 * Why half-life 7: the old 4-night half-life discounted nights 8–14 to 25 % or less, undercounting the 14-day build-up. One 10 h recovery night is incomplete (Banks et al. 2010), and about 1 h of debt took 4 nights to clear (Kitamura 2016).

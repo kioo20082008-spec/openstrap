@@ -38,7 +38,7 @@ object Recovery {
         val remMinutes: Int? = null,
         /** The strap's own sleep score, when it computed one. */
         val strapScore: Int? = null,
-        /** Mean RMSSD during the sleep, ms. */
+        /** Mean RMSSD during the sleep, ms, of the samples [nightHrvSamples] keeps. */
         val hrv: Float? = null,
         /** Lowest 30-minute average heart rate during the sleep, bpm (`rhr_n`). */
         val restingHr: Float? = null,
@@ -46,7 +46,7 @@ object Recovery {
         val rhrMeanSleep: Float? = null,
         /** 10th percentile of the per-minute heart rate during the sleep, bpm (`rhr_p10`). */
         val rhrP10: Float? = null,
-        /** RMSSD samples behind [hrv], after gating to [HRV_MIN_MS]..[HRV_MAX_MS]. */
+        /** RMSSD samples behind [hrv], gated to [HRV_MIN_MS]..[HRV_MAX_MS] and without outliers ([nightHrvSamples]). */
         val hrvSamples: Int = 0,
         /** Minutes of heart rate in [HR_MIN_BPM]..[HR_MAX_BPM] during the sleep. */
         val hrMinutes: Int = 0,
@@ -652,6 +652,32 @@ object Recovery {
     const val HRV_MAX_MS = 200
     const val HR_MIN_BPM = HeartRate.MIN_BPM
     const val HR_MAX_BPM = HeartRate.MAX_BPM
+
+    /**
+     * A night's RMSSD sample further than this many robust SDs from that night's own median, in ln units, is artefact
+     * ([nightHrvSamples]): the Hampel identifier's usual cut, which leaves 0.3 % of clean, log-normal samples out.
+     * A missed or extra beat or a movement only pushes RMSSD up (229 against 163 ms on ECG in Altini's example), and
+     * the fixed [HRV_MIN_MS]..[HRV_MAX_MS] gate can't see a 150 ms sample on a 40 ms night. Yet seven samples at
+     * 40 ms and one at 150 ms average 54 ms: `hrv_n` up 0.3, more than a usual night-to-night spread.
+     */
+    const val HRV_OUTLIER_SCALES = 3f
+    /**
+     * Floor for a night's robust SD of ln RMSSD, so a very steady night doesn't call ordinary samples outliers: at
+     * [HRV_OUTLIER_SCALES] it keeps everything within about ×0.64 to ×1.57 of the night's median.
+     */
+    const val HRV_NIGHT_LN_SD_FLOOR = 0.15f
+
+    /**
+     * The samples of one night's RMSSD [rmssd] (ms, already gated to [HRV_MIN_MS]..[HRV_MAX_MS]) its HRV is the mean
+     * of: those within [HRV_OUTLIER_SCALES] robust SDs (1.4826·MAD, floored at [HRV_NIGHT_LN_SD_FLOOR]) of the night's
+     * median ln RMSSD. Fewer than [MIN_HRV_SAMPLES] come back as they are: too few to tell an outlier by, and too few
+     * for a valid night anyway. At least half the samples are always kept, as the median absolute deviation goes.
+     */
+    fun nightHrvSamples(rmssd: List<Float>): List<Float> {
+        val logs = rmssd.map { ln(it) }
+        val night = baseline(logs, HRV_NIGHT_LN_SD_FLOOR, MIN_HRV_SAMPLES) ?: return rmssd
+        return rmssd.filterIndexed { i, _ -> abs(night.z(logs[i])) <= HRV_OUTLIER_SCALES }
+    }
 
     /** The [p]-th percentile (0-1) of [values] by linear interpolation; null when empty. */
     fun percentile(values: List<Float>, p: Float): Float? = Stats.quantile(values, p)

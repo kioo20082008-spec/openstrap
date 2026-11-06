@@ -301,8 +301,8 @@ class RecoveryEngine(private val dao: HealthDao) {
         // never changes: by the day a night belongs to, one moved past midnight would lose them. When two main sleeps
         // come from one strap day, the longer has them.
         val strapOwners = mains.values.groupBy { SleepHistory.strapDay(it, zone) }.mapValues { (_, v) -> v.maxBy { it.end - it.start } }
-        // Naps count toward a day's total sleep for the debt. A nap belongs to the day it ended, as every sleep.
-        val napsByDay = sessions.filter { it.nap }.groupBy { Days.start(SleepHistory.nightOf(it, zone), zone) }
+        // Naps count toward total sleep for the debt, on the morning [napMorning] gives each.
+        val napsByDay = sessions.filter { it.nap }.groupBy { napMorning(it, zone) }
             .mapValues { (_, v) -> v.sumOf { asleepMinutes(it) } }
         val nights = mains.map { (morning, s) ->
             val stages = reads.stagesOf(s).map { Triple(it.start, it.end, it.stage) }
@@ -449,7 +449,9 @@ class RecoveryEngine(private val dao: HealthDao) {
         val zone = span.zone
         val to = span.to
         val weekFrom = DayWindow.of(date.minusDays(ACTIVITY_DAYS - 1L), zone).from
-        val workouts = reads.strapWorkouts.filter { it.end >= weekFrom }
+        // Every workout, phone and strap, less a phone workout's pauses: the ranges load counts as workout minutes, so
+        // arm-counted steps in a phone-recorded ride or circuit don't break its heart-rate run either.
+        val inWorkout = Recovery.MinuteRanges(base.workoutRanges)
         val minuteSteps = reads.activity.within(weekFrom, to) { it.timestamp }.filter { it.steps in 0..Recovery.MAX_MINUTE_STEPS }
             .associate { it.timestamp / 60 * 60 to it.steps }
         val weekHr = base.hr.filter { it.first >= weekFrom }.toMap()
@@ -460,7 +462,7 @@ class RecoveryEngine(private val dao: HealthDao) {
             times.map { t ->
                 Activity.Minute(
                     t, minuteSteps[t] ?: 0, weekHr[t]?.let { Recovery.hrr(it, base.restingHr, base.maxHr) }, base.asleep(t),
-                    workouts.any { t in it.start..it.end },
+                    inWorkout(t),
                 )
             }
         }
@@ -526,9 +528,9 @@ class RecoveryEngine(private val dao: HealthDao) {
     /**
      * Calories for [date] ([RecoveryResult.calories]) on the given resting and max HR and VO2max, reading only that day:
      * [compute] uses it, and so does the daily calories history for days nobody opened. Every minute with data (a step
-     * record, heart rate, sleep, or a phone workout's minute) counts; no row is missing, never zero. A phone workout's
-     * minutes take its own kcal ([phoneWorkoutKcal]), so the day counts what the workout says; a strap workout's are
-     * the strap's kcal pro-rated.
+     * record from the wrist, heart rate, sleep, or a phone workout's minute) counts; no row is missing, never zero. A
+     * phone workout's minutes take its own kcal ([phoneWorkoutKcal]), so the day counts what the workout says; a strap
+     * workout's are the strap's kcal pro-rated.
      */
     suspend fun calories(
         date: LocalDate, profile: UserProfile, restingHr: Float, maxHr: Float, vo2max: Float?,
@@ -555,7 +557,11 @@ class RecoveryEngine(private val dao: HealthDao) {
     ): EnergyExpenditure.Day? {
         val day = DayWindow.of(date, zone)
         val age = profile.age(date)
-        val minuteSteps = reads.activity.filter { it.steps in 0..Recovery.MAX_MINUTE_STEPS }
+        // The strap writes a record every minute, worn or not: one it marked not worn or charging ([Recovery.offWrist])
+        // with no steps isn't a minute with data. At the sedentary rate it would add active kcal for a strap on the desk
+        // or the charger, and a day mostly off the wrist would never read as partial.
+        val minuteSteps = reads.activity
+            .filter { it.steps in 0..Recovery.MAX_MINUTE_STEPS && !(it.steps == 0 && Recovery.offWrist(it.kind)) }
             .associate { it.timestamp / 60 * 60 to it.steps }
         val minuteHr = minuteHeartRate(reads.heartRate, reads.activity).toMap()
         val sessions = reads.sessions
@@ -707,7 +713,8 @@ class RecoveryEngine(private val dao: HealthDao) {
         val inSleep = { t: Long -> t in s.start..s.end }
         val sleepHr = hr.filter { inSleep(it.first) && it.second in Recovery.HR_MIN_BPM..Recovery.HR_MAX_BPM }
         val sleepBpm = sleepHr.map { it.second.toFloat() }
-        val rmssd = hrv.filter { inSleep(it.timestamp) && it.milliseconds in Recovery.HRV_MIN_MS..Recovery.HRV_MAX_MS }.map { it.milliseconds.toFloat() }
+        val gated = hrv.filter { inSleep(it.timestamp) && it.milliseconds in Recovery.HRV_MIN_MS..Recovery.HRV_MAX_MS }
+        val rmssd = Recovery.nightHrvSamples(gated.map { it.milliseconds.toFloat() })
         val asleep = asleepMinutes(s)
         val skinValues = skin.filter { inSleep(it.timestamp) }.map { it.celsius }
         val spo2Values = spo2.filter { inSleep(it.timestamp) }.map { it.percent.toFloat() }
@@ -800,6 +807,22 @@ class RecoveryEngine(private val dao: HealthDao) {
         internal fun usualBedtime(mains: Collection<SleepSession>, date: LocalDate, zone: ZoneId): java.time.LocalTime? =
             if (mains.isEmpty()) null
             else usualSleep(mains, date, zone).firstOrNull()?.let { Instant.ofEpochSecond(it.first).atZone(zone).toLocalTime() }
+
+        /**
+         * The morning (local midnight) whose sleep debt the nap [nap] counts toward: the day it ended
+         * ([SleepHistory.nightOf]) when it ended before [NAP_NEXT_NIGHT_HOUR], as part of that night (back to sleep
+         * after waking, or a stretch of broken night sleep the strap kept apart), else the day after. The debt is
+         * worked out at waking, so an afternoon or evening nap pays toward the night after it, as WHOOP counts a nap
+         * toward the next Recovery, and a morning's Readiness doesn't change with a nap later that day.
+         */
+        internal fun napMorning(nap: SleepSession, zone: ZoneId): Long {
+            val day = SleepHistory.nightOf(nap, zone)
+            val later = Instant.ofEpochSecond(nap.end).atZone(zone).hour >= NAP_NEXT_NIGHT_HOUR
+            return Days.start(if (later) day.plusDays(1) else day, zone)
+        }
+
+        /** From this hour on the clock, a nap's end counts it toward the next night's sleep debt ([napMorning]). */
+        const val NAP_NEXT_NIGHT_HOUR = 12
 
         /** [SleepHistory.mainSleeps] keyed by each day's local midnight: one main sleep per day, the day it ended. */
         internal fun mainsByMorning(sessions: List<SleepSession>, zone: ZoneId): Map<Long, SleepSession> =

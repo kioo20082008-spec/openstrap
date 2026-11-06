@@ -153,6 +153,23 @@ class RecoveryTest {
     }
 
     @Test
+    fun nightHrvLeavesOutArtefactSamples() {
+        // Seven samples near 40 ms and one at 150 ms: the 150 is an artefact (the mean would be 54 ms), the rest stay.
+        val spiked = listOf(38f, 40f, 41f, 39f, 42f, 40f, 40f, 150f)
+        assertEquals(spiked.dropLast(1), Recovery.nightHrvSamples(spiked))
+        // A low one goes the same way, in ln units.
+        assertEquals(listOf(40f, 41f, 39f, 42f, 40f, 40f), Recovery.nightHrvSamples(listOf(40f, 41f, 39f, 42f, 40f, 40f, 8f)))
+        // A night that moves between stages (deep near 80, REM near 30) keeps every sample.
+        val staged = listOf(30f, 32f, 35f, 45f, 55f, 70f, 80f, 85f, 34f, 60f)
+        assertEquals(staged, Recovery.nightHrvSamples(staged))
+        // A very steady night still keeps samples within the floor's band (about x0.64 to x1.57 of its median).
+        assertEquals(listOf(40f, 40f, 40f, 40f, 40f, 40f, 60f), Recovery.nightHrvSamples(listOf(40f, 40f, 40f, 40f, 40f, 40f, 60f)))
+        // Too few samples to tell an outlier by: as they are.
+        assertEquals(listOf(40f, 150f), Recovery.nightHrvSamples(listOf(40f, 150f)))
+        assertEquals(emptyList<Float>(), Recovery.nightHrvSamples(emptyList()))
+    }
+
+    @Test
     fun ownAndStrapDisagreeingRaisesAQualityFlag() {
         val r = Recovery.readiness(night(31, hrv = 50f, rhr = 55f).copy(strapHrv = 62f, strapRestingHr = 59f), history())
         assertEquals(2, r.qualityFlags.size)

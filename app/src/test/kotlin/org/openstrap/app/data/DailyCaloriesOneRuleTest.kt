@@ -74,4 +74,25 @@ class DailyCaloriesOneRuleTest {
         DailyCaloriesHistory(db.healthDao()).update(you, profileChanged = true, zone = ZoneOffset.UTC, now = clock.now)
         assertEquals(page.totalKcal, stored(today), 0.01f)
     }
+
+    @Test fun `minutes the strap marks off the wrist add no kcal and leave the day partial`() = runBlocking {
+        val worn = LocalDate.of(2025, 12, 27)
+        val desk = LocalDate.of(2025, 12, 28)
+        // The same hour of light stepping on both days.
+        for (d in listOf(worn, desk)) {
+            val from = DayWindow.of(d).from + 9 * 3600
+            db.healthDao().insertActivity((0 until 60).map { ActivityMinute(from + it * 60L, 5, 10, 0, 90) })
+        }
+        // Then, as the strap writes them, three hours not worn (mode 3) and one charging (mode 6): no steps, no heart rate.
+        val off = DayWindow.of(desk).from + 12 * 3600
+        db.healthDao().insertActivity((0 until 240).map { ActivityMinute(off + it * 60L, 0, 0, if (it < 180) 3 else 6, null) })
+
+        val engine = RecoveryEngine(db.healthDao())
+        val a = checkNotNull(engine.calories(worn, you, 60f, 180f, null, ZoneOffset.UTC, clock.now))
+        val b = checkNotNull(engine.calories(desk, you, 60f, 180f, null, ZoneOffset.UTC, clock.now))
+        assertEquals(60, b.minutesWithData)
+        assertEquals(true, b.partial)
+        assertEquals(a.totalKcal, b.totalKcal, 0.01f)
+        assertEquals(a.activeKcal, b.activeKcal, 0.01f)
+    }
 }

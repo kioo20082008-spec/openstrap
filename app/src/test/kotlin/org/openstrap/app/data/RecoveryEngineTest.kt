@@ -125,6 +125,20 @@ class RecoveryEngineTest {
     }
 
     @Test
+    fun aNapCountsTowardTheNightItLeadsInto() {
+        fun nap(from: java.time.LocalTime, to: java.time.LocalTime) =
+            SleepSession(start = date.atTime(from).toEpochSecond(zone), end = date.atTime(to).toEpochSecond(zone), nap = true)
+        val morning = date.atStartOfDay(zone).toEpochSecond()
+        val next = date.plusDays(1).atStartOfDay(zone).toEpochSecond()
+        // An afternoon or evening nap pays toward the next night, so this morning's Readiness doesn't move with it.
+        assertEquals(next, RecoveryEngine.napMorning(nap(java.time.LocalTime.of(15, 0), java.time.LocalTime.of(15, 40)), zone))
+        assertEquals(next, RecoveryEngine.napMorning(nap(java.time.LocalTime.of(11, 30), java.time.LocalTime.NOON), zone))
+        // One that ended in the morning is part of the night it continues: back to sleep after waking, or broken sleep.
+        assertEquals(morning, RecoveryEngine.napMorning(nap(java.time.LocalTime.of(8, 0), java.time.LocalTime.of(9, 30)), zone))
+        assertEquals(morning, RecoveryEngine.napMorning(nap(java.time.LocalTime.of(4, 0), java.time.LocalTime.of(6, 45)), zone))
+    }
+
+    @Test
     fun circularMeanWrapsRoundTheClock() {
         assertEquals(0, RecoveryEngine.circularMean(listOf(23 * 3600 + 50 * 60, 10 * 60)))
         assertEquals(12 * 3600, RecoveryEngine.circularMean(listOf(11 * 3600 + 50 * 60, 12 * 3600 + 10 * 60)))

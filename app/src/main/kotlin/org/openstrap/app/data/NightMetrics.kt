@@ -7,7 +7,10 @@ import kotlin.math.ln
 
 /** OpenStrap's own nightly inputs as logged for the calibration review (evidence-review.md, implementation step 1). */
 object NightMetrics {
-    /** `hrv_n`: ln of the night's mean gated RMSSD; null without one. Never change this inside a baseline. */
+    /**
+     * `hrv_n`: ln of the night's mean gated RMSSD, outliers left out ([Recovery.nightHrvSamples]); null without one.
+     * Never change this inside a baseline.
+     */
     fun hrvLn(n: Recovery.Night): Float? = n.hrv?.takeIf { it > 0 }?.let { ln(it) }
 
     /** [n]'s row, under the date its morning ([Recovery.Night.day], a local midnight in [zone]) has there. */
