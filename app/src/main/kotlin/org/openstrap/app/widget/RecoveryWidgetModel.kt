@@ -48,7 +48,7 @@ data class RecoveryDay(
                 firstNights = !r.charge.anchored,
                 restingHr = night?.validRestingHr ?: ready.fallbackRestingHr,
                 hrv = night?.hrv?.takeIf { night.hrvLn != null } ?: ready.fallbackHrv,
-                sleep = ready.contributors.firstOrNull { it.factor == Recovery.Factor.Sleep }?.score ?: night?.strapScore,
+                sleep = ready.contributors.firstOrNull { it.factor == Recovery.Factor.Sleep }?.score ?: r.sleepScore?.total,
                 week = r.readinessTrend,
             )
         }

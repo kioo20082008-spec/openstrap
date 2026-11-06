@@ -51,9 +51,9 @@
     <!-- In place of the Sleep score when the strap gave none, a word or two. -->
     <string name="day_sleep_no_score">No score</string>
     <!-- Under it, on today. -->
-    <string name="day_sleep_no_score_last_night">The strap didn\'t score last night</string>
+    <string name="day_sleep_no_score_last_night">No score for last night yet</string>
     <!-- Under it, on an earlier day. -->
-    <string name="day_sleep_no_score_that_night">The strap didn\'t score that night</string>
+    <string name="day_sleep_no_score_that_night">No score for that night yet</string>
     <!-- The night's headline ("Short night") as the first sentence of the Sleep score's sentence. -->
     <string name="day_sleep_headline_sentence"><xliff:g id="headline" example="Short night">%1$s</xliff:g>.</string>
 
@@ -65,6 +65,12 @@
     <string name="day_sleep_factor_asleep_detail"><xliff:g id="asleep" example="7 h 40">%1$s</xliff:g> of <xliff:g id="need" example="8 h">%2$s</xliff:g></string>
     <!-- Under Staying asleep: the minutes awake after first falling asleep. -->
     <string name="day_sleep_factor_awake_detail"><xliff:g id="awake" example="45 min">%1$s</xliff:g> awake after falling asleep</string>
+    <!-- What shaped the score: the row about sleeping at your usual times (the middle of the night against your usual). -->
+    <string name="day_sleep_factor_regular_timing">Regular timing</string>
+    <!-- Under Regular timing: how far the middle of the night sat from its usual time. -->
+    <string name="day_sleep_factor_regular_detail">Middle of the night <xliff:g id="shift" example="1 h 20">%1$s</xliff:g> off your usual</string>
+    <!-- Under Regular timing: the middle of the night within half an hour of its usual time. -->
+    <string name="day_sleep_factor_regular_detail_usual">Middle of the night close to your usual</string>
     <!-- What a row did to the night, beside it: much better than guidance asks. A word or two. -->
     <string name="day_sleep_factor_helping">Helping</string>
     <!-- What a row did: as guidance asks. -->
@@ -148,8 +154,6 @@
     <string name="day_sleep_stages_cover">The stages cover the <xliff:g id="length" example="15 min">%1$s</xliff:g> the strap saw.</string>
     <!-- On a sleep with the user's own times, then day_sleep_strap_saw ("The strap saw 23:20 to 07:21."). -->
     <string name="day_sleep_your_times">Your times. <xliff:g id="strap_saw" example="The strap saw 23:20 to 07:21.">%1$s</xliff:g></string>
-    <!-- On the Sleep score's sheet, when the score was moved for the user's times. -->
-    <string name="day_sleep_score_from_your_times">The strap\'s score, adjusted for your times.</string>
 
     <!-- The delete sheet's question for a nap. -->
     <string name="day_sleep_delete_title_nap">Delete this nap?</string>

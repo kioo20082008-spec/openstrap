@@ -119,6 +119,16 @@ class RecoveryEngineComputeTest {
         assertTrue(r.maxHrFromAge)
 
         assertEquals(SNAPSHOT, snapshot(r))
+
+        // The night's sleep score is OpenStrap's own, every part full, and the strap's 80 is kept beside it.
+        assertEquals(80, tonight.strapScore)
+        assertEquals(0, tonight.awakenings)
+        assertEquals(3 * 60, tonight.midpointMinutes)
+        val sleep = requireNotNull(r.sleepScore)
+        assertEquals(100, sleep.total)
+        assertEquals(0, sleep.midpointShiftMinutes)
+        assertEquals(100, r.sleepScores[date])
+        assertEquals(nights, r.sleepScores.size)
     }
 
     /** The figures the engine works out, so reading its inputs another way can't change them. */
@@ -137,9 +147,10 @@ class RecoveryEngineComputeTest {
          * at wake moved in the fifth figure on 2026-11-04, when each earlier night began to recharge against its own
          * lowest half hour rather than tonight's. The load (and Strain with it) rose 3 % on 2026-11-04, when the
          * evening walk, an hour at over 30 % of reserve, became a sustained run and its first two minutes counted too,
-         * as Charge drains them.
+         * as Charge drains them. The six days rose from 84 to 88 on 2026-11-06, when the Sleep contributor became
+         * OpenStrap's own sleep score ([SleepScore]: 8 h at the same times, unbroken, scores 100) rather than the strap's 80.
          */
-        const val SNAPSHOT = "null|20|[84, 84, 84, 84, 84, 84, null]|52.26888|52.26888|55.833332|50|51.24335|96.531845|241|" +
+        const val SNAPSHOT = "null|20|[88, 88, 88, 88, 88, 88, null]|52.26888|52.26888|55.833332|50|51.24335|96.531845|241|" +
             "5.292476|100|9900|60|7172.55|1736.3221|423.3075|1200|100.0|3|0.0|52.26888|23:00|21"
     }
 }

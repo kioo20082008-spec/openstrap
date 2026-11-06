@@ -4,7 +4,7 @@ Every number OpenStrap works out itself, explained in plain words. Written from 
 
 * For research sources and the reasoning behind each choice, see [recovery.md](recovery.md) and [evidence-review.md](evidence-review.md).
 * For the planned check against the strap's own Readiness, see [readiness-calibration.md](readiness-calibration.md).
-* Code lives in `app/src/main/kotlin/org/openstrap/app/data/`. The rules are in one file per part: `ReadinessModel.kt` (Readiness, §5, and the sleep score, §9), `ChargeModel.kt` (Energy, §7), `LoadModel.kt` (training load, Strain and fitness, §8, and daytime resting HR, §4) and `MaxHrModel.kt` (maximum HR, §4). Their inputs, results and constants are in `Recovery.kt`, named `Recovery.X` as the code names them, and `RecoveryEngine.kt` feeds them from the database.
+* Code lives in `app/src/main/kotlin/org/openstrap/app/data/`. The rules are in one file per part: `ReadinessModel.kt` (Readiness, §5), `SleepScore.kt` (the sleep score, §9), `ChargeModel.kt` (Energy, §7), `LoadModel.kt` (training load, Strain and fitness, §8, and daytime resting HR, §4) and `MaxHrModel.kt` (maximum HR, §4). Their inputs, results and constants are in `Recovery.kt`, named `Recovery.X` as the code names them, and `RecoveryEngine.kt` feeds them from the database.
 
 OpenStrap is a wellness app. None of these numbers is a medical measurement.
 
@@ -30,9 +30,9 @@ OpenStrap is a wellness app. None of these numbers is a medical measurement.
 
 ## 1. What comes from the strap, and what we calculate
 
-**Taken from the strap as is:** heart rate, steps, sleep sessions and stages, RMSSD (HRV) samples, SpO₂, stress (0–100), skin temperature, breathing rate, the daily resting HR, PAI, the strap's sleep score, its sleep-apnea summary (desaturation event count), and workout records with their training effect.
+**Taken from the strap as is:** heart rate, steps, sleep sessions and stages, RMSSD (HRV) samples, SpO₂, stress (0–100), skin temperature, breathing rate, the daily resting HR, PAI, the strap's sleep score (kept for comparison only), its sleep-apnea summary (desaturation event count), and workout records with their training effect.
 
-**Calculated by OpenStrap:** everything in sections 3–14: Readiness, body-signal alerts, Energy, training load, Strain, fitness/fatigue, sleep score (when the strap gave none), sleep debt, sleep regularity, sleep-health count, active minutes, distance, calories, VO2max, workout zones and recovery HR, and training effect, EPOC, recovery time and run VO2max for workouts started in OpenStrap.
+**Calculated by OpenStrap:** everything in sections 3–14: Readiness, body-signal alerts, Energy, training load, Strain, fitness/fatigue, sleep score, sleep debt, sleep regularity, sleep-health count, active minutes, distance, calories, VO2max, workout zones and recovery HR, and training effect, EPOC, recovery time and run VO2max for workouts started in OpenStrap.
 
 **Logged but not used in any score:** the strap's own Readiness and its parts, and your morning check-in (1–5, asked on Today before noon). They're kept for the calibration review.
 
@@ -212,7 +212,7 @@ Each contributor scores 0–100. Weights are a design choice, and the evidence r
 |---|---|---|
 | **HRV balance** | 30 % | 0.4 × z(tonight) + 0.6 × z(7-night average), on the log scale, through the dead zone, then z → score. The 7-night average needs ≥ 3 valid nights in the past 7 days (tonight included); below 5 it's marked "thin". Without it, tonight alone. The detail shows the % difference from usual. |
 | **Resting heart rate** | 22 % | Tonight's lowest 30-minute average vs baseline, flipped so lower is better, through the dead zone, then z → score. |
-| **Last night's sleep** | 16 % | The strap's sleep score when it gave one, otherwise OpenStrap's (section 9). |
+| **Last night's sleep** | 16 % | OpenStrap's sleep score (section 9). The strap's is never used. |
 | **Sleep balance** | 12 % | 100 − 25 points per hour of sleep debt (section 9), floored at 0. So 1 h of debt → 75 and 2 h → 50. |
 | **Body temperature** | 6 % | Distance from your usual nightly skin temperature, in **either** direction, through the dead zone, then z → score. |
 | **Breathing rate** | 4 % | Like temperature: a change either way counts. |
@@ -405,28 +405,28 @@ Classic 42-day / 7-day model, over worn days only (an unworn day holds rather th
 
 ### OpenStrap's sleep score
 
-Used only when the strap didn't give its own score:
+The score every screen shows, and Readiness' Sleep contributor. The strap's own score is kept for comparison only (the Sleep score's sheet names it). The curves and sources are in recovery.md, "Last night's sleep".
 
-**Sleep score = 0.7 × duration + 0.3 × continuity**
+**Sleep score = 0.45 × duration + 0.30 × continuity + 0.25 × regularity**, over the parts the night has (their weights renormalised).
 
-* **Duration** = 100 × (time asleep ÷ need)², capped at 100. 7 h of an 8 h need → 77, and 6 h → 56.
-* **Continuity** = 100 − (WASO − 30 min) × 100 ÷ 90, kept within 0–100. Up to 30 minutes awake is free, and 120 minutes scores 0.
-* Without stages (no WASO), duration alone.
+* **Duration**: 100 within an hour of your need (7–9 h at 8 h), 60 an hour short of that, 0 three hours short; above, 85 an hour over, 55 three hours over, and never under 40. Naps aren't added.
+* **Continuity**: the mean of a WASO part (100 up to 20 min, 0 from 50 min) and an awakenings part (awake stretches of 5 min or more: one or none 100, two 67, three 33, four or more 0). Without stages, no continuity part.
+* **Regularity**: the night's midpoint against the circular mean of the previous up to 14 main sleeps' midpoints: within 30 min 100, 3 h or more off 0. Needs 5 earlier nights.
 * Sleep stages are shown but **not scored**: consumer devices agree poorly with lab staging.
 
 ### Sleep score rating and headline
 
-The sleep score (the strap's, or OpenStrap's above) is rated in Zepp's bands: **90–100 Optimal, 80–89 Good, 60–79 Fair, 0–59 Pay attention**. The Sleep screen shows it next to the score, and the Recovery tab uses it for the Sleep contributor. Other contributors keep their own 85 / 70 / 55 bands.
+The sleep score is rated in Zepp's bands: **90–100 Optimal, 80–89 Good, 60–79 Fair, 0–59 Pay attention**. The Sleep screen shows it next to the score, and the Recovery tab uses it for the Sleep contributor. Other contributors keep their own 85 / 70 / 55 bands.
 
 The headline names what pulled the night down, checked in this order:
 
 * **Short night:** under 6 h asleep (the bottom of Zepp's duration bands).
-* **Broken sleep:** 30 min or more awake after falling asleep (where continuity starts losing points), or 6 or more wake-ups (about one an hour, set high because wake detection is the least reliable part of staging).
+* **Broken sleep:** 30 min or more awake after falling asleep (the Sleep score's WASO part is down to 67 by then), or 6 or more wake-ups (about one an hour, set high because wake detection is the least reliable part of staging).
 * Both → **Short, broken night**. Either one wins over the score: a short night at 70 is still "Short night".
 * Otherwise by score: 90+ **Great night**, 80+ **Good night**.
 * Below 80, **Light sleep** if deep + REM is under 25 % of time asleep (adults usually spend 40–50 % there), else **Okay night**. This is the weakest cause because stages aren't reliable.
 
-Total sleep in "What shaped the score" is rated against need, plus Zepp's oversleep bands: over 9 h 30 is Fair, over 10 h Pay attention.
+"What shaped the score" shows the Sleep score's parts (docs/algorithms/recovery.md, "Last night's sleep"): time asleep, staying asleep and, from 5 earlier nights, regular timing, each rated by its part. Time asleep past an hour over need is never rated better than On track.
 
 ### Sleep need
 

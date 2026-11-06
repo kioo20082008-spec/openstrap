@@ -162,7 +162,7 @@ internal object SleepCopy {
     fun scoreLabel(today: Boolean, strings: Strings = Strings.app): String =
         strings.get(if (today) R.string.day_sleep_score_label_last_night else R.string.day_sleep_score_label_that_night)
 
-    /** The Sleep score's state with no score: no sleep at all, or a night the strap didn't score. */
+    /** The Sleep score's state with no score: no sleep at all, or a night whose score isn't worked out yet. */
     fun noScore(hasSleep: Boolean, today: Boolean, strings: Strings = Strings.app): Pair<String, String> = when {
         !hasSleep -> strings.get(R.string.day_sleep_no_sleep) to
             strings.get(if (today) R.string.day_sleep_none_last_night else R.string.day_sleep_none_that_night)
@@ -179,21 +179,27 @@ internal object SleepCopy {
     data class Factor(val name: String, val detail: String, val word: String, val fraction: Float, val off: Boolean)
 
     /**
-     * What shaped the score, from [Narrative.sleepContributors]: time asleep against your need and minutes awake after
-     * falling asleep, each against general sleep guidance. The words say what each did to the night, never the
-     * strap's own bands ("Optimal", "Pay attention").
+     * What shaped the score, from [Narrative.sleepContributors]: time asleep against your need, minutes awake after
+     * falling asleep and, once there are enough nights, how far the night's middle sat from your usual, each against
+     * sleep guidance. The words say what each did to the night, never the strap's own bands ("Optimal", "Pay attention").
      */
     fun factors(
         contributors: List<Narrative.Contributor>, asleepSeconds: Long, needMinutes: Int, wasoMinutes: Int?, strings: Strings = Strings.app,
     ): List<Factor> =
         contributors.map { c ->
-            val total = c.label == Narrative.TOTAL_SLEEP
-            val detail = if (total) {
-                strings.format(R.string.day_sleep_factor_asleep_detail, Units.duration(asleepSeconds), Units.duration(needMinutes * 60L))
-            } else {
-                strings.format(R.string.day_sleep_factor_awake_detail, Units.duration((wasoMinutes ?: 0) * 60L))
+            val need = Units.duration(needMinutes * 60L)
+            val detail = when (c.label) {
+                Narrative.TOTAL_SLEEP -> strings.format(R.string.day_sleep_factor_asleep_detail, Units.duration(asleepSeconds), need)
+                Narrative.CONTINUITY -> strings.format(R.string.day_sleep_factor_awake_detail, Units.duration((wasoMinutes ?: 0) * 60L))
+                else -> c.detail
             }
-            val name = strings.get(if (total) R.string.day_sleep_factor_time_asleep else R.string.day_sleep_factor_staying_asleep)
+            val name = strings.get(
+                when (c.label) {
+                    Narrative.TOTAL_SLEEP -> R.string.day_sleep_factor_time_asleep
+                    Narrative.CONTINUITY -> R.string.day_sleep_factor_staying_asleep
+                    else -> R.string.day_sleep_factor_regular_timing
+                },
+            )
             Factor(name, detail, factorWord(c.rating, strings), c.fraction, c.rating != Narrative.Rating.GOOD)
         }
 
@@ -334,9 +340,6 @@ internal object SleepCopy {
     /** On a detail whose sleep or nap has the user's times. */
     fun yourTimes(from: String, to: String, strings: Strings = Strings.app): String =
         strings.format(R.string.day_sleep_your_times, strapSaw(from, to, strings))
-
-    /** The score's info sheet, when the strap's score was moved for the user's times ([org.openstrap.app.data.SleepEdits.anchored]). */
-    val SCORE_FROM_YOUR_TIMES: String get() = Strings.app.get(R.string.day_sleep_score_from_your_times)
 
     /* ------------------------------------------ Delete (edit spec 4.3) ---------------------------------- */
 

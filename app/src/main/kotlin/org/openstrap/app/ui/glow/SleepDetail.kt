@@ -137,7 +137,7 @@ internal fun SleepScoreDetail(
     var deleting by remember(state.date) { mutableStateOf(false) }
     // The strap's session just deleted, while its Undo shows.
     var undo by remember { mutableStateOf<SleepSession?>(null) }
-    // TODO(step 6): Month and Year wait for a stored history of the strap's sleep scores; the day loads only 14 nights.
+    // TODO(step 6): Month and Year wait for a longer history of sleep scores; the day loads only 14 nights.
     val ranges = listOf(Range.Day, Range.Week)
     var rangeIndex by rememberSaveable { mutableIntStateOf(0) }
     val range = ranges[rangeIndex.coerceIn(ranges.indices)]
@@ -218,10 +218,14 @@ internal fun SleepScoreDetail(
                             TabCopy.woke(session.wakeCount)?.let { Caption(it, Modifier.padding(top = 6.dp)) }
                         }
                     }
-                    // What shaped the score: time asleep against your need and staying asleep, against sleep guidance.
+                    // What shaped the score: its parts (time asleep against your need, staying asleep and regular
+                    // timing) against sleep guidance; before the score is in, the first two from the night alone.
                     val need = r?.sleepNeed ?: Recovery.SLEEP_NEED_MINUTES
-                    val waso = Recovery.wasoMinutes(state.sleepStages.map { Triple(it.start, it.end, it.stage) })
-                    val factors = SleepCopy.factors(Narrative.sleepContributors(session, asleep, need, waso), asleep, need, waso)
+                    val parts = state.sleepScore
+                    val waso = parts?.wasoMinutes ?: Recovery.wasoMinutes(state.sleepStages.map { Triple(it.start, it.end, it.stage) })
+                    val contributors = parts?.let { Narrative.sleepContributors(it, asleep) }
+                        ?: Narrative.sleepContributors(session, asleep, need, waso)
+                    val factors = SleepCopy.factors(contributors, asleep, parts?.needMinutes ?: need, waso)
                     if (factors.isNotEmpty()) item {
                         ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_sleep_what_shaped)) {
                             factors.forEachIndexed { i, f ->
@@ -260,12 +264,12 @@ internal fun SleepScoreDetail(
     }
 
     val detected = state.sleepAsDetected
-    // A move of 15 minutes or more has the strap's score adjusted for the user's times (edit spec 5).
-    val ownScore = session != null && detected != null && score != null && !SleepEdits.keepsScore(detected, session.start, session.end)
+    // The strap's own score for the night, kept beside OpenStrap's for comparison.
+    val strapScore = r?.tonight?.takeIf { session != null && it.start == session.start && it.end == session.end }?.strapScore
     if (info) InfoSheet(
         InfoCopy.of(Score.Sleep), color, score?.let(InfoCopy::sleepBar), score?.let { InfoCopy.HERE },
         onDismiss = { info = false },
-        notes = listOfNotNull(SleepCopy.SCORE_FROM_YOUR_TIMES.takeIf { ownScore }) + InfoCopy.sleepNotes(r?.sleepNeed ?: Recovery.SLEEP_NEED_MINUTES),
+        notes = InfoCopy.sleepNotes(r?.sleepNeed ?: Recovery.SLEEP_NEED_MINUTES, strapScore),
     )
     if (adjusting && session != null && detected != null) SleepTimesSheet(
         session, detected, state.sleepHeartRate, state.sleepNeighbours.filter { it.nap || it.start != session.start },

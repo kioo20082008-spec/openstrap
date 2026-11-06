@@ -131,7 +131,10 @@ class WidgetSnapshot(
         val span = if (kinds.any { it in NIGHT_KINDS }) catching { sleepSpanSessions(today, zone) } else null
         val moment = workouts?.let { w -> catching { momentInputs(w.getOrThrow(), span?.getOrNull(), today, t, zone) } }
         // Steps too: today's Recovery finds the arm movement at a desk that Today takes off its steps.
-        val profile = if (kinds.any { it in RECOVERY_KINDS || it in STEP_KINDS }) catching { settings.profile.first() } else null
+        // Sleep too: the night's score is OpenStrap's own ([org.openstrap.app.data.SleepScore]), worked out with Recovery.
+        val profile = if (kinds.any { it in RECOVERY_KINDS || it in STEP_KINDS || it == WidgetKind.Sleep }) {
+            catching { settings.profile.first() }
+        } else null
         val rec = profile?.let { p ->
             catching { health.recovery(today, p.getOrThrow()) }.onFailure { logUnread("Recovery for $today", it) }.getOrNull()
         }
@@ -152,7 +155,7 @@ class WidgetSnapshot(
             start = if (WidgetKind.Start in kinds) start() else null,
             recovery = profile?.takeIf { WidgetKind.Recovery in kinds }?.let { recovery(today, rec, it) },
             sleep = span?.takeIf { WidgetKind.Sleep in kinds }?.let { s ->
-                catching { sleep(s.getOrThrow(), today, zone) }.onFailure { logUnread("sleep for $today", it) }
+                catching { sleep(s.getOrThrow(), today, zone, rec?.sleepScores.orEmpty()) }.onFailure { logUnread("sleep for $today", it) }
             },
             momentWidget = if (WidgetKind.Moment in kinds) catching { momentWidget(reads) } else null,
             // Today's Recovery is read once for every widget that shows it: Energy is its Charge.
@@ -252,11 +255,11 @@ class WidgetSnapshot(
      * the week's other nights from [SleepHistory.mainSleeps] over the tab's nights), and yesterday's while this
      * morning's isn't synced.
      */
-    private suspend fun sleep(sessions: List<SleepSession>, today: LocalDate, zone: ZoneId): SleepRead {
-        val nights = SleepHistory.mainSleeps(sessions, zone)
+    private suspend fun sleep(sessions: List<SleepSession>, today: LocalDate, zone: ZoneId, scores: Map<LocalDate, Int>): SleepRead {
+        val nights = scored(SleepHistory.mainSleeps(sessions, zone), scores)
         suspend fun night(date: LocalDate): SleepWidgetNight? =
             SleepHistory.mainSleep(sessions, SleepHistory.endingOn(date, zone))?.let { main ->
-                SleepWidgetNight.of(date, main, health.sleep.stagesOnce(main), nights)
+                SleepWidgetNight.of(date, main.copy(score = scores[date]), health.sleep.stagesOnce(main), nights)
             }
         val tonight = night(today)
         // A night the user deleted is this morning's answer: yesterday's doesn't stand in for it.
@@ -266,6 +269,13 @@ class WidgetSnapshot(
         val naps = sessions.any { it.nap && SleepHistory.nightOf(it, zone) == today }
         return SleepRead(tonight, yesterday, first, naps, deleted)
     }
+
+    /**
+     * [nights] with OpenStrap's own sleep score in place of the strap's, as the app shows them ([scores] by the
+     * night's day, from Recovery); none for a night Recovery didn't score, never the strap's.
+     */
+    private fun scored(nights: Map<LocalDate, SleepSession>, scores: Map<LocalDate, Int>): Map<LocalDate, SleepSession> =
+        nights.mapValues { (day, s) -> s.copy(score = scores[day]) }
 
     /**
      * Everything Today's hero reads: the moment's inputs, today's Recovery and Energy, last night as the Sleep tab reads
@@ -283,7 +293,10 @@ class WidgetSnapshot(
         val night = read("last night", null) {
             val sessions = checkNotNull(r.span).getOrThrow()
             SleepHistory.mainSleep(sessions, SleepHistory.endingOn(today, zone))?.let { main ->
-                SleepWidgetNight.of(today, main, health.sleep.stagesOnce(main), SleepHistory.mainSleeps(sessions, zone))
+                val scores = rec?.sleepScores.orEmpty()
+                SleepWidgetNight.of(
+                    today, main.copy(score = scores[today]), health.sleep.stagesOnce(main), scored(SleepHistory.mainSleeps(sessions, zone), scores),
+                )
             }
         }
         val yours = w.strap.filter(::startedByYou).map { it.sportType to it.start } +

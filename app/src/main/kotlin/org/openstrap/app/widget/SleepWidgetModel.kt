@@ -65,7 +65,7 @@ data class SleepWidgetModel(
     val note: String?,
     /** Yesterday's night, shown while this morning's isn't synced. */
     val stale: Boolean,
-    /** The strap's sleep score in dots; null when it gave none. */
+    /** The night's sleep score in dots (OpenStrap's own); null before Recovery scored it. */
     val score: String?,
     /** The Small's word, "Good". */
     val word: String?,

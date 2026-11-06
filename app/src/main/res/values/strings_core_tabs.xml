@@ -129,7 +129,7 @@
     <!-- The same. -->
     <string name="core_tab_sleep_score_great">Sleep score, great</string>
     <!-- A night the strap gave no score. Short. -->
-    <string name="core_tab_no_strap_score">No score from the strap</string>
+    <string name="core_tab_no_strap_score">No score yet</string>
     <!-- A stage's total on the stage bar's legend: the stage's name and its time, "Deep 1 h 32". -->
     <string name="core_tab_stage_total"><xliff:g id="stage" example="Deep">%1$s</xliff:g> <xliff:g id="duration" example="1 h 32">%2$s</xliff:g></string>
     <!-- Time asleep. The time is "7 h 40", "7 h" or "40 min". Short. -->

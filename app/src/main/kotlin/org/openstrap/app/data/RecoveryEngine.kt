@@ -71,6 +71,17 @@ data class RecoveryResult(
      * ([SleepHistory.strapDay]), so a night moved to another day keeps it. Null without one.
      */
     val strapScore: Int? = null,
+    /**
+     * OpenStrap's own sleep score for [tonight] with its parts ([SleepScore]): the sleep score every screen shows, and
+     * Readiness' Sleep contributor. Null without a night.
+     */
+    val sleepScore: SleepScore.Result? = null,
+    /**
+     * [SleepScore] of every main sleep the model read (the [Recovery.BASELINE_NIGHTS] + [RecoveryEngine.TREND_DAYS]
+     * days ending on [date]), by the day it belongs to, each against the main sleeps before it: the week's and the
+     * previous night's sleep scores.
+     */
+    val sleepScores: Map<LocalDate, Int> = emptyMap(),
 )
 
 /** Loads what [Recovery] needs from the database and runs it. All work happens off the main thread by the caller. */
@@ -152,6 +163,8 @@ class RecoveryEngine(private val dao: HealthDao) {
             dailyLoads = base.loadDays.map { span.dayOf(it.first) to it.second }
                 .filter { it.first >= date.minusDays(RECENT_LOAD_DAYS.toLong()) },
             strapScore = tonight?.strapDay?.let(reads.strapNights::get)?.score,
+            sleepScore = tonight?.let { SleepScore.of(it, nights, base.sleepNeed) },
+            sleepScores = nights.associate { span.dayOf(it.day) to SleepScore.of(it, nights, base.sleepNeed).total },
         )
     }
 
@@ -314,6 +327,8 @@ class RecoveryEngine(private val dao: HealthDao) {
                 strapHrv = strapDay?.let(strapNights::get)?.sleepHrv?.toFloat(),
                 strapRestingHr = strapDay?.let(strapNights::get)?.sleepRestingHr?.toFloat(),
                 wasoMinutes = Recovery.wasoMinutes(stages),
+                awakenings = SleepScore.awakenings(stages),
+                midpointMinutes = Instant.ofEpochSecond((s.start + s.end) / 2).atZone(zone).toLocalTime().toSecondOfDay() / 60,
                 napMinutes = napsByDay[morning] ?: 0,
             )
         }.sortedBy { it.day }

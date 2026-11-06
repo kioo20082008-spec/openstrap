@@ -58,7 +58,7 @@
     <string name="glow_today_alert_line">⁨%1$s⁩.</string>
     <string name="glow_today_score_unit">نتيجة</string>
     <string name="glow_today_last_night_scored">⁨%1$s⁩، نمت ⁨%2$s⁩</string>
-    <string name="glow_today_last_night_unscored">نمت ⁨%1$s⁩، بدون نتيجة من السترب</string>
+    <string name="glow_today_last_night_unscored">نمت ⁨%1$s⁩، بلا نتيجة بعد</string>
     <string name="glow_today_heart_rate">النبض</string>
     <string name="glow_today_resting">الراحة ⁨%1$d⁩</string>
     <string name="glow_today_steps_title">الخطوات</string>

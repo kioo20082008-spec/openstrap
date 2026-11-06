@@ -125,7 +125,7 @@
     <!-- Under the sleep score: its word and the time asleep. -->
     <string name="glow_today_last_night_scored"><xliff:g id="word" example="Good">%1$s</xliff:g>, <xliff:g id="duration" example="7 h 20">%2$s</xliff:g> asleep</string>
     <!-- Last night when the strap gave no score: the time asleep. -->
-    <string name="glow_today_last_night_unscored"><xliff:g id="duration" example="7 h 20">%1$s</xliff:g> asleep, no score from the strap</string>
+    <string name="glow_today_last_night_unscored"><xliff:g id="duration" example="7 h 20">%1$s</xliff:g> asleep, no score yet</string>
     <!-- Title of the heart rate card. -->
     <string name="glow_today_heart_rate">Heart rate</string>
     <!-- The heart rate card's note on its title row: today's resting heart rate. -->

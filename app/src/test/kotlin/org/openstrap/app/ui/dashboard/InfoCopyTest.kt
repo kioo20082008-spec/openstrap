@@ -35,7 +35,7 @@ class InfoCopyTest {
                 InfoCopy.HERE,
             ) +
             InfoCopy.regularityNotes(SleepRegularity.Result(82f, 9000, null)) + InfoCopy.regularityNotes(SleepRegularity.Result(null, 3360, 40f)) +
-            InfoCopy.sleepNotes(480) +
+            InfoCopy.sleepNotes(480, strapScore = 84) +
             InfoCopy.activeNotes(12, true) + InfoCopy.loadNotes(52f, 186f, true, 1.21f) +
             InfoCopy.vo2Notes(
                 org.openstrap.app.data.Vo2max.Estimate(45, 40, 50, 52f, fitnessAge = 28..38, sex = org.openstrap.app.data.settings.UserProfile.Sex.Male),
@@ -99,8 +99,16 @@ class InfoCopyTest {
         assertEquals(3, InfoCopy.regularityBar(SleepRegularity.Band.VeryRegular))
         assertEquals(listOf("This week compares 150 h of wear."), InfoCopy.regularityNotes(SleepRegularity.Result(82f, 9000, null)))
         assertTrue(InfoCopy.regularityNotes(SleepRegularity.Result(null, 3360, 40f)).any { "56 h of the 120 h" in it })
-        // The sleep score's guidance note, from the old What shaped the score panel.
-        assertTrue(InfoCopy.of(Score.Sleep).how.contains("under 30 minutes awake"))
+        // The sleep score is OpenStrap's own, in three parts against published guidance, and the strap's stays a note.
+        val sleep = InfoCopy.of(Score.Sleep).how
+        listOf("up to 20 minutes awake", "National Sleep Foundation", "Regular timing").forEach { assertTrue(it, sleep.contains(it)) }
+        assertEquals(
+            listOf(
+                "Your sleep need here is 8 h, from your age or your own setting.",
+                "The strap's own estimate for this night is 84. It's kept for comparison and never enters OpenStrap's score.",
+            ),
+            InfoCopy.sleepNotes(480, strapScore = 84),
+        )
         assertEquals(listOf(0, 1, 2, 3), listOf(50, 60, 80, 90).map(InfoCopy::sleepBar))
         // Breathing disturbances stay an early estimate with no severity scale.
         assertTrue(InfoCopy.BREATHING_DISTURBANCES.meaning.contains("early estimate"))

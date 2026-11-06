@@ -105,6 +105,39 @@ class DayViewModelUiStateTest {
         assertEquals(0, DayViewModel.withoutFalseSteps(s.copy(steps = 100), off).steps)
     }
 
+    @Test fun `every sleep score is OpenStrap's own from the day's Recovery, and none until it's in`() {
+        val main = SleepSession(at(0), at(7), score = 91)
+        val before = SleepSession(at(0) - 86_400L, at(7) - 86_400L, score = 88)
+        val nights = listOf(
+            org.openstrap.app.data.SleepNight(date.minusDays(2), null),
+            org.openstrap.app.data.SleepNight(date.minusDays(1), before),
+            org.openstrap.app.data.SleepNight(date, main),
+        )
+        val s = DayViewModel.toUiState(DayData(date, sleep = SleepDay(main = main, previousScore = 88), nights = nights))
+        val parts = org.openstrap.app.data.SleepScore.of(420, 480, 11, 1, 300)
+        fun recovery(day: LocalDate) = RecoveryResult(
+            day, org.openstrap.app.data.Recovery.Readiness(null, emptyList(), 0, false, emptyList(), false),
+            org.openstrap.app.data.Recovery.ChargeDay(emptyList(), null, null, 0f, 0f, 0f, 0f, null, null, anchored = false),
+            emptyList(), 0f, null, 52f, 190f, true, org.openstrap.app.data.Recovery.StressThreshold(60, null, 0),
+            sleepScore = parts, sleepScores = mapOf(date to parts.total, date.minusDays(1) to 64),
+        )
+        val shown = DayViewModel.withSleepScores(s, recovery(date))
+        assertEquals(parts.total, shown.sleep?.score)
+        assertEquals(parts, shown.sleepScore)
+        assertEquals(64, shown.previousSleepScore)
+        assertEquals(listOf(null, 64, parts.total), shown.nights.map { it.session?.score })
+        // The times and totals stay the strap's session's.
+        assertEquals(main.copy(score = parts.total), shown.sleep)
+        // Before the day's Recovery, or with another day's, no score at all rather than the strap's.
+        listOf(null, recovery(date.minusDays(1))).forEach { r ->
+            val waiting = DayViewModel.withSleepScores(s, r)
+            assertNull(waiting.sleep?.score)
+            assertNull(waiting.sleepScore)
+            assertNull(waiting.previousSleepScore)
+            assertEquals(listOf<Int?>(null, null, null), waiting.nights.map { it.session?.score })
+        }
+    }
+
     @Test fun `the trends carry their weekday labels, and today's resting value and flag come from the last day`() {
         val days = (6L downTo 0L).map { date.minusDays(it) }
         val data = DayData(

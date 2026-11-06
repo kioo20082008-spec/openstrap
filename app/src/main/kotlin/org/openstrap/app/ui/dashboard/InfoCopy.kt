@@ -345,9 +345,14 @@ object InfoCopy {
         }
     }
 
-    /** What's particular about the night's Sleep score: the sleep need the guidance measures against. */
-    fun sleepNotes(needMinutes: Int, strings: Strings = Strings.app): List<String> =
-        listOf(strings.format(R.string.day_info_sleep_note_need, Units.duration(needMinutes * 60L)))
+    /**
+     * What's particular about the night's Sleep score: the sleep need the guidance measures against, and the strap's own
+     * score for the night ([strapScore]) when it gave one, kept for comparison.
+     */
+    fun sleepNotes(needMinutes: Int, strapScore: Int? = null, strings: Strings = Strings.app): List<String> = listOfNotNull(
+        strings.format(R.string.day_info_sleep_note_need, Units.duration(needMinutes * 60L)),
+        strapScore?.let { strings.format(R.string.day_info_sleep_note_strap, it) },
+    )
 
     /**
      * What's particular about today's Recovery, for its info sheet: the strap's own score beside ours, and anything that

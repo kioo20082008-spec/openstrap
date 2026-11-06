@@ -137,7 +137,7 @@ class SleepWidgetModelTest {
         val m = SleepWidgetModel.from(night(bare, emptyList()), null, false, false, zone)
         assertNull(m.score)
         assertNull(m.word)
-        assertEquals("No score from the strap", m.scoreLine)
+        assertEquals("No score yet", m.scoreLine)
         assertNull(m.scoreDescription)
         // No stages: the whole session, as the hero.
         assertEquals("7 h 58 asleep", m.asleep)

@@ -36,7 +36,7 @@ object Recovery {
         val awakeMinutes: Int? = null,
         val deepMinutes: Int? = null,
         val remMinutes: Int? = null,
-        /** The strap's own sleep score, when it computed one. */
+        /** The strap's own sleep score, when it computed one: kept for comparison, never scored ([SleepScore] is). */
         val strapScore: Int? = null,
         /** Mean RMSSD during the sleep, ms, of the samples [nightHrv] keeps. */
         val hrv: Float? = null,
@@ -56,6 +56,10 @@ object Recovery {
         val breathRate: Float? = null,
         /** Wake after sleep onset: awake minutes between the first and the last sleep stage; null without stages. */
         val wasoMinutes: Int? = null,
+        /** Awake stretches of 5 min or more between the first and the last sleep stage ([SleepScore.awakenings]); null without stages. */
+        val awakenings: Int? = null,
+        /** The sleep's midpoint as a local clock time, minutes after midnight (0-1439), for [SleepScore]'s regularity. */
+        val midpointMinutes: Int? = null,
         /** Minutes asleep in naps on this day, counted toward total sleep for the debt. */
         val napMinutes: Int = 0,
         /** Mean blood oxygen during the sleep, %. */
@@ -367,6 +371,10 @@ object Recovery {
     const val ACWR_CHRONIC_DAYS = 28
     const val ACWR_MIN_CHRONIC_DAYS = 14
 
+    /**
+     * The weights and WASO curve of [sleepScore], which only moves the strap's stored score when the user changes a
+     * sleep's times ([SleepEdits.anchored]). The sleep score the app shows, and Readiness' Sleep contributor, is [SleepScore].
+     */
     const val SLEEP_DURATION_WEIGHT = 0.7f
     const val SLEEP_CONTINUITY_WEIGHT = 0.3f
     /** WASO up to this is free; continuity then falls to 0 over the next [WASO_SPAN_MINUTES]. */

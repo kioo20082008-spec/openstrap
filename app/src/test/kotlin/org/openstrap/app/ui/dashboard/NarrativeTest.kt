@@ -66,13 +66,38 @@ class NarrativeTest {
     @Test
     fun totalSleepRatesOversleep() {
         fun total(min: Int) = Narrative.sleepContributors(SleepSession(start = 0, end = min * 60L), min * 60L).first { it.label == "Total sleep" }.rating
+        // By the Sleep score's duration part: full within an hour of the 8 h need.
+        assertEquals(Rating.OPTIMAL, total(7 * 60))
         assertEquals(Rating.OPTIMAL, total(8 * 60))
-        assertEquals(Rating.OPTIMAL, total(570))
-        assertEquals(Rating.FAIR, total(571))
-        assertEquals(Rating.FAIR, total(600))
-        assertEquals(Rating.LOW, total(601))
-        // Short nights still rate against need.
+        assertEquals(Rating.OPTIMAL, total(9 * 60))
+        // Past 9 h it's never what helped: 10 h scores 85 and stays On track, 12 h 55 and 13 h the floor of 40.
+        assertEquals(Rating.GOOD, total(9 * 60 + 1))
+        assertEquals(Rating.GOOD, total(10 * 60))
+        assertEquals(Rating.FAIR, total(12 * 60))
+        assertEquals(Rating.LOW, total(13 * 60))
+        // Short nights rate against need: 6 h scores 60, 5 h 30.
+        assertEquals(Rating.FAIR, total(6 * 60))
         assertEquals(Rating.LOW, total(5 * 60))
+    }
+
+    @Test fun `the contributors are the Sleep score's parts, regular timing among them`() {
+        val score = org.openstrap.app.data.SleepScore.of(7 * 60 + 40, 480, 35, 2, 105)
+        val c = Narrative.sleepContributors(score, (7 * 60 + 40) * 60L)
+        assertEquals(listOf("Total sleep", "Continuity", "Regularity"), c.map { it.label })
+        assertEquals(0.5833f, c[1].fraction, 1e-3f)
+        assertEquals(Rating.FAIR, c[1].rating)
+        assertEquals(0.5f, c[2].fraction, 1e-4f)
+        assertEquals("Middle of the night 1 h 45 off your usual", c[2].detail)
+        val factors = SleepCopy.factors(c, (7 * 60 + 40) * 60L, 480, 35)
+        assertEquals(listOf("Time asleep", "Staying asleep", "Regular timing"), factors.map { it.name })
+        assertEquals("Middle of the night 1 h 45 off your usual", factors[2].detail)
+        // Within half an hour of the usual it just says so; and a night without stages or enough nights has no such rows.
+        assertEquals(
+            "Middle of the night close to your usual",
+            Narrative.sleepContributors(org.openstrap.app.data.SleepScore.of(480, 480, null, null, 20), 480 * 60L).last().detail,
+        )
+        val bare = org.openstrap.app.data.SleepScore.of(480, 480, null, null, null)
+        assertEquals(listOf("Total sleep"), Narrative.sleepContributors(bare, 480 * 60L).map { it.label })
     }
 
     @Test fun `the contributors write lengths of time as the rest of the app does`() {

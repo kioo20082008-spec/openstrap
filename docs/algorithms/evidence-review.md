@@ -113,10 +113,7 @@ Vendors define these differently and often don't say how: Garmin hides its windo
 
 * Drop the "deep + REM vs 45 %" target. Across six devices, four-stage kappa was 0.21–0.53, deep sleep was classified correctly only 47–70 % of the time, and wake specificity was 29–52 % ([Schyvens et al. 2025](https://academic.oup.com/sleepadvances/article/6/2/zpaf021/8090472)).
 * Low wake specificity inflates wearable efficiency by 2–10 points, so an 85 % time-in-bed threshold uses the wrong denominator.
-* Last-night sleep contributor = the strap's sleep score when there is one, else:
-  * `durationScore` = 100·min(1, TST/need)², so 7 of 8 h ≈ 77 and 6 h ≈ 56.
-  * `continuityScore` = clamp(100 − (WASO − 30 min)·(100/90), 0, 100), with WASO counted from first sleep to final wake.
-  * sleep = 0.7·duration + 0.3·continuity.
+* Last-night sleep contributor = OpenStrap's own sleep score (`SleepScore`), never the strap's: 0.45·duration (NSF 7–9 h, Hirshkowitz et al. 2015) + 0.30·continuity (WASO and awakenings over 5 min, NSF sleep quality, Ohayon et al. 2017) + 0.25·regularity (the midpoint against the usual, Windred et al. 2024), renormalised over the parts present. The curves are in recovery.md, "Last night's sleep".
 * Stages are shown for information only, at most against the user's own baseline.
 
 ### Need (Established)

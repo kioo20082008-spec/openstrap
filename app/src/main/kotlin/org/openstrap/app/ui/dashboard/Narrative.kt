@@ -2,9 +2,8 @@ package org.openstrap.app.ui.dashboard
 
 import androidx.annotation.StringRes
 import org.openstrap.app.R
-import org.openstrap.app.data.continuityScore
+import org.openstrap.app.data.SleepScore
 import org.openstrap.app.data.db.SleepSession
-import org.openstrap.app.data.durationScore
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.RecoveryBands
 import org.openstrap.app.presentation.SleepBands
@@ -36,10 +35,10 @@ object Narrative {
         else -> Rating.LOW
     }
 
-    /** Under 6 h asleep: the bottom of Zepp's duration bands (codemap 06 §4.2), and 56 on [org.openstrap.app.data.Recovery.durationScore]. */
+    /** Under 6 h asleep: the bottom of Zepp's duration bands (codemap 06 §4.2), and 60 on [SleepScore.duration] at 8 h need. */
     const val SHORT_NIGHT_MINUTES = 6 * 60
 
-    /** Awake after falling asleep from here on: where [org.openstrap.app.data.Recovery.continuityScore] starts taking points off. */
+    /** Awake in all from here on is a broken night: [SleepScore.wasoPart] is down to 67 by then. */
     const val BROKEN_AWAKE_MINUTES = 30
 
     /**
@@ -82,17 +81,22 @@ object Narrative {
         )
     }
 
-    /** One sleep contributor: rating plus how full its bar is. [label] is [TOTAL_SLEEP] or [CONTINUITY], a key never shown. */
+    /**
+     * One sleep contributor: rating plus how full its bar is. [label] is [TOTAL_SLEEP], [CONTINUITY] or [REGULARITY],
+     * a key never shown.
+     */
     data class Contributor(val label: String, val rating: Rating, val fraction: Float, val detail: String)
 
-    /** The keys of the two contributors. */
+    /** The keys of the three contributors. */
     const val TOTAL_SLEEP = "Total sleep"
     const val CONTINUITY = "Continuity"
+    const val REGULARITY = "Regularity"
 
     /**
-     * What shaped the night: total sleep against need (and too much of it) and continuity (wake after sleep onset). Deep and REM aren't
-     * rated: wearable staging is too unreliable to score (evidence-review.md, "Sleep"), so the stages panel shows them
-     * without a target.
+     * What shaped the night, as OpenStrap's sleep score ([SleepScore]) rates it: total sleep against need (and too much
+     * of it) and continuity (wake after sleep onset), here without the awakenings or the regularity [score] has. Deep
+     * and REM aren't rated: wearable staging is too unreliable to score (evidence-review.md, "Sleep"), so the stages
+     * panel shows them without a target.
      */
     fun sleepContributors(
         session: SleepSession,
@@ -100,31 +104,48 @@ object Narrative {
         needMinutes: Int = org.openstrap.app.data.Recovery.SLEEP_NEED_MINUTES,
         wasoMinutes: Int? = null,
         strings: Strings = Strings.app,
-    ): List<Contributor> = buildList {
+    ): List<Contributor> {
         val asleepMin = (asleepSeconds / 60).toInt()
-        val duration = org.openstrap.app.data.Recovery.durationScore(asleepMin, needMinutes)
-        val need = Units.duration(needMinutes * 60L)
+        val score = SleepScore.of(asleepMin, needMinutes, wasoMinutes?.takeIf { asleepMin > 0 }, null, null)
+        return sleepContributors(score, asleepSeconds, strings)
+    }
+
+    /**
+     * What shaped the night's [score], part by part: total sleep against need, staying asleep (wake after sleep onset
+     * and awakenings) and, once there are enough nights, how far the middle of the night sat from your usual.
+     * [asleepSeconds] is the time asleep the page shows, which the line repeats.
+     */
+    fun sleepContributors(score: SleepScore.Result, asleepSeconds: Long, strings: Strings = Strings.app): List<Contributor> = buildList {
+        val need = Units.duration(score.needMinutes * 60L)
         val total = strings.format(R.string.day_sleep_factor_asleep_detail, Units.duration(asleepSeconds), need)
-        add(Contributor(TOTAL_SLEEP, totalSleepRating(asleepMin, duration), asleepMin / needMinutes.toFloat(), total))
-        if (wasoMinutes != null && asleepMin > 0) {
-            val c = org.openstrap.app.data.Recovery.continuityScore(wasoMinutes)
-            val awake = strings.format(R.string.day_sleep_factor_awake_detail, Units.duration(wasoMinutes * 60L))
-            add(Contributor(CONTINUITY, ratingFor(Math.round(c)), c / 100f, awake))
+        add(Contributor(TOTAL_SLEEP, totalSleepRating(score), score.asleepMinutes / score.needMinutes.toFloat(), total))
+        val waso = score.wasoMinutes
+        val continuity = score.continuity
+        if (waso != null && continuity != null) {
+            val awake = strings.format(R.string.day_sleep_factor_awake_detail, Units.duration(waso * 60L))
+            add(Contributor(CONTINUITY, ratingFor(Math.round(continuity)), continuity / FULL, awake))
+        }
+        val shift = score.midpointShiftMinutes
+        val regularity = score.regularity
+        if (shift != null && regularity != null) {
+            val detail = if (shift <= SleepScore.REGULARITY_GOOD_MINUTES) strings.get(R.string.day_sleep_factor_regular_detail_usual)
+            else strings.format(R.string.day_sleep_factor_regular_detail, Units.duration(shift * 60L))
+            add(Contributor(REGULARITY, ratingFor(Math.round(regularity)), regularity / FULL, detail))
         }
     }
 
     /**
-     * Total sleep against need, plus Zepp's oversleep bands: over 10 h is Attention, over 9 h 30 Fair (codemap 06
-     * §4.2). Need tops out at 9 h, so these only ever lower a night that met it.
+     * Total sleep by [SleepScore.duration]'s part, no better than Good once past the top of the band (need + 1 h): a
+     * long night is never what helped.
      */
-    private fun totalSleepRating(asleepMinutes: Int, durationScore: Float): Rating = when {
-        asleepMinutes > OVERSLEEP_ATTENTION_MINUTES -> Rating.LOW
-        asleepMinutes > OVERSLEEP_FAIR_MINUTES -> Rating.FAIR
-        else -> ratingFor(Math.round(durationScore))
+    private fun totalSleepRating(score: SleepScore.Result): Rating {
+        val rating = ratingFor(Math.round(score.duration))
+        val long = score.asleepMinutes > score.needMinutes + SleepScore.DURATION_BAND_MINUTES
+        return if (long && rating == Rating.OPTIMAL) Rating.GOOD else rating
     }
 
-    const val OVERSLEEP_FAIR_MINUTES = 570
-    const val OVERSLEEP_ATTENTION_MINUTES = 600
+    /** A part's best, for its bar. */
+    private const val FULL = 100f
 
     /** +1 / -1 when [today] differs from [baseline] by more than [tolerance], else 0; null if either is missing. */
     fun direction(today: Float?, baseline: Float?, tolerance: Float): Int? {

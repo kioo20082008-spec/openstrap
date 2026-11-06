@@ -56,7 +56,7 @@
     <string name="core_tab_sleep_score_fair">نتيجة النوم: مقبولة</string>
     <string name="core_tab_sleep_score_good">نتيجة النوم: جيدة</string>
     <string name="core_tab_sleep_score_great">نتيجة النوم: ممتازة</string>
-    <string name="core_tab_no_strap_score">لا توجد نتيجة من السترب</string>
+    <string name="core_tab_no_strap_score">لا توجد نتيجة بعد</string>
     <string name="core_tab_stage_total">⁨%1$s⁩ ⁨%2$s⁩</string>
     <string name="core_tab_asleep">نوم ⁨%1$s⁩</string>
     <string name="core_tab_slept_through">نوم متواصل</string>

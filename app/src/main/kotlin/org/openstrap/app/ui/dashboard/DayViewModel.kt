@@ -30,6 +30,7 @@ import org.openstrap.app.data.DayValue
 import org.openstrap.app.data.RecoveryResult
 import org.openstrap.app.data.SleepEdits
 import org.openstrap.app.data.SleepHistory
+import org.openstrap.app.data.SleepScore
 import org.openstrap.app.data.Summaries
 import org.openstrap.app.data.Today
 import org.openstrap.app.data.catching
@@ -74,10 +75,16 @@ data class DayUiState(
     val restingEstimated: Boolean = false,
     val restingTrend: List<TrendPoint> = emptyList(),
     val hrvTrend: List<TrendPoint> = emptyList(),
-    /** The main sleep, carrying the strap's own score and stage totals when it reported them. */
+    /**
+     * The main sleep with the strap's stage totals. Its score is OpenStrap's own ([SleepScore]) once the day's Recovery
+     * is in, and null until then ([DayViewModel.withSleepScores]): the strap's own is [sleepAsDetected]'s, or the Recovery's
+     * night's ([org.openstrap.app.data.Recovery.Night.strapScore]).
+     */
     val sleep: SleepSession? = null,
-    /** The strap's score for the night before, to show which way sleep moved. */
+    /** OpenStrap's sleep score for the night before, to show which way sleep moved ([DayViewModel.withSleepScores]). */
     val previousSleepScore: Int? = null,
+    /** [sleep]'s score with its parts, for What shaped the score; null until the day's Recovery is in. */
+    val sleepScore: SleepScore.Result? = null,
     val naps: List<SleepSession> = emptyList(),
     /** Each nap's stages and totals, keyed by the nap's start. */
     val napStages: Map<Long, List<StageSpan>> = emptyMap(),
@@ -278,10 +285,12 @@ class DayViewModel(
     /**
      * The day as the screens draw it, less the steps its Recovery found were arm movement at a desk
      * ([withoutFalseSteps]), so the Steps card, its line, the goal and the coach all count the same steps as the
-     * widgets. Until the day's Recovery is in, or when it fails, every step counts.
+     * widgets. Until the day's Recovery is in, or when it fails, every step counts. Every sleep score is OpenStrap's
+     * own, from the same Recovery ([withSleepScores]).
      */
     val state: StateFlow<DayUiState> = combine(dayState, recovery) { s, r ->
-        withoutFalseSteps(s, r?.takeIf { it.date == s.date }?.activity?.falseSteps.orEmpty())
+        val day = r?.takeIf { it.date == s.date }
+        withSleepScores(withoutFalseSteps(s, day?.activity?.falseSteps.orEmpty()), day)
     }
         .flowOn(work)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), DayUiState(date = Today.on(clock())))
@@ -425,6 +434,27 @@ class DayViewModel(
                 minuteSteps = Activity.withoutFalseSteps(s.minuteSteps, today),
                 hourlySteps = hourly.toList(),
                 activeHours = Summaries.activeHours(hourly.toList()),
+            )
+        }
+
+        /**
+         * [s] with OpenStrap's own sleep scores ([SleepScore]) from [r], the day's Recovery, in place of the strap's:
+         * the night's ([DayUiState.sleep], with its parts in [DayUiState.sleepScore]), the night before's and each of the
+         * nights' ([DayUiState.nights]), so the hero, Today, the details, the week and Readiness' Sleep contributor give
+         * one number. Without [r] (still working out, failed, or another day's) there are none, rather than the strap's
+         * for a moment and then a different one.
+         */
+        internal fun withSleepScores(s: DayUiState, r: RecoveryResult?): DayUiState {
+            val scores = r?.takeIf { it.date == s.date }?.sleepScores.orEmpty()
+            val tonight = r?.takeIf { it.date == s.date }?.sleepScore
+            return s.copy(
+                sleep = s.sleep?.copy(score = tonight?.total),
+                sleepScore = tonight.takeIf { s.sleep != null },
+                previousSleepScore = scores[s.date.minusDays(1)],
+                nights = s.nights.map { n ->
+                    val score = if (n.date == s.date) tonight?.total else scores[n.date]
+                    n.copy(session = n.session?.copy(score = score))
+                },
             )
         }
 

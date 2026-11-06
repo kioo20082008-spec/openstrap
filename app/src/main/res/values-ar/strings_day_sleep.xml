@@ -21,13 +21,16 @@
     <string name="day_sleep_score_label_last_night">الليلة الماضية</string>
     <string name="day_sleep_score_label_that_night">تلك الليلة</string>
     <string name="day_sleep_no_score">لا توجد نتيجة</string>
-    <string name="day_sleep_no_score_last_night">لم يحسب السترب نتيجة الليلة الماضية</string>
-    <string name="day_sleep_no_score_that_night">لم يحسب السترب نتيجة تلك الليلة</string>
+    <string name="day_sleep_no_score_last_night">لا توجد نتيجة لليلة الماضية بعد</string>
+    <string name="day_sleep_no_score_that_night">لا توجد نتيجة لتلك الليلة بعد</string>
     <string name="day_sleep_headline_sentence">⁨%1$s⁩.</string>
     <string name="day_sleep_factor_time_asleep">مدة النوم</string>
     <string name="day_sleep_factor_staying_asleep">الاستمرار في النوم</string>
     <string name="day_sleep_factor_asleep_detail">⁨%1$s⁩ من ⁨%2$s⁩</string>
     <string name="day_sleep_factor_awake_detail">⁨%1$s⁩ يقظة بعد النوم</string>
+    <string name="day_sleep_factor_regular_timing">انتظام التوقيت</string>
+    <string name="day_sleep_factor_regular_detail">منتصف الليلة بعيد عن معتادك بـ⁨%1$s⁩</string>
+    <string name="day_sleep_factor_regular_detail_usual">منتصف الليلة قريب من معتادك</string>
     <string name="day_sleep_factor_helping">يساعد</string>
     <string name="day_sleep_factor_good">على المسار</string>
     <string name="day_sleep_factor_fair">يؤثر قليلاً</string>
@@ -70,7 +73,6 @@
     <string name="day_sleep_trim_line_nap">⁨%1$s⁩، ⁨%2$s⁩</string>
     <string name="day_sleep_stages_cover">المراحل تغطي ⁨%1$s⁩ التي رصدها السترب.</string>
     <string name="day_sleep_your_times">أوقاتك. ⁨%1$s⁩</string>
-    <string name="day_sleep_score_from_your_times">نتيجة السترب بعد تعديلها حسب أوقاتك.</string>
     <string name="day_sleep_delete_title_nap">حذف هذه القيلولة؟</string>
     <string name="day_sleep_delete_title_last_night">حذف نوم الليلة الماضية؟</string>
     <string name="day_sleep_delete_title_that_night">حذف نوم تلك الليلة؟</string>

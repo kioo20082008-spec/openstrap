@@ -85,8 +85,8 @@ fun Recovery.readiness(
     val out = listOfNotNull(
         if (scored) hrvBalance(tonight, hrvBase, hrv7) else null,
         if (scored) restingHeartRate(tonight, baseline(rhrHistory, RHR_SD_FLOOR)) else null,
-        // Last night's sleep: the strap's own score when there is one, else ours.
-        Contributor(Factor.Sleep, tonight.strapScore ?: sleepScore(tonight, sleepNeed), Detail.Asleep(tonight.asleepMinutes)),
+        // Last night's sleep: OpenStrap's own sleep score ([SleepScore]), the one the app shows. The strap's is kept, never scored.
+        Contributor(Factor.Sleep, SleepScore.of(tonight, earlier, sleepNeed).total, Detail.Asleep(tonight.asleepMinutes)),
         sleepBalance(earlier + tonight, tonight, sleepNeed),
         recoveryIndex(tonight),
         temperature(tonight, past),
@@ -296,10 +296,10 @@ fun Recovery.breathingDisturbances(tonight: Night?, history: List<Night>): Breat
 }
 
 /**
- * Our sleep score when the strap didn't give one: 0.7·duration + 0.3·continuity. No stage target: four-stage
- * agreement across six devices was kappa 0.21-0.53 (Schyvens et al. 2025), so stages are shown, not scored. And
- * low wake specificity inflates wearable efficiency, so continuity uses wake after sleep onset, not time in bed.
- * Without stages (no WASO), duration alone.
+ * The older duration and continuity score, 0.7·duration + 0.3·continuity (duration alone without stages). It no longer
+ * scores any night: [SleepEdits] uses the change in it to move the strap's stored score when the user changes a sleep's
+ * times, so that stored value stays the strap's judgement. The sleep score the app shows, and Readiness' Sleep
+ * contributor, is [SleepScore].
  */
 fun Recovery.sleepScore(n: Night, need: Int = SLEEP_NEED_MINUTES): Int {
     val duration = durationScore(n.asleepMinutes, need)

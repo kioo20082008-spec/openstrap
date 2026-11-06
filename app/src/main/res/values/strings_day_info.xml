@@ -111,9 +111,9 @@
     <string name="day_info_energy_off">Energy starts after your first night. With the strap off overnight there\'s no sleep to fill it from, so the day starts from your usual Energy at waking, an estimate.</string>
 
     <!-- The Sleep score's sheet. REM is rapid eye movement sleep. -->
-    <string name="day_info_sleep_meaning">How well you slept, from 0 to 100, scored by the strap from the night.</string>
+    <string name="day_info_sleep_meaning">How well you slept, from 0 to 100: how long, how settled and how regular the night was.</string>
     <!-- What shaped the score is a section of the Sleep score's page. -->
-    <string name="day_info_sleep_how">The score is the strap\'s own, from the length and the stages of the night, and it mostly follows how long you slept. The stages are light, deep and REM (rapid eye movement), when most dreams happen. What shaped the score rates the night against general sleep guidance: time asleep against your sleep need, and staying asleep, with under 30 minutes awake after falling asleep counting as settled. Too much sleep counts against it too, past 9½ hours. Stages aren\'t rated, since a strap tells them apart less surely than sleep from waking. It\'s a guide, not a medical assessment.</string>
+    <string name="day_info_sleep_how">OpenStrap works the score out itself, from published sleep guidance, in three parts. Time asleep counts most: within an hour of your sleep need is full marks, as the National Sleep Foundation recommends 7 to 9 hours for adults, and it falls off below that and, more gently, above. Staying asleep counts next: up to 20 minutes awake after falling asleep and at most one wake-up of 5 minutes or more is settled, and 50 minutes or four wake-ups is broken. Regular timing counts least: the middle of the night within half an hour of your usual is full marks, and 3 hours off is none, since regular sleep goes with better health. It needs 5 earlier nights. A part the night can\'t tell is left out. The stages are light, deep and REM (rapid eye movement), when most dreams happen. They aren\'t rated, since a strap tells them apart less surely than sleep from waking. It\'s a guide, not a medical assessment.</string>
     <string name="day_info_sleep_moves">Regular bedtimes, a dark, cool room and less caffeine and alcohol late in the day help. Late nights, a restless night and waking early pull it down.</string>
     <string name="day_info_sleep_off">Lying still awake can count as asleep, and light and deep sleep are hard to tell apart through the skin. A night with the strap off or loose may be missed or cut short.</string>
 
@@ -254,6 +254,8 @@
 
     <!-- A note under the Sleep score's sheet: the time asleep the guidance measures against. -->
     <string name="day_info_sleep_note_need">Your sleep need here is <xliff:g id="need" example="8 h">%1$s</xliff:g>, from your age or your own setting.</string>
+    <!-- A note under the Sleep score's sheet: the strap's own sleep score for the night, kept for comparison. -->
+    <string name="day_info_sleep_note_strap">The strap\'s own estimate for this night is <xliff:g id="score" example="84">%1$d</xliff:g>. It\'s kept for comparison and never enters OpenStrap\'s score.</string>
 
     <!-- A note under Recovery's sheet: the strap's own readiness score today, kept for comparison. -->
     <string name="day_info_recovery_note_strap">The strap\'s own score today is <xliff:g id="score" example="91">%1$d</xliff:g>. It doesn\'t count sleep length, so after a short night it reads higher than OpenStrap\'s. It\'s kept for comparison and never enters OpenStrap\'s score.</string>
