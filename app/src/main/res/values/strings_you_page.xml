@@ -183,7 +183,7 @@
     <!-- The release notes panel's title: the versions newer than this one. -->
     <string name="you_updates_whats_new">What\'s new</string>
     <!-- The panel's title when this version is the newest. -->
-    <string name="you_updates_in_your_version">What's in your version</string>
+    <string name="you_updates_in_your_version">What\'s in your version</string>
     <string name="you_updates_version">Version <xliff:g id="version" example="3.0.46">%1$s</xliff:g></string>
     <string name="you_updates_badge_yours">Yours</string>
     <string name="you_updates_badge_newest">Newest</string>
