@@ -77,8 +77,8 @@ Most contributors are z-scores (deviation from the baseline centre in units of i
 
 **Sleep balance** (weight 0.12)
 * Input: sleep debt (`sleepDebtMinutes`) over the last `SLEEP_DEBT_NIGHTS` = 14 nights, oldest to newest; missing nights are skipped and naps count toward total sleep: one that ended before noon (`NAP_NEXT_NIGHT_HOUR`) on the night it continues, a later one on the next night (`napMorning`), so a morning's score doesn't change with a nap that afternoon. λ = `SLEEP_DEBT_DECAY` = 0.5^(1/7) ≈ 0.906 (half-life 7 nights). With d = need − TST: d ≥ 0 gives debt = debt·λ + d; d < 0 gives debt = max(0, debt·λ − min(0.5·|d|, 60 min)).
-* Score: 100 − `SLEEP_DEBT_POINTS_PER_HOUR` = 25 points per hour of debt, so 1 h ≈ 75 and 2 h ≈ 50. Withheld with fewer than `SLEEP_DEBT_MIN_NIGHTS` = 7 of 14 nights.
-* The debt is cumulative, so it saturates fast: 30 min short every night for two weeks is about 4 h of debt, a score of 0. Worth checking at the review.
+* Score: 100 − `SLEEP_DEBT_POINTS_PER_HOUR` = 25 points per hour of average nightly shortfall, the debt over Σλ^k for the nights in the window (≈ 8 for 14 nights), so 30 min short a night ≈ 87, 1 h ≈ 75 and 2 h ≈ 50. Withheld with fewer than `SLEEP_DEBT_MIN_NIGHTS` = 7 of 14 nights. The detail line keeps the debt itself.
+* Why the average: the debt is cumulative, so scored on it directly it saturated: 30 min short every night for two weeks is about 4 h of debt, which scored 0, and anyone sleeping 7 of 8 h lost the whole contributor.
 * Why half-life 7: the old 4-night half-life discounted nights 8–14 to 25 % or less, undercounting the 14-day build-up. One 10 h recovery night is incomplete (Banks et al. 2010), and about 1 h of debt took 4 nights to clear (Kitamura 2016).
 * Source: Van Dongen et al. 2003 (Sleep 26:117): 6 h nights for 14 days caused deficits that built up night by night, equal to one or two nights of total deprivation, which subjects didn't notice.
 

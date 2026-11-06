@@ -189,7 +189,10 @@ class RecoveryTest {
         val debt = Recovery.readiness(night(14, asleep = 330), short).contributors.first { it.factor == Factor.SleepBalance }.score
         val none = Recovery.readiness(night(14, asleep = 480), rested).contributors.first { it.factor == Factor.SleepBalance }.score
         assertEquals(100, none)
-        assertEquals(0, debt) // 2.5 h short for 14 nights is far more than 4 h of debt
+        assertEquals(38, debt) // 2.5 h short a night: 100 − 25·2.5, rounded
+        // Scored on the average nightly shortfall, not the summed debt: 1 h short every night is 75, not 0.
+        val hour = (1..13).map { night(it, asleep = 420) }
+        assertEquals(75, Recovery.readiness(night(14, asleep = 420), hour).contributors.first { it.factor == Factor.SleepBalance }.score)
     }
 
     @Test

@@ -148,12 +148,25 @@ private fun Recovery.restingHeartRate(tonight: Night, base: Baseline?): Contribu
     return Contributor(Factor.RestingHr, scoreFromZ(deadZone(-base.z(rhr))), Detail.RestingHr(rhr.toInt(), delta))
 }
 
-/** Sleep balance: debt built over the last 14 nights, against need (naps count). */
+/**
+ * Sleep balance: debt built over the last 14 nights, against need (naps count), scored on the average nightly shortfall
+ * behind it: the debt over Σλ^k, the weight its nights carry. Scored on the debt itself it saturated, since the debt
+ * sums the nights: 30 min short every night for two weeks is about 4 h of debt, which scored 0, so most people
+ * sleeping 7 of 8 h lost the whole contributor. Now 30 min short a night ≈ 87, 1 h ≈ 75, 2 h ≈ 50. The detail keeps
+ * the debt itself.
+ */
 private fun Recovery.sleepBalance(nights: List<Night>, tonight: Night, sleepNeed: Int): Contributor? =
     sleepDebtMinutes(nights, tonight.day, sleepNeed)?.let { debt ->
-        val score = (100 - SLEEP_DEBT_POINTS_PER_HOUR * debt / 60f).toInt().coerceIn(0, 100)
+        val count = debtWindow(nights, tonight.day).size
+        val carried = (0 until count).sumOf { SLEEP_DEBT_DECAY.toDouble().pow(it) }.toFloat()
+        val shortfall = debt / carried.coerceAtLeast(1f)
+        val score = Math.round(100 - SLEEP_DEBT_POINTS_PER_HOUR * shortfall / 60f).coerceIn(0, 100)
         Contributor(Factor.SleepBalance, score, Detail.SleepDebt(if (debt < SLEEP_DEBT_NAMED_FROM) 0 else debt.toInt()))
     }
+
+/** The nights [sleepDebtMinutes] counts at the morning [day], oldest first. */
+private fun Recovery.debtWindow(nights: List<Night>, day: Long): List<Night> =
+    nights.filter { it.day <= day && day - it.day < SLEEP_DEBT_NIGHTS * DAY - DST_SLACK }.sortedBy { it.day }
 
 /** Recovery index: the night's lowest heart rate should come in its first half (Oura). */
 private fun recoveryIndex(tonight: Night): Contributor? {
@@ -255,7 +268,7 @@ fun Recovery.softMinimum(parts: List<Pair<Float, Int>>): Double {
  * nights to clear (Kitamura 2016).
  */
 fun Recovery.sleepDebtMinutes(nights: List<Night>, day: Long, need: Int = SLEEP_NEED_MINUTES): Float? {
-    val window = nights.filter { it.day <= day && day - it.day < SLEEP_DEBT_NIGHTS * DAY - DST_SLACK }.sortedBy { it.day }
+    val window = debtWindow(nights, day)
     if (window.size < SLEEP_DEBT_MIN_NIGHTS) return null
     var debt = 0f
     for (n in window) {
