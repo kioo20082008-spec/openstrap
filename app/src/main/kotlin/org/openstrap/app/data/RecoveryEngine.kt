@@ -391,7 +391,14 @@ class RecoveryEngine(private val dao: HealthDao) {
             .flatMap { s -> reads.stagesOf(s).map { Triple(it.start, it.end, it.stage) } }
         val stress = reads.stress.within(simFrom, simTo) { it.timestamp }.map { it.timestamp to it.value }
         val simActivity = reads.activity.within(simFrom, simTo) { it.timestamp }
-        val steps = simActivity.associate { it.timestamp / 60 * 60 to it.steps }
+        val rawSteps = simActivity.associate { it.timestamp / 60 * 60 to it.steps }
+        // Arm movement at a desk ([Recovery.falseStepMinutes]) is sitting here too, as in activity and calories: its
+        // minutes would count as moving, so a calm desk hour could never Relax and recharge.
+        val falseSteps = Recovery.falseStepMinutes(
+            rawSteps.filterValues { it in 0..Recovery.MAX_MINUTE_STEPS }, base.hr.filter { it.first in simFrom until simTo }.toMap(),
+            base.restingHr, base.maxHr, base.asleep, Recovery.MinuteRanges(base.workoutRanges)::invoke,
+        )
+        val steps = if (falseSteps.isEmpty()) rawSteps else rawSteps.mapValues { (t, s) -> if (t in falseSteps) 0 else s }
         val offWrist = simActivity.filter { Recovery.offWrist(it.kind) }.mapTo(HashSet()) { it.timestamp / 60 * 60 }
         // Heart rate after the day (the lookahead) only says when the strap went back on.
         val hrAhead = if (simTo > day.to + 1) {
