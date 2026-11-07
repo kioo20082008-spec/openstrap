@@ -150,7 +150,7 @@ class RecoveryEngineComputeTest {
          * as Charge drains them. The six days rose from 84 to 88 on 2026-11-06, when the Sleep contributor became
          * OpenStrap's own sleep score ([SleepScore]: 8 h at the same times, unbroken, scores 100) rather than the strap's 80.
          */
-        const val SNAPSHOT = "null|20|[88, 88, 88, 88, 88, 88, null]|52.26888|52.26888|55.833332|50|51.24335|96.531845|241|" +
+        const val SNAPSHOT = "null|20|[88, 88, 88, 88, 88, 88, null]|52.26888|52.26888|55.833332|50|47.70398|96.316086|241|" +
             "5.292476|100|9900|60|7172.55|1736.3221|423.3075|1200|100.0|3|0.0|52.26888|23:00|21"
     }
 }

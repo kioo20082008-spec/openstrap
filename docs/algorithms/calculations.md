@@ -323,7 +323,7 @@ Energy is always kept within 0–100.
 * Recharge is a share of the room left, so it slows as you fill up. About 30 → 92 over 7.5 hours of normal sleep.
 
 **Exercise drain.** Linear in heart-rate reserve (energy spent), not the exponential Banister weighting: an hour at 60 % of reserve costs about 25 points, a 73-minute match at 80 % about 40. It eases as the tank empties (× 0.4 at 0 charge, × 1 at 100). Why: Banister's weights were fitted to training load, and HR-based load methods correlate with oxygen uptake only at r = 0.65–0.90 (Scott 2013); cardiac recovery after exercise depends on intensity more than duration (Stanley 2013).
-**Next-night carry-over.** Exercise drain adds to a carry-over that halves every 24 h; at 40 points of it, sleep recharges 15 % less (parasympathetic recovery takes 24–48 h after hard sessions). The constants are calibration choices, not published figures.
+**Next-night carry-over.** Exercise drain adds to a carry-over that halves every 24 h; at 40 points of it, sleep recharges 15 % less (parasympathetic recovery takes 24–48 h after hard sessions). The constants are calibration choices, not published figures. Two independent expert reviews (2026-11) found the drain's shape defensible and equally robust to a ±7 bpm max-HR error (±5 % on a match) as a saturating-TRIMP alternative, and advised no change of the constants (0.04, 0.85, 15 %, 24 h) until 4–6 weeks of the user's own check-ins show an effect. No body-battery has a peer-reviewed validation.
 
 **Exercise recovery details**
 * An "after-burn" tally adds up exercise TRIMP and halves about every 20 minutes once exercise stops (× 0.966 per minute).
