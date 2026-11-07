@@ -163,7 +163,7 @@ internal fun LastNightStrip(state: DayUiState, onClick: () -> Unit, modifier: Mo
  * so lit from below in the neutral light (spec 2.5): a question, not Recovery's.
  */
 @Composable
-internal fun CheckInStrip(feeling: Int?, onCheckIn: (Int?) -> Unit, modifier: Modifier = Modifier) =
+internal fun CheckInStrip(feeling: Int?, onCheckIn: (Int?) -> Unit, modifier: Modifier = Modifier, note: String? = null) =
     TodayStrip(EdgeNeutral, EdgeKind.Value, modifier) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -176,6 +176,10 @@ internal fun CheckInStrip(feeling: Int?, onCheckIn: (Int?) -> Unit, modifier: Mo
         // Tapping the chosen one again takes the answer back.
         val values = (CheckIn.MIN..CheckIn.MAX).toList()
         GlowSegments(values.map { "$it" }, feeling?.let(values::indexOf) ?: -1, { onCheckIn(values[it].takeIf { v -> v != feeling }) })
+        if (note != null) {
+            Spacer(Modifier.height(8.dp))
+            Text(note, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        }
     }
 
 /**

@@ -526,7 +526,6 @@ private fun DialsToday(
             charge = ctx.charge, napToday = ctx.state.naps.isNotEmpty(),
         ),
     )
-    CheckInCard(ctx.now, ctx.zone, ctx.isToday, ctx.rec?.charge?.takeIf { it.anchored }?.atWake?.toInt(), ctx.score)
     CoachCard(tips, live = ctx.live != null, onWorkout = onOtherSport)
     JournalCard(ctx.now, ctx.zone, ctx.isToday)
     }
@@ -858,7 +857,20 @@ private fun TodayRow(
         TodayCard.Offer -> offer?.let { OfferPanel(it, onRecordOffer, onDeclineOffer, edge = EdgeKind.Live) }
         TodayCard.Suggestion -> suggestion?.let { SuggestionPanel(it, onSaveSuggestion, onDismissSuggestion, edge = EdgeKind.Earlier) }
         TodayCard.Alerts -> AlertsStrip(s.alerts, onOpenMetric)
-        TodayCard.CheckIn -> CheckInStrip(checkIn, onCheckIn)
+        TodayCard.CheckIn -> {
+            // Each answer is kept with the Energy at wake and the Recovery shown, so the two can be held against each other.
+            val journal = LocalJournal.current
+            val day = java.time.Instant.ofEpochSecond(ctx.now).atZone(ctx.zone).toLocalDate()
+            val atWake = ctx.rec?.charge?.takeIf { it.anchored }?.atWake?.toInt()
+            CheckInStrip(
+                checkIn,
+                { v ->
+                    onCheckIn(v)
+                    if (v != null) journal?.checkIn?.invoke(day, org.openstrap.app.data.MorningFeel.Entry(v, atWake, ctx.score))
+                },
+                note = journal?.let { morningFitNote(it.checkIns) },
+            )
+        }
         TodayCard.BodyMorning -> BodyList(
             stringResource(R.string.glow_today_body_morning),
             listOf(

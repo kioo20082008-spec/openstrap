@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="checkin_title">How rested do you feel?</string>
-    <string name="checkin_hint">Answer before you look at the numbers. It is how we check them against you.</string>
-    <string name="checkin_low">Wrecked</string>
-    <string name="checkin_high">Fresh</string>
     <string name="checkin_learning">%1$d of %2$d mornings. Then we compare your Energy with how you felt.</string>
     <string name="checkin_fit">Your Energy at wake follows how you feel: %1$s (%2$d mornings).</string>
     <string name="checkin_fit_strong">strongly</string>
