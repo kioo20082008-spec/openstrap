@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="glow_strip_effort">الجهد</string>
+    <string name="glow_strip_kcal">سعرة نشطة</string>
+    <string name="glow_strip_max">أعلى نبض</string>
+    <string name="glow_zones_tap">اضغط منطقة لتضيء على الرسم</string>
+</resources>

@@ -17,10 +17,10 @@ object Ranges {
     /** Two moments as times of day in the phone's clock ([TimeOfDay]): "22:58 to 06:56", or "10:58 PM to 6:56 AM". */
     fun times(
         start: Long, end: Long, zone: ZoneId = ZoneId.systemDefault(),
-        use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app,
+        use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app,
     ): String = of(TimeOfDay.format(start, zone, use24Hour, locale), TimeOfDay.format(end, zone, use24Hour, locale), strings)
 
     /** Two whole numbers in the phone's digits, with thousands marks: "8,000 to 10,000", "40 to 45". */
-    fun numbers(low: Int, high: Int, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String =
+    fun numbers(low: Int, high: Int, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app): String =
         of(Units.count(low, locale), Units.count(high, locale), strings)
 }

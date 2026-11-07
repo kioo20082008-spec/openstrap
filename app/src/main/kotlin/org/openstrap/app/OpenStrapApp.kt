@@ -97,6 +97,12 @@ class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
     override val workManagerConfiguration: androidx.work.Configuration
         get() = androidx.work.Configuration.Builder().setWorkerFactory(org.openstrap.app.widget.WidgetWork).build()
 
+    /** Android resets the default locale when the language or settings change: keep Arabic on Western digits. */
+    override fun onConfigurationChanged(newConfig: android.content.res.Configuration) {
+        super.onConfigurationChanged(newConfig)
+        java.util.Locale.setDefault(org.openstrap.app.i18n.LatinDigits.latin(java.util.Locale.getDefault()))
+    }
+
     override fun onCreate() {
         // Arabic keeps Western digits in widgets, workers and the strap service too, not only once the app is open.
         java.util.Locale.setDefault(org.openstrap.app.i18n.LatinDigits.latin(java.util.Locale.getDefault()))

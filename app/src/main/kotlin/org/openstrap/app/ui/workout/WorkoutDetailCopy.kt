@@ -111,7 +111,7 @@ object WorkoutDetailCopy {
     }
 
     /** The hero's day ([DayWords.relative]): "Today", "Yesterday", "Tuesday", "Tue 21 Oct", "Tue 21 Oct 2025". */
-    fun day(start: Long, today: LocalDate, zone: ZoneId = ZoneId.systemDefault(), locale: Locale = Locale.getDefault()): String =
+    fun day(start: Long, today: LocalDate, zone: ZoneId = ZoneId.systemDefault(), locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
         DayWords.relative(Instant.ofEpochSecond(start).atZone(zone).toLocalDate(), today, locale)
 
     /**
@@ -121,7 +121,7 @@ object WorkoutDetailCopy {
      */
     fun facts(
         meters: Float?, fromSteps: Boolean, pausedSeconds: Long, steps: Int?, calories: Int?, activeKcal: Int? = null,
-        locale: Locale = Locale.getDefault(), strings: Strings = Strings.app,
+        locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app,
     ): List<WorkoutFact> =
         listOfNotNull(
             meters?.takeIf { it >= Units.SHOWN_FROM_METERS }?.let { m ->
@@ -163,7 +163,7 @@ object WorkoutDetailCopy {
      * got there without a time, or "Not reached, 212 of 300" from [activeKcal]. Null for no target or another kind.
      */
     fun targetFact(
-        target: String?, reachedSeconds: Long?, activeKcal: Int?, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app,
+        target: String?, reachedSeconds: Long?, activeKcal: Int?, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app,
     ): WorkoutFact? {
         val k = WorkoutTarget.parse(target) as? WorkoutTarget.Kcal ?: return null
         val status = when {

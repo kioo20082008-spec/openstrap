@@ -7,6 +7,13 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.presentation.Ranges
 import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -109,6 +116,7 @@ fun GlowWorkoutDetailScreen(
     var info by rememberSaveable { mutableStateOf(false) }
     val usual = remember(workouts) { Workouts.usualLoad(workouts.map { it.workout.trainingLoad }) }
     val zones = shown?.zoneSeconds.orEmpty()
+    var focus by rememberSaveable { mutableStateOf<Int?>(null) }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
         ScreenList(contentPadding, list, gutter = GlowLayout.Gutter) {
             item {
@@ -132,8 +140,9 @@ fun GlowWorkoutDetailScreen(
                 val hero = SummaryHero(dotClock(shown.activeSeconds), "", sentence = sentence)
                 SummaryHeroCard(hero, MetricColors.heart, Workouts.effort(w.trainingLoad, usual))
             }
-            if (shown.heartRate.isNotEmpty() || w.averageHeartRate != null) item { HeartRateCard(shown) }
+            if (shown.heartRate.isNotEmpty() || w.averageHeartRate != null) item { HeartRateCard(shown, focus = focus) }
             val activeKcal = Workouts.activeKcal(shown, bmrPerMinute)
+            item { WorkoutStatStrip(w.trainingLoad, activeKcal.takeIf { bmrPerMinute != null }, w.maxHeartRate) }
             val facts = WorkoutDetailCopy.facts(
                 shown.distanceMeters, shown.distanceFromSteps,
                 0L, w.steps, w.calories,
@@ -154,12 +163,8 @@ fun GlowWorkoutDetailScreen(
             // A list right under another would look the same, so the later one sits on a neutral edge card (spec 2.4):
             // the zones when the facts are right above them, else the splits under a plain list.
             val zonesShown = zones.sum() > 0
-            val factsRightAbove = factsShown && inDay == null && !loadShown
-            val zonesOnEdge = zonesShown && factsRightAbove
             if (zonesShown) item {
-                CompositionLocalProvider(LocalEdgeOverride provides if (zonesOnEdge) EdgeOverride(edge = Edge.Bottom) else EdgeOverride()) {
-                    ZonesList(remember(zones) { ZoneSeconds(zones) }, shown.maxHeartRate)
-                }
+                ZoneStripPanel(remember(zones) { ZoneSeconds(zones) }, focus, { focus = it })
             }
             item { DeleteWorkout(stringResource(R.string.glow_workout_delete_strap), onDelete) }
         }
@@ -196,6 +201,7 @@ private fun PastSummary(
     val family = org.openstrap.app.ui.workout.FamilySummary.familyOf(w.sportType, summary.structure)
     val weekStarts = remember(workouts) { goalWeekStarts(workouts) }
     val trim = rememberWorkoutTrim(summary, onTrim, onUndoTrim)
+    var focus by rememberSaveable { mutableStateOf<Int?>(null) }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
         ScreenList(contentPadding, list, gutter = GlowLayout.Gutter) {
             item {
@@ -224,7 +230,8 @@ private fun PastSummary(
                     // The heart rate card is lit from the left; under the section's own edge card it takes the bottom.
                     // Always there, even before any heart rate, since it holds Trim.
                     val heartEdge = if (sectionOnEdge) EdgeOverride(edge = Edge.Bottom) else EdgeOverride()
-                    CompositionLocalProvider(LocalEdgeOverride provides heartEdge) { HeartRateCard(a, trim) }
+                    CompositionLocalProvider(LocalEdgeOverride provides heartEdge) { HeartRateCard(a, trim, focus) }
+                    WorkoutStatStrip(w.trainingLoad, Workouts.activeKcal(a, null), w.maxHeartRate)
                     val facts = WorkoutDetailCopy.facts(
                         a.distanceMeters, a.distanceFromSteps, (a.durationSeconds - a.activeSeconds).coerceAtLeast(0), w.steps, w.calories,
                         activeKcal = Workouts.activeKcal(a, null),
@@ -244,7 +251,7 @@ private fun PastSummary(
                     }
                     // Zones and splits for the kinds whose section doesn't already show them.
                     val zonesShown = zones.sum() > 0 && family !in setOf(Workouts.Family.IndoorCardio, Workouts.Family.Games)
-                    if (zonesShown) ZoneStripPanel(zones)
+                    if (zonesShown) ZoneStripPanel(zones, focus, { focus = it })
                     if (family != Workouts.Family.Distance && family != Workouts.Family.Strength) {
                         CompositionLocalProvider(LocalEdgeOverride provides if (zonesShown) EdgeOverride(edge = Edge.Bottom) else EdgeOverride()) {
                             SplitsList(summary, liveRoute = emptyList())
@@ -266,7 +273,7 @@ private fun PastSummary(
  * the chart, there even before any heart rate has arrived.
  */
 @Composable
-private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
+private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null, focus: Int? = null) {
     val w = a.workout
     val first = a.shownStart
     val last = (a.heartRate.maxOfOrNull { it.timestamp } ?: a.end).coerceIn(a.end, a.end + Workouts.RECOVERY_TAIL_S)
@@ -304,7 +311,7 @@ private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
             stringResource(R.string.glow_workout_heart_none), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary, modifier = Modifier.padding(top = 10.dp),
         ) else {
-            ZoneHeartLine(values, first, a.end, a.maxHeartRate, a.historyRanges, scrubbed, { scrubbed = it }, Modifier.padding(top = 16.dp))
+            ZoneHeartLine(values, first, a.end, a.maxHeartRate, a.historyRanges, scrubbed, { scrubbed = it }, focus, Modifier.padding(top = 16.dp))
             Ltr {
             Row(Modifier.fillMaxWidth().padding(top = 6.dp)) {
                 PageNote(clock(first))
@@ -332,7 +339,7 @@ private fun HeartRateCard(a: WorkoutAnalysis, trim: WorkoutTrim? = null) {
 @Composable
 private fun ZoneHeartLine(
     values: List<Float?>, first: Long, end: Long, maxHr: Int, history: List<LongRange>,
-    scrubbed: Int?, onScrub: (Int?) -> Unit, modifier: Modifier = Modifier,
+    scrubbed: Int?, onScrub: (Int?) -> Unit, focus: Int?, modifier: Modifier = Modifier,
 ) {
     val heartZones = LocalHeartZones.current
     var width by remember { mutableStateOf(0f) }
@@ -341,8 +348,15 @@ private fun ZoneHeartLine(
     val lo = (known.minOrNull() ?: 60f) - 5f
     val hi = (known.maxOrNull() ?: 180f) + 5f
     val endIndex = ((end - first) / HeartStep).toInt()
+    // The line draws in from the start when the page opens, and the point under the finger beats at that heart rate.
+    val reveal = remember { Animatable(0f) }
+    LaunchedEffect(values.size) { reveal.snapTo(0f); reveal.animateTo(1f, tween(1100)) }
+    val bpm = scrubbed?.let { values.getOrNull(it) }?.roundToInt() ?: 70
+    val pulse by rememberInfiniteTransition(label = "beat").animateFloat(
+        1f, 2.4f, infiniteRepeatable(tween((60_000 / bpm.coerceIn(40, 220)), easing = LinearEasing)), label = "beat ring",
+    )
     Canvas(
-        modifier.fillMaxWidth().height(96.dp).onSizeChanged { width = it.width.toFloat() }.scrub(values) { x ->
+        modifier.fillMaxWidth().height(150.dp).onSizeChanged { width = it.width.toFloat() }.scrub(values) { x ->
             val i = x?.let { nearestReading(values, it, width, 0f) }
             tick(i, values, null, true)
             onScrub(i)
@@ -353,17 +367,22 @@ private fun ZoneHeartLine(
         if (endIndex in 1 until values.lastIndex) drawLine(
             AppColors.ink.copy(alpha = 0.35f), Offset(endIndex * dx, 0f), Offset(endIndex * dx, size.height), strokeWidth = 1.dp.toPx(),
         )
+        clipRect(right = size.width * reveal.value) {
         drawZoneLine(values.size, 2.5.dp.toPx(), at = { i -> values[i]?.let { Offset(i * dx, y(it)) } }) { i ->
             val v = values[i] ?: return@drawZoneLine null
             val t = first + i * HeartStep
             val color = if (i >= endIndex) AppColors.ink.copy(alpha = 0.55f) else zoneColor(v.roundToInt(), maxHr, heartZones)
+            // A zone picked in the list lights its stretches; the rest of the line dims.
+            val lit = if (focus == null || i >= endIndex || WorkoutRecorder.liveZone(v.roundToInt(), maxHr, heartZones) == focus) color else color.copy(alpha = color.alpha * 0.15f)
             // The strap's history, filled in after: the same line, dimmed (spec 2.7, no dashes).
-            if (history.any { t in it }) color.copy(alpha = color.alpha * 0.45f) else color
+            if (history.any { t in it }) lit.copy(alpha = lit.alpha * 0.45f) else lit
+        }
         }
         scrubbed?.let { i ->
             val v = values.getOrNull(i) ?: return@let
             val p = Offset(i * dx, y(v))
             drawLine(AppColors.ink.copy(alpha = 0.4f), Offset(p.x, 0f), Offset(p.x, size.height), strokeWidth = 1.dp.toPx())
+            drawCircle(AppColors.ink.copy(alpha = (2.4f - pulse) / 1.4f * 0.5f), 6.dp.toPx() * pulse, p, style = Stroke(1.5.dp.toPx()))
             drawCircle(AppColors.shade.copy(alpha = 0.6f), 6.dp.toPx(), p)
             drawCircle(AppColors.ink, 4.dp.toPx(), p)
         }

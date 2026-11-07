@@ -10,6 +10,7 @@ import org.openstrap.app.presentation.Ranges
 import org.openstrap.app.presentation.Units
 import org.openstrap.app.presentation.Pace
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -478,20 +479,48 @@ private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
  * each zone's dot and minutes under it, the first with its unit.
  */
 @Composable
-internal fun ZoneStripPanel(zones: ZoneSeconds) {
+internal fun ZoneStripPanel(zones: ZoneSeconds, focus: Int? = null, onFocus: ((Int?) -> Unit)? = null) {
     val minutes = remember(zones) { FamilySummary.zoneMinutes(zones) }
+    val total = zones.sum().coerceAtLeast(1)
     QuietPanel {
-        GlowHeader(stringResource(R.string.glow_summary_time_in_zones), FamilySummary.mostlyZone(zones))
+        GlowHeader(
+            stringResource(R.string.glow_summary_time_in_zones),
+            if (onFocus != null) stringResource(R.string.glow_zones_tap) else FamilySummary.mostlyZone(zones),
+        )
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             // Time in zones as one strip (boards SummaryGame, SummaryIndoor): each zone a rounded part as long as its time.
             ZoneBar(zones, ZONE_COLORS, height = 12.dp, gap = 3.dp, corner = 4.dp, ends = 4.dp)
-            // Each zone's minutes under the strip, the first with its unit.
-            val shown = zones.indices.filter { zones[it] > 0 }
-            val first = stringResource(R.string.glow_summary_minutes, shown.firstOrNull()?.let { minutes[it] } ?: 0)
-            val keys = shown.mapIndexed { k, z ->
-                (if (k == 0) first else "${minutes[z]}") to ZONE_COLORS[z]
+            // Each zone, hardest first: tap one and it lights on the heart rate line above, the others dim.
+            Column {
+                for (z in zones.indices.reversed()) {
+                    if (zones[z] <= 0) continue
+                    val on = focus == z
+                    Row(
+                        Modifier.fillMaxWidth().height(44.dp).clip(RoundedCornerShape(12.dp))
+                            .background(if (on) ZONE_COLORS[z].copy(alpha = 0.14f) else Color.Transparent)
+                            .let { m -> if (onFocus != null) m.clickable { onFocus(if (on) null else z) } else m }
+                            .padding(horizontal = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        val alpha = if (focus != null && !on) 0.5f else 1f
+                        Box(Modifier.size(10.dp).background(ZONE_COLORS[z].copy(alpha = alpha), CircleShape))
+                        Text(
+                            stringResource(R.string.glow_summary_zone_name, z + 1, ZONE_NAMES[z].lowercase()),
+                            color = AppColors.ink.copy(alpha = alpha),
+                            style = if (on) GlowType.secondary.copy(fontWeight = FontWeight.SemiBold) else GlowType.secondary,
+                            maxLines = 1, modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+                        )
+                        Text(
+                            stringResource(R.string.glow_summary_minutes, minutes[z]),
+                            color = AppColors.ink.copy(alpha = alpha), style = GlowType.secondary,
+                        )
+                        Text(
+                            "${Math.round(zones[z] * 100f / total)}%", color = AppColors.ink.copy(alpha = alpha * GlowType.SECONDARY_ALPHA),
+                            style = GlowType.secondary, textAlign = TextAlign.End, modifier = Modifier.width(44.dp),
+                        )
+                    }
+                }
             }
-            Legend(keys, layout = LegendLayout.Spread)
         }
     }
 }
