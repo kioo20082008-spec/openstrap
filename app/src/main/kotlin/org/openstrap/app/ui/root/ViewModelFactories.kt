@@ -21,10 +21,17 @@ import org.openstrap.app.ui.workout.WorkoutsViewModel
  * share a view model with it can't build it two ways.
  */
 internal object ViewModelFactories {
+    /** How often today's Recovery and Charge are worked out again while Today is in view. */
+    private const val LIVE_TICK_MS = 5 * 60_000L
+
+
     /** The day shown, which moves on to the new day as soon as the phone's date, time or time zone changes. */
     fun day(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
         initializer {
-            DayViewModel(c.days, c.settings.profile, c.autoHealthConnect::sleepEdited, dateChanges = Today.changes(c.app))
+            DayViewModel(
+                c.days, c.settings.profile, c.autoHealthConnect::sleepEdited, dateChanges = Today.changes(c.app),
+                liveTickMs = LIVE_TICK_MS,
+            )
         }
     }
 

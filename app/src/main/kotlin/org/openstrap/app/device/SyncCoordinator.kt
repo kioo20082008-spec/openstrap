@@ -3,6 +3,7 @@ package org.openstrap.app.device
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,13 +13,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withTimeoutOrNull
 import org.openstrap.app.data.catching
 import org.openstrap.app.data.db.HealthDao
 import org.openstrap.app.data.settings.SettingsStore
 import org.openstrap.protocol.ChannelSession
 
 /**
- * History sync: one at a time, a full sync or the types the strap pushed queued behind it, the hourly auto sync, and
+ * History sync: one at a time, a full sync or the types the strap pushed queued behind it, the auto sync, and
  * the work that follows each sync (body signals, workout gap fill, workout effect, daily calories).
  */
 // The sync queue and each piece of work after a sync, as small functions.
@@ -53,20 +55,33 @@ internal class SyncCoordinator(
         }
     }
 
+    /** The app is on screen: syncs come often, so Energy and the rest move without a pull. */
+    @Volatile private var appVisible = false
+    private val visibleChanged = Channel<Unit>(Channel.CONFLATED)
+
+    fun setAppVisible(visible: Boolean) {
+        appVisible = visible
+        if (visible) visibleChanged.trySend(Unit)
+    }
+
     /**
      * Sync right after connecting (unless one ran recently and didn't fail), then every [AUTO_SYNC_SECONDS] while
-     * connected. A failed one is retried at once: it was most likely cut off by the link this connect replaces.
+     * connected, and every [FOREGROUND_GAP_SECONDS] while the app is on screen (and at once when it comes to the front).
+     * A failed one is retried at once: it was most likely cut off by the link this connect replaces.
      */
     fun autoSync(s: ChannelSession) = scope.launch {
         while (isActive && link.session === s) {
             val now = nowSeconds()
-            val due = now - lastAutoSync >= MIN_SYNC_GAP_SECONDS || sync.value is SyncState.Failed
+            val gap = if (appVisible) FOREGROUND_GAP_SECONDS else MIN_SYNC_GAP_SECONDS
+            val last = maxOf(lastAutoSync, syncRecord.value.lastAttempt ?: 0L)
+            val due = now - last >= gap || sync.value is SyncState.Failed
             if (due && sync.value !is SyncState.Running && !firmwareUpdating.value) {
                 lastAutoSync = now
                 log("auto sync")
                 syncNow()
             }
-            delay(AUTO_SYNC_SECONDS * MILLIS_PER_SECOND)
+            val wait = if (appVisible) FOREGROUND_CHECK_SECONDS else AUTO_SYNC_SECONDS
+            withTimeoutOrNull(wait * MILLIS_PER_SECOND) { visibleChanged.receive() }
         }
     }
 
@@ -197,7 +212,9 @@ internal class SyncCoordinator(
 
     private companion object {
         const val MIN_SYNC_GAP_SECONDS = 15 * 60L
-        const val AUTO_SYNC_SECONDS = 60 * 60L
+        const val AUTO_SYNC_SECONDS = 15 * 60L
+        const val FOREGROUND_GAP_SECONDS = 3 * 60L
+        const val FOREGROUND_CHECK_SECONDS = 60L
         const val MILLIS_PER_SECOND = 1_000L
         const val SECONDS_PER_DAY = 86_400L
         /**

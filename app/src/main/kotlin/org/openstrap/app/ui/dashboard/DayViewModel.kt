@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -16,6 +17,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -195,6 +197,8 @@ class DayViewModel(
     dateChanges: Flow<Unit> = emptyFlow(),
     /** Where the day's rows are worked into its state, off the main thread (audit C7). */
     private val work: CoroutineDispatcher = Dispatchers.Default,
+    /** How often today's Recovery and Charge are worked out again by the clock alone; null for never (tests). */
+    private val liveTickMs: Long? = null,
 ) : ViewModel() {
     /** Today as it moves, so a screen left open past midnight moves on to the new day (audit C10). */
     private val today: StateFlow<LocalDate> = Today.dates(clock, dateChanges)
@@ -224,6 +228,15 @@ class DayViewModel(
     /** The day's rows as the screens draw them, before the day's false steps come off ([state]). */
     private val dayState: Flow<DayUiState> = shown.flatMapLatest { (date, isToday) -> repo.day(date, isToday) }
         .map(::toUiState)
+
+    /**
+     * Ticks every [liveTickMs] while today is shown (and this is watched), so Charge, which drains with the clock, moves
+     * between syncs. Other days only change with their data.
+     */
+    private val liveTicks: Flow<Int> = shown.flatMapLatest { (_, isToday) ->
+        val every = liveTickMs
+        if (!isToday || every == null) flowOf(0) else flow { var i = 0; while (true) { emit(i++); delay(every) } }
+    }
 
     /** Bumped by [retryRecovery], so the same day and data are worked out again. */
     private val recoveryRetries = MutableStateFlow(0)
@@ -259,7 +272,7 @@ class DayViewModel(
      */
     @OptIn(FlowPreview::class)
     private val recoveryOutcome: StateFlow<RecoveryOutcome?> =
-        combine(selected, profile, repo.changes().debounce(800), recoveryRetries) { d, p, _, _ -> d to p }
+        combine(selected, profile, repo.changes().debounce(800), recoveryRetries, liveTicks) { d, p, _, _, _ -> d to p }
             .mapLatest { (d, p) ->
                 withContext(work) {
                     // mapLatest cancels this when newer data arrives. That's not a failure, and catching lets it through.
