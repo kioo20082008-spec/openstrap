@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import org.openstrap.app.R
 import org.openstrap.app.data.DayKey
+import org.openstrap.app.data.Journal
 import org.openstrap.app.i18n.Strings
 import java.time.LocalDate
 import java.time.ZoneId
@@ -380,6 +381,19 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
             it[activeGoal] = g.activeHours
             it[calorieGoal] = g.calories
             it[workoutGoal] = g.workoutsPerWeek
+        }
+    }
+
+    private val journalKey = stringPreferencesKey(SettingsKeys.JOURNAL)
+
+    /** The evening journal: the habits tapped on each day, the last [Journal.KEEP_DAYS] days. */
+    val journal: Flow<Map<LocalDate, Set<Journal.Tag>>> = read { Journal.decode(it[journalKey]) }
+
+    /** Switches [tag] on [day]'s journal; [today] only decides which old days are let go. */
+    suspend fun toggleJournal(day: LocalDate, tag: Journal.Tag, today: LocalDate) {
+        store.edit { prefs ->
+            val next = Journal.toggled(Journal.decode(prefs[journalKey]), day, tag, today)
+            if (next.isEmpty()) prefs.remove(journalKey) else prefs[journalKey] = Journal.encode(next)
         }
     }
 
@@ -826,6 +840,7 @@ object SettingsKeys {
     const val GOAL_ACTIVE_HOURS = "goal_active_hours"
     const val GOAL_CALORIES = "goal_calories"
     const val GOAL_WORKOUTS_WEEK = "goal_workouts_week"
+    const val JOURNAL = "journal_tags"
     const val TODAY_HIDDEN = "today_hidden"
     const val TODAY_PINNED = "today_pinned"
     const val CELEBRATE_GOAL = "celebrate_goal"

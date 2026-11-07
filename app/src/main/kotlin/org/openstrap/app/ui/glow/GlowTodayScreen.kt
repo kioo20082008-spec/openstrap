@@ -527,6 +527,7 @@ private fun DialsToday(
         ),
     )
     CoachCard(tips, live = ctx.live != null, onWorkout = onOtherSport)
+    JournalCard(ctx.now, ctx.zone, ctx.isToday)
     }
 }
 

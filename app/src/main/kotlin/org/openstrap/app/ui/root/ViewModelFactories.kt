@@ -12,6 +12,7 @@ import org.openstrap.app.export.AutoBackup
 import org.openstrap.app.ui.alarms.AlarmsViewModel
 import org.openstrap.app.ui.alarms.PhoneAlertsViewModel
 import org.openstrap.app.ui.dashboard.DayViewModel
+import org.openstrap.app.ui.dashboard.JournalViewModel
 import org.openstrap.app.ui.device.DeviceViewModel
 import org.openstrap.app.ui.firmware.FirmwareViewModel
 import org.openstrap.app.ui.workout.WorkoutsViewModel
@@ -33,6 +34,11 @@ internal object ViewModelFactories {
                 liveTickMs = LIVE_TICK_MS,
             )
         }
+    }
+
+    /** The evening journal and what it finds. */
+    fun journal(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
+        initializer { JournalViewModel(c.settings, c.health, c.settings.profile) }
     }
 
     fun workouts(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {

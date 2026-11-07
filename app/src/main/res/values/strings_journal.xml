@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="journal_title">What shaped your day?</string>
+    <string name="journal_hint">Tap what happened today. In a few weeks you\'ll see how each one moves your sleep, HRV and resting heart rate the next morning.</string>
+    <string name="journal_tag_caffeine">Late coffee</string>
+    <string name="journal_tag_dinner">Heavy dinner</string>
+    <string name="journal_tag_workout">Late workout</string>
+    <string name="journal_tag_screens">Screens before bed</string>
+    <string name="journal_tag_stress">A stressful day</string>
+    <string name="journal_tag_nap">A long nap</string>
+    <string name="journal_learning">%1$d days logged so far. A habit shows once it has %2$d days with it and %2$d without.</string>
+    <string name="journal_found">What your days show</string>
+    <string name="journal_finding">%1$s: %2$s the next morning (%3$d days against %4$d)</string>
+    <string name="journal_caveat">A pattern in your own data, not proof of a cause.</string>
+    <string name="journal_effect_hrv_down">HRV lower by %1$d%%</string>
+    <string name="journal_effect_hrv_up">HRV higher by %1$d%%</string>
+    <string name="journal_effect_rhr_down">resting heart rate lower by %1$d</string>
+    <string name="journal_effect_rhr_up">resting heart rate higher by %1$d</string>
+    <string name="journal_effect_sleep_down">sleep score lower by %1$d</string>
+    <string name="journal_effect_sleep_up">sleep score higher by %1$d</string>
+</resources>

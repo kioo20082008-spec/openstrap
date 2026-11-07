@@ -332,12 +332,16 @@ private fun AppRoot(
     deviceVm: DeviceViewModel = viewModel(factory = ViewModelFactories.device(container)),
     firmwareVm: FirmwareViewModel = viewModel(factory = ViewModelFactories.firmware(container)),
     workoutsVm: WorkoutsViewModel = viewModel(factory = ViewModelFactories.workouts(container)),
+    journalVm: org.openstrap.app.ui.dashboard.JournalViewModel = viewModel(factory = ViewModelFactories.journal(container)),
     rootVm: AppRootViewModel = viewModel(factory = ViewModelFactories.root(container, workoutsVm.workouts)),
 ) {
     // Where the app is: the tab, the pages over it, each tab's details, the sheets and the workout screens.
     val nav = rememberSaveable(saver = AppNavState.Saver) { AppNavState() }
     val tab = nav.tab.current
     val goals by rootVm.goals.collectAsStateWithLifecycle()
+    val journalTags by journalVm.tags.collectAsStateWithLifecycle()
+    val journalInsights by journalVm.insights.collectAsStateWithLifecycle()
+    val journalUi = remember(journalTags, journalInsights) { org.openstrap.app.ui.glow.JournalUi(journalTags, journalInsights, journalVm::toggle) }
     val heartZones by rootVm.heartZones.collectAsStateWithLifecycle()
     val strapPreview by previews.strap.collectAsStateWithLifecycle()
     val dataPreview by previews.data.collectAsStateWithLifecycle()
@@ -444,6 +448,7 @@ private fun AppRoot(
     CompositionLocalProvider(
         LocalGoals provides goals, LocalHeartZones provides heartZones, LocalGlassHost provides glassHost,
         org.openstrap.app.ui.glow.LocalOpenBreathe provides { breatheOpen = true },
+        org.openstrap.app.ui.glow.LocalJournal provides journalUi,
         org.openstrap.app.ui.glow.LocalStrapBattery provides ((strapFacts.connection as? org.openstrap.app.device.ConnectionState.Connected)?.let { it.batteryPercent to it.charging } ?: (null to false)),
         LocalGrowOrigin provides growOrigin,
     ) {

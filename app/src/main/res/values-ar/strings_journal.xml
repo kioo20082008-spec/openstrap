@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="journal_title">ما الذي أثّر في يومك؟</string>
+    <string name="journal_hint">اضغط على ما حدث اليوم. بعد أسابيع ترى كيف يغيّر كل واحد منها نومك وHRV ونبض راحتك في الصباح التالي.</string>
+    <string name="journal_tag_caffeine">قهوة متأخرة</string>
+    <string name="journal_tag_dinner">عشاء ثقيل</string>
+    <string name="journal_tag_workout">تمرين متأخر</string>
+    <string name="journal_tag_screens">شاشات قبل النوم</string>
+    <string name="journal_tag_stress">يوم ضاغط</string>
+    <string name="journal_tag_nap">قيلولة طويلة</string>
+    <string name="journal_learning">سجّلت ⁨%1$d⁩ يوماً حتى الآن. تظهر نتيجة العادة بعد ⁨%2$d⁩ أيام معها و⁨%2$d⁩ بدونها.</string>
+    <string name="journal_found">ما تُظهره أيامك</string>
+    <string name="journal_finding">⁨%1$s⁩: ⁨%2$s⁩ في الصباح التالي (⁨%3$d⁩ أيام مقابل ⁨%4$d⁩)</string>
+    <string name="journal_caveat">نمط في بياناتك أنت، وليس دليلاً على السبب.</string>
+    <string name="journal_effect_hrv_down">HRV أقل بنسبة ⁨%1$d%%⁩</string>
+    <string name="journal_effect_hrv_up">HRV أعلى بنسبة ⁨%1$d%%⁩</string>
+    <string name="journal_effect_rhr_down">نبض الراحة أقل بمقدار ⁨%1$d⁩</string>
+    <string name="journal_effect_rhr_up">نبض الراحة أعلى بمقدار ⁨%1$d⁩</string>
+    <string name="journal_effect_sleep_down">تقييم النوم أقل بمقدار ⁨%1$d⁩</string>
+    <string name="journal_effect_sleep_up">تقييم النوم أعلى بمقدار ⁨%1$d⁩</string>
+</resources>
