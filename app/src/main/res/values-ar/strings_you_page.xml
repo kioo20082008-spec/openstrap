@@ -112,4 +112,6 @@
     <string name="you_diagnostics_log">سجل السترب</string>
     <plurals name="you_diagnostics_lines"><item quantity="zero">⁨%1$d⁩ سطر</item><item quantity="one">سطر واحد</item><item quantity="two">⁨%1$d⁩ سطر</item><item quantity="few">⁨%1$d⁩ سطر</item><item quantity="many">⁨%1$d⁩ سطر</item><item quantity="other">⁨%1$d⁩ سطر</item></plurals>
     <string name="you_diagnostics_empty">لا توجد أحداث بعد.</string>
+    <string name="you_row_weekly_report">تقريرك الأسبوعي</string>
+    <string name="you_weekly_report_line">آخر 7 أيام مقارنةً بالـ 7 التي قبلها</string>
 </resources>

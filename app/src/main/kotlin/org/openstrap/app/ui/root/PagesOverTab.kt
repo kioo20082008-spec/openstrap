@@ -228,6 +228,9 @@ private fun DataPage(
         Page.HealthConnect -> HealthConnectPageHost(hooks, padding, close)
         Page.Backup -> BackupPageHost(hooks, padding, close)
         Page.Updates -> UpdatesPageHost(container, hooks.rootVm, padding, close)
+        Page.WeeklyReport -> org.openstrap.app.ui.glow.WeeklyReportPage(
+            viewModel(factory = ViewModelFactories.weeklyReport(container)), padding, close,
+        )
         Page.DeletedSleep -> {
             val deleted by hooks.dayVm.deletedSleep.collectAsStateWithLifecycle()
             DeletedSleepPage(deleted, padding, onRestore = hooks.dayVm::restoreSleep, onBack = close)
@@ -293,6 +296,7 @@ private fun YouPageHost(
         onHeartZones = { open(Page.HeartZones) },
         onGoals = onGoals,
         onGoalsAndBests = { open(Page.GoalsAndBests) },
+        onWeeklyReport = { open(Page.WeeklyReport) },
         healthConnectAuto = hcAuto,
         healthConnectAvailability = hcAvailability,
         onHealthConnect = { open(Page.HealthConnect) },

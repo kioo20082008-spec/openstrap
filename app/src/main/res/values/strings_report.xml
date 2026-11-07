@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report_title">Your week</string>
+    <string name="report_loading">Working out your week…</string>
+    <string name="report_unavailable">There isn\'t enough data for a report yet.</string>
+    <string name="report_range">%1$s to %2$s</string>
+    <string name="report_next_week">For next week</string>
+    <string name="report_advice_nodata_title">Not enough this week</string>
+    <string name="report_advice_nodata_body">Wear the strap through the night so next week\'s report has something to say.</string>
+    <string name="report_advice_ease_title">Ease off next week</string>
+    <string name="report_advice_ease_body">Recovery was low, or your resting heart rate rose while HRV fell. Keep training light and protect your sleep.</string>
+    <string name="report_advice_sleep_title">Sleep is the lever</string>
+    <string name="report_advice_sleep_body">Your nights averaged %1$s under your need. Move your bedtime earlier before you add training.</string>
+    <string name="report_advice_build_title">A good week to build</string>
+    <string name="report_advice_build_body">Recovery held up and your load has room. You can raise it by up to 10%%.</string>
+    <string name="report_advice_hold_title">Hold steady</string>
+    <string name="report_advice_hold_body">A steady week. Keep the same rhythm and watch how you recover.</string>
+    <string name="report_readiness">Recovery</string>
+    <string name="report_sleep_score">Sleep</string>
+    <string name="report_steps">Steps a day</string>
+    <string name="report_asleep">Sleep a night</string>
+    <string name="report_min">m</string>
+    <string name="report_rhr">Resting heart rate</string>
+    <string name="report_hrv">HRV</string>
+    <string name="report_load">Daily load</string>
+    <string name="report_best">Best day</string>
+    <string name="report_worst">Hardest day</string>
+    <string name="report_day_score">%1$s, Recovery %2$d</string>
+    <string name="report_foot">Averages over the days the strap was worn, against the 7 days before. Steps are the strap\'s own count.</string>
+    <string name="report_share_button">Share the report</string>
+    <string name="report_share_title">Share your week</string>
+    <string name="report_share">OpenStrap, %1$s to %2$s\nRecovery %3$s, sleep %4$s, %5$s steps a day\n%6$s: %7$s</string>
+</resources>

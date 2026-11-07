@@ -50,6 +50,7 @@ enum class Page(
     Updates(PageRowKeys.UPDATES),
     Diagnostics(PageRowKeys.DIAGNOSTICS),
     GoalsAndBests(PageRowKeys.GOALS_AND_BESTS),
+    WeeklyReport(PageRowKeys.WEEKLY_REPORT),
     AllBadges,
     WeeklyRecap,
     Strap,

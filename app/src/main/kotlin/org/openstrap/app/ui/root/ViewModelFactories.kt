@@ -13,6 +13,7 @@ import org.openstrap.app.ui.alarms.AlarmsViewModel
 import org.openstrap.app.ui.alarms.PhoneAlertsViewModel
 import org.openstrap.app.ui.dashboard.DayViewModel
 import org.openstrap.app.ui.dashboard.JournalViewModel
+import org.openstrap.app.ui.dashboard.WeeklyReportViewModel
 import org.openstrap.app.ui.device.DeviceViewModel
 import org.openstrap.app.ui.firmware.FirmwareViewModel
 import org.openstrap.app.ui.workout.WorkoutsViewModel
@@ -34,6 +35,11 @@ internal object ViewModelFactories {
                 liveTickMs = LIVE_TICK_MS,
             )
         }
+    }
+
+    /** The week report, worked out when its page opens. */
+    fun weeklyReport(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
+        initializer { WeeklyReportViewModel(c.health, c.settings.profile) }
     }
 
     /** The evening journal and what it finds. */

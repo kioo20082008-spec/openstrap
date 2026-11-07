@@ -123,6 +123,7 @@ fun YouPage(
     onGoals: () -> Unit,
     /** The weekly goal, personal bests and badges (workouts spec 3.5). */
     onGoalsAndBests: () -> Unit,
+    onWeeklyReport: () -> Unit,
     /** Auto sync to Health Connect, said on its row; the row opens the Health Connect page. */
     healthConnectAuto: HealthConnectAuto,
     /** Whether Health Connect is there or can be installed, for the row's stopped wording. */
@@ -175,6 +176,10 @@ fun YouPage(
                     pluralStringResource(R.plurals.you_goals_and_bests_line, goals.workoutsPerWeek, goals.workoutsPerWeek),
                     onClick = onGoalsAndBests,
                     below = true, icon = AppIcons.FlagCheckered, selected = selected == PageRowKeys.GOALS_AND_BESTS,
+                )
+                PageRow(
+                    stringResource(R.string.you_row_weekly_report), stringResource(R.string.you_weekly_report_line), onClick = onWeeklyReport,
+                    below = true, icon = AppIcons.ChartLineUp, selected = selected == PageRowKeys.WEEKLY_REPORT,
                 )
             }
         }

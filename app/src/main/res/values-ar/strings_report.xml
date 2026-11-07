@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="report_title">أسبوعك</string>
+    <string name="report_loading">نجهّز أسبوعك…</string>
+    <string name="report_unavailable">لا توجد بيانات كافية لتقرير بعد.</string>
+    <string name="report_range">من ⁨%1$s⁩ إلى ⁨%2$s⁩</string>
+    <string name="report_next_week">للأسبوع القادم</string>
+    <string name="report_advice_nodata_title">لا يكفي هذا الأسبوع</string>
+    <string name="report_advice_nodata_body">ارتدِ الستراب طوال الليل ليجد تقرير الأسبوع القادم ما يقوله.</string>
+    <string name="report_advice_ease_title">خفّف في الأسبوع القادم</string>
+    <string name="report_advice_ease_body">كان استشفاؤك منخفضاً، أو ارتفع نبض راحتك مع هبوط HRV. اجعل تمرينك خفيفاً واحمِ نومك.</string>
+    <string name="report_advice_sleep_title">النوم هو الأولوية</string>
+    <string name="report_advice_sleep_body">قلّ نومك في المتوسط ⁨%1$s⁩ عن حاجتك. قدّم موعد نومك قبل أن تزيد التمرين.</string>
+    <string name="report_advice_build_title">أسبوع مناسب للتقدّم</string>
+    <string name="report_advice_build_body">استشفاؤك جيد وحملك فيه متسع. يمكنك رفعه حتى 10%%.</string>
+    <string name="report_advice_hold_title">حافظ على إيقاعك</string>
+    <string name="report_advice_hold_body">أسبوع مستقر. استمر بالإيقاع نفسه وراقب استشفاءك.</string>
+    <string name="report_readiness">الاستشفاء</string>
+    <string name="report_sleep_score">النوم</string>
+    <string name="report_steps">خطوات يومياً</string>
+    <string name="report_asleep">النوم في الليلة</string>
+    <string name="report_min">د</string>
+    <string name="report_rhr">نبض الراحة</string>
+    <string name="report_hrv">HRV</string>
+    <string name="report_load">الحمل اليومي</string>
+    <string name="report_best">أفضل يوم</string>
+    <string name="report_worst">أصعب يوم</string>
+    <string name="report_day_score">⁨%1$s⁩، الاستشفاء ⁨%2$d⁩</string>
+    <string name="report_foot">المتوسطات على الأيام التي لبست فيها الستراب، مقارنةً بالأيام السبعة التي قبلها. الخطوات هي عدّ الستراب نفسه.</string>
+    <string name="report_share_button">شارك التقرير</string>
+    <string name="report_share_title">شارك أسبوعك</string>
+    <string name="report_share">OpenStrap، من ⁨%1$s⁩ إلى ⁨%2$s⁩\nالاستشفاء ⁨%3$s⁩، النوم ⁨%4$s⁩، ⁨%5$s⁩ خطوة يومياً\n%6$s: %7$s</string>
+</resources>

@@ -207,4 +207,6 @@
         <item quantity="other"><xliff:g id="count" example="250">%1$d</xliff:g> lines</item>
     </plurals>
     <string name="you_diagnostics_empty">No events yet.</string>
+    <string name="you_row_weekly_report">Weekly report</string>
+    <string name="you_weekly_report_line">The last 7 days against the 7 before</string>
 </resources>
