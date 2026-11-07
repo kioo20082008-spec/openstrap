@@ -181,9 +181,9 @@ Each minute gets a state, following Firstbeat's stress/recovery method (*Stress 
 |---|---|---|
 | Sleep | inside a sleep stage | `SLEEP_K`·w(stage)·relax·hrvFactor·(100 − C). Stage weights: deep 1.0, light 0.8, REM 0.65, awake-in-bed 0.1. relax = 1.2 − 0.04·(HR − night resting), limited to 0.5–1.2. hrvFactor comes from that sleep's own HRV contributor, as its morning's Readiness scored it (0.6–1.1, `sleepHrvScore`). |
 | Not worn | no heart rate, not asleep, and the strap reported itself off-body, or marked off-wrist, or a gap ≥ `NO_WEAR_GAP_MINUTES` = 10 | Zepp's drift, or no value (below) |
-| Exercise | HRR ≥ 0.30 and moving, in a sustained run (below) or in the stress exclusion | −`BASE_DRAIN` − 0.32·TRIMP(HRR). Also builds an EPOC-like debt. |
+| Exercise | HRR ≥ 0.30 and moving, in a sustained run (below) or in the stress exclusion | −`exerciseDrain`(HRR, charge) = `BASE_DRAIN` + 0.85·HRR·(0.4 + 0.6·charge÷100). Also builds an EPOC-like debt. |
 | Exercise recovery | debt > 5 and HR not rising | −`BASE_DRAIN` only, even if the strap reports high stress |
-| Activity | HRR ≥ 0.20 and moving (or in the stress exclusion), or ≥ 60 steps/min | −`BASE_DRAIN` − 0.32·TRIMP(HRR) |
+| Activity | HRR ≥ 0.20 and moving (or in the stress exclusion), or ≥ 60 steps/min | −`exerciseDrain`(HRR, charge) = `BASE_DRAIN` + 0.85·HRR·(0.4 + 0.6·charge÷100) |
 | Around a workout | in the stress exclusion (below) and none of the above | Activity inside the workout's active time, Exercise recovery in the 20 min after; Rest in either when HRR < `WORKOUT_REST_HRR` = 0.10 |
 | Stress | strap stress ≥ your threshold *T* (below) for ≥ `STRESS_GATE_MINUTES` = 3 consecutive minutes | −`BASE_DRAIN` − 0.007·(stress − *T*) |
 | Relax | stress < 25, still, HRR < 0.20 | + `RELAX_K`·(100 − C), `RELAX_K` = 0.00015, no drain |
@@ -242,7 +242,7 @@ Zepp does the same job differently. It computes a stress threshold on the phone 
 * 30 minutes at HRR 0.5 with no steps is Exercise throughout; 5 (or 9) such minutes aren't.
 * 8 calm, still hours from 85 end between 85 and 87.
 * A night with the strap off (11 h, over the usual sleep) is a gap, not a sleepless night: the next day restarts from the median wake value, is flagged, and stays above 45, where treating the night as awake leaves it 15+ lower. Two hours off the wrist drift by 120 × −0.0482; a 5-minute dropout holds; 7 hours off in the day are a gap after 384 minutes until the next sleep.
-* A recorded workout without steps drains exactly as before: `BASE_DRAIN` + 0.32·TRIMP a minute, then `BASE_DRAIN` in the 20 minutes after.
+* A recorded workout without steps drains exactly as before: `exerciseDrain` a minute, then `BASE_DRAIN` in the 20 minutes after.
 * An Alert night recharges clearly less (30 → about 79 rather than 94 over 7.5 h of light sleep), the day after drains 1.3–1.5× as much, an Alert ends at the next sleep, and Watch changes nothing.
 * An hour at 60% of reserve drains 20–32.
 * A post-workout cool-down never counts as stress.

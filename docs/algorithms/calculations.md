@@ -300,9 +300,9 @@ A body-battery: sleep fills it, and the day drains it.
 | **Sleep** | inside a sleep stage | + 0.006 × stage weight × relaxation × HRV factor × (100 − charge) |
 | **Not worn** | no heart rate, and the strap said it was off your body, or marked off-wrist, or a gap of 10+ minutes | − 0.0482 (charge ≥ 50) or − 0.0349 (below), then no value (see below) |
 | **No data** | a heart-rate gap under 10 minutes, or one not synced yet | 0, the value holds |
-| **Exercise** | HRR ≥ 30 % and moving, or 10+ minutes in a row at HRR ≥ 30 %, or in a workout's stress exclusion | − 0.04 − 0.32 × TRIMP of that minute |
+| **Exercise** | HRR ≥ 30 % and moving, or 10+ minutes in a row at HRR ≥ 30 %, or in a workout's stress exclusion | − (0.04 + 0.85 × HRR × (0.4 + 0.6 × charge ÷ 100)) |
 | **Exercise recovery** | after exercise, while HR isn't rising | − 0.04 |
-| **Activity** | HRR ≥ 20 % and moving (or in a workout's stress exclusion), or ≥ 60 steps that minute | − 0.04 − 0.32 × TRIMP of that minute |
+| **Activity** | HRR ≥ 20 % and moving (or in a workout's stress exclusion), or ≥ 60 steps that minute | − (0.04 + 0.85 × HRR × (0.4 + 0.6 × charge ÷ 100)) |
 | **Around a workout** | in the stress exclusion (below) | Activity inside the workout, Exercise recovery in the 20 minutes after; Rest in either when HRR < 10 % |
 | **Stress** | stress ≥ your threshold for 3+ minutes in a row, awake | − 0.04 − 0.007 × (stress − threshold) |
 | **Relax** | stress < 25, < 10 steps and HRR < 20 % | + 0.00015 × (100 − charge), no drain (85 → 86 over 8 hours) |
@@ -321,6 +321,9 @@ Energy is always kept within 0–100.
 * **Relaxation:** 1.2 − 0.04 × (HR − that night's resting HR), kept between 0.5 and 1.2. A calmer heart recharges better.
 * **HRV factor:** 0.75 + 0.25 × (the sleep's HRV contributor ÷ 80), kept between 0.6 and 1.1. Each sleep uses its own night's contributor, so an earlier night in the replay isn't scored by tonight's HRV.
 * Recharge is a share of the room left, so it slows as you fill up. About 30 → 92 over 7.5 hours of normal sleep.
+
+**Exercise drain.** Linear in heart-rate reserve (energy spent), not the exponential Banister weighting: an hour at 60 % of reserve costs about 25 points, a 73-minute match at 80 % about 40. It eases as the tank empties (× 0.4 at 0 charge, × 1 at 100). Why: Banister's weights were fitted to training load, and HR-based load methods correlate with oxygen uptake only at r = 0.65–0.90 (Scott 2013); cardiac recovery after exercise depends on intensity more than duration (Stanley 2013).
+**Next-night carry-over.** Exercise drain adds to a carry-over that halves every 24 h; at 40 points of it, sleep recharges 15 % less (parasympathetic recovery takes 24–48 h after hard sessions). The constants are calibration choices, not published figures.
 
 **Exercise recovery details**
 * An "after-burn" tally adds up exercise TRIMP and halves about every 20 minutes once exercise stops (× 0.966 per minute).

@@ -602,8 +602,27 @@ object Recovery {
      */
     const val SUSTAINED_EFFORT_MINUTES = 10
 
-    /** Charge drained per TRIMP unit of exercise (≈25 for an hour at 60% of reserve). */
-    const val EXERCISE_DRAIN_PER_TRIMP = 0.32f
+    /**
+     * Charge drained per minute per unit of heart-rate reserve (0..1) while exercising, on top of [BASE_DRAIN]. Linear
+     * in reserve, as energy spent is (heart rate reserve tracks oxygen uptake reserve), not the exponential Banister
+     * TRIMP weighting, which was fitted to training load and put a hard match at about −60. Calibrated so an hour at
+     * 60 % of reserve still costs about 25 and a 73-minute match at 80 % about 40.
+     */
+    const val EXERCISE_DRAIN_PER_HRR = 0.85f
+    /** The exercise drain eases as the tank empties (a finite store): × this at 0 charge, × 1 at 100. */
+    const val EXERCISE_DRAIN_FLOOR = 0.4f
+    /** Exercise drain per minute at reserve [hrr] with [charge] in the tank. */
+    fun exerciseDrain(hrr: Float, charge: Float): Float =
+        BASE_DRAIN + EXERCISE_DRAIN_PER_HRR * hrr.coerceAtLeast(0f) *
+            (EXERCISE_DRAIN_FLOOR + (1f - EXERCISE_DRAIN_FLOOR) * charge / 100f)
+    /**
+     * Hard exercise leaves the next night less restful: parasympathetic recovery takes 24 to 48 h after threshold or
+     * harder sessions (Stanley 2013). Exercise drain adds to a carry-over that halves each 24 h; at
+     * [CARRY_FULL] points of it, sleep recharges [CARRY_MAX] less.
+     */
+    const val CARRY_FULL = 40f
+    const val CARRY_MAX = 0.15f
+    const val CARRY_DECAY = 0.99952f
     /** Extra drain per stress point above the threshold, per minute (80 over 60 drains 0.14/min). */
     const val STRESS_DRAIN = 0.007f
     /**

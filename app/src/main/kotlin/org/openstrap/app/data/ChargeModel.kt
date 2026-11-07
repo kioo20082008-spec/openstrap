@@ -100,6 +100,7 @@ fun Recovery.charge(
 ): ChargeDay {
     var c = start
     var epoc = 0f
+    var carry = 0f
     var lastHr: Int? = null
     val points = mutableListOf<ChargePoint>()
     var recharged = 0f
@@ -208,7 +209,8 @@ fun Recovery.charge(
                 anchored = true
                 state = State.Sleep
                 val relax = hr?.let { (1.2f - 0.04f * (it - nightRest)).coerceIn(0.5f, 1.2f) } ?: 1f
-                delta = SLEEP_K * (STAGE_WEIGHT[m.sleepStage] ?: 0.8f) * relax * hrvFactor * (100 - c)
+                delta = SLEEP_K * (STAGE_WEIGHT[m.sleepStage] ?: 0.8f) * relax * hrvFactor * (100 - c) *
+                    (1f - CARRY_MAX * (carry / CARRY_FULL).coerceAtMost(1f))
             }
 
             // A short heart-rate dropout (under [NO_WEAR_GAP_MINUTES], or not yet synced): the value holds.
@@ -219,9 +221,8 @@ fun Recovery.charge(
 
             x >= EXERCISE_HRR && effort -> {
                 state = State.Exercise
-                val t = trimpMinute(x, params.female)
-                epoc += t
-                delta = -BASE_DRAIN - EXERCISE_DRAIN_PER_TRIMP * t
+                epoc += trimpMinute(x, params.female)
+                delta = -exerciseDrain(x, c)
             }
 
             // After exercise the heart rate stays up while the body recovers; that isn't stress.
@@ -232,14 +233,14 @@ fun Recovery.charge(
 
             (x >= ACTIVITY_HRR && effort) || m.steps >= ACTIVE_STEPS -> {
                 state = State.Activity
-                delta = -BASE_DRAIN - EXERCISE_DRAIN_PER_TRIMP * trimpMinute(x, params.female)
+                delta = -exerciseDrain(x, c)
             }
 
             // Inside the stress exclusion ([stressExcluded]) the strap's stress score is ignored, so a minute that
             // reaches here is never Stress or Relax. See [WORKOUT_REST_HRR] for the state it takes instead.
             m.workout == WorkoutPhase.Active && x >= WORKOUT_REST_HRR -> {
                 state = State.Activity
-                delta = -BASE_DRAIN - EXERCISE_DRAIN_PER_TRIMP * trimpMinute(x, params.female)
+                delta = -exerciseDrain(x, c)
             }
 
             m.workout == WorkoutPhase.After && x >= WORKOUT_REST_HRR -> {
@@ -273,6 +274,7 @@ fun Recovery.charge(
         if (signal == BodySignals.State.Alert) delta *= if (delta > 0) ALERT_RECHARGE else ALERT_DRAIN
         // EPOC-like debt decays with a half-life of about 20 minutes once exercise stops.
         if (state != State.Exercise) epoc *= EPOC_DECAY
+        carry *= CARRY_DECAY
         if (hr != null) lastHr = hr
 
         val before = c
@@ -284,6 +286,7 @@ fun Recovery.charge(
             } else {
                 when (state) {
                     State.Exercise, State.Activity -> {
+                        carry += -applied * (1 - baseShare)
                         exercise += -applied * (1 - baseShare)
                         living += -applied * baseShare
                     }

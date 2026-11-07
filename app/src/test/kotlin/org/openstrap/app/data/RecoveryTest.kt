@@ -386,7 +386,9 @@ class RecoveryTest {
         val active = run(30) { Minute(it * 60L, hr, 0, null, null, Recovery.WorkoutPhase.Active) }
         val after = run(20) { Minute((30 + it) * 60L, 78, 0, null, null, Recovery.WorkoutPhase.After) }
         val r = Recovery.charge(active + after, params, 0L..3_000L, start = 80f, requireAnchor = false)
-        val expected = 80f - 30 * (Recovery.BASE_DRAIN + Recovery.EXERCISE_DRAIN_PER_TRIMP * Recovery.trimpMinute(x)) - 20 * Recovery.BASE_DRAIN
+        var expected = 80f
+        repeat(30) { expected -= Recovery.exerciseDrain(x, expected) }
+        expected -= 20 * Recovery.BASE_DRAIN
         assertEquals(expected, r.latest!!, 0.01f)
         assertTrue(r.points.filter { it.t < 30 * 60L }.all { it.state == State.Exercise })
     }
