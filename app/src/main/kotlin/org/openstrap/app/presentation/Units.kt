@@ -69,7 +69,7 @@ object Units {
      * when [fromSteps]. Null under [SHOWN_FROM_METERS].
      */
     fun distance(
-        meters: Float, precision: Precision, fromSteps: Boolean = false, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()),
+        meters: Float, precision: Precision, fromSteps: Boolean = false, locale: Locale = Locale.getDefault(),
         strings: Strings = Strings.app,
     ): String? {
         if (meters < SHOWN_FROM_METERS) return null
@@ -82,23 +82,23 @@ object Units {
     }
 
     /** [meters] as a number of km alone, for a figure with its unit drawn apart: "5.21". */
-    fun km(meters: Float, precision: Precision, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun km(meters: Float, precision: Precision, locale: Locale = Locale.getDefault()): String =
         String.format(locale, "%.${precision.decimals}f", meters / METERS_PER_KM)
 
     /** Whole metres, cut rather than rounded so 999.6 m never reads as a kilometre's 1000. */
     private fun metres(meters: Float, locale: Locale): String = String.format(locale, "%d", meters.toInt())
 
     /** A count with the language's grouping: "23,410" steps, "23.410" in German. */
-    fun count(n: Long, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String = String.format(locale, "%,d", n)
+    fun count(n: Long, locale: Locale = Locale.getDefault()): String = String.format(locale, "%,d", n)
 
     /** [count] for an Int. */
-    fun count(n: Int, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String = count(n.toLong(), locale)
+    fun count(n: Int, locale: Locale = Locale.getDefault()): String = count(n.toLong(), locale)
 
     /** [v] with [places] decimals in the phone's language, for text: "1.4", "1,4" in German. */
-    fun decimal(v: Number, places: Int, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String = String.format(locale, "%.${places}f", v)
+    fun decimal(v: Number, places: Int, locale: Locale = Locale.getDefault()): String = String.format(locale, "%.${places}f", v)
 
     /** A length of time: "40 min", "7 h", "7 h 40", "7 h 05". Under a minute is "0 min". */
-    fun duration(seconds: Long, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app): String {
+    fun duration(seconds: Long, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String {
         val minutes = seconds.coerceAtLeast(0) / MINUTE
         val h = minutes / MINUTES_PER_HOUR
         val m = minutes % MINUTES_PER_HOUR
@@ -111,16 +111,16 @@ object Units {
     }
 
     /** A length of time with a clock's look, hours and minutes, where a design asks for it: "7:40". */
-    fun clockDuration(seconds: Long, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun clockDuration(seconds: Long, locale: Locale = Locale.getDefault()): String =
         String.format(locale, "%d:%02d", seconds / HOUR, seconds % HOUR / MINUTE)
 
     /** The workout timer: "12:34", or "1:02:03" past the hour. */
-    fun workoutClock(seconds: Long, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun workoutClock(seconds: Long, locale: Locale = Locale.getDefault()): String =
         if (seconds >= HOUR) String.format(locale, "%d:%02d:%02d", seconds / HOUR, seconds / MINUTE % MINUTES_PER_HOUR, seconds % MINUTE)
         else String.format(locale, "%d:%02d", seconds / MINUTE, seconds % MINUTE)
 
     /** A finished workout's length, or a gap between two: "45 s" under a minute, else [workoutClock]. */
-    fun secondsOrClock(seconds: Long, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app): String =
+    fun secondsOrClock(seconds: Long, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String =
         if (seconds < MINUTE) {
             strings.format(R.string.core_unit_seconds, String.format(locale, "%d", seconds))
         } else {
@@ -130,7 +130,7 @@ object Units {
 
 /** A change against your usual, with its sign: "+3", "−3", or "±0" when it rounds to nothing, never "-0". */
 object Signed {
-    fun of(v: Int, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String {
+    fun of(v: Int, locale: Locale = Locale.getDefault()): String {
         val text = String.format(locale, "%d", abs(v))
         return when {
             v > 0 -> "+$text"
@@ -140,7 +140,7 @@ object Signed {
     }
 
     /** [v] to [decimals] places with its sign: "+0.4", "−3", "±0.0". */
-    fun of(v: Float, decimals: Int, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String {
+    fun of(v: Float, decimals: Int, locale: Locale = Locale.getDefault()): String {
         val text = String.format(locale, "%.${decimals}f", abs(v))
         // Decided on the rounded value, not the text, so a comma decimal mark can't make "0,0" read as a change.
         val rounded = (abs(v) * TEN.pow(decimals)).roundToLong()
@@ -167,14 +167,14 @@ object Pace {
         meters?.takeIf { it >= FROM_METERS }?.let { seconds / (it / Units.METERS_PER_KM.toDouble()) }
 
     /** A pace as a clock alone, "5:24", for a figure with its unit drawn apart. Null with none or slower than [SLOWEST_S]. */
-    fun clock(secondsPerKm: Double?, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String? {
+    fun clock(secondsPerKm: Double?, locale: Locale = Locale.getDefault()): String? {
         if (secondsPerKm == null || secondsPerKm <= 0.0 || secondsPerKm > SLOWEST_S) return null
         val s = Math.round(secondsPerKm)
         return String.format(locale, "%d:%02d", s / Units.MINUTE, s % Units.MINUTE)
     }
 
     /** A pace with its unit, "5:24 /km", null as for [clock]. */
-    fun text(secondsPerKm: Double?, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault()), strings: Strings = Strings.app): String? =
+    fun text(secondsPerKm: Double?, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String? =
         clock(secondsPerKm, locale)?.let { strings.format(R.string.core_unit_pace, it) }
 }
 
@@ -183,15 +183,15 @@ object TimeOfDay {
     private const val MINUTES_PER_DAY = 1440
 
     /** [epoch] as a time of day: "22:30", or "10:30 PM" on a 12 hour phone. [use24Hour] is the phone's setting ([ClockSetting]). */
-    fun format(epoch: Long, zone: ZoneId, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun format(epoch: Long, zone: ZoneId, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = Locale.getDefault()): String =
         Instant.ofEpochSecond(epoch).atZone(zone).format(formatter(use24Hour, locale))
 
     /** A wall clock time with no date. */
-    fun format(time: LocalTime, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun format(time: LocalTime, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = Locale.getDefault()): String =
         time.format(formatter(use24Hour, locale))
 
     /** Minutes since midnight, wrapping past either end of the day: 1470 is "00:30". */
-    fun minutes(minutes: Int, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = org.openstrap.app.i18n.LatinDigits.latin(Locale.getDefault())): String =
+    fun minutes(minutes: Int, use24Hour: Boolean = ClockSetting.use24Hour, locale: Locale = Locale.getDefault()): String =
         format(LocalTime.ofSecondOfDay(Math.floorMod(minutes, MINUTES_PER_DAY) * Units.MINUTE), use24Hour, locale)
 
     private fun formatter(use24Hour: Boolean, locale: Locale) = Formatters.of(if (use24Hour) "HH:mm" else "h:mm a", locale)
@@ -220,8 +220,5 @@ internal object Formatters {
     private val cache = ConcurrentHashMap<Pair<String, Locale>, DateTimeFormatter>()
 
     fun of(pattern: String, locale: Locale): DateTimeFormatter =
-        cache.getOrPut(pattern to locale) {
-            val latin = org.openstrap.app.i18n.LatinDigits.latin(locale)
-            DateTimeFormatter.ofPattern(pattern, latin).withDecimalStyle(DecimalStyle.of(latin))
-        }
+        cache.getOrPut(pattern to locale) { DateTimeFormatter.ofPattern(pattern, locale).withDecimalStyle(DecimalStyle.of(locale)) }
 }
