@@ -44,8 +44,8 @@ class JournalUi(
     val tags: Map<LocalDate, Set<Journal.Tag>>,
     val insights: Insights.Result,
     val toggle: (LocalDate, Journal.Tag) -> Unit,
-    val checkIns: Map<LocalDate, org.openstrap.app.data.CheckIn.Entry> = emptyMap(),
-    val checkIn: (LocalDate, org.openstrap.app.data.CheckIn.Entry) -> Unit = { _, _ -> },
+    val checkIns: Map<LocalDate, org.openstrap.app.data.MorningFeel.Entry> = emptyMap(),
+    val checkIn: (LocalDate, org.openstrap.app.data.MorningFeel.Entry) -> Unit = { _, _ -> },
 )
 
 val LocalJournal = compositionLocalOf<JournalUi?> { null }

@@ -9,7 +9,7 @@ import kotlin.math.sqrt
  * at wake and the Recovery score shown that morning, and [fit] says how well they follow how you felt. Stored as one line
  * of text (`2026-11-07=4,82,76;2026-11-06=2,,`), the last [KEEP_DAYS] days.
  */
-object CheckIn {
+object MorningFeel {
     /** [rating] 1 (wrecked) to 5 (fresh); [energy] and [readiness] as shown that morning, when there was one. */
     data class Entry(val rating: Int, val energy: Int?, val readiness: Int?)
 

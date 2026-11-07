@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.R
-import org.openstrap.app.data.CheckIn
+import org.openstrap.app.data.MorningFeel
 import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.ui.theme.AppPalette
 import java.time.Instant
@@ -37,8 +37,8 @@ private const val MIDDLE_R = 0.3f
 
 /**
  * "How rested do you feel?", 1 to 5, asked in the morning before the numbers are looked at. Each answer is kept with
- * the Energy and Recovery shown that morning, so after [CheckIn.MIN_DAYS] answers the card can say how well they follow
- * how you actually felt ([CheckIn.fit]): the only way to know the computed readings are right for you.
+ * the Energy and Recovery shown that morning, so after [MorningFeel.MIN_DAYS] answers the card can say how well they follow
+ * how you actually felt ([MorningFeel.fit]): the only way to know the computed readings are right for you.
  */
 // The card reads the clock it is given, not its own.
 @Composable
@@ -48,7 +48,7 @@ internal fun CheckInCard(now: Long, zone: ZoneId, isToday: Boolean, energyAtWake
     if (!isToday || time.hour !in MORNING_FROM_HOUR until MORNING_UNTIL_HOUR) return
     val day = time.toLocalDate()
     val mine = journal.checkIns[day]
-    val fit = CheckIn.fit(journal.checkIns)
+    val fit = MorningFeel.fit(journal.checkIns)
     val shape = RoundedCornerShape(26.dp)
     Column(
         Modifier.fillMaxWidth().padding(top = 14.dp).clip(shape).background(AppColors.glass).border(1.dp, AppColors.hairline, shape)
@@ -59,13 +59,13 @@ internal fun CheckInCard(now: Long, zone: ZoneId, isToday: Boolean, energyAtWake
         Text(stringResource(R.string.checkin_hint), color = AppColors.muted, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(12.dp))
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            for (rating in CheckIn.MIN_RATING..CheckIn.MAX_RATING) {
+            for (rating in MorningFeel.MIN_RATING..MorningFeel.MAX_RATING) {
                 val on = mine?.rating == rating
                 Box(
                     Modifier.weight(1f).height(48.dp).clip(CircleShape)
                         .background((if (on) AppPalette.Coral else AppColors.ink).copy(alpha = if (on) 0.16f else 0.06f))
                         .border(1.dp, if (on) AppPalette.Coral.copy(alpha = 0.6f) else AppColors.hairline, CircleShape)
-                        .clickable { journal.checkIn(day, CheckIn.Entry(rating, energyAtWake, readiness)) },
+                        .clickable { journal.checkIn(day, MorningFeel.Entry(rating, energyAtWake, readiness)) },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -84,7 +84,7 @@ internal fun CheckInCard(now: Long, zone: ZoneId, isToday: Boolean, energyAtWake
         val energyR = fit.energyR
         if (energyR == null) {
             Text(
-                stringResource(R.string.checkin_learning, fit.days, CheckIn.MIN_DAYS),
+                stringResource(R.string.checkin_learning, fit.days, MorningFeel.MIN_DAYS),
                 color = AppColors.muted, style = MaterialTheme.typography.bodySmall,
             )
         } else {

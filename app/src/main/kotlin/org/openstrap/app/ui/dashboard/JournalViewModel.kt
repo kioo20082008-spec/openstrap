@@ -39,10 +39,10 @@ class JournalViewModel(
     val tags: StateFlow<Map<LocalDate, Set<Journal.Tag>>> = settings.journal
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), emptyMap())
 
-    val checkIns: StateFlow<Map<LocalDate, org.openstrap.app.data.CheckIn.Entry>> = settings.checkIns
+    val checkIns: StateFlow<Map<LocalDate, org.openstrap.app.data.MorningFeel.Entry>> = settings.checkIns
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), emptyMap())
 
-    fun checkIn(day: LocalDate, entry: org.openstrap.app.data.CheckIn.Entry) {
+    fun checkIn(day: LocalDate, entry: org.openstrap.app.data.MorningFeel.Entry) {
         viewModelScope.launch { settings.setCheckIn(day, entry, LocalDate.now()) }
     }
 

@@ -400,12 +400,12 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
     private val checkInKey = stringPreferencesKey(SettingsKeys.CHECK_INS)
 
     /** The morning check-in: how rested you felt on each day, with the Energy and Recovery shown then. */
-    val checkIns: Flow<Map<LocalDate, org.openstrap.app.data.CheckIn.Entry>> = read { org.openstrap.app.data.CheckIn.decode(it[checkInKey]) }
+    val checkIns: Flow<Map<LocalDate, org.openstrap.app.data.MorningFeel.Entry>> = read { org.openstrap.app.data.MorningFeel.decode(it[checkInKey]) }
 
-    suspend fun setCheckIn(day: LocalDate, entry: org.openstrap.app.data.CheckIn.Entry, today: LocalDate) {
+    suspend fun setCheckIn(day: LocalDate, entry: org.openstrap.app.data.MorningFeel.Entry, today: LocalDate) {
         store.edit { prefs ->
-            val next = org.openstrap.app.data.CheckIn.with(org.openstrap.app.data.CheckIn.decode(prefs[checkInKey]), day, entry, today)
-            prefs[checkInKey] = org.openstrap.app.data.CheckIn.encode(next)
+            val next = org.openstrap.app.data.MorningFeel.with(org.openstrap.app.data.MorningFeel.decode(prefs[checkInKey]), day, entry, today)
+            prefs[checkInKey] = org.openstrap.app.data.MorningFeel.encode(next)
         }
     }
 
