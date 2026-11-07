@@ -397,6 +397,18 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         }
     }
 
+    private val checkInKey = stringPreferencesKey(SettingsKeys.CHECK_INS)
+
+    /** The morning check-in: how rested you felt on each day, with the Energy and Recovery shown then. */
+    val checkIns: Flow<Map<LocalDate, org.openstrap.app.data.CheckIn.Entry>> = read { org.openstrap.app.data.CheckIn.decode(it[checkInKey]) }
+
+    suspend fun setCheckIn(day: LocalDate, entry: org.openstrap.app.data.CheckIn.Entry, today: LocalDate) {
+        store.edit { prefs ->
+            val next = org.openstrap.app.data.CheckIn.with(org.openstrap.app.data.CheckIn.decode(prefs[checkInKey]), day, entry, today)
+            prefs[checkInKey] = org.openstrap.app.data.CheckIn.encode(next)
+        }
+    }
+
     private val todayHidden = stringPreferencesKey(SettingsKeys.TODAY_HIDDEN)
     private val todayPinned = stringPreferencesKey(SettingsKeys.TODAY_PINNED)
 
@@ -841,6 +853,7 @@ object SettingsKeys {
     const val GOAL_CALORIES = "goal_calories"
     const val GOAL_WORKOUTS_WEEK = "goal_workouts_week"
     const val JOURNAL = "journal_tags"
+    const val CHECK_INS = "morning_checkins"
     const val TODAY_HIDDEN = "today_hidden"
     const val TODAY_PINNED = "today_pinned"
     const val CELEBRATE_GOAL = "celebrate_goal"

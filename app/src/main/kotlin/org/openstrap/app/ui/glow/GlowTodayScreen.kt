@@ -526,6 +526,7 @@ private fun DialsToday(
             charge = ctx.charge, napToday = ctx.state.naps.isNotEmpty(),
         ),
     )
+    CheckInCard(ctx.now, ctx.zone, ctx.isToday, ctx.rec?.charge?.takeIf { it.anchored }?.atWake?.toInt(), ctx.score)
     CoachCard(tips, live = ctx.live != null, onWorkout = onOtherSport)
     JournalCard(ctx.now, ctx.zone, ctx.isToday)
     }

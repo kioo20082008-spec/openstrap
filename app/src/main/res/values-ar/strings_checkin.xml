@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="checkin_title">كيف ترتاح هالصبح؟</string>
+    <string name="checkin_hint">جاوب قبل ما تشوف الأرقام. بهذي الطريقة نقارنها بإحساسك.</string>
+    <string name="checkin_low">منهك</string>
+    <string name="checkin_high">نشيط</string>
+    <string name="checkin_learning">\u2068%1$d\u2069 من \u2068%2$d\u2069 صباح. بعدها نقارن طاقتك بإحساسك.</string>
+    <string name="checkin_fit">طاقتك عند الاستيقاظ تتبع إحساسك: %1$s (\u2068%2$d\u2069 صباح).</string>
+    <string name="checkin_fit_strong">بقوة</string>
+    <string name="checkin_fit_middle">بشكل متوسط</string>
+    <string name="checkin_fit_weak">بضعف، فالحساب ما يناسبك بعد</string>
+</resources>
