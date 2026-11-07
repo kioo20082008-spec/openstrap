@@ -33,4 +33,16 @@
     <string name="coach_charge_good">الآن وقت مناسب لشحنه: لا تمرين لديك، ويعود إلى يدك قبل نومك الساعة ⁨%1$s⁩.</string>
     <string name="coach_fitter_title">نبض راحتك انخفض ⁨%1$d⁩ خلال أسابيع</string>
     <string name="coach_fitter_body">لياقتك تتحسن. استمر على الإيقاع نفسه.</string>
+    <string name="coach_late_title_rough">ليلة متعبة</string>
+    <string name="coach_late_title_heavy">ليلة ثقيلة، خذ الأمر بهدوء</string>
+    <string name="coach_late_body_rough">⁨%1$s⁩. خفّف اليوم، واشرب الماء، ونم مبكراً الليلة.</string>
+    <string name="coach_late_body_heavy">⁨%1$s⁩. تجنّب التمرين الشاق اليوم، واشرب الماء، وكن في فراشك مبكراً الليلة.</string>
+    <string name="coach_late_cause_bed">نمت متأخراً ⁨%1$s⁩ عن موعدك المعتاد</string>
+    <string name="coach_late_cause_short">نقص نومك ⁨%1$s⁩ عن حاجتك</string>
+    <string name="coach_late_cause_hrv">هبط HRV بنسبة ⁨%1$d%%⁩</string>
+    <string name="coach_late_cause_heart">ارتفع نبض الراحة ⁨%1$d⁩</string>
+    <string name="coach_late_cause_skin">حرارة الجلد أعلى بمقدار ⁨%1$s⁩°</string>
+    <string name="coach_bed_heavy">لتستيقظ ⁨%1$s⁩ مع نصف ساعة إضافية لتعويض ليلة ثقيلة.</string>
+    <string name="coach_nap_title">قيلولة ⁨%1$d⁩ دقيقة تنفعك</string>
+    <string name="coach_nap_body">طاقتك الآن ⁨%1$d⁩. استلقِ قبل ⁨%2$s⁩ كي لا تؤثر في نوم الليلة، وضع منبّهاً.</string>
 </resources>

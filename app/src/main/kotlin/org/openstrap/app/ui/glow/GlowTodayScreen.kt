@@ -522,6 +522,8 @@ private fun DialsToday(
             restingHr = ctx.state.restingHeartRate, liveHr = ctx.live, recording = recording, usualBedtime = bedtime,
             wake = ctx.state.sleep?.end?.let { java.time.Instant.ofEpochSecond(it).atZone(ctx.zone).toLocalTime() },
             restingTrend = ctx.state.restingTrend.mapNotNull { it.value }, battery = battery, charging = charging,
+            bedStart = ctx.state.sleep?.start?.let { java.time.Instant.ofEpochSecond(it).atZone(ctx.zone).toLocalTime() },
+            charge = ctx.charge, napToday = ctx.state.naps.isNotEmpty(),
         ),
     )
     CoachCard(tips, live = ctx.live != null, onWorkout = onOtherSport)

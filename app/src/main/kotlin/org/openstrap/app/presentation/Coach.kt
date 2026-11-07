@@ -1,7 +1,10 @@
 package org.openstrap.app.presentation
 
 import org.openstrap.app.R
+import org.openstrap.app.data.BedtimePlan
 import org.openstrap.app.data.BodySignals
+import org.openstrap.app.data.LateNight
+import org.openstrap.app.data.NapPlan
 import org.openstrap.app.data.Recovery
 import org.openstrap.app.i18n.Strings
 import java.time.Instant
@@ -16,7 +19,7 @@ import kotlin.math.roundToInt
  * the numbers behind it. Nothing is canned: a tip exists only while its reading does, and its text carries the reading.
  */
 object Coach {
-    enum class Kind { Illness, HeartHigh, Stress, Hrv, RestingHr, LoadHigh, LoadRoom, Steps, Bedtime, Charge, Good, Fitter }
+    enum class Kind { Illness, HeartHigh, Stress, Hrv, RestingHr, LoadHigh, LoadRoom, Steps, Bedtime, Charge, Good, Fitter, LateNight, Nap }
     enum class Tone { Warn, Calm, Good }
     enum class Action { Breathe, Workout, None }
 
@@ -47,12 +50,19 @@ object Coach {
         val restingTrend: List<Float>,
         val battery: Int?,
         val charging: Boolean,
+        /** When last night's sleep began, for the late-night read. */
+        val bedStart: LocalTime? = null,
+        /** Charge now, a whole number, for the nap. */
+        val charge: Int? = null,
+        /** A nap already taken today. */
+        val napToday: Boolean = false,
     )
 
     private const val STRESS_HIGH = 60f
     private const val STRESS_WINDOW_S = 45 * 60L
     private const val HEART_ABOVE_REST = 30
     private const val STEPS_A_MINUTE = 100
+    private const val BED_TIP_MINUTES = 240
 
     fun tips(i: Input, strings: Strings = Strings.app): List<Tip> {
         if (!i.isToday) return emptyList()
@@ -90,9 +100,25 @@ object Coach {
         val asleep = (details[Recovery.Factor.Sleep] as? Recovery.Detail.Asleep)?.minutes
         val need = i.sleepNeed
         val short = if (asleep != null && need != null) need - asleep else null
+        // A heavy night: the late bed, short sleep and the body's own signals together, which replace their separate tips.
+        val night = LateNight.read(
+            i.bedStart, i.usualBedtime, asleep, need,
+            (details[Recovery.Factor.HrvBalance] as? Recovery.Detail.Hrv)?.percentVsUsual,
+            (details[Recovery.Factor.RestingHr] as? Recovery.Detail.RestingHr)?.vsUsual,
+            (details[Recovery.Factor.Temperature] as? Recovery.Detail.Temperature)?.vsUsual,
+        )
+        val heavy = night.level == LateNight.Level.Heavy
+        if (night.level != LateNight.Level.None) {
+            val causes = night.causes.joinToString(strings.get(R.string.coach_list_join)) { cause(it, strings) }
+            out += Tip(
+                Kind.LateNight, 75, Tone.Calm,
+                strings.get(if (heavy) R.string.coach_late_title_heavy else R.string.coach_late_title_rough),
+                strings.format(if (heavy) R.string.coach_late_body_heavy else R.string.coach_late_body_rough, causes),
+            )
+        }
         (details[Recovery.Factor.HrvBalance] as? Recovery.Detail.Hrv)?.let { h ->
             when {
-                h.percentVsUsual <= -10 -> out += Tip(
+                h.percentVsUsual <= -10 && night.level == LateNight.Level.None -> out += Tip(
                     Kind.Hrv, 70, Tone.Calm, strings.format(R.string.coach_hrv_low_title, h.ms, -h.percentVsUsual),
                     if (short != null && short >= 45) strings.format(R.string.coach_hrv_low_sleep, Units.duration(asleep!! * 60L), Units.duration(short * 60L))
                     else strings.get(R.string.coach_hrv_low_body),
@@ -103,7 +129,7 @@ object Coach {
                 else -> Unit
             }
         }
-        (details[Recovery.Factor.RestingHr] as? Recovery.Detail.RestingHr)?.takeIf { it.vsUsual >= 4f }?.let { h ->
+        (details[Recovery.Factor.RestingHr] as? Recovery.Detail.RestingHr)?.takeIf { it.vsUsual >= 4f && night.level == LateNight.Level.None }?.let { h ->
             out += Tip(Kind.RestingHr, 65, Tone.Calm, strings.format(R.string.coach_rhr_title, h.bpm, h.vsUsual.roundToInt()), strings.get(R.string.coach_rhr_body))
         }
         // Load: the last week against your fitness (fatigue against the 42-day base).
@@ -132,12 +158,21 @@ object Coach {
         val debt = (details[Recovery.Factor.SleepBalance] as? Recovery.Detail.SleepDebt)?.minutes ?: 0
         val wake = i.wake
         if (need != null && wake != null) {
-            val bed = wake.minusMinutes((need + debt.coerceAtMost(60)).toLong())
+            val bed = BedtimePlan.bedtime(wake, need, debt, heavy)
             val until = minutesUntil(time, bed)
-            if (until in 0..180) out += Tip(
+            if (until in 0..BED_TIP_MINUTES) out += Tip(
                 Kind.Bedtime, 55, Tone.Calm, strings.format(R.string.coach_bed_title, clock(bed)),
-                if (debt >= 20) strings.format(R.string.coach_bed_debt, clock(wake), Units.duration(debt.coerceAtMost(60) * 60L))
+                if (heavy) strings.format(R.string.coach_bed_heavy, clock(wake))
+                else if (debt >= 20) strings.format(R.string.coach_bed_debt, clock(wake), Units.duration(debt.coerceAtMost(60) * 60L))
                 else strings.format(R.string.coach_bed_body, clock(wake)),
+            )
+        }
+        // A short nap, only when Charge is low in the early afternoon and it won't cost tonight's sleep.
+        val napBed = if (need != null && wake != null) BedtimePlan.bedtime(wake, need, debt, heavy) else i.usualBedtime
+        NapPlan.suggest(time, i.charge, debt, short ?: 0, heavy, i.napToday, i.recording, napBed)?.let { plan ->
+            out += Tip(
+                Kind.Nap, 52, Tone.Calm, strings.format(R.string.coach_nap_title, plan.minutes),
+                strings.format(R.string.coach_nap_body, i.charge ?: 0, clock(plan.latestStart)),
             )
         }
         // The strap's battery: the time to charge is now, while you're up and before the night it must record.
@@ -163,6 +198,14 @@ object Coach {
             if (drop >= 2) out += Tip(Kind.Fitter, 30, Tone.Good, strings.format(R.string.coach_fitter_title, drop), strings.get(R.string.coach_fitter_body))
         }
         return out.sortedByDescending { it.priority }
+    }
+
+    private fun cause(c: LateNight.Cause, strings: Strings): String = when (c.reason) {
+        LateNight.Reason.LateBed -> strings.format(R.string.coach_late_cause_bed, Units.duration(c.value * 60L))
+        LateNight.Reason.ShortSleep -> strings.format(R.string.coach_late_cause_short, Units.duration(c.value * 60L))
+        LateNight.Reason.HrvDown -> strings.format(R.string.coach_late_cause_hrv, c.value)
+        LateNight.Reason.HeartUp -> strings.format(R.string.coach_late_cause_heart, c.value)
+        LateNight.Reason.SkinWarm -> strings.format(R.string.coach_late_cause_skin, "${c.value / 10}.${c.value % 10}")
     }
 
     private fun minutesUntil(now: LocalTime, at: LocalTime): Int {

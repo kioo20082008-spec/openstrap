@@ -33,4 +33,16 @@
     <string name="coach_charge_good">Now is a good time to charge: you\'re not working out, and it\'s back on before bed at %1$s.</string>
     <string name="coach_fitter_title">Resting heart rate down %1$d in weeks</string>
     <string name="coach_fitter_body">Your fitness is improving. Keep the same rhythm.</string>
+    <string name="coach_late_title_rough">A rough night</string>
+    <string name="coach_late_title_heavy">A heavy night, take it easy</string>
+    <string name="coach_late_body_rough">%1$s. Keep today light, drink water and sleep early tonight.</string>
+    <string name="coach_late_body_heavy">%1$s. Skip hard training today, drink water, and be in bed early tonight.</string>
+    <string name="coach_late_cause_bed">you fell asleep %1$s later than usual</string>
+    <string name="coach_late_cause_short">%1$s short of your need</string>
+    <string name="coach_late_cause_hrv">HRV down %1$d%%</string>
+    <string name="coach_late_cause_heart">resting heart rate up %1$d</string>
+    <string name="coach_late_cause_skin">skin %1$s° warmer</string>
+    <string name="coach_bed_heavy">To wake at %1$s, with half an hour extra to make up for a heavy night.</string>
+    <string name="coach_nap_title">A %1$d-minute nap would help</string>
+    <string name="coach_nap_body">Charge is %1$d now. Lie down before %2$s so it doesn\'t cost you tonight\'s sleep, and set an alarm.</string>
 </resources>
