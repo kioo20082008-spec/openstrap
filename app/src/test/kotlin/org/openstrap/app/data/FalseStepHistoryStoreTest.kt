@@ -26,7 +26,8 @@ import java.time.ZoneId
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [35])
 class FalseStepHistoryStoreTest {
-    private val zone = ZoneId.of("Asia/Kathmandu")
+    // UTC: the history queries group by SQLite's own 'localtime', which on a test machine is UTC whatever the JVM zone is.
+    private val zone = ZoneId.of("UTC")
 
     @get:Rule val zoneRule = ZoneRule(zone)
 
