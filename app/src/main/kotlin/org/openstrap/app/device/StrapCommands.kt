@@ -29,6 +29,8 @@ internal class StrapCommands(
     private val link: LiveLink,
     private val firmwareUpdating: StateFlow<Boolean>,
     private val log: (String) -> Unit,
+    /** Returns when no history download is running (the strap is slow to answer during one). */
+    private val awaitSyncIdle: suspend () -> Unit = {},
 ) {
     /** Sends a settings-style command and returns the reply whose first byte is the command + 1 (or that [matches]). */
     // Each throw is a reason the user is shown.
@@ -41,9 +43,14 @@ internal class StrapCommands(
     ): ByteArray {
         val s = link.activeSession ?: throw StrapCommandException(R.string.system_command_not_connected)
         if (firmwareUpdating.value) throw StrapCommandException(R.string.system_command_firmware_updating)
-        val reply = catching {
-            s.request(endpoint, request, timeoutMs, matches = matches)
-        }.getOrElse { throw StrapCommandException(R.string.system_command_no_answer) }
+        awaitSyncIdle()
+        // One more try: a strap busy with a notification or a sync that began a moment ago can miss the first.
+        val reply = catching { s.request(endpoint, request, timeoutMs, matches = matches) }
+            .recoverCatching {
+                awaitSyncIdle()
+                s.request(endpoint, request, timeoutMs, matches = matches)
+            }
+            .getOrElse { throw StrapCommandException(R.string.system_command_no_answer) }
         log("cmd %04x > %s < %s".format(Locale.ROOT, endpoint, request.toHex(), reply.toHex()))
         return reply
     }

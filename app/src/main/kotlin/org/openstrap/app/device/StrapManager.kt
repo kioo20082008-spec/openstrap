@@ -96,7 +96,7 @@ class StrapManager(
             }
         },
     )
-    private val commands: StrapCommands = StrapCommands(connections, firmwareUpdating, ::log)
+    private val commands: StrapCommands = StrapCommands(connections, firmwareUpdating, ::log) { syncs.awaitIdle() }
     private val buzzer: BuzzCoordinator = BuzzCoordinator(scope, connections, firmwareUpdating, commands, ::log)
     private val syncs: SyncCoordinator = SyncCoordinator(
         context, scope, settings, dao, connections, firmwareUpdating,

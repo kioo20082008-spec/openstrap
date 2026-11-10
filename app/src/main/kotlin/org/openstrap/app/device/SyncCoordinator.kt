@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 import org.openstrap.app.data.catching
 import org.openstrap.app.data.db.HealthDao
@@ -100,6 +101,15 @@ internal class SyncCoordinator(
 
     /** A sync holds the lock, so a firmware install mustn't start. */
     val isSyncing: Boolean get() = syncLock.isLocked
+
+    /**
+     * Returns when no history download is running, or after [maxMs]. The strap answers a command slowly (or not at all)
+     * while it streams history, and the app now syncs every few minutes while open, so a command waits its turn.
+     */
+    suspend fun awaitIdle(maxMs: Long = AWAIT_IDLE_MS) {
+        if (!syncLock.isLocked) return
+        kotlinx.coroutines.withTimeoutOrNull(maxMs) { syncLock.withLock { } }
+    }
 
     private fun takePending(): Set<Int> = synchronized(pendingTypes) { pendingTypes.toSet().also { pendingTypes.clear() } }
     private fun hasPending(): Boolean = pendingFull.get() || synchronized(pendingTypes) { pendingTypes.isNotEmpty() }
@@ -215,6 +225,7 @@ internal class SyncCoordinator(
         const val AUTO_SYNC_SECONDS = 15 * 60L
         const val FOREGROUND_GAP_SECONDS = 3 * 60L
         const val FOREGROUND_CHECK_SECONDS = 60L
+        const val AWAIT_IDLE_MS = 30_000L
         const val MILLIS_PER_SECOND = 1_000L
         const val SECONDS_PER_DAY = 86_400L
         /**
