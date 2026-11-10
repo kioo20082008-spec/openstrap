@@ -16,6 +16,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -121,6 +122,12 @@ fun GlowWorkoutDetailScreen(
     val recovery = remember(shown) { shown?.let { HeartRateRecovery.of(it) } }
     val zones = shown?.zoneSeconds.orEmpty()
     var focus by rememberSaveable { mutableStateOf<Int?>(null) }
+    // Share opens the big number card in the page's place; close comes back here.
+    var sharing by rememberSaveable { mutableStateOf(false) }
+    if (sharing && shown != null) {
+        BigShareScreen(shown, Workouts.activeKcal(shown, bmrPerMinute).takeIf { bmrPerMinute != null }, contentPadding, onClose = { sharing = false })
+        return
+    }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
         ScreenList(contentPadding, list, gutter = GlowLayout.Gutter) {
             item {
@@ -133,7 +140,12 @@ fun GlowWorkoutDetailScreen(
                 }
                 PageHeader(
                     (shown ?: a)?.sportName ?: stringResource(R.string.glow_workout_untitled), onBack, subtitle = day,
-                    trailing = if ((shown ?: a)?.startedByYou == false) ({ OutlineTag(TabCopy.AUTO_DETECTED) }) else null,
+                    trailing = {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if ((shown ?: a)?.startedByYou == false) OutlineTag(TabCopy.AUTO_DETECTED)
+                            if (shown != null) RoundIconButton(AppIcons.UploadSimple, stringResource(R.string.glow_share), { sharing = true }, size = 44.dp)
+                        }
+                    },
                 )
             }
             if (shown == null) return@ScreenList
@@ -211,6 +223,11 @@ private fun PastSummary(
     val trim = rememberWorkoutTrim(summary, onTrim, onUndoTrim)
     val recovery = remember(a) { HeartRateRecovery.of(a) }
     var focus by rememberSaveable { mutableStateOf<Int?>(null) }
+    var sharing by rememberSaveable { mutableStateOf(false) }
+    if (sharing) {
+        BigShareScreen(a, Workouts.activeKcal(a, null), contentPadding, onClose = { sharing = false })
+        return
+    }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
         ScreenList(contentPadding, list, gutter = GlowLayout.Gutter) {
             item {
@@ -220,7 +237,12 @@ private fun PastSummary(
                         R.string.glow_workout_day_times, WorkoutDetailCopy.day(a.shownStart, LocalDate.now()),
                         Ranges.times(a.shownStart, a.end),
                     ),
-                    trailing = if (foundTag) ({ OutlineTag(TabCopy.AUTO_DETECTED) }) else null,
+                    trailing = {
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            if (foundTag) OutlineTag(TabCopy.AUTO_DETECTED)
+                            RoundIconButton(AppIcons.UploadSimple, stringResource(R.string.glow_share), { sharing = true }, size = 44.dp)
+                        }
+                    },
                 )
             }
             item {

@@ -85,4 +85,8 @@
     <string name="glow_share_route_line">Line</string>
     <!-- A switch that cuts the route's first and last 200 m, so home doesn't show. -->
     <string name="glow_share_hide_ends">Hide start and end</string>
+    <string name="glow_share_big_kcal">kcal</string>
+    <string name="glow_share_big_avg">avg bpm</string>
+    <string name="glow_share_big_max">max</string>
+    <plurals name="glow_share_big_minutes"><item quantity="one">minute of %1$s</item><item quantity="other">minutes of %1$s</item></plurals>
 </resources>

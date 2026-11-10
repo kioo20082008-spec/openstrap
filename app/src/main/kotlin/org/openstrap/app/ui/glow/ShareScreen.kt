@@ -110,6 +110,24 @@ internal fun WorkoutShareScreen(
 }
 
 /**
+ * The share screen for the workout [a] as the big number card: its minutes, then its active kcal ([activeKcal], when
+ * known), average and highest heart rate. From the workout's page, for strap and phone workouts alike.
+ */
+@Composable
+internal fun BigShareScreen(a: WorkoutAnalysis, activeKcal: Int?, contentPadding: PaddingValues, onClose: () -> Unit) {
+    val w = a.workout
+    val minutes = ((a.activeSeconds + 30) / 60).toInt().coerceAtLeast(1)
+    val stats = listOfNotNull(
+        activeKcal?.takeIf { it > 0 }?.let { StoryStat(it.toString(), null, stringResource(R.string.glow_share_big_kcal)) },
+        w.averageHeartRate?.takeIf { it > 0 }?.let { StoryStat(it.toString(), null, stringResource(R.string.glow_share_big_avg)) },
+        w.maxHeartRate?.takeIf { it > 0 }?.let { StoryStat(it.toString(), null, stringResource(R.string.glow_share_big_max)) },
+    )
+    val line = androidx.compose.ui.res.pluralStringResource(R.plurals.glow_share_big_minutes, minutes, a.sportName)
+    val card = remember(a, activeKcal, line) { StoryCard.Big(a.sportName, minutes.toString(), line, stats, FamilySummary.familyOf(w.sportType, null)) }
+    ShareScreen(card, emptyList(), "OpenStrap_${w.start}.png", contentPadding, onClose)
+}
+
+/**
  * Hides the app's tab bar while it's given true: the share screen covers the whole screen, even from a page that sits
  * over the tabs (the weekly recap).
  */

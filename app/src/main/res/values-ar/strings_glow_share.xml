@@ -36,4 +36,8 @@
     <string name="glow_share_route_off">متوقف</string>
     <string name="glow_share_route_line">خط</string>
     <string name="glow_share_hide_ends">أخفِ البداية والنهاية</string>
+    <string name="glow_share_big_kcal">سعرة</string>
+    <string name="glow_share_big_avg">نبض</string>
+    <string name="glow_share_big_max">أعلى</string>
+    <plurals name="glow_share_big_minutes"><item quantity="zero">دقيقة ⁨%1$s⁩</item><item quantity="one">دقيقة ⁨%1$s⁩</item><item quantity="two">دقائق ⁨%1$s⁩</item><item quantity="few">دقائق ⁨%1$s⁩</item><item quantity="many">دقيقة ⁨%1$s⁩</item><item quantity="other">دقيقة ⁨%1$s⁩</item></plurals>
 </resources>

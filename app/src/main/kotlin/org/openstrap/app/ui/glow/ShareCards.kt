@@ -45,6 +45,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import java.time.Instant
 import java.time.ZoneId
 import kotlin.math.cos
@@ -116,6 +118,9 @@ internal sealed interface StoryCard {
         // Not a kind of workout: the card is lit in the goal green, as the recap is.
         override val family = Workouts.Family.Distance
     }
+
+    /** The big number: the sport and the brand at the top, the minutes huge and thin at the foot over up to three figures. */
+    class Big(val sport: String, val minutes: String, val line: String, val stats: List<StoryStat>, override val family: Workouts.Family) : StoryCard
 
     /** A game: minutes in dots, Load and the peak. */
     class Game(val sport: String, val minutes: String, val unit: String, val load: String?, val peak: String?) : StoryCard {
@@ -322,7 +327,7 @@ internal fun StoryCardView(card: StoryCard, photo: ImageBitmap?, route: List<Rou
     Box(modifier.size(StoryWidth, StoryHeight).background(EdgeSurface)) {
         if (photo != null) {
             Image(photo, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-            PhotoFade(top = card !is StoryCard.Run && card !is StoryCard.Game)
+            if (card is StoryCard.Big) BigFade() else PhotoFade(top = card !is StoryCard.Run && card !is StoryCard.Game)
         } else StoryGlow(storyColor(card), if (card is StoryCard.Calm) 0.6f else 0.95f)
         if (route.size >= 2) RouteLine(route, Modifier.fillMaxWidth().padding(horizontal = 48.dp).padding(top = 110.dp).height(240.dp))
         Box(Modifier.fillMaxSize().padding(24.dp)) {
@@ -333,6 +338,7 @@ internal fun StoryCardView(card: StoryCard, photo: ImageBitmap?, route: List<Rou
                 is StoryCard.Rounds -> RoundsStory(card)
                 is StoryCard.Calm -> CalmStory(card)
                 is StoryCard.Game -> GameStory(card)
+                is StoryCard.Big -> BigStory(card)
                 is StoryCard.Week -> WeekStory(card)
             }
         }
@@ -626,3 +632,44 @@ private fun GameStory(card: StoryCard.Game) {
 @Composable
 private fun GameLine(text: String, modifier: Modifier) =
     Text(text, color = Color.White, style = GlowType.sentence, maxLines = 1, modifier = modifier)
+
+/** The big number's fade over a photo: light, since its text carries its own shadow. */
+@Composable
+private fun BigFade() {
+    Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxWidth().fillMaxHeight(0.2f).background(Brush.verticalGradient(listOf(Color.Black.copy(alpha = 0.3f), Color.Transparent))))
+        Box(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth().fillMaxHeight(0.55f)
+                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f)))),
+        )
+    }
+}
+
+/** The big number card: the sport and the brand at the top; at the foot the minutes, their line, a hairline and the figures. */
+@Composable
+private fun BigStory(card: StoryCard.Big) {
+    val shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.45f), blurRadius = with(androidx.compose.ui.platform.LocalDensity.current) { 10.dp.toPx() })
+    val number = GlowType.flaskNumber.copy(shadow = shadow)
+    Column(Modifier.fillMaxSize().padding(vertical = 4.dp), verticalArrangement = Arrangement.SpaceBetween) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Text(card.sport, color = Color.White, style = GlowType.body.copy(fontWeight = FontWeight.Bold, shadow = shadow), maxLines = 1, modifier = Modifier.weight(1f))
+            Text(
+                "OPENSTRAP", color = Color.White, maxLines = 1,
+                style = number.copy(fontWeight = FontWeight.Light, fontSize = 11.sp, lineHeight = 14.sp, letterSpacing = 0.14.em),
+            )
+        }
+        Column {
+            Text(card.minutes, color = Color.White, style = number.copy(fontSize = 150.sp, lineHeight = 150.sp, letterSpacing = (-7).sp), maxLines = 1, softWrap = false)
+            Text(card.line, color = Color.White, style = GlowType.cardTitle.copy(fontWeight = FontWeight.Bold, shadow = shadow), maxLines = 1)
+            Box(Modifier.padding(top = 10.dp).fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.5f)))
+            Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(22.dp), verticalAlignment = Alignment.CenterVertically) {
+                card.stats.forEach { s ->
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(s.value, color = Color.White, style = number.copy(fontWeight = FontWeight.Light, fontSize = 20.sp, lineHeight = 24.sp, letterSpacing = 0.sp), maxLines = 1)
+                        Text(s.label, color = Color.White, style = GlowType.secondary.copy(shadow = shadow), maxLines = 1, modifier = Modifier.padding(start = 5.dp, bottom = 2.dp))
+                    }
+                }
+            }
+        }
+    }
+}
