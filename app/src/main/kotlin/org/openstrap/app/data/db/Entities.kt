@@ -592,6 +592,9 @@ data class DailyAggregate(
 /** One local hour's steps: the local date as SQLite prints it, the hour 0 to 23, and the steps in it. */
 data class HourSteps(val day: String, val hour: Int, val steps: Int)
 
+/** A day's stored false steps by hour ([DailyCaloriesRow.falseSteps]); only days that have been worked out. */
+data class FalseStepsDay(val day: LocalDate, val falseSteps: String)
+
 /** The day's last PAI reading: what the strap reported for that day and the 7-day total. */
 data class DailyPai(val day: String, val daily: Float, val total: Float, val latest: Long)
 
@@ -671,6 +674,12 @@ data class DailyCaloriesRow(
     val walkingKcal: Float,
     /** Active kcal for each local hour, 0 to 23, comma separated; see [hourlyKcal]. */
     val hourly: String,
+    /**
+     * The steps taken off each local hour of the day as arm movement at a desk ([org.openstrap.app.data.Recovery.falseStepMinutes]),
+     * 24 whole numbers comma separated ([org.openstrap.app.data.FalseStepHistory]); empty until the day has been worked
+     * out with this rule. Derived: the raw `activity_minute` rows are never touched.
+     */
+    @ColumnInfo(defaultValue = "") val falseSteps: String = "",
 ) {
     val hourlyKcal: List<Float> get() = hourly.split(',').map { it.toFloatOrNull() ?: 0f }
 }

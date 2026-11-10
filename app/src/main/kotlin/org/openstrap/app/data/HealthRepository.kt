@@ -152,7 +152,11 @@ class HealthRepository(
         val maxHr = if (date == today) r.maxHr else recoveryEngine.maxHeartRate(profile, today)
         val calories = caloriesHistory.calories(date, profile, maxHr, r.vo2max?.value?.toFloat(), now = now)
         if (calories != null) {
-            dao.insertDailyCalories(listOf(DailyCaloriesHistory.row(date, calories, System.currentTimeMillis() / 1000)))
+            // The false steps stored are the ones the page shows ([Activity.Day.falseSteps]), so a day's bar in the history and its
+            // own page count the same steps; the minutes it was judged on are the same, the resting HR basis can differ a little.
+            val falseSteps = r.activity?.let { FalseStepHistory.byHour(it.falseSteps) { t -> Instant.ofEpochSecond(t).atZone(ZoneId.systemDefault()).hour } }
+                ?: calories.falseStepsByHour
+            dao.insertDailyCalories(listOf(DailyCaloriesHistory.row(date, calories, System.currentTimeMillis() / 1000, falseSteps)))
         }
         return r.copy(calories = calories)
     }
@@ -298,7 +302,8 @@ class HealthRepository(
         val rows = when (metric) {
             DailyMetric.RestingHr, DailyMetric.Stress -> error("handled above")
             DailyMetric.HeartRate -> dao.dailyHeartRate(a, b)
-            DailyMetric.Steps -> dao.dailySteps(a, b)
+            // Raw sums less the false steps stored per day ([FalseStepHistory]), as the day's own page counts them.
+            DailyMetric.Steps -> dao.dailySteps(a, b).combine(dao.falseSteps(from, to)) { raw, stored -> FalseStepHistory.daily(raw, stored) }
             DailyMetric.Hrv -> dao.dailyHrv(a, b)
             DailyMetric.HrvSdnn -> dao.dailyHrvSdnn(a, b)
             DailyMetric.Spo2 -> dao.dailySpo2(a, b)
@@ -311,16 +316,20 @@ class HealthRepository(
 
     /**
      * Each local day's steps hour by hour, from [from] to [to], keyed by date; days without a step record are absent.
+     * Less each day's stored false steps ([FalseStepHistory]).
      * Read once, off the main thread, for your usual steps by this time of day.
      */
     suspend fun hourlySteps(from: LocalDate, to: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Map<LocalDate, List<Float>> =
-        dao.hourlyStepsOnce(DayWindow.of(from, zone).from, DayWindow.of(to, zone).to).groupBy { it.day }.mapNotNull { (day, hours) ->
-            DayStat.parseDay(day)?.let { d ->
-                val buckets = FloatArray(24)
-                hours.forEach { if (it.hour in 0..23) buckets[it.hour] += it.steps.toFloat() }
-                d to buckets.toList()
-            }
-        }.toMap()
+        FalseStepHistory.hourly(
+            dao.hourlyStepsOnce(DayWindow.of(from, zone).from, DayWindow.of(to, zone).to).groupBy { it.day }.mapNotNull { (day, hours) ->
+                DayStat.parseDay(day)?.let { d ->
+                    val buckets = FloatArray(24)
+                    hours.forEach { if (it.hour in 0..23) buckets[it.hour] += it.steps.toFloat() }
+                    d to buckets.toList()
+                }
+            }.toMap(),
+            dao.falseStepsOnce(from, to),
+        )
 
     /** Each day's PAI (earned that day, and the 7-day total), keyed by local date. */
     fun dailyPai(from: LocalDate, to: LocalDate, zone: ZoneId = ZoneId.systemDefault()): Flow<Map<LocalDate, DailyPai>> =

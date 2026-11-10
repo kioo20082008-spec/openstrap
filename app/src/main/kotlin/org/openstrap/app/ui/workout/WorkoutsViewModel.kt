@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.openstrap.app.data.DayWindow
+import org.openstrap.app.data.HeartRateRecovery
 import org.openstrap.app.data.Today
 import org.openstrap.app.data.WorkoutAnalysis
 import org.openstrap.app.data.WorkoutRepository
@@ -107,6 +108,14 @@ class WorkoutsViewModel(
      */
     suspend fun usualDrop(before: Long): Int? = withContext(work) {
         SummaryCopy.usualDrop(repo.recoveryDrops(before, SummaryCopy.USUAL_DROP_OF * 2))
+    }
+
+    /**
+     * Your usual first-minute heart rate recovery over the [HeartRateRecovery.LOOKBACK_DAYS] days before [before]
+     * ([HeartRateRecovery.usual]), from the strap's own workouts. Null with too few.
+     */
+    suspend fun usualHeartRateRecovery(before: Long): Int? = withContext(work) {
+        HeartRateRecovery.usual(repo.heartRateRecoveries(before, HeartRateRecovery.LOOKBACK_DAYS))
     }
 
     fun open(start: Long?) { openStart.value = start }

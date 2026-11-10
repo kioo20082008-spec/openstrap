@@ -673,7 +673,9 @@ class RecoveryEngine(private val dao: HealthDao) {
         val inWorkout = Recovery.MinuteRanges(
             phoneWorkouts.flatMap { Recovery.activeRanges(it, now) } + strap.map { it.start until it.end },
         )
-        Recovery.falseStepMinutes(minuteSteps, minuteHr, restingHr, maxHr, asleep, inWorkout::invoke).keys.forEach { minuteSteps[it] = 0 }
+        val falseSteps = Recovery.falseStepMinutes(minuteSteps, minuteHr, restingHr, maxHr, asleep, inWorkout::invoke)
+        falseSteps.keys.forEach { minuteSteps[it] = 0 }
+        val hourOf = { t: Long -> Instant.ofEpochSecond(t).atZone(zone).hour }
         val times = (minuteSteps.keys.filter { it in day.from..day.to } + minuteHr.keys.filter { it in day.from..day.to } + sleep + phone.keys).toSortedSet()
         return EnergyExpenditure.day(
             times.map { t ->
@@ -683,8 +685,8 @@ class RecoveryEngine(private val dao: HealthDao) {
                     phone[t] ?: w?.calories?.let { kcal -> kcal / ((w.end - w.start) / 60f).coerceAtLeast(1f) },
                 )
             },
-            profile, age, vo2max,
-        ) { Instant.ofEpochSecond(it).atZone(zone).hour }
+            profile, age, vo2max, hourOf,
+        )?.copy(falseStepsByHour = FalseStepHistory.byHour(falseSteps.filterKeys { it in day.from..day.to }, hourOf))
     }
 
     /**

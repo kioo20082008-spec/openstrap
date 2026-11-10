@@ -107,7 +107,7 @@ class HealthspanEngine(private val dao: HealthDao) {
         }
 
         // Steps: the sum of synced minutes, on days worn long enough.
-        val stepsByDate = dao.dailyStepsOnce(from, to).mapNotNull { r -> DayStat.parseDay(r.day)?.let { it to r.value.toInt() } }.toMap()
+        val stepsByDate = dao.dailyStepsCorrectedOnce(from, to, zone).mapNotNull { r -> DayStat.parseDay(r.day)?.let { it to r.value.toInt() } }.toMap()
         val steps = days.indices.mapNotNull { i ->
             stepsByDate[days[i]]?.takeIf { wornPerDay[i] >= Healthspan.STEP_DAY_WORN_MINUTES }?.let { starts[i] to it }
         }.toMap()

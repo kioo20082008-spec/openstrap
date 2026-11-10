@@ -68,6 +68,18 @@
     <string name="workout_detail_fact_kcal">kcal</string>
     <!-- A fact's name: the calorie target set before the workout. One word. -->
     <string name="workout_detail_fact_target">Target</string>
+    <!-- A fact's name: how far the heart rate fell in the minute after the effort stopped, from the peak of the last minute. -->
+    <string name="workout_detail_fact_hrr">Heart rate recovery at 1 min</string>
+    <!-- Under Heart rate recovery: the fall is the value, in beats per minute; this says what it fell from. -->
+    <string name="workout_detail_fact_hrr_status">bpm down from a peak of <xliff:g id="peak" example="172">%1$d</xliff:g>.</string>
+    <!-- Under Heart rate recovery when two minutes were recorded: what it fell from and the fall at two minutes. -->
+    <string name="workout_detail_fact_hrr_status_two">bpm down from a peak of <xliff:g id="peak" example="172">%1$d</xliff:g>, <xliff:g id="bpm_two" example="48">%2$d</xliff:g> down at 2 min.</string>
+    <!-- Against the person's own usual over the last 30 days. A trend, not a finding. -->
+    <string name="workout_detail_fact_hrr_faster">Faster than your usual <xliff:g id="usual" example="28">%1$d</xliff:g> over 30 days.</string>
+    <string name="workout_detail_fact_hrr_usual">About your usual <xliff:g id="usual" example="28">%1$d</xliff:g> over 30 days.</string>
+    <string name="workout_detail_fact_hrr_slower">Slower than your usual <xliff:g id="usual" example="28">%1$d</xliff:g> over 30 days.</string>
+    <!-- With no usual yet and a fall of 12 or less. Never a diagnosis. -->
+    <string name="workout_detail_fact_hrr_low">A slow recovery. Take it as a trend to watch, not a diagnosis.</string>
     <!-- The calorie target's value. -->
     <string name="workout_detail_target_kcal"><xliff:g id="kcal" example="300">%1$s</xliff:g> kcal</string>
     <!-- Under Target: reached at a time into the workout. -->

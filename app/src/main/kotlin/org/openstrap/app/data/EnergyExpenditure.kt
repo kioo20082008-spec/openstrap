@@ -102,6 +102,11 @@ object EnergyExpenditure {
         val hourly: Hourly = Hourly(),
         /** The walking minutes behind [walkingKcal]: awake, outside workouts, at [CADENCE_MET_STEPS] or more. */
         val walkingMinutes: Int = 0,
+        /**
+         * The steps left out of the day as arm movement at a desk ([Recovery.falseStepMinutes]) for each local hour, 24
+         * of them; empty when the day was not judged for them. Kept with the day's row ([FalseStepHistory]).
+         */
+        val falseStepsByHour: List<Int> = emptyList(),
     ) {
         val everydayKcal: Float get() = activeKcal - workoutKcal - walkingKcal
     }

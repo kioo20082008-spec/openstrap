@@ -75,7 +75,7 @@ class RewardsKeeper(
         days
     }
 
-    private suspend fun readDays(from: Long) = dao.dailyStepsOnce(from, Long.MAX_VALUE / 2).mapNotNull { d ->
+    private suspend fun readDays(from: Long) = dao.dailyStepsCorrectedOnce(from, Long.MAX_VALUE / 2).mapNotNull { d ->
         runCatching { Rewards.Day(LocalDate.parse(d.day), d.value.toInt()) }.getOrNull()
     }
 

@@ -198,6 +198,17 @@ class RoomWorkoutRepository(
             }
     }
 
+    /** From the strap's own workouts, as [recoveryDrops]; at most [RECOVERY_MAX_WORKOUTS] are read. */
+    override suspend fun heartRateRecoveries(before: Long, days: Int): List<Int> {
+        val (maxHr, zones) = maxHrAndZones.first()
+        val effects = dao.sportEffects().first()
+        return dao.workouts().first()
+            .filter { it.start < before && it.start >= before - days * 86_400L }
+            .sortedByDescending { it.start }
+            .take(RECOVERY_MAX_WORKOUTS)
+            .mapNotNull { w -> HeartRateRecovery.of(Workouts.analyse(w, dao.workoutHeartRateOnce(w.start), effects, maxHr, zones))?.hrr1 }
+    }
+
     override suspend fun deleteStrapWorkout(start: Long, now: Long) {
         dao.deleteStrapWorkout(start, now)
     }
@@ -205,6 +216,9 @@ class RoomWorkoutRepository(
     private companion object {
         /** Heart rate a minute at a time. */
         const val MINUTE_S = 60L
+
+        /** The most workouts [heartRateRecoveries] reads the heart rate of. */
+        const val RECOVERY_MAX_WORKOUTS = 40
 
         /** Drops older than this say little about your fitness now. */
         const val USUAL_DROP_LOOKBACK_S = 180 * 86_400L

@@ -40,6 +40,12 @@ interface WorkoutRepository {
      */
     suspend fun recoveryDrops(before: Long, count: Int): List<Int>
 
+    /**
+     * The first-minute heart rate recovery ([HeartRateRecovery.Result.hrr1]) of the strap workouts in the [days] days
+     * before [before], newest first, for your usual ([HeartRateRecovery.usual]). Only those it can be told for.
+     */
+    suspend fun heartRateRecoveries(before: Long, days: Int): List<Int> = emptyList()
+
     /** Works out and saves the effect of phone workout [start] when it ended before effects were worked out. */
     suspend fun backfillEffect(start: Long)
 

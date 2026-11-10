@@ -38,7 +38,8 @@ class DailyCaloriesHistory(private val dao: HealthDao) {
         }
 
         val today = Instant.ofEpochSecond(now).atZone(zone).toLocalDate()
-        val have = dao.dailyCaloriesDaysOnce().toHashSet()
+        // A row from before false steps were kept ([DailyCaloriesRow.falseSteps]) counts as missing, so it is worked out again.
+        val have = dao.falseStepsDaysOnce().toHashSet()
         val days = dao.hoursWithData().first().mapTo(sortedSetOf()) { Instant.ofEpochSecond(it * 3600).atZone(zone).toLocalDate() }
             .filter { d -> d <= today && (profileChanged || d > today.minusDays(RECENT_DAYS.toLong()) || d !in have) }
         if (days.isEmpty()) return 0
@@ -112,7 +113,9 @@ class DailyCaloriesHistory(private val dao: HealthDao) {
         private const val DEFAULT_RESTING_HR = 60f
 
         /** [e] as the row for [day]. */
-        fun row(day: LocalDate, e: EnergyExpenditure.Day, now: Long) = DailyCaloriesRow(
+        fun row(
+            day: LocalDate, e: EnergyExpenditure.Day, now: Long, falseSteps: List<Int> = e.falseStepsByHour,
+        ) = DailyCaloriesRow(
             day = day,
             updatedAt = now,
             totalKcal = e.totalKcal,
@@ -123,6 +126,7 @@ class DailyCaloriesHistory(private val dao: HealthDao) {
             workoutKcal = e.workoutKcal,
             walkingKcal = e.walkingKcal,
             hourly = e.hourly.total.joinToString(",") { "%.1f".format(java.util.Locale.ROOT, it) },
+            falseSteps = FalseStepHistory.format(falseSteps),
         )
 
         /**

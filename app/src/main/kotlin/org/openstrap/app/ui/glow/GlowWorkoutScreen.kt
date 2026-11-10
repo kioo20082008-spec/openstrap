@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
+import org.openstrap.app.data.HeartRateRecovery
 import org.openstrap.app.data.Route
 import org.openstrap.app.data.WorkoutAnalysis
 import org.openstrap.app.data.WorkoutRecorder
@@ -100,13 +101,15 @@ fun GlowWorkoutDetailScreen(
     /** The active kcal of the workout's day, for In your day, and the way to that day's Calories. */
     dayActiveKcal: Float? = null,
     onOpenDay: (() -> Unit)? = null,
+    /** Your usual first-minute heart rate recovery over the last 30 days ([HeartRateRecovery.usual]); null until there is one. */
+    usualRecovery: Int? = null,
 ) {
     BackHandler(onBack = onBack)
     // A workout recorded on the phone opens as its summary did, per kind (workouts spec 2.8), with a back arrow.
     if (a?.fromPhone == true && summary != null) {
         PastSummary(
             summary, workouts, contentPadding, onBack, onDelete, onTrim, onUndoTrim, dayActiveKcal, onOpenDay,
-            foundTag = !a.startedByYou,
+            foundTag = !a.startedByYou, usualRecovery = usualRecovery,
         )
         return
     }
@@ -115,6 +118,7 @@ fun GlowWorkoutDetailScreen(
     val list = rememberLazyListState()
     var info by rememberSaveable { mutableStateOf(false) }
     val usual = remember(workouts) { Workouts.usualLoad(workouts.map { it.workout.trainingLoad }) }
+    val recovery = remember(shown) { shown?.let { HeartRateRecovery.of(it) } }
     val zones = shown?.zoneSeconds.orEmpty()
     var focus by rememberSaveable { mutableStateOf<Int?>(null) }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
@@ -147,7 +151,10 @@ fun GlowWorkoutDetailScreen(
                 shown.distanceMeters, shown.distanceFromSteps,
                 0L, w.steps, w.calories,
                 activeKcal = activeKcal.takeIf { bmrPerMinute != null },
-            ) + listOfNotNull(WorkoutDetailCopy.targetFact(shown.target, shown.targetReachedSeconds, shown.activeKcal?.roundToInt()))
+            ) + listOfNotNull(
+                WorkoutDetailCopy.targetFact(shown.target, shown.targetReachedSeconds, shown.activeKcal?.roundToInt()),
+                WorkoutDetailCopy.recoveryFact(recovery, usualRecovery),
+            )
             val factsShown = facts.isNotEmpty()
             if (factsShown) item { WorkoutFactsList(facts, null) }
             // The workout's share of its day, right under its kcal (calories spec 4.2).
@@ -190,6 +197,7 @@ private fun PastSummary(
     dayActiveKcal: Float?,
     onOpenDay: (() -> Unit)?,
     foundTag: Boolean,
+    usualRecovery: Int?,
 ) {
     val heartZones = LocalHeartZones.current
     val a = summary.analysis
@@ -201,6 +209,7 @@ private fun PastSummary(
     val family = org.openstrap.app.ui.workout.FamilySummary.familyOf(w.sportType, summary.structure)
     val weekStarts = remember(workouts) { goalWeekStarts(workouts) }
     val trim = rememberWorkoutTrim(summary, onTrim, onUndoTrim)
+    val recovery = remember(a) { HeartRateRecovery.of(a) }
     var focus by rememberSaveable { mutableStateOf<Int?>(null) }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
         ScreenList(contentPadding, list, gutter = GlowLayout.Gutter) {
@@ -235,7 +244,10 @@ private fun PastSummary(
                     val facts = WorkoutDetailCopy.facts(
                         a.distanceMeters, a.distanceFromSteps, (a.durationSeconds - a.activeSeconds).coerceAtLeast(0), w.steps, w.calories,
                         activeKcal = Workouts.activeKcal(a, null),
-                    ) + listOfNotNull(WorkoutDetailCopy.targetFact(a.target, a.targetReachedSeconds, a.activeKcal?.roundToInt()))
+                    ) + listOfNotNull(
+                        WorkoutDetailCopy.targetFact(a.target, a.targetReachedSeconds, a.activeKcal?.roundToInt()),
+                        WorkoutDetailCopy.recoveryFact(recovery, usualRecovery),
+                    )
                     // The map is in the route card for a run; any other kind with a kept route has it here.
                     val map = family != Workouts.Family.Distance && Route.mappable(summary.route)
                     if (facts.isNotEmpty() || map) WorkoutFactsList(facts, summary.takeIf { map })
@@ -409,6 +421,7 @@ private fun WorkoutFactsList(facts: List<WorkoutFact>, summary: PhoneSummary?) {
             val color = when (f.kind) {
                 WorkoutFact.Kind.Paused -> PausedColor
                 WorkoutFact.Kind.Calories, WorkoutFact.Kind.Target -> MetricColors.calories
+                WorkoutFact.Kind.HeartRecovery -> MetricColors.heart
                 else -> MetricColors.steps
             }
             val icon = when (f.kind) {
@@ -417,6 +430,7 @@ private fun WorkoutFactsList(facts: List<WorkoutFact>, summary: PhoneSummary?) {
                 WorkoutFact.Kind.Steps -> Metric.Steps.rowIcon()
                 WorkoutFact.Kind.Calories -> Score.Calories.rowIcon()
                 WorkoutFact.Kind.Target -> AppIcons.Target
+                WorkoutFact.Kind.HeartRecovery -> Metric.HeartRate.rowIcon()
             }
             ListRow(f.name, color, f.value, f.status, divider = i > 0, icon = icon)
         }

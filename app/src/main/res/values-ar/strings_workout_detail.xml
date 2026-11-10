@@ -30,6 +30,13 @@
     <string name="workout_detail_fact_calories_total">المجموع ⁨%1$s⁩</string>
     <string name="workout_detail_fact_kcal">سعرة</string>
     <string name="workout_detail_fact_target">الهدف</string>
+    <string name="workout_detail_fact_hrr">تعافي النبض بعد دقيقة</string>
+    <string name="workout_detail_fact_hrr_status">ن/د أقل من ذروة ⁨%1$d⁩.</string>
+    <string name="workout_detail_fact_hrr_status_two">ن/د أقل من ذروة ⁨%1$d⁩، و⁨%2$d⁩ بعد دقيقتين.</string>
+    <string name="workout_detail_fact_hrr_faster">أسرع من معتادك ⁨%1$d⁩ خلال 30 يوماً.</string>
+    <string name="workout_detail_fact_hrr_usual">قريب من معتادك ⁨%1$d⁩ خلال 30 يوماً.</string>
+    <string name="workout_detail_fact_hrr_slower">أبطأ من معتادك ⁨%1$d⁩ خلال 30 يوماً.</string>
+    <string name="workout_detail_fact_hrr_low">تعافٍ بطيء. اعتبره اتجاهاً يستحق المتابعة وليس تشخيصاً.</string>
     <string name="workout_detail_target_kcal">⁨%1$s⁩ سعرة</string>
     <string name="workout_detail_target_reached_at">تحقق عند ⁨%1$s⁩</string>
     <string name="workout_detail_target_reached">تحقق</string>

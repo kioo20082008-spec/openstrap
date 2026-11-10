@@ -767,6 +767,16 @@ interface HealthDao : RangedReads {
     @Query("SELECT day FROM daily_energy")
     suspend fun dailyCaloriesDaysOnce(): List<LocalDate>
 
+    // The days whose false steps have been worked out ([DailyCaloriesRow.falseSteps]), for the history to take off steps.
+    @Query("SELECT day, falseSteps FROM daily_energy WHERE falseSteps != '' AND day BETWEEN :from AND :to ORDER BY day")
+    fun falseSteps(from: LocalDate, to: LocalDate): Flow<List<FalseStepsDay>>
+
+    @Query("SELECT day, falseSteps FROM daily_energy WHERE falseSteps != '' AND day BETWEEN :from AND :to ORDER BY day")
+    suspend fun falseStepsOnce(from: LocalDate, to: LocalDate): List<FalseStepsDay>
+
+    @Query("SELECT day FROM daily_energy WHERE falseSteps != ''")
+    suspend fun falseStepsDaysOnce(): List<LocalDate>
+
     @Query("UPDATE app_workout SET activeKcal = :activeKcal, totalKcal = :totalKcal WHERE start = :start")
     suspend fun updateAppWorkoutKcal(start: Long, activeKcal: Float?, totalKcal: Float?)
 

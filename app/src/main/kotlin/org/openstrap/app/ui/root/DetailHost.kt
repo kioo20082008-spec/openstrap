@@ -144,6 +144,8 @@ private fun WorkoutDetail(
         if (start != null && fromPhone) workoutsVm.phoneSummary(start) else flowOf(null)
     }.collectAsStateWithLifecycle(null)
     val usualDrop by produceState<Int?>(null, start, fromPhone) { value = start?.takeIf { !fromPhone }?.let { workoutsVm.usualDrop(it) } }
+    // Your usual first-minute heart rate recovery over the last 30 days, the baseline of the recovery fact.
+    val usualRecovery by produceState<Int?>(null, start) { value = start?.let { workoutsVm.usualHeartRateRecovery(it) } }
     // The workout's day: its active kcal as just worked out when it's the day shown, else as stored.
     val date = a?.let { Instant.ofEpochSecond(it.shownStart).atZone(ZoneId.systemDefault()).toLocalDate() }
     val stored by remember(date, days) {
@@ -155,5 +157,6 @@ private fun WorkoutDetail(
         onDelete = if (fromPhone) onDelete else ({ start?.let(workoutsVm::deleteStrapWorkout); onBack() }),
         onTrim = { from, to -> start?.let { session.trim(it, from, to) } }, onUndoTrim = { start?.let(session::undoTrim) },
         bmrPerMinute = bmrPerMinute, dayActiveKcal = dayActive, onOpenDay = date?.let { d -> { onOpenDay(d) } },
+        usualRecovery = usualRecovery,
     )
 }

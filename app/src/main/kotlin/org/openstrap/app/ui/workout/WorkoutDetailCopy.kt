@@ -6,6 +6,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Locale
 import org.openstrap.app.R
+import org.openstrap.app.data.HeartRateRecovery
 import org.openstrap.app.data.WorkoutTarget
 import org.openstrap.app.data.Workouts
 import org.openstrap.app.i18n.Strings
@@ -26,7 +27,7 @@ import org.openstrap.app.presentation.sportNoun
  * what its colour and icon go by, so a change to the words can't change them.
  */
 data class WorkoutFact(val name: String, val value: String, val status: String?, val kind: Kind) {
-    enum class Kind { Distance, Paused, Steps, Calories, Target }
+    enum class Kind { Distance, Paused, Steps, Calories, Target, HeartRecovery }
 }
 
 /** What a workout's other figures look like, for the strap's own record of a phone workout; [from] its start, "22:53". */
@@ -176,6 +177,30 @@ object WorkoutDetailCopy {
         return WorkoutFact(
             strings.get(R.string.workout_detail_fact_target),
             strings.format(R.string.workout_detail_target_kcal, Units.count(k.kcal, locale)), status, WorkoutFact.Kind.Target,
+        )
+    }
+
+    /**
+     * The heart rate recovery as a fact ([HeartRateRecovery]): the fall in the first minute after the stop as the value,
+     * with the peak it fell from and the fall at two minutes under the name, then one plain line: against your
+     * [usual] of the last 30 days when there is one (a trend, never a finding), else a slow one flagged as a trend to
+     * watch. Null when [r] is null.
+     */
+    fun recoveryFact(r: HeartRateRecovery.Result?, usual: Int?, strings: Strings = Strings.app): WorkoutFact? {
+        r ?: return null
+        val base = if (r.hrr2 != null) strings.format(R.string.workout_detail_fact_hrr_status_two, r.peak, r.hrr2)
+        else strings.format(R.string.workout_detail_fact_hrr_status, r.peak)
+        val line = if (usual != null) {
+            when (HeartRateRecovery.trend(r.hrr1, usual)) {
+                HeartRateRecovery.Trend.Faster -> strings.format(R.string.workout_detail_fact_hrr_faster, usual)
+                HeartRateRecovery.Trend.Usual -> strings.format(R.string.workout_detail_fact_hrr_usual, usual)
+                HeartRateRecovery.Trend.Slower -> strings.format(R.string.workout_detail_fact_hrr_slower, usual)
+                null -> null
+            }
+        } else if (HeartRateRecovery.isLow(r.hrr1)) strings.get(R.string.workout_detail_fact_hrr_low) else null
+        return WorkoutFact(
+            strings.get(R.string.workout_detail_fact_hrr), r.hrr1.toString(),
+            line?.let { sentences(base, it, strings) } ?: base, WorkoutFact.Kind.HeartRecovery,
         )
     }
 
