@@ -80,6 +80,7 @@ class SettingsBackupTest {
             "backup_folder", "backup_folder_name", "backup_last_done", "backup_failed", "backup_failed_at",
             "goal_moment_week", "recap_week", "rewards_started", "history_badges_waiting", "habit_age_seen", "habit_age_seen_day",
             "update_checked_at", "update_notified_tag", "update_installing_tag", "update_seen_tag",
+            "personal_calibration",
         )
         val keys = org.openstrap.app.data.settings.SettingsKeys::class.java.declaredFields
             .filter { java.lang.reflect.Modifier.isStatic(it.modifiers) && it.type == String::class.java && !it.name.endsWith("_PREFIX") }

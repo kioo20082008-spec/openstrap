@@ -409,6 +409,15 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         }
     }
 
+    private val calibrationKey = stringPreferencesKey(SettingsKeys.CALIBRATION)
+
+    /** What the personal Energy and Readiness calibrations concluded, and the day ([CalibrationKeeper] works it out). */
+    val calibration: Flow<org.openstrap.app.data.CalibrationResult?> = read { org.openstrap.app.data.CalibrationResult.decode(it[calibrationKey]) }
+
+    suspend fun setCalibration(result: org.openstrap.app.data.CalibrationResult) {
+        store.edit { it[calibrationKey] = result.encode() }
+    }
+
     private val todayHidden = stringPreferencesKey(SettingsKeys.TODAY_HIDDEN)
     private val todayPinned = stringPreferencesKey(SettingsKeys.TODAY_PINNED)
 
@@ -854,6 +863,7 @@ object SettingsKeys {
     const val GOAL_WORKOUTS_WEEK = "goal_workouts_week"
     const val JOURNAL = "journal_tags"
     const val CHECK_INS = "morning_checkins"
+    const val CALIBRATION = "personal_calibration"
     const val TODAY_HIDDEN = "today_hidden"
     const val TODAY_PINNED = "today_pinned"
     const val CELEBRATE_GOAL = "celebrate_goal"

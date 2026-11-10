@@ -55,6 +55,8 @@ fun Recovery.readiness(
     dailyLoad: List<Float> = emptyList(),
     causes: (Long) -> List<String> = { emptyList() },
     sleepNeed: Int = SLEEP_NEED_MINUTES,
+    /** The user's own contributor weights ([ReadinessCalibration]); the default is the published ones. */
+    weights: ReadinessWeights = ReadinessWeights.Default,
 ): Readiness {
     if (tonight == null) {
         val valid = history.filter { it.valid }.takeLast(BASELINE_NIGHTS)
@@ -114,7 +116,7 @@ fun Recovery.readiness(
 
         SOFT_MIN_FUSION -> extras(soft, alert && soft == ALERT_CAP, false, soft)
 
-        else -> weightedScore(out, alert).let { (score, capped) -> extras(score, capped, false, soft) }
+        else -> weightedScore(out, alert, weights).let { (score, capped) -> extras(score, capped, false, soft) }
     }
 }
 
@@ -218,12 +220,23 @@ private fun Recovery.previousDayLoad(dailyLoad: List<Float>): Contributor? {
 /**
  * The weighted mean of [out] (0-100) and whether a cap lowered it: one very poor body signal ([RED_FLAG]) caps it
  * at [RED_FLAG_HEADROOM] above that signal, so good sleep and a quiet day can't average it away, and an [alert]
- * caps it at [ALERT_CAP].
+ * caps it at [ALERT_CAP]. [weights] are the user's own multipliers on the contributor weights.
  */
-private fun Recovery.weightedScore(out: List<Contributor>, alert: Boolean): Pair<Int, Boolean> {
-    val totalWeight = out.sumOf { it.factor.weight.toDouble() }
-    var score = (out.sumOf { it.factor.weight.toDouble() * it.score } / totalWeight).toInt()
-    val worst = out.filter { it.factor.physiological }.minOfOrNull { it.score }
+private fun Recovery.weightedScore(out: List<Contributor>, alert: Boolean, weights: ReadinessWeights): Pair<Int, Boolean> =
+    fusedScore(out.map { it.factor to it.score }, alert, weights)
+
+/**
+ * [weightedScore] on bare (factor, score) pairs, which [ReadinessCalibration] replays with other [weights]. With
+ * [ReadinessWeights.Default] it is the score Readiness shows.
+ */
+internal fun Recovery.fusedScore(
+    parts: List<Pair<Factor, Int>>,
+    alert: Boolean,
+    weights: ReadinessWeights = ReadinessWeights.Default,
+): Pair<Int, Boolean> {
+    val totalWeight = parts.sumOf { weights.of(it.first).toDouble() }
+    var score = (parts.sumOf { weights.of(it.first).toDouble() * it.second } / totalWeight).toInt()
+    val worst = parts.filter { it.first.physiological }.minOfOrNull { it.second }
     var capped = false
     if (worst != null && worst < RED_FLAG && score > worst + RED_FLAG_HEADROOM) {
         score = worst + RED_FLAG_HEADROOM

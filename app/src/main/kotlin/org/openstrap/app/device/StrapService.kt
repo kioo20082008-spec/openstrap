@@ -324,7 +324,12 @@ class StrapService : LifecycleService() {
 
     /** Today's Recovery and Charge, the last sync and your usual sport; the model runs in a few hundred ms. */
     private suspend fun loadFigures(dao: HealthDao, settings: SettingsStore, strap: StrapController): Figures {
-        val r = org.openstrap.app.data.RecoveryEngine(dao).compute(java.time.LocalDate.now(), settings.profile.first())
+        val own = settings.calibration.first()
+        val r = org.openstrap.app.data.RecoveryEngine(dao).compute(
+            java.time.LocalDate.now(), settings.profile.first(),
+            tuning = own?.tuning ?: org.openstrap.app.data.ChargeTuning.Default,
+            weights = own?.weights ?: org.openstrap.app.data.ReadinessWeights.Default,
+        )
         val sport = dao.appWorkoutsAll().maxByOrNull { it.start }?.sportType ?: Workouts.DEFAULT_SPORTS.first()
         val syncedAt = (strap.sync.value as? SyncState.Done)?.atEpochSeconds ?: figures.value?.syncedAt
         return Figures(NotificationCopy.recovery(r), r.charge.latest?.let(::chargeShown), sport, syncedAt)

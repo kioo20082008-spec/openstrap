@@ -84,6 +84,15 @@ data class RecoveryResult(
     val sleepScores: Map<LocalDate, Int> = emptyMap(),
 )
 
+/**
+ * The inputs of one day's Charge run (see [RecoveryEngine.replay]): the minutes, the parameters, the window it reports on
+ * and the end of the main sleep, where Energy at wake is read.
+ */
+class ChargeInputs(val minutes: List<Recovery.Minute>, val params: Recovery.ChargeParams, val window: LongRange, val mainSleepEnd: Long?)
+
+/** A day's Readiness (published weights) and the inputs of its Charge run, for [CalibrationRunner]. */
+class Replay(val readiness: Recovery.Readiness, val charge: ChargeInputs)
+
 /** Loads what [Recovery] needs from the database and runs it. All work happens off the main thread by the caller. */
 class RecoveryEngine(private val dao: HealthDao) {
     /** Sleep as shown, with the user's edits ([SleepEdits]). */
@@ -105,26 +114,24 @@ class RecoveryEngine(private val dao: HealthDao) {
      * turns the rows into what each score stands on (nights, resting and max HR, daily loads), and each score is then
      * worked out from those and put together here. Only [calories] reads on its own, as it also runs without the rest.
      */
-    suspend fun compute(date: LocalDate, profile: UserProfile, zone: ZoneId = ZoneId.systemDefault(), now: Long = System.currentTimeMillis() / 1000): RecoveryResult {
-        val span = Span(date, zone, now)
-        val reads = gather(span)
-        val base = basis(span, reads, profile)
-
-        val readiness = Recovery.readiness(base.tonight, base.nights, base.loads, base.causes, base.sleepNeed)
-        // Each night's readiness as that morning had it: only the nights and loads before it, which [Span.from] reaches
-        // back far enough for on the trend's first day too. Charge takes each sleep's HRV contributor from it.
-        val byMorning = HashMap<Long, Recovery.Readiness>()
-        base.tonight?.let { byMorning[it.day] = readiness }
-        val readinessOf = { n: Recovery.Night ->
-            byMorning.getOrPut(n.day) { Recovery.readiness(n, base.nights, loadsBefore(base.loadDays, n.day), base.causes, base.sleepNeed) }
-        }
-        val trend = (TREND_DAYS - 1 downTo 0).map { back ->
-            val d = date.minusDays(back.toLong())
-            val m = DayWindow.of(d, zone).from
-            d to if (back == 0) readiness.score else base.nights.lastOrNull { it.day == m }?.let(readinessOf)?.score
-        }
-        val stressThreshold = stressThreshold(span, reads, base)
-        val charge = charge(span, reads, base, readiness, stressThreshold, readinessOf)
+    @Suppress("LongParameterList") // The date, who, where and when, then the user's own calibration.
+    suspend fun compute(
+        date: LocalDate,
+        profile: UserProfile,
+        zone: ZoneId = ZoneId.systemDefault(),
+        now: Long = System.currentTimeMillis() / 1000,
+        /** The user's own Energy and Readiness calibration ([CalibrationRunner]); the default is the published formulas. */
+        tuning: ChargeTuning = ChargeTuning.Default,
+        weights: ReadinessWeights = ReadinessWeights.Default,
+    ): RecoveryResult {
+        val p = prepare(date, profile, zone, now, weights)
+        val span = p.span
+        val reads = p.reads
+        val base = p.base
+        val readiness = p.readiness
+        val trend = p.trend
+        val stressThreshold = p.stressThreshold
+        val charge = charge(span, reads, base, readiness, stressThreshold, p.readinessOf, tuning)
         val activity = activity(span, reads, base, profile)
 
         // VO2max: recomputed weekly, as of the first day of the week ([Weeks]), from the nightly resting HR.
@@ -166,6 +173,52 @@ class RecoveryEngine(private val dao: HealthDao) {
             sleepScore = tonight?.let { SleepScore.of(it, nights, base.sleepNeed) },
             sleepScores = nights.associate { span.dayOf(it.day) to SleepScore.of(it, nights, base.sleepNeed).total },
         )
+    }
+
+    /**
+     * What [compute] and [replay] share: the reads, the nights, the Readiness with its trend, and the stress threshold.
+     * Readiness looks only backwards, so each night's has the nights and loads before it, which [Span.from] reaches
+     * back far enough for on the trend's first day too. Charge takes each sleep's HRV contributor from [readinessOf].
+     */
+    private class Prepared(
+        val span: Span,
+        val reads: Reads,
+        val base: Basis,
+        val readiness: Recovery.Readiness,
+        val readinessOf: (Recovery.Night) -> Recovery.Readiness,
+        val trend: List<Pair<LocalDate, Int?>>,
+        val stressThreshold: Recovery.StressThreshold,
+    )
+
+    private suspend fun prepare(date: LocalDate, profile: UserProfile, zone: ZoneId, now: Long, weights: ReadinessWeights): Prepared {
+        val span = Span(date, zone, now)
+        val reads = gather(span)
+        val base = basis(span, reads, profile)
+
+        val readiness = Recovery.readiness(base.tonight, base.nights, base.loads, base.causes, base.sleepNeed, weights)
+        // Each night's readiness as that morning had it: only the nights and loads before it, which [Span.from] reaches
+        // back far enough for on the trend's first day too. Charge takes each sleep's HRV contributor from it.
+        val byMorning = HashMap<Long, Recovery.Readiness>()
+        base.tonight?.let { byMorning[it.day] = readiness }
+        val readinessOf = { n: Recovery.Night ->
+            byMorning.getOrPut(n.day) { Recovery.readiness(n, base.nights, loadsBefore(base.loadDays, n.day), base.causes, base.sleepNeed, weights) }
+        }
+        val trend = (TREND_DAYS - 1 downTo 0).map { back ->
+            val d = date.minusDays(back.toLong())
+            val m = DayWindow.of(d, zone).from
+            d to if (back == 0) readiness.score else base.nights.lastOrNull { it.day == m }?.let(readinessOf)?.score
+        }
+        return Prepared(span, reads, base, readiness, readinessOf, trend, stressThreshold(span, reads, base))
+    }
+
+    /**
+     * [date]'s Readiness and the inputs of its Charge run, without running it: [CalibrationRunner] runs the same minutes
+     * under other [ChargeTuning]s to see which suits the morning check-ins. Worked out as [compute] does, at the
+     * published tuning and weights.
+     */
+    suspend fun replay(date: LocalDate, profile: UserProfile, zone: ZoneId = ZoneId.systemDefault(), now: Long): Replay {
+        val p = prepare(date, profile, zone, now, ReadinessWeights.Default)
+        return Replay(p.readiness, chargeInputs(p.span, p.reads, p.base, p.readiness, p.stressThreshold, p.readinessOf, ChargeTuning.Default))
     }
 
     /** The spans [compute] reads and scores for [date]. */
@@ -397,8 +450,17 @@ class RecoveryEngine(private val dao: HealthDao) {
      */
     private suspend fun charge(
         span: Span, reads: Reads, base: Basis, readiness: Recovery.Readiness, stressThreshold: Recovery.StressThreshold,
-        readinessOf: (Recovery.Night) -> Recovery.Readiness,
+        readinessOf: (Recovery.Night) -> Recovery.Readiness, tuning: ChargeTuning,
     ): Recovery.ChargeDay {
+        val i = chargeInputs(span, reads, base, readiness, stressThreshold, readinessOf, tuning)
+        return Recovery.charge(i.minutes, i.params, i.window, start = 50f, mainSleepEnd = i.mainSleepEnd)
+    }
+
+    /** What the day's Charge run is given: the minutes, the parameters (with the user's [tuning]) and where it reports. */
+    private suspend fun chargeInputs(
+        span: Span, reads: Reads, base: Basis, readiness: Recovery.Readiness, stressThreshold: Recovery.StressThreshold,
+        readinessOf: (Recovery.Night) -> Recovery.Readiness, tuning: ChargeTuning,
+    ): ChargeInputs {
         val simFrom = span.simFrom
         val simTo = span.simTo
         val day = span.day
@@ -442,8 +504,9 @@ class RecoveryEngine(private val dao: HealthDao) {
             usualSleep = usualSleep(base.mains.filterKeys { it <= span.midnight }.values, span.date, span.zone),
             sleepRestingHr = runMains.map { it.start to chargeNightRestingHr(it, reads.moved, refHr) },
             sleepHrvScore = base.nights.filter { it.end > simFrom && it.start < simTo }.map { it.start to hrvContributor(readinessOf(it)) },
+            tuning = tuning,
         )
-        return Recovery.charge(minutes, params, day.from..day.to, start = 50f, mainSleepEnd = base.tonight?.end)
+        return ChargeInputs(minutes, params, day.from..day.to, base.tonight?.end)
     }
 
     /** The HRV balance contributor of [r] (0-100), which scales how well that night's sleep recharges. Null without one. */

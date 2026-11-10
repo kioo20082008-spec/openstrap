@@ -868,7 +868,7 @@ private fun TodayRow(
                     onCheckIn(v)
                     if (v != null) journal?.checkIn?.invoke(day, org.openstrap.app.data.MorningFeel.Entry(v, atWake, ctx.score))
                 },
-                note = journal?.let { morningFitNote(it.checkIns) },
+                note = journal?.let { morningFitNote(it.checkIns, it.calibration) },
             )
         }
         TodayCard.BodyMorning -> BodyList(

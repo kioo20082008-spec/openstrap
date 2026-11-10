@@ -98,6 +98,7 @@ fun Recovery.charge(
     /** Report nothing until a sleep has been seen (see [ChargeDay.anchored]); tests switch this off. */
     requireAnchor: Boolean = true,
 ): ChargeDay {
+    val tuning = params.tuning
     var c = start
     var epoc = 0f
     var carry = 0f
@@ -209,8 +210,8 @@ fun Recovery.charge(
                 anchored = true
                 state = State.Sleep
                 val relax = hr?.let { (1.2f - 0.04f * (it - nightRest)).coerceIn(0.5f, 1.2f) } ?: 1f
-                delta = SLEEP_K * (STAGE_WEIGHT[m.sleepStage] ?: 0.8f) * relax * hrvFactor * (100 - c) *
-                    (1f - CARRY_MAX * (carry / CARRY_FULL).coerceAtMost(1f))
+                delta = SLEEP_K * tuning.sleep * (STAGE_WEIGHT[m.sleepStage] ?: 0.8f) * relax * hrvFactor * (100 - c) *
+                    (1f - CARRY_MAX * tuning.carry * (carry / CARRY_FULL).coerceAtMost(1f))
             }
 
             // A short heart-rate dropout (under [NO_WEAR_GAP_MINUTES], or not yet synced): the value holds.
@@ -222,7 +223,7 @@ fun Recovery.charge(
             x >= EXERCISE_HRR && effort -> {
                 state = State.Exercise
                 epoc += trimpMinute(x, params.female)
-                delta = -exerciseDrain(x, c)
+                delta = -exerciseDrain(x, c, tuning.exercise)
             }
 
             // After exercise the heart rate stays up while the body recovers; that isn't stress.
@@ -233,14 +234,14 @@ fun Recovery.charge(
 
             (x >= ACTIVITY_HRR && effort) || m.steps >= ACTIVE_STEPS -> {
                 state = State.Activity
-                delta = -exerciseDrain(x, c)
+                delta = -exerciseDrain(x, c, tuning.exercise)
             }
 
             // Inside the stress exclusion ([stressExcluded]) the strap's stress score is ignored, so a minute that
             // reaches here is never Stress or Relax. See [WORKOUT_REST_HRR] for the state it takes instead.
             m.workout == WorkoutPhase.Active && x >= WORKOUT_REST_HRR -> {
                 state = State.Activity
-                delta = -exerciseDrain(x, c)
+                delta = -exerciseDrain(x, c, tuning.exercise)
             }
 
             m.workout == WorkoutPhase.After && x >= WORKOUT_REST_HRR -> {

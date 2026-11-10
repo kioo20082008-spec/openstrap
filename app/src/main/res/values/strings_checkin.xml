@@ -5,4 +5,9 @@
     <string name="checkin_fit_strong">strongly</string>
     <string name="checkin_fit_middle">moderately</string>
     <string name="checkin_fit_weak">weakly, so the formula may not suit you yet</string>
+    <string name="checkin_cal_learning">Tuning Energy to you starts at %2$d mornings (%1$d so far).</string>
+    <string name="checkin_cal_active">Energy is tuned to you and follows your mornings better (%1$s, was %2$s).</string>
+    <string name="checkin_cal_not_needed">Energy needs no tuning: it already follows your mornings.</string>
+    <string name="checkin_cal_no_gain">Checked tuning Energy to you: nothing beat the standard formula.</string>
+    <string name="checkin_cal_readiness">Recovery weights are tuned to you too.</string>
 </resources>

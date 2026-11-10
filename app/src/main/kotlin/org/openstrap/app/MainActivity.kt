@@ -342,8 +342,9 @@ private fun AppRoot(
     val journalTags by journalVm.tags.collectAsStateWithLifecycle()
     val journalInsights by journalVm.insights.collectAsStateWithLifecycle()
     val checkIns by journalVm.checkIns.collectAsStateWithLifecycle()
-    val journalUi = remember(journalTags, journalInsights, checkIns) {
-        org.openstrap.app.ui.glow.JournalUi(journalTags, journalInsights, journalVm::toggle, checkIns, journalVm::checkIn)
+    val calibration by journalVm.calibration.collectAsStateWithLifecycle()
+    val journalUi = remember(journalTags, journalInsights, checkIns, calibration) {
+        org.openstrap.app.ui.glow.JournalUi(journalTags, journalInsights, journalVm::toggle, checkIns, journalVm::checkIn, calibration)
     }
     val heartZones by rootVm.heartZones.collectAsStateWithLifecycle()
     val strapPreview by previews.strap.collectAsStateWithLifecycle()

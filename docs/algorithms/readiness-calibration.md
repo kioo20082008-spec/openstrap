@@ -94,3 +94,15 @@ Switch `SOFT_MIN_FUSION` on only if the soft minimum is at least as good on both
 
    Then compare the overall score with the sleep parts left out.
 4. Decide between rescaling our parts, falling back to the strap's parts while learning, or leaving the formula alone. Record the decision and the numbers here, and update [recovery.md](recovery.md).
+
+## Personal weights (from the check-in)
+
+The safe part of step 4 above, built: **re-weighting the parts Readiness already has, per person, from the morning check-in.** It does not touch the strap comparison or any contributor's scoring. Code: `ReadinessCalibration.kt` (pure), `ReadinessWeights.kt`, replayed and stored with the Energy calibration (`CalibrationRunner`, `CalibrationKeeper`; see calculations.md section 7).
+
+* **Needs at least 42 answered mornings** in the last 60 days that had a Readiness score. Fewer: nothing changes.
+* **What can move:** a multiplier on each contributor's weight (HRV 30 %, resting HR 22 %, sleep 16 %, sleep balance 12 %, temperature 6 %, breathing 4 %, previous day's load 4 %, blood oxygen 3 %, recovery index 3 %), each kept within 0.5 to 1.5 of the default. The weights are rescaled over the contributors present, as always; the red-flag cap and the Alert cap stay.
+* **Fit:** the first two thirds of the mornings choose the multipliers by coordinate search (five values per weight, three passes) on the Spearman between feeling and the re-weighted score, less a ridge penalty of 0.1 × the squared distance of each multiplier from 1. The last third judges them.
+* **Accepted only if** the held-out Spearman improves by at least 0.05, reaches at least 0.2, and the published weights were not already at 0.6 or more. Otherwise the published weights stay, exactly: `ReadinessWeights.Default` gives today's score for every input (the existing tests run on it).
+* **Applied:** the accepted weights go into the Readiness shown, its 7-day trend and the HRV contributor that Energy reads, all through the same `Recovery.readiness(..., weights)` call. The soft-minimum score the backtest writes beside it stays on the published weights.
+* **Not decided here:** whether to rescale to the strap's parts, or fall back to them while learning. The check-in is the only ground truth this uses, and 42 mornings is little data for nine weights: expect it to be accepted rarely, and treat an accepted result as a personal preference, not a finding.
+

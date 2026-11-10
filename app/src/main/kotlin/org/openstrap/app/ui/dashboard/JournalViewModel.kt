@@ -42,6 +42,9 @@ class JournalViewModel(
     val checkIns: StateFlow<Map<LocalDate, org.openstrap.app.data.MorningFeel.Entry>> = settings.checkIns
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), emptyMap())
 
+    val calibration: StateFlow<org.openstrap.app.data.CalibrationResult?> = settings.calibration
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_MS), null)
+
     fun checkIn(day: LocalDate, entry: org.openstrap.app.data.MorningFeel.Entry) {
         viewModelScope.launch { settings.setCheckIn(day, entry, LocalDate.now()) }
     }

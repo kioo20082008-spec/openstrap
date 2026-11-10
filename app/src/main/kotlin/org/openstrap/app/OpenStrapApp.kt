@@ -74,6 +74,8 @@ class AppContainer(val app: Application) {
     init {
         // The Recovery cache follows the data from here on.
         health.start(appScope, HealthRepository.recoveryInputs(database))
+        // The user's own Energy and Readiness calibration, from the morning check-ins, follows from here on.
+        org.openstrap.app.data.CalibrationKeeper(database.healthDao(), settings, health, appScope).start()
     }
     /** The home screen widgets' refreshes. Built last: it watches the strap, the workout and settings. */
     val widgets = org.openstrap.app.widget.WidgetUpdater(

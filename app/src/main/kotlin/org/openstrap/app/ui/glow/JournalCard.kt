@@ -46,6 +46,8 @@ class JournalUi(
     val toggle: (LocalDate, Journal.Tag) -> Unit,
     val checkIns: Map<LocalDate, org.openstrap.app.data.MorningFeel.Entry> = emptyMap(),
     val checkIn: (LocalDate, org.openstrap.app.data.MorningFeel.Entry) -> Unit = { _, _ -> },
+    /** What the personal Energy and Readiness calibration concluded, for the line under the check-in. */
+    val calibration: org.openstrap.app.data.CalibrationResult? = null,
 )
 
 val LocalJournal = compositionLocalOf<JournalUi?> { null }

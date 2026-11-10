@@ -71,6 +71,20 @@ class HealthRepository(
     private val recoveries = LinkedHashMap<Triple<LocalDate, UserProfile, ZoneId>, CachedRecovery>()
     private val recoveryLock = Mutex()
 
+    /**
+     * The user's own Energy and Readiness calibration ([CalibrationKeeper]); the published formulas until one is Active.
+     * A change moves [dataVersion], so nothing worked out under the other one is kept.
+     */
+    @Volatile private var calibration: CalibrationResult? = null
+
+    fun applyCalibration(next: CalibrationResult?) {
+        val old = calibration
+        calibration = next
+        val changed = (old?.tuning ?: ChargeTuning.Default) != (next?.tuning ?: ChargeTuning.Default) ||
+            (old?.weights ?: ReadinessWeights.Default) != (next?.weights ?: ReadinessWeights.Default)
+        if (changed) dataVersion.incrementAndGet()
+    }
+
     /** Moves whenever a table Recovery reads changes, so a cached Recovery is never older than the data under it. */
     private val dataVersion = AtomicLong()
 
@@ -129,7 +143,10 @@ class HealthRepository(
      * Recovery just worked out, which takes them by the same rules: max HR as of [date] is today's when [date] is today.
      */
     private suspend fun computeRecovery(date: LocalDate, profile: UserProfile, now: Long): RecoveryResult {
-        val r = recoveryEngine.compute(date, profile, now = now)
+        val personal = calibration
+        val r = recoveryEngine.compute(
+            date, profile, now = now, tuning = personal?.tuning ?: ChargeTuning.Default, weights = personal?.weights ?: ReadinessWeights.Default,
+        )
         r.tonight?.let { logNight(it) }
         val today = Instant.ofEpochSecond(now).atZone(ZoneId.systemDefault()).toLocalDate()
         val maxHr = if (date == today) r.maxHr else recoveryEngine.maxHeartRate(profile, today)

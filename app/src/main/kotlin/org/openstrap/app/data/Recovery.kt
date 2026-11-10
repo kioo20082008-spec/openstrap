@@ -511,6 +511,11 @@ object Recovery {
          * no HRV to go by and recharges as an average night would. Before the first, [hrvScore] stands in.
          */
         val sleepHrvScore: List<Pair<Long, Int?>> = emptyList(),
+        /**
+         * The user's own multipliers on the sleep recharge, the exercise drain and the next-night carry-over, from
+         * [EnergyCalibration]. The default is 1 for each, which is the published constants.
+         */
+        val tuning: ChargeTuning = ChargeTuning.Default,
     )
 
     data class ChargePoint(val t: Long, val value: Float, val state: State)
@@ -611,9 +616,12 @@ object Recovery {
     const val EXERCISE_DRAIN_PER_HRR = 0.85f
     /** The exercise drain eases as the tank empties (a finite store): × this at 0 charge, × 1 at 100. */
     const val EXERCISE_DRAIN_FLOOR = 0.4f
-    /** Exercise drain per minute at reserve [hrr] with [charge] in the tank. */
-    fun exerciseDrain(hrr: Float, charge: Float): Float =
-        BASE_DRAIN + EXERCISE_DRAIN_PER_HRR * hrr.coerceAtLeast(0f) *
+    /**
+     * Exercise drain per minute at reserve [hrr] with [charge] in the tank. [scale] is the user's own multiplier on the
+     * part that follows heart-rate reserve ([ChargeTuning.exercise]); [BASE_DRAIN] stays as it is.
+     */
+    fun exerciseDrain(hrr: Float, charge: Float, scale: Float = 1f): Float =
+        BASE_DRAIN + EXERCISE_DRAIN_PER_HRR * scale * hrr.coerceAtLeast(0f) *
             (EXERCISE_DRAIN_FLOOR + (1f - EXERCISE_DRAIN_FLOOR) * charge / 100f)
     /**
      * Hard exercise leaves the next night less restful: parasympathetic recovery takes 24 to 48 h after threshold or

@@ -5,4 +5,9 @@
     <string name="checkin_fit_strong">بقوة</string>
     <string name="checkin_fit_middle">بشكل متوسط</string>
     <string name="checkin_fit_weak">بضعف، فالحساب ما يناسبك بعد</string>
+    <string name="checkin_cal_learning">ضبط الطاقة عليك يبدأ عند \u2068%2$d\u2069 صباح (عندك \u2068%1$d\u2069).</string>
+    <string name="checkin_cal_active">الطاقة مضبوطة عليك وتتبع إحساسك أفضل (\u2068%1$s\u2069 بعد ما كانت \u2068%2$s\u2069).</string>
+    <string name="checkin_cal_not_needed">الطاقة ما تحتاج ضبط: تتبع إحساسك أصلاً.</string>
+    <string name="checkin_cal_no_gain">جرّبنا نضبط الطاقة عليك: ما لقينا أفضل من الحساب العادي.</string>
+    <string name="checkin_cal_readiness">وأوزان الاستشفاء مضبوطة عليك كذلك.</string>
 </resources>
