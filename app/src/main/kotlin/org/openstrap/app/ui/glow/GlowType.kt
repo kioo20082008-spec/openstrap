@@ -78,13 +78,13 @@ object GlowType {
      * A Small that breaks down the card beside it (Recharged, Drained): Display 300, 34 on 36, tabular. Plain, since
      * the dotted answer is the other card's.
      */
-    val smallValue get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 34.sp, letterSpacing = (-0.02).em, lineHeight = 36.sp, fontFeatureSettings = "tnum")
+    val smallValue get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Bold, fontSize = 34.sp, letterSpacing = (-0.02).em, lineHeight = 36.sp, fontFeatureSettings = "tnum")
 
     /**
      * A goal's value on Ready, typed in place ("7.5 km", "1 h 15 min", "6 × 400 m"): Display 300, 44 on 44, tabular.
      * Plain, since the card's dotted number is the heart rate's.
      */
-    val goalValue get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 44.sp, letterSpacing = (-0.02).em, lineHeight = 44.sp, fontFeatureSettings = "tnum")
+    val goalValue get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Bold, fontSize = 44.sp, letterSpacing = (-0.02).em, lineHeight = 44.sp, fontFeatureSettings = "tnum")
 
     /** Energy's number under the flask on Today: the numerals' face at 200, 64 on 64, drawn tight, left to right. */
     val flaskNumber get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.Ltr, fontFamily = NumberFamily, fontWeight = FontWeight.ExtraLight, fontSize = 64.sp, lineHeight = 64.sp, letterSpacing = (-3).sp)
@@ -93,5 +93,5 @@ object GlowType {
     val flaskUnit get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.Ltr, fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 18.sp)
 
     /** The smaller numbers beside a [goalValue] (the rest in "with 90 s rest between", the ×): Display 300, 26 on 28. */
-    val goalValueMinor get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 26.sp, lineHeight = 28.sp, fontFeatureSettings = "tnum")
+    val goalValueMinor get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Bold, fontSize = 26.sp, lineHeight = 28.sp, fontFeatureSettings = "tnum")
 }

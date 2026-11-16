@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.sp
 object MetricColors {
     val heart = Color(0xFFFF5A5F)
     val steps = Color(0xFF3DD6FF)
-    val sleepDeep = Color(0xFF4C6FFF)
-    val sleepLight = Color(0xFF8FA8FF)
+    val sleepDeep = Color(0xFF8B7BFF)
+    val sleepLight = Color(0xFFB3A8FF)
     val sleepRem = Color(0xFFB37CFF)
     val sleepAwake = Color(0xFFFFB547)
     val spo2 = Color(0xFF38BDF8)

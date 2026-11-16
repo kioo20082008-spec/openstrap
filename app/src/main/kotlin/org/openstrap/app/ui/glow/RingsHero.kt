@@ -190,8 +190,8 @@ internal fun RingSkyHero(
             Canvas(Modifier.size(220.dp)) { ring(share.value, hue, 24.dp.toPx(), 0f) }
             Text(
                 buildAnnotatedString {
-                    append(hours.toString()); withStyle(SpanStyle(fontSize = 14.sp, color = Muted, fontWeight = FontWeight.Normal)) { append(" ${units.first}  ") }
-                    append(minutes.toString()); withStyle(SpanStyle(fontSize = 14.sp, color = Muted, fontWeight = FontWeight.Normal)) { append(" ${units.second}") }
+                    append(hours.toString()); withStyle(SpanStyle(fontSize = 16.sp, color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.first}  ") }
+                    append(minutes.toString()); withStyle(SpanStyle(fontSize = 16.sp, color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.second}") }
                 },
                 color = AppColors.ink, maxLines = 1,
                 style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 38.sp),
@@ -243,7 +243,8 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
         Box(Modifier.size(230.dp), contentAlignment = Alignment.Center) {
             Canvas(Modifier.size(230.dp)) { ring(share.value, RingColors.Steps, 24.dp.toPx(), 0f) }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                RingNumber(n.format(steps), null, 50.sp)
+                val text = n.format(steps)
+                RingNumber(text, null, if (text.length >= 6) 34.sp else if (text.length == 5) 40.sp else 50.sp)
                 Text(stepsWord, color = Muted, style = MaterialTheme.typography.bodyMedium)
             }
         }
