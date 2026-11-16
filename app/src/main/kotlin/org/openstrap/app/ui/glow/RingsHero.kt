@@ -10,6 +10,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -42,10 +45,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.openstrap.app.ui.theme.AppColors
+import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.NumberFamily
 
 /** The rings design's metric hues: one thick ring a metric, the same hue wherever that metric shows. */
@@ -75,6 +80,12 @@ private fun animatedShare(target: Float): Animatable<Float, AnimationVector1D> {
     val a = remember { Animatable(0f) }
     LaunchedEffect(target) { a.animateTo(target.coerceIn(0f, 1f), tween(1200, easing = FastOutSlowInEasing)) }
     return a
+}
+
+/** A metric's mark on its ring, where the ring starts at the top: [top] is how far down the ring's middle sits. */
+@Composable
+private fun BoxScope.RingMark(icon: ImageVector, top: Dp, size: Dp = 14.dp) {
+    Icon(icon, null, tint = Color(0xFF0A0A0C), modifier = Modifier.align(Alignment.TopCenter).padding(top = top - size / 2).size(size))
 }
 
 @Composable
@@ -107,9 +118,12 @@ internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifi
                 ring(r.value, RingColors.Recovery, w, step)
                 ring(s.value, RingColors.Sleep, w, step * 2)
             }
+            RingMark(AppIcons.Lightning, 10.dp)
+            RingMark(AppIcons.HeartFill, 35.dp)
+            RingMark(AppIcons.MoonFill, 60.dp)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 RingNumber(energy.level?.toString() ?: "–", if (energy.level != null) "%" else null, 40.sp)
-                if (word != null) Text(word, color = AppColors.readable(RingColors.Energy), style = MaterialTheme.typography.labelMedium, maxLines = 1)
+                if (word != null) Text(word, color = AppColors.readable(RingColors.Energy), style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1)
             }
         }
     }
@@ -134,6 +148,7 @@ internal fun RingPulseHero(
             Box(Modifier.align(Alignment.TopEnd)) { info() }
             Box(Modifier.align(Alignment.Center).padding(top = 8.dp).size(220.dp), contentAlignment = Alignment.Center) {
                 Canvas(Modifier.size(220.dp)) { ring(share.value, hue, 24.dp.toPx(), 0f) }
+                RingMark(AppIcons.HeartFill, 12.dp, 16.dp)
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     RingNumber(score.toString(), "%", 56.sp)
                     Text(word, color = AppColors.readable(hue), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
@@ -188,14 +203,19 @@ internal fun RingSkyHero(
     ) {
         Box(Modifier.padding(top = 8.dp).size(220.dp), contentAlignment = Alignment.Center) {
             Canvas(Modifier.size(220.dp)) { ring(share.value, hue, 24.dp.toPx(), 0f) }
-            Text(
-                buildAnnotatedString {
-                    append(hours.toString()); withStyle(SpanStyle(fontSize = 16.sp, color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.first}  ") }
-                    append(minutes.toString()); withStyle(SpanStyle(fontSize = 16.sp, color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.second}") }
-                },
-                color = AppColors.ink, maxLines = 1,
-                style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 38.sp),
-            )
+            RingMark(AppIcons.MoonFill, 12.dp, 16.dp)
+            val asleep = buildAnnotatedString {
+                append(hours.toString()); withStyle(SpanStyle(color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.first}  ") }
+                append(minutes.toString()); withStyle(SpanStyle(color = Muted, fontWeight = FontWeight.Medium)) { append(" ${units.second}") }
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                // The night's score leads when there is one; the time asleep sits under it, or alone without a score.
+                if (score != null) RingNumber(score.toString(), null, 56.sp)
+                Text(
+                    asleep, color = AppColors.ink, maxLines = 1,
+                    style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = if (score != null) 17.sp else 38.sp),
+                )
+            }
         }
         Spacer(Modifier.height(14.dp))
         Text(line, Modifier.fillMaxWidth(), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
@@ -242,6 +262,7 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
     ) {
         Box(Modifier.size(230.dp), contentAlignment = Alignment.Center) {
             Canvas(Modifier.size(230.dp)) { ring(share.value, RingColors.Steps, 24.dp.toPx(), 0f) }
+            RingMark(AppIcons.SneakerMoveFill, 12.dp, 16.dp)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val text = n.format(steps)
                 RingNumber(text, null, if (text.length >= 6) 34.sp else if (text.length == 5) 40.sp else 50.sp)
@@ -258,9 +279,15 @@ private val OnHue = Color(0xFF0A0A0C)
 
 /** One of Today's three figures as a solid card: its name, the number, and a bar of it in the metric's hue. */
 @Composable
-internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null) {
     Column(modifier.clip(RoundedCornerShape(20.dp)).background(AppColors.glass).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp)) {
-        Text(label, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (icon != null) {
+                Icon(icon, null, tint = AppColors.readable(hue), modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(5.dp))
+            }
+            Text(label, color = Muted, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1)
+        }
         Spacer(Modifier.height(2.dp))
         RingNumber(value?.toString() ?: "–", null, 26.sp)
         Spacer(Modifier.height(8.dp))
@@ -274,12 +301,13 @@ internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () ->
 /** The day's Energy as one bar: where it stood at waking, faint, and where it stands now, solid, with Energy's line. */
 @Composable
 internal fun EnergyDayCard(energy: FlaskModel, startLabel: String, modifier: Modifier = Modifier) {
+    val said = listOfNotNull(energy.word, energy.line.takeIf { it.isNotEmpty() }).joinToString("، ")
     val now = energy.level ?: return
     val hue = RingColors.Energy
     val bar = RoundedCornerShape(7.dp)
     Column(modifier.fillMaxWidth().clip(RingCard).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 14.dp)) {
         Row(Modifier.fillMaxWidth()) {
-            Text(energy.line, Modifier.weight(1f), color = Muted, style = MaterialTheme.typography.labelMedium)
+            Text(said, Modifier.weight(1f), color = Muted, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp))
             energy.atWake?.let { Text("$startLabel $it", color = AppColors.ink, style = MaterialTheme.typography.labelMedium) }
         }
         Spacer(Modifier.height(10.dp))
