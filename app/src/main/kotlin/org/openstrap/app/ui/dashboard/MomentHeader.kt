@@ -128,15 +128,16 @@ private fun CentredRow(
         val sp = s.first().measure(loose)
         val ep = e.first().measure(loose)
         val over = overhang.roundToPx()
-        val room = (constraints.maxWidth - sp.width - ep.width + over).coerceAtLeast(0)
+        val gap = 8.dp.roundToPx()
+        val room = (constraints.maxWidth - sp.width - ep.width - gap + over).coerceAtLeast(0)
         val cp = c.first().measure(loose.copy(maxWidth = room))
         val w = constraints.maxWidth
         val h = constraints.maxHeight
         layout(w, h) {
-            sp.placeRelative(0, (h - sp.height) / 2)
-            ep.placeRelative(w - ep.width, (h - ep.height) / 2)
-            val x = ((w - cp.width) / 2).coerceIn(sp.width, (w - ep.width - cp.width + over).coerceAtLeast(sp.width))
-            cp.placeRelative(x, (h - cp.height) / 2)
+            // The rings design: the avatar at the far end, the strap chip beside it, the day at the start.
+            sp.placeRelative(w - sp.width, (h - sp.height) / 2)
+            ep.placeRelative(w - sp.width - gap - ep.width, (h - ep.height) / 2)
+            cp.placeRelative(0, (h - cp.height) / 2)
         }
     }
 }

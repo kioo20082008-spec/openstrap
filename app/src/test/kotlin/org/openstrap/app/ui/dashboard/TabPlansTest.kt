@@ -60,7 +60,7 @@ class TabPlansTest {
             assertEquals(Tier.Glow, slots.first().look.tier)
         }
         // Today's start strip sits over the steps glow, which still leads the cards.
-        assertEquals(listOf(ActivityCard.Start, ActivityCard.Steps), activityCards().take(2).map { it.card })
+        assertEquals(listOf(ActivityCard.Steps, ActivityCard.Start), activityCards().take(2).map { it.card })
         // At most two glows and two plain lists on a screen (spec 2.4).
         for (slots in listOf(recoveryCards(), sleepCards(SleepFacts(naps = true)), activityCards())) {
             assertTrue(slots.count { it.look.tier == Tier.Glow } <= 2)

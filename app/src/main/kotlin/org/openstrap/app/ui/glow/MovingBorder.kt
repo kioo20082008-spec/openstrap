@@ -32,8 +32,12 @@ import kotlinx.coroutines.flow.first
  * spec 2.5). It holds still while the list scrolls, the page is off screen or the workout covers it ([LocalGlowPaused],
  * [LocalGlowPagePaused]), as the glows do, and with the system's animations off the light rests at the top.
  */
+private const val RINGS_FLAT = true
+
 @Composable
 fun Modifier.movingBorder(color: Color, periodMillis: Int = MOVING_BORDER_PERIOD): Modifier {
+    // The rings design keeps cards flat: no light travels the border.
+    if (RINGS_FLAT) return this
     val context = LocalContext.current
     val animate = remember(context) { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f }
     // Read through state, so the running loop follows a newly provided lambda rather than the first one it saw.

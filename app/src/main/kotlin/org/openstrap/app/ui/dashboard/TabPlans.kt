@@ -113,8 +113,8 @@ data class ActivityFacts(val isToday: Boolean = true, val suggestion: Boolean = 
  */
 fun activityCards(facts: ActivityFacts = ActivityFacts()): List<TabSlot<ActivityCard>> = listOfNotNull(
     // Plain, not a list: an unlit card whose border carries the moving light.
-    TabSlot(ActivityCard.Start, CardLook(Tier.Plain, Hue.Heart), Pane.Full).takeIf { facts.isToday },
     TabSlot(ActivityCard.Steps, glow(Hue.Steps), Pane.Full),
+    TabSlot(ActivityCard.Start, CardLook(Tier.Plain, Hue.Heart), Pane.Full).takeIf { facts.isToday },
     small(ActivityCard.ActiveMinutes, Hue.Steps, Edge.Bottom, Pane.Left),
     small(ActivityCard.HeartPoints, Hue.Heart, Edge.Top, Pane.Left),
     TabSlot(ActivityCard.Load, CardLook(Tier.Level, Hue.Load, Edge.Left), Pane.Left),

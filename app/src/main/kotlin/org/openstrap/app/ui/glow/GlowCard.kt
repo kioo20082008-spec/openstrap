@@ -98,7 +98,7 @@ val LocalGlowPaused = staticCompositionLocalOf<() -> Boolean> { { false } }
 /** The redesign: cards are flat navy panels with a hairline, no glow. */
 internal const val FlatCards = true
 internal val FlatSurface: Color get() = AppColors.glass
-internal val FlatHairline: Color get() = AppColors.hairline
+internal val FlatHairline: Color get() = Color.Transparent
 
 val LocalGlowPagePaused = staticCompositionLocalOf<() -> Boolean> { { false } }
 

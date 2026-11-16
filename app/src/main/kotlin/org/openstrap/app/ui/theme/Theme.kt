@@ -151,13 +151,24 @@ private val AlmaraiFamily = FontFamily(
     Font(R.font.almarai_extrabold, FontWeight.ExtraBold),
 )
 
+/** The rings design's face: Alexandria (SIL OFL 1.1), Arabic and Latin merged in one file a weight. */
+private val AlexandriaFamily = FontFamily(
+    Font(R.font.alexandria_regular, FontWeight.ExtraLight),
+    Font(R.font.alexandria_regular, FontWeight.Light),
+    Font(R.font.alexandria_regular, FontWeight.Normal),
+    Font(R.font.alexandria_medium, FontWeight.Medium),
+    Font(R.font.alexandria_bold, FontWeight.SemiBold),
+    Font(R.font.alexandria_bold, FontWeight.Bold),
+    Font(R.font.alexandria_extrabold, FontWeight.ExtraBold),
+)
+
 private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
 
 /** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
 /** Numbers stay in Inter in every language. */
-val NumberFamily: FontFamily get() = InterFamily
-val FunnelDisplay: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
-val FunnelSans: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
+val NumberFamily: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
+val FunnelDisplay: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
+val FunnelSans: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
 
 private val Base = Typography()
 
