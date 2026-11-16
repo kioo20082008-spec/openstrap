@@ -94,7 +94,7 @@ private fun RingNumber(value: String, unit: String?, size: TextUnit) {
  * level in the middle, with Energy's own line under them.
  */
 @Composable
-internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifier: Modifier = Modifier) {
+internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifier: Modifier = Modifier, word: String? = null) {
     val e = animatedShare(energy.fill)
     val r = animatedShare((recovery ?: 0) / 100f)
     val s = animatedShare((sleep ?: 0) / 100f)
@@ -107,10 +107,11 @@ internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifi
                 ring(r.value, RingColors.Recovery, w, step)
                 ring(s.value, RingColors.Sleep, w, step * 2)
             }
-            RingNumber(energy.level?.toString() ?: "–", if (energy.level != null) "%" else null, 40.sp)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                RingNumber(energy.level?.toString() ?: "–", if (energy.level != null) "%" else null, 40.sp)
+                if (word != null) Text(word, color = AppColors.readable(RingColors.Energy), style = MaterialTheme.typography.labelMedium, maxLines = 1)
+            }
         }
-        Spacer(Modifier.height(12.dp))
-        Text(energy.line, color = Muted, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
     }
 }
 
@@ -154,13 +155,16 @@ internal fun RingPulseHero(
                 Text(it, Modifier.weight(1f), color = Muted, style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
             }
         }
-        if (line.isNotEmpty()) {
-            Spacer(Modifier.height(14.dp))
-            Text(line, color = Muted, style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-        }
         if (sentence != null) {
-            Spacer(Modifier.height(12.dp))
-            Text(sentence, color = AppColors.ink.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 8.dp))
+            Spacer(Modifier.height(16.dp))
+            RingAdviceCard(word, sentence, hue)
+        }
+        if (line.isNotEmpty()) {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                line, Modifier.fillMaxWidth().clip(RingCard).background(AppColors.glass).padding(horizontal = 20.dp, vertical = 14.dp),
+                color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+            )
         }
         Spacer(Modifier.height(8.dp))
     }
@@ -204,6 +208,10 @@ internal fun RingSkyHero(
         if (stages.isNotEmpty()) {
             Spacer(Modifier.height(10.dp))
             Column(Modifier.fillMaxWidth().clip(glass).background(GlassFill).border(1.dp, GlassEdge, glass).padding(horizontal = 16.dp, vertical = 8.dp)) {
+                // The night in one bar, each stage as wide as its share.
+                Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp).height(22.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    stages.forEach { s -> Box(Modifier.weight(s.share.coerceAtLeast(0.02f)).fillMaxHeight().clip(RoundedCornerShape(7.dp)).background(s.color)) }
+                }
                 stages.forEach { s ->
                     Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(10.dp).clip(CircleShape).background(s.color))
@@ -241,5 +249,52 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
         }
         Spacer(Modifier.height(14.dp))
         Text(line, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
+    }
+}
+
+private val RingCard = RoundedCornerShape(22.dp)
+private val OnHue = Color(0xFF0A0A0C)
+
+/** One of Today's three figures as a solid card: its name, the number, and a bar of it in the metric's hue. */
+@Composable
+internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier.clip(RoundedCornerShape(20.dp)).background(AppColors.glass).clickable(onClick = onClick).padding(horizontal = 14.dp, vertical = 12.dp)) {
+        Text(label, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+        Spacer(Modifier.height(2.dp))
+        RingNumber(value?.toString() ?: "–", null, 26.sp)
+        Spacer(Modifier.height(8.dp))
+        Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)).background(hue.copy(alpha = 0.2f))) {
+            val filled = (value ?: 0).coerceIn(0, 100) / 100f
+            if (filled > 0f) Box(Modifier.fillMaxWidth(filled).fillMaxHeight().clip(RoundedCornerShape(3.dp)).background(hue))
+        }
+    }
+}
+
+/** The day's Energy as one bar: where it stood at waking, faint, and where it stands now, solid, with Energy's line. */
+@Composable
+internal fun EnergyDayCard(energy: FlaskModel, startLabel: String, modifier: Modifier = Modifier) {
+    val now = energy.level ?: return
+    val hue = RingColors.Energy
+    val bar = RoundedCornerShape(7.dp)
+    Column(modifier.fillMaxWidth().clip(RingCard).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 14.dp)) {
+        Row(Modifier.fillMaxWidth()) {
+            Text(energy.line, Modifier.weight(1f), color = Muted, style = MaterialTheme.typography.labelMedium)
+            energy.atWake?.let { Text("$startLabel $it", color = AppColors.ink, style = MaterialTheme.typography.labelMedium) }
+        }
+        Spacer(Modifier.height(10.dp))
+        Box(Modifier.fillMaxWidth().height(14.dp).clip(bar).background(AppColors.ink.copy(alpha = 0.1f))) {
+            energy.atWake?.let { Box(Modifier.fillMaxWidth((it.coerceIn(0, 100) / 100f).coerceAtLeast(0.02f)).fillMaxHeight().clip(bar).background(hue.copy(alpha = 0.35f))) }
+            Box(Modifier.fillMaxWidth((now.coerceIn(0, 100) / 100f).coerceAtLeast(0.02f)).fillMaxHeight().clip(bar).background(hue))
+        }
+    }
+}
+
+/** What to do with the day, on a card filled with the metric's [hue], in dark ink. */
+@Composable
+internal fun RingAdviceCard(title: String, note: String, hue: Color, modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxWidth().clip(RingCard).background(hue).padding(horizontal = 20.dp, vertical = 14.dp)) {
+        Text(title, color = OnHue, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
+        Spacer(Modifier.height(2.dp))
+        Text(note, color = OnHue, style = MaterialTheme.typography.bodyMedium)
     }
 }

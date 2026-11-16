@@ -72,43 +72,20 @@ internal fun DialsHero(
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // Room above the glass for its glow, inside the ripple's corners.
-        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 24.dp, bottom = 12.dp), contentAlignment = Alignment.TopCenter) {
-            TripleRings(energy, recovery, sleep)
+        val energyTitle = stringResource(R.string.glow_today_energy_title)
+        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 12.dp, bottom = 14.dp), contentAlignment = Alignment.TopCenter) {
+            TripleRings(energy, recovery, sleep, word = energy.word?.let { "$energyTitle $it" } ?: energyTitle)
         }
-        Text(
-            buildAnnotatedString {
-                append(stringResource(R.string.glow_today_energy_title))
-                energy.word?.let { withStyle(SpanStyle(color = AppColors.ink)) { append(" · "); append(it) } }
-            },
-            color = Muted, style = MaterialTheme.typography.labelLarge,
-        )
-        Spacer(Modifier.height(4.dp))
-        Text(planTitle, color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold))
-        Spacer(Modifier.height(14.dp))
-        Text(planNote, color = AppColors.ink.copy(alpha = 0.8f), style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, modifier = Modifier.padding(horizontal = 12.dp))
-        Spacer(Modifier.height(20.dp))
-        // Three figures in one pane of glass, hairlines between: Energy at waking, Recovery, Sleep.
-        val shape = RoundedCornerShape(24.dp)
-        Row(Modifier.fillMaxWidth().clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(vertical = 14.dp)) {
-            listOf(
-                Triple(labels.first, energy.atWake?.let { "$it" }, onEnergy),
-                Triple(labels.second, recovery?.let { "$it" }, onRecovery),
-                Triple(labels.third, sleep?.let { "$it" }, onSleep),
-            ).forEachIndexed { i, (k, v, open) ->
-                val hue = listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep)[i]
-                if (i > 0) Box(Modifier.width(1.dp).height(52.dp).background(PlanEdge))
-                Column(Modifier.weight(1f).clickable(onClick = open).padding(horizontal = 16.dp)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Box(Modifier.size(8.dp).clip(CircleShape).background(hue))
-                        Spacer(Modifier.width(6.dp))
-                        Text(k, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    Text(v ?: "–", color = AppColors.ink, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
-                }
-            }
+        // The rings' three figures as cards, each with its own bar: Energy, Recovery, Sleep.
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            RingStatCard(energyTitle, energy.level, RingColors.Energy, onEnergy, Modifier.weight(1f))
+            RingStatCard(labels.second, recovery, RingColors.Recovery, onRecovery, Modifier.weight(1f))
+            RingStatCard(labels.third, sleep, RingColors.Sleep, onSleep, Modifier.weight(1f))
         }
+        Spacer(Modifier.height(10.dp))
+        EnergyDayCard(energy, labels.first)
+        Spacer(Modifier.height(10.dp))
+        RingAdviceCard(planTitle, planNote, RingColors.Energy)
         if (plan.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
             PlanCard(planTitle, planNote, planChip, plan)

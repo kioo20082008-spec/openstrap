@@ -221,7 +221,6 @@ val NavRailWidth = 92.dp
 /** The redesign's bar: tabs in a navy pill, the selected one in coral, and the coral "+" raised in the middle. */
 @Composable
 private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, onPlus: () -> Unit, modifier: Modifier, glass: HazeState) {
-    val coral = org.openstrap.app.ui.theme.AppPalette.Coral
     Box(
         modifier.fillMaxWidth().drawBehind {
             val height = maxOf(TabBarFade.Height.toPx(), size.height)
@@ -236,21 +235,21 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
             val half = (items.size + 1) / 2
             items.forEachIndexed { i, item ->
                 if (i == half) Spacer(Modifier.width(72.dp))
-                NavCell(item, i == selected, Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).padding(vertical = 6.dp))
+                // The rings design: the chosen tab is a pill filled with ink, its icon and label in the page's colour.
+                NavCell(item, i == selected, Modifier.weight(1f).clip(CircleShape).background(if (i == selected) AppColors.ink else Color.Transparent).clickable { onSelect(i) }.padding(vertical = 6.dp), onTint = AppColors.onInk)
             }
         }
         Box(
             Modifier.size(60.dp)
-                .drawBehind { drawCircle(androidx.compose.ui.graphics.Brush.radialGradient(listOf(coral.copy(alpha = 0.45f), Color.Transparent), radius = size.minDimension), size.minDimension) }
                 .clip(CircleShape)
-                .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(Color(0xFFFF8A6E), Color(0xFFFF5C4E))))
+                .background(Color(0xFFFF5C39))
                 .clickable(onClick = onPlus),
             contentAlignment = Alignment.Center,
         ) {
             androidx.compose.foundation.Canvas(Modifier.size(24.dp)) {
                 val w = 3.dp.toPx()
-                drawLine(org.openstrap.app.ui.theme.AppPalette.Cream, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
-                drawLine(org.openstrap.app.ui.theme.AppPalette.Cream, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
+                drawLine(Color(0xFF0A0A0C), Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
+                drawLine(Color(0xFF0A0A0C), Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
             }
         }
     }
