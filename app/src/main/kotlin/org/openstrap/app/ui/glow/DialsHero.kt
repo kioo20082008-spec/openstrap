@@ -74,7 +74,7 @@ internal fun DialsHero(
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         // Room above the glass for its glow, inside the ripple's corners.
         Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 24.dp, bottom = 12.dp), contentAlignment = Alignment.TopCenter) {
-            EnergyFlask(energy)
+            TripleRings(energy, recovery, sleep)
         }
         Text(
             buildAnnotatedString {
@@ -96,9 +96,14 @@ internal fun DialsHero(
                 Triple(labels.second, recovery?.let { "$it" }, onRecovery),
                 Triple(labels.third, sleep?.let { "$it" }, onSleep),
             ).forEachIndexed { i, (k, v, open) ->
+                val hue = listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep)[i]
                 if (i > 0) Box(Modifier.width(1.dp).height(52.dp).background(PlanEdge))
                 Column(Modifier.weight(1f).clickable(onClick = open).padding(horizontal = 16.dp)) {
-                    Text(k, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(8.dp).clip(CircleShape).background(hue))
+                        Spacer(Modifier.width(6.dp))
+                        Text(k, color = Muted, style = MaterialTheme.typography.labelMedium, maxLines = 1)
+                    }
                     Spacer(Modifier.height(4.dp))
                     Text(v ?: "–", color = AppColors.ink, style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Light, fontSize = 28.sp, textDirection = TextDirection.Ltr))
                 }

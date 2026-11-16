@@ -166,7 +166,7 @@ fun GlowActivityScreen(
                     ActivityCard.Start -> StartCard(sports, onStartWorkout, onAllSports)
                     ActivityCard.Steps -> LocalGoals.current.steps.let { goal ->
                         val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
-                        PathHero(
+                        RingPathHero(
                             state.steps, goal, stringResource(R.string.dials_steps_word),
                             if (state.steps >= goal) stringResource(R.string.dials_steps_done)
                             else stringResource(R.string.dials_path_left, n.format(goal - state.steps)),
