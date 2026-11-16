@@ -72,12 +72,12 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="101"
-            android:background="#FFB37CFF" />
+            android:background="#FF8B7BFF" />
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="267"
-            android:background="#FF8FA8FF" />
+            android:background="#FFB3A8FF" />
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"

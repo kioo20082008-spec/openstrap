@@ -184,15 +184,15 @@ private fun DaySwitcher(
                 .clickable(onClickLabel = stringResource(R.string.day_header_pick_day), onClick = onPick)
                 .padding(horizontal = 10.dp, vertical = 4.dp)
                 .semantics { contentDescription = description },
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
-                dateLine(date), color = AppColors.ink.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
+                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
+                dateLine(date), color = AppColors.ink.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
         }
