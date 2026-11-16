@@ -61,7 +61,11 @@ android {
             // en-XA (accented and longer, so text still in Kotlin or text that clips stands out) and ar-XB (right to
             // left) can be picked as the phone's language on a debug build (docs/audits/2026-11-04-i18n-plan.md).
             isPseudoLocalesEnabled = true
-            if (providers.gradleProperty("demoApp").isPresent) applicationIdSuffix = ".demo"
+            if (providers.gradleProperty("demoApp").isPresent) {
+                applicationIdSuffix = ".demo"
+                // Its own name on the launcher, so it can't be mistaken for the real app beside it.
+                manifestPlaceholders["appLabel"] = "حلقات تجربة"
+            }
             if (providers.gradleProperty("devApp").isPresent) {
                 applicationIdSuffix = ".dev"
                 manifestPlaceholders["appLabel"] = "OpenStrap ${appVersionName.removeSuffix(".0")}"

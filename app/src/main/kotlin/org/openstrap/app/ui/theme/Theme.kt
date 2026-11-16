@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
  */
 object MetricColors {
     val heart = Color(0xFFFF5A5F)
-    val steps = Color(0xFFC3F53C)
+    val steps = Color(0xFF3DD6FF)
     val sleepDeep = Color(0xFF4C6FFF)
     val sleepLight = Color(0xFF8FA8FF)
     val sleepRem = Color(0xFFB37CFF)
@@ -33,9 +33,9 @@ object MetricColors {
     val hrv = Color(0xFF2DD4BF)
     val temperature = Color(0xFFFF8A3D)
     /** Recovery: one teal on every surface. */
-    val readiness = Color(0xFFFF6B5B)
+    val readiness = Color(0xFFC8FF3D)
     /** Charge: Ember orange on every surface, whatever the level. */
-    val charge = Color(0xFFF66C28)
+    val charge = Color(0xFFFF5C39)
     /**
      * Calories: Gold (hue 48), between Charge's orange and Steps' lime and lighter than the warning amber, so Calories
      * and Steps read as two metrics side by side on Activity.
