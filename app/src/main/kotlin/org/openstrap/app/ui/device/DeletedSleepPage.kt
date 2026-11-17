@@ -47,7 +47,7 @@ fun DeletedSleepPage(
         else item {
             RingsRows {
                 deleted.forEachIndexed { i, r ->
-                    PageRow(
+                    RingsRow(
                         SleepCopy.deletedName(r.strap.nap, DayWords.short(SleepCopy.deletedDay(r, zone))),
                         SleepCopy.deletedLine(clock(r.start), clock(r.end), r.edit?.let { SleepEdits.daysLeft(it, now) } ?: SleepEdits.KEEP_DAYS),
                         below = true, divider = i > 0, icon = AppIcons.Moon,

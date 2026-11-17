@@ -216,12 +216,12 @@ fun ProfileScreen(profile: UserProfile, contentPadding: PaddingValues, onSave: (
                                 else stringResource(R.string.you_profile_activity_pick),
                             )
                         }
-                        PageSwitchRow(
+                        RingsSwitchRow(
                             stringResource(R.string.you_profile_beta_blockers), null, betaBlocker, { betaBlocker = it }, divider = false,
                         )
-                        PageSwitchRow(stringResource(R.string.you_profile_pregnant), null, pregnant, { pregnant = it }, divider = false)
+                        RingsSwitchRow(stringResource(R.string.you_profile_pregnant), null, pregnant, { pregnant = it }, divider = false)
                         // Your max is set on the Heart rate zones page, with the zones that follow it.
-                        PageRow(
+                        RingsRow(
                             org.openstrap.app.ui.workout.HeartZonesCopy.MAX_ROW, org.openstrap.app.ui.workout.HeartZonesCopy.profileLine(profile.maxHeartRate),
                             onClick = onHeartZones, below = true, divider = false,
                         )

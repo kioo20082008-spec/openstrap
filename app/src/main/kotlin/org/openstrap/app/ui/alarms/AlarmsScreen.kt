@@ -3,6 +3,8 @@ package org.openstrap.app.ui.alarms
 import androidx.activity.compose.BackHandler
 import org.openstrap.app.ui.device.RingsHeader
 import org.openstrap.app.ui.device.RingsPanel
+import org.openstrap.app.ui.device.pressSink
+import org.openstrap.app.ui.device.riseIn
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -204,7 +206,7 @@ private fun AlarmsPanel(
         // List rows with a hairline between them; the time bold, the days under it.
         if (state.alarms.isNotEmpty()) Column { state.alarms.forEachIndexed { i, a ->
             Row(
-                Modifier.fillMaxWidth().clickable(enabled = !state.busy) { onEdit(a) }
+                Modifier.fillMaxWidth().riseIn().pressSink(!state.busy, 0.98f).clickable(enabled = !state.busy) { onEdit(a) }
                     .topHairline(i > 0, AppColors.ink.copy(alpha = 0.08f))
                     .padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,

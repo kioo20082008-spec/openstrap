@@ -33,6 +33,8 @@ fun ScreenList(
     state: LazyListState = rememberLazyListState(),
     /** Space between the screen edge and the cards. */
     gutter: Dp = 16.dp,
+    /** False leaves the list clear, so the tab's living page ([org.openstrap.app.ui.glow.SkyBackground]) shows through. */
+    opaque: Boolean = true,
     content: LazyListScope.() -> Unit,
 ) {
     // A tap on the tab that's showing scrolls whatever screen is open on it back to the top (spec 3.3).
@@ -45,7 +47,7 @@ fun ScreenList(
         val side = org.openstrap.app.ui.glow.GlowLayout.pageSide(maxWidth, column, gutter)
         // The status bar gets an opaque strip so cards don't scroll underneath the clock.
         LazyColumn(
-            Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding(),
+            Modifier.fillMaxSize().let { if (opaque) it.background(MaterialTheme.colorScheme.background) else it }.statusBarsPadding(),
             state = state,
             contentPadding = PaddingValues(
                 start = side, end = side,

@@ -6,7 +6,9 @@ package org.openstrap.app.ui.root
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.DragInteraction
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigationevent.NavigationEventDispatcherOwner
@@ -65,6 +68,7 @@ import org.openstrap.app.ui.glow.IndexTarget
 import org.openstrap.app.ui.glow.LiveHeroHooks
 import org.openstrap.app.ui.glow.LocalGlowMood
 import org.openstrap.app.ui.glow.LocalGlowPagePaused
+import org.openstrap.app.ui.glow.LocalTabSeen
 import org.openstrap.app.ui.glow.TodayStrap
 import org.openstrap.app.ui.glow.draw.GlowMood
 import org.openstrap.app.ui.glow.metricIndex
@@ -191,6 +195,7 @@ internal fun TabsPager(
         CompositionLocalProvider(
             // Remembered: a new lambda each time would be a new static local, recomposing the whole tab under it.
             LocalGlowPagePaused provides remember(pager, page, covered) { tabPaused(pager, page, covered) },
+            LocalTabSeen provides remember(pager, page) { { pageShift(pager, page) < 1f } },
             LocalScrollToTop provides scroll.of(page),
             *back,
         ) {
@@ -208,17 +213,33 @@ internal fun TabsPager(
                     Tab.Activity -> org.openstrap.app.ui.glow.SkyTint.Activity
                 }
                 org.openstrap.app.ui.glow.SkyBackground(tint) {
-                    PullToSync(strap.sync, connected, container.strap::syncNow) {
-                        TabRoot(
-                            t, nav, shown, histories, today, container, dayVm, workoutsVm, rootVm, live, padding, showCharge,
-                            onChargeConsume, header, onOpenPage, seeHabitAge,
-                        )
+                    // While a swipe or a tap moves between tabs, the one leaving eases back and dims and the one coming
+                    // in settles forward: read in the layer, so the move only redraws.
+                    Box(
+                        Modifier.fillMaxSize().graphicsLayer {
+                            val d = pageShift(pager, page).coerceIn(0f, 1f)
+                            alpha = 1f - 0.4f * d
+                            val k = 1f - 0.05f * d
+                            scaleX = k
+                            scaleY = k
+                        },
+                    ) {
+                        PullToSync(strap.sync, connected, container.strap::syncNow) {
+                            TabRoot(
+                                t, nav, shown, histories, today, container, dayVm, workoutsVm, rootVm, live, padding, showCharge,
+                                onChargeConsume, header, onOpenPage, seeHabitAge,
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
+
+/** How far [page] is from sitting fully on screen, in pages: 0 when it fills the screen, 1 and over when it's gone. */
+internal fun pageShift(pager: PagerState, page: Int): Float =
+    kotlin.math.abs(pager.currentPage + pager.currentPageOffsetFraction - page)
 
 /**
  * Whether glows on [page] hold still: while the pager moves, while the page is off screen, and while [covered] says the

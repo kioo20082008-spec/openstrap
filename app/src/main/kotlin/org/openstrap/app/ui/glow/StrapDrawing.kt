@@ -32,7 +32,14 @@ import androidx.compose.ui.graphics.graphicsLayer
  * goes out to an empty ring. No gradients and no glow.
  */
 @Composable
-internal fun StrapDrawing(led: Color, lit: Boolean, syncing: Boolean, modifier: Modifier) {
+internal fun StrapDrawing(
+    led: Color,
+    lit: Boolean,
+    syncing: Boolean,
+    modifier: Modifier,
+    /** Connected and live: the light's dot pulses gently and a soft ring ripples out from it now and then. */
+    alive: Boolean = false,
+) {
     // The turn is a State read only in draw, so a syncing strap redraws each frame without recomposing.
     val turn: State<Float> = if (syncing) {
         val t = rememberInfiniteTransition(label = "strap sync")
@@ -41,6 +48,9 @@ internal fun StrapDrawing(led: Color, lit: Boolean, syncing: Boolean, modifier: 
             label = "strap sync turn",
         )
     } else NoTurn
+    // Read only in draw too: a slow heartbeat of the dot, and a ripple that runs out and fades every 2.8 s.
+    val beat: State<Float> = if (alive && lit) rememberPulse(1800) else NoTurn
+    val wave: State<Float> = if (alive && lit) rememberLoop(2800) else NoTurn
     Spacer(
         modifier.graphicsLayer { alpha = if (lit) 1f else 0.45f }.drawWithCache {
             // Drawn on a 120 by 150 grid, the card slot's shape.
@@ -64,8 +74,13 @@ internal fun StrapDrawing(led: Color, lit: Boolean, syncing: Boolean, modifier: 
                 val tl = Offset(c.x - ring, c.y - ring)
                 val box = Size(ring * 2, ring * 2)
                 if (lit) {
+                    if (alive) {
+                        val w = wave.value
+                        drawCircle(led.copy(alpha = 0.38f * (1f - w)), ring + 16f * k * w, c, style = Stroke(1.4f * k))
+                        drawCircle(led.copy(alpha = 0.10f + 0.12f * beat.value), 5.6f * k, c)
+                    }
                     drawArc(led.copy(alpha = 0.2f), 0f, 360f, false, tl, box, style = Stroke(stroke))
-                    drawCircle(led, 3.4f * k, c)
+                    drawCircle(led, 3.4f * k * (1f + 0.16f * beat.value), c)
                     if (syncing) rotate(turn.value, c) {
                         drawArc(led, -90f, 90f, false, tl, box, style = Stroke(stroke, cap = StrokeCap.Round))
                     } else drawArc(led, -90f, 360f, false, tl, box, style = Stroke(stroke, cap = StrokeCap.Round))

@@ -1,5 +1,7 @@
 package org.openstrap.app.ui.alarms
 
+import org.openstrap.app.ui.device.RingsRow
+import org.openstrap.app.ui.device.RingsSwitchRow
 import android.Manifest
 import org.openstrap.app.ui.device.RingsHeader
 import org.openstrap.app.ui.device.RingsPanel
@@ -126,7 +128,7 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
         item { RingsHeader(stringResource(R.string.you_phone_title), onBack) }
         item {
             RingsPanel {
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_phone_calls), stringResource(R.string.you_phone_calls_note),
                     calls && callPermission,
                     { on ->
@@ -151,7 +153,7 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                         callPreviewError?.let { PageNote(it, color = MetricColors.warn) }
                     }
                 }
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_phone_notifications), stringResource(R.string.you_phone_notifications_note),
                     notifications && notificationAccess,
                     { on ->
@@ -170,18 +172,18 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                         RingsSegments(BuzzPattern.entries.map { it.label }, pattern.ordinal, { i -> vm.pickPattern(BuzzPattern.entries[i]) })
                         previewError?.let { PageNote(it, color = MetricColors.warn) }
                     }
-                    PageSwitchRow(
+                    RingsSwitchRow(
                         stringResource(R.string.you_phone_quiet), quietHoursSummary(quiet, calls && callPermission), quiet.on,
                         { on -> vm.updateQuietHours { it.copy(on = on) } },
                     )
                     if (quiet.on) {
-                        PageRow(
+                        RingsRow(
                             stringResource(R.string.you_phone_quiet_from), quietClock(quiet.from), onClick = { pickingFrom = true },
                             divider = false,
                         )
-                        PageRow(stringResource(R.string.you_phone_quiet_to), quietClock(quiet.to), onClick = { pickingFrom = false })
+                        RingsRow(stringResource(R.string.you_phone_quiet_to), quietClock(quiet.to), onClick = { pickingFrom = false })
                         if (calls && callPermission) {
-                            PageSwitchRow(
+                            RingsSwitchRow(
                                 stringResource(R.string.you_phone_quiet_calls), stringResource(R.string.you_phone_quiet_calls_note),
                                 quiet.calls,
                                 { on -> vm.updateQuietHours { it.copy(calls = on) } },

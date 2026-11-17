@@ -52,6 +52,8 @@ private fun signed(n: Int) = String.format(Locale.ROOT, "%+d", n)
 fun WeeklyReportPage(vm: WeeklyReportViewModel, contentPadding: PaddingValues, onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     val state by vm.state.collectAsStateWithLifecycle()
+    val cascade = androidx.compose.runtime.remember { DetailCascade() }
+    androidx.compose.runtime.CompositionLocalProvider(LocalDetailCascade provides cascade) {
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item {
             // The week's dates under the title, as every detail's subtitle.
@@ -66,6 +68,7 @@ fun WeeklyReportPage(vm: WeeklyReportViewModel, contentPadding: PaddingValues, o
             WeeklyReportViewModel.State.Unavailable -> item { Note(stringResource(R.string.report_unavailable)) }
             is WeeklyReportViewModel.State.Ready -> reportItems(s.report)
         }
+    }
     }
 }
 
@@ -100,7 +103,7 @@ private fun adviceText(r: WeeklyReport.Report): Pair<String, String> = when (r.a
 private fun AdviceCard(r: WeeklyReport.Report) {
     val (title, body) = adviceText(r)
     // The page's one call to action: filled in Recovery's hue, in dark ink (the rings design).
-    Column(Modifier.fillMaxWidth().clip(RingDetailShape).background(RingColors.Recovery).padding(horizontal = 20.dp, vertical = 16.dp)) {
+    Column(Modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(RingColors.Recovery).padding(horizontal = 20.dp, vertical = 16.dp)) {
         Text(stringResource(R.string.report_next_week), color = RingOnHue.copy(alpha = 0.7f), style = MaterialTheme.typography.labelLarge)
         Spacer(Modifier.height(6.dp))
         Text(title, color = RingOnHue, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
@@ -135,7 +138,7 @@ private fun Trio(r: WeeklyReport.Report) {
 private fun Big(label: String, value: String?, change: String?, hue: Color, share: Float) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         DetailRing(share, hue, diameter = 88.dp, stroke = 9.dp) {
-            Ltr { Text(value ?: "–", color = AppColors.ink, style = ringFigure(if ((value?.length ?: 1) > 4) 15.sp else 20.sp), maxLines = 1, textAlign = TextAlign.Center) }
+            Ltr { Text(detailCountUp(value ?: "–"), color = AppColors.ink, style = ringFigure(if ((value?.length ?: 1) > 4) 15.sp else 20.sp), maxLines = 1, textAlign = TextAlign.Center) }
         }
         Spacer(Modifier.height(8.dp))
         Text(label, color = AppColors.muted, style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
@@ -148,7 +151,7 @@ private fun Figures(r: WeeklyReport.Report) {
     val min = stringResource(R.string.report_min)
     val asleep = r.asleepMinutes
     val asleepText = asleep.value?.let { Units.duration(it.roundToInt() * SECONDS_A_MINUTE) + change(asleep.change, min) }
-    PageRows {
+    PageRows(Modifier.detailRise()) {
         PageRow(stringResource(R.string.report_asleep), asleepText, below = true, divider = false, icon = AppIcons.Moon)
         PageRow(stringResource(R.string.report_rhr), figure(r.restingHr), below = true, icon = AppIcons.Heartbeat)
         PageRow(stringResource(R.string.report_hrv), figure(r.hrv), below = true, icon = AppIcons.ChartLineUp)
@@ -184,6 +187,6 @@ private fun ShareButton(r: WeeklyReport.Report) {
             val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
             context.startActivity(Intent.createChooser(send, chooser))
         },
-        modifier = Modifier.fillMaxWidth(), icon = AppIcons.UploadSimple,
+        modifier = Modifier.detailRise().fillMaxWidth(), icon = AppIcons.UploadSimple,
     )
 }

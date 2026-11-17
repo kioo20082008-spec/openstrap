@@ -3,6 +3,10 @@ package org.openstrap.app.ui.components
 import androidx.compose.animation.core.animateFloatAsState
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
+import kotlinx.coroutines.launch
+import org.openstrap.app.ui.glow.bounceClick
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.graphicsLayer
@@ -234,10 +238,26 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         }.navigationBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
+        // Where each tab's cell sits in the bar (window pixels), so the chosen pill can glide from one to the next.
+        val cells = remember { androidx.compose.runtime.mutableStateMapOf<Int, androidx.compose.ui.geometry.Rect>() }
+        var origin by remember { androidx.compose.runtime.mutableStateOf(Offset.Zero) }
+        val pill = rememberGlidingPill(cells[selected]?.translate(-origin))
         Row(
             // Takes every touch inside it, so a tap between two tabs never lands on the card under the bar.
             Modifier.widthIn(max = 480.dp).fillMaxWidth().height(68.dp).clip(CircleShape).background(AppColors.glass)
-                .pointerInput(Unit) {}.padding(horizontal = 8.dp),
+                .pointerInput(Unit) {}.padding(horizontal = 8.dp)
+                .onGloballyPositioned { origin = it.positionInWindow() }
+                // The chosen tab's ink pill, drawn under the cells: it slides and stretches to the tab with a spring.
+                .drawBehind {
+                    val w = pill.width.value
+                    if (w > 0f) {
+                        val h = 46.dp.toPx()
+                        drawRoundRect(
+                            AppColors.ink, Offset(pill.left.value, (size.height - h) / 2f), Size(w, h),
+                            androidx.compose.ui.geometry.CornerRadius(h / 2f),
+                        )
+                    }
+                },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround,
         ) {
@@ -253,7 +273,13 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
                         drawLine(PlusInk, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
                     }
                 }
-                RingNavCell(item, i == selected) { onSelect(i) }
+                RingNavCell(
+                    item, i == selected,
+                    Modifier.onGloballyPositioned { c ->
+                        val p = c.positionInWindow()
+                        cells[i] = androidx.compose.ui.geometry.Rect(p.x, p.y, p.x + c.size.width, p.y + c.size.height)
+                    },
+                ) { onSelect(i) }
             }
         }
     }
@@ -263,23 +289,54 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
 private val PlusHue = Color(0xFFFF5C39)
 private val PlusInk = Color(0xFF0A0A0C)
 
-/** A tab in the rings bar: the one showing is an ink pill with its icon and name; the rest an icon in a 46 dp cell. */
+/** The chosen tab's pill: its start and width in the bar, each on a spring, jumping into place the first time. */
+private class GlidingPill(
+    val left: androidx.compose.animation.core.Animatable<Float, androidx.compose.animation.core.AnimationVector1D>,
+    val width: androidx.compose.animation.core.Animatable<Float, androidx.compose.animation.core.AnimationVector1D>,
+)
+
 @Composable
-private fun RingNavCell(item: NavItem, on: Boolean, onClick: () -> Unit) {
+private fun rememberGlidingPill(target: androidx.compose.ui.geometry.Rect?): GlidingPill {
+    val pill = remember { GlidingPill(androidx.compose.animation.core.Animatable(0f), androidx.compose.animation.core.Animatable(0f)) }
+    androidx.compose.runtime.LaunchedEffect(target) {
+        val t = target ?: return@LaunchedEffect
+        if (pill.width.value == 0f) {
+            pill.left.snapTo(t.left)
+            pill.width.snapTo(t.width)
+            return@LaunchedEffect
+        }
+        val glide = androidx.compose.animation.core.spring<Float>(dampingRatio = 0.72f, stiffness = 420f)
+        kotlinx.coroutines.coroutineScope {
+            launch { pill.left.animateTo(t.left, glide) }
+            launch { pill.width.animateTo(t.width, glide) }
+        }
+    }
+    return pill
+}
+
+/**
+ * A tab in the rings bar: the one showing carries its icon and name over the gliding ink pill the bar draws; the rest
+ * an icon in a 46 dp cell. The icon pops a little when its tab is chosen, and the cell presses in under the finger.
+ */
+@Composable
+private fun RingNavCell(item: NavItem, on: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val tint by androidx.compose.animation.animateColorAsState(
         if (on) AppColors.onInk else AppColors.ink.copy(alpha = 0.6f), tween(Motion.QUICK), label = "nav tint",
     )
-    val fill by androidx.compose.animation.animateColorAsState(
-        if (on) AppColors.ink else Color.Transparent, tween(Motion.QUICK), label = "nav pill",
+    val pop by animateFloatAsState(
+        if (on) 1f else 0.92f, androidx.compose.animation.core.spring(dampingRatio = 0.45f, stiffness = 500f), label = "nav pop",
     )
     Row(
-        Modifier.height(46.dp).widthIn(min = 46.dp).clip(CircleShape).background(fill).clickable(onClick = onClick)
-            .animateContentSize(tween(Motion.SWIFT, easing = Motion.easing))
+        modifier.height(46.dp).widthIn(min = 46.dp).bounceClick(onClick = onClick)
+            .animateContentSize(androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 420f))
             .padding(horizontal = if (on) 16.dp else 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
-        Icon(if (on) item.selectedIcon else item.icon, item.label, tint = tint, modifier = Modifier.size(22.dp))
+        Icon(
+            if (on) item.selectedIcon else item.icon, item.label, tint = tint,
+            modifier = Modifier.size(22.dp).graphicsLayer { scaleX = pop; scaleY = pop },
+        )
         if (on) {
             Spacer(Modifier.width(8.dp))
             Text(

@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
@@ -204,10 +205,13 @@ internal fun HabitAgeRingHero(state: Healthspan.Outcome?, modifier: Modifier = M
         else -> withheld?.reason
     }
     val shown = r?.estimate?.roundToInt() ?: state.age
-    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+    Box(modifier.fillMaxWidth().clip(RingDetailShape)) {
+    // Habit Age's orchid drifting faintly behind its ring.
+    AmbientAura(Orchid, Modifier.matchParentSize(), strength = 0.7f)
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         DetailRing(if (shown != null) 1f else 0f, Orchid, icon = org.openstrap.app.ui.dashboard.Detail.Healthspan.rowIcon()) {
             Text(
-                shown?.toString() ?: "–", color = if (shown != null) AppColors.ink else AppColors.ink.copy(alpha = 0.3f),
+                detailCountUp(shown?.toString() ?: "–"), color = if (shown != null) AppColors.ink else AppColors.ink.copy(alpha = 0.3f),
                 style = ringFigure(54.sp), maxLines = 1,
             )
             if (shown != null) Text(stringResource(R.string.glow_healthspan_years), color = AppColors.muted, style = RingLabel, maxLines = 1)
@@ -222,6 +226,7 @@ internal fun HabitAgeRingHero(state: Healthspan.Outcome?, modifier: Modifier = M
             Spacer(Modifier.height(18.dp))
             DetailCard { AgeScale(r.age, r.low, r.high, r.estimate) }
         }
+    }
     }
 }
 
@@ -251,6 +256,9 @@ internal fun AgeScale(age: Int, low: Int, high: Int, estimate: Float) {
         fun f(a: Float) = (a.coerceIn(from.toFloat(), to.toFloat()) - from) / (to - from)
         fun x(a: Float) = pad + (w - pad * 2) * f(a)
         val label = AppColors.ink.copy(alpha = 0.6f)
+        // The band opens out from the estimate on first show, and the estimate's dot breathes.
+        val open = rememberDetailOnce(700, 200)
+        val pulse = rememberPulse(1_800)
         Column {
             // Your age over its hairline, the range under its band, as in the kit, so the two never overlap.
             Box(Modifier.fillMaxWidth().height(16.dp)) { ScaleLabel(TabCopy.yourAge(age), x(age.toFloat()) / w, label) }
@@ -258,8 +266,12 @@ internal fun AgeScale(age: Int, low: Int, high: Int, estimate: Float) {
                 val y = size.height / 2
                 fun px(a: Float) = x(a).toPx()
                 drawLine(AppColors.ink.copy(alpha = 0.15f), Offset(px(from.toFloat()), y), Offset(px(to.toFloat()), y), 6.dp.toPx(), StrokeCap.Round)
-                drawLine(Orchid.copy(alpha = 0.5f), Offset(px(low.toFloat()), y), Offset(px(high.toFloat()), y), 12.dp.toPx(), StrokeCap.Round)
+                val o = open.value.let { 1f - (1f - it) * (1f - it) }
+                val lo = estimate + (low - estimate) * o
+                val hi = estimate + (high - estimate) * o
+                drawLine(Orchid.copy(alpha = 0.5f), Offset(px(lo), y), Offset(px(hi), y), 12.dp.toPx(), StrokeCap.Round)
                 drawLine(AppColors.ink.copy(alpha = 0.6f), Offset(px(age.toFloat()), 0f), Offset(px(age.toFloat()), size.height), 1.dp.toPx())
+                drawCircle(AppColors.ink.copy(alpha = 0.22f * (1f - pulse.value)), 7.dp.toPx() * (1.2f + 0.9f * pulse.value), Offset(px(estimate), y))
                 drawCircle(AppColors.ink, 7.dp.toPx(), Offset(px(estimate), y))
             }
             Box(Modifier.fillMaxWidth().height(16.dp)) { ScaleLabel(TabCopy.ageRange(low, high), x((low + high) / 2f) / w, label) }

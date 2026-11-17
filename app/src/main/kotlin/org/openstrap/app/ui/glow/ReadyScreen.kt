@@ -223,15 +223,16 @@ fun GlowWorkoutReadyScreen(
     WorkoutPage(
         Color.Transparent, contentPadding,
         // While a goal is typed the keyboard has the bottom of the screen.
-        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), StartHue, RingInk, start, icon = AppIcons.PlayFill, height = 60.dp) }),
+        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), StartHue, RingInk, start, icon = AppIcons.PlayFill, height = 60.dp, breathe = true) }),
     ) {
-        Box(Modifier.fillMaxWidth()) {
+        // The page cascades in, part by part.
+        Box(Modifier.fillMaxWidth().enterRise(0)) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack, Modifier.align(Alignment.CenterStart))
             Box(Modifier.align(Alignment.Center)) { IconPill(Workouts.shortName(type), { picking = true }, caret = true) }
         }
         if (cardio) {
-            ReadyHeartCard(connection, liveHeartRate)
-            ReadyWhere(
+            Box(Modifier.fillMaxWidth().enterRise(1)) { ReadyHeartCard(connection, liveHeartRate) }
+            Box(Modifier.fillMaxWidth().enterRise(2)) { ReadyWhere(
                 type, pair, indoor == true, outdoor, locationOn, StartCopy.gpsStatus(accuracy),
                 onSwitch = {
                     val next = indoor != true
@@ -244,17 +245,17 @@ fun GlowWorkoutReadyScreen(
                 },
                 askToEnd = askToEnd, onAskToEnd = { askToEnd = it },
                 keepRoute = keepRoute.takeIf { useGps }, onKeepRoute = { keepRoute = it },
-            )
+            ) }
             val zones = LocalHeartZones.current
-            ReadyGoal(
+            Box(Modifier.fillMaxWidth().enterRise(3)) { ReadyGoal(
                 type, kinds, hasDistance, draft.copy(kind = kind), { draft = it }, typing, { typing = it }, zones, maxHeartRate, onYourZones,
                 saved.filter { Workouts.tileType(it.sport) == key },
                 onSave = { name, reps -> onSaveIntervals(name, reps.code) },
-            )
+            ) }
             return@WorkoutPage
         }
-        ReadyHeartCard(connection, liveHeartRate, familyColor(family))
-        when (family) {
+        Box(Modifier.fillMaxWidth().enterRise(1)) { ReadyHeartCard(connection, liveHeartRate, familyColor(family)) }
+        Box(Modifier.fillMaxWidth().enterRise(2)) { when (family) {
             Workouts.Family.Strength -> StrengthPlanCard(
                 type, sets, { sets = it; if (it != null) planSets = it }, planSets, restSeconds, { restSeconds = it }, typing, { typing = it },
             )
@@ -265,8 +266,8 @@ fun GlowWorkoutReadyScreen(
                 draft.seconds, typing, { typing = it },
             )
             else -> GamePlanCard(type, rounds as? Structure.Periods, { structureCode = it?.code }, typing, { typing = it })
-        }
-        ReadyRows {
+        } }
+        Box(Modifier.fillMaxWidth().enterRise(3)) { ReadyRows {
             var divider = false
             if (strength) {
                 PageSwitchRow(
@@ -281,7 +282,7 @@ fun GlowWorkoutReadyScreen(
                 divider = true
             }
             PageSwitchRow(StartCopy.ASK_TO_END, StartCopy.ASK_TO_END_NOTE, askToEnd, { askToEnd = it }, divider = divider)
-        }
+        } }
     }
 }
 

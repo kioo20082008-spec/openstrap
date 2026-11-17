@@ -55,6 +55,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -150,9 +152,28 @@ internal fun WorkoutButton(
     label: String, background: Color, content: Color, onClick: () -> Unit,
     modifier: Modifier = Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, height: Dp = 56.dp,
     fill: Boolean = true,
+    /** The page's one Start: it breathes gently, a slow swell with a soft light of its colour round it. */
+    breathe: Boolean = false,
 ) {
+    val swell = if (breathe) rememberPulse(3_200) else null
     Row(
         modifier.then(if (fill) Modifier.fillMaxWidth() else Modifier).height(height)
+            .then(
+                if (swell == null) Modifier
+                else Modifier.graphicsLayer {
+                    val k = 1f + 0.018f * swell.value
+                    scaleX = k
+                    scaleY = k
+                }.drawBehind {
+                    val g = 7.dp.toPx() * swell.value
+                    val r = size.height / 2f + g
+                    drawRoundRect(
+                        background.copy(alpha = 0.22f * swell.value), Offset(-g, -g),
+                        androidx.compose.ui.geometry.Size(size.width + 2 * g, size.height + 2 * g),
+                        androidx.compose.ui.geometry.CornerRadius(r, r),
+                    )
+                },
+            )
             .clip(RoundedCornerShape(50)).background(background).pressClickable(onClick, RoundedCornerShape(50))
             .then(if (fill) Modifier else Modifier.padding(horizontal = 18.dp)),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
@@ -177,12 +198,15 @@ internal fun WorkoutPage(
     pinned: (@Composable ColumnScope.() -> Unit)? = null,
     /** Painted over the whole screen in place of the top glow (HIIT's phase light). */
     backdrop: Brush? = null,
+    /** A live screen's zone colour, washing slowly behind the page ([LiveZoneWash]) where there's no [backdrop]. */
+    aura: Color? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     BoxWithConstraints(Modifier.fillMaxSize().background(AppColors.page)) {
         val density = LocalDensity.current
         var pinnedHeight by remember { mutableStateOf(0.dp) }
         if (backdrop != null) Box(Modifier.fillMaxSize().background(backdrop))
+        else if (aura != null) LiveZoneWash(aura, Modifier.fillMaxSize())
         // On a wide screen the page keeps to one centred column (spec 2.4 Unfolded); the glow stays the screen's.
         val side = GlowLayout.pageSide(maxWidth, LocalPageColumn.current, GlowLayout.Gutter)
         // The content ends [PinnedFade.Ramp] above the pinned buttons (their box already counts the bottom padding),

@@ -86,10 +86,14 @@ internal fun WorkoutRing(
     ringSize: Dp = 200.dp,
     stroke: Dp = 22.dp,
     icon: ImageVector? = null,
+    /** A hero's ring: a softly pulsing light at its tip and a slow shimmer travelling along the arc once it's drawn. */
+    alive: Boolean = false,
     content: @Composable BoxScope.() -> Unit,
 ) {
     val a = remember { Animatable(0f) }
     LaunchedEffect(share) { a.animateTo(share.coerceIn(0f, 1f), tween(1100, easing = FastOutSlowInEasing)) }
+    val tip = if (alive) org.openstrap.app.ui.glow.rememberPulse(2_400) else null
+    val shimmer = if (alive) org.openstrap.app.ui.glow.rememberLoop(4_200) else null
     Box(modifier.size(ringSize), contentAlignment = Alignment.Center) {
         Canvas(Modifier.size(ringSize)) {
             val w = stroke.toPx()
@@ -99,6 +103,25 @@ internal fun WorkoutRing(
                 drawArc(hue.copy(alpha = 0.2f), 0f, 360f, false, tl, Size(d, d), style = Stroke(w))
                 val sweep = 360f * a.value
                 if (sweep > 0f) drawArc(hue, -90f, sweep, false, tl, Size(d, d), style = Stroke(w, cap = StrokeCap.Round))
+                // The shimmer: a short pale stretch running from the start to the tip, only along what's filled.
+                if (shimmer != null && sweep > 40f) {
+                    val len = 26f
+                    val at = -90f + (sweep - len) * shimmer.value
+                    drawArc(
+                        Color.White.copy(alpha = 0.22f * kotlin.math.sin(shimmer.value * Math.PI).toFloat()), at, len, false, tl,
+                        Size(d, d), style = Stroke(w * 0.5f, cap = StrokeCap.Round),
+                    )
+                }
+                // The tip's light, breathing.
+                if (tip != null && sweep > 0f) {
+                    val rad = Math.toRadians((-90f + sweep).toDouble())
+                    val c = Offset(center.x + d / 2f * kotlin.math.cos(rad).toFloat(), center.y + d / 2f * kotlin.math.sin(rad).toFloat())
+                    val glow = w * (0.85f + 0.35f * tip.value)
+                    drawCircle(
+                        androidx.compose.ui.graphics.Brush.radialGradient(listOf(hue.copy(alpha = 0.55f * (0.6f + 0.4f * tip.value)), Color.Transparent), c, glow),
+                        glow, c,
+                    )
+                }
             }
         }
         if (icon != null) {

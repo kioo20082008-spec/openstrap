@@ -109,8 +109,10 @@ internal fun ReadyHeartCard(connection: ConnectionState, liveHeartRate: Int?, co
         Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        WorkoutRing(if (bpm != null) 1f else 0f, color, ringSize = 64.dp, stroke = 9.dp) {
-            Icon(AppIcons.HeartFill, null, tint = AppColors.readable(color), modifier = Modifier.size(20.dp))
+        // The ring and its heart beat at the strap's own heart rate, so you see it's live before you start.
+        val beat = rememberBeatPhase(bpm)
+        WorkoutRing(if (bpm != null) 1f else 0f, color, Modifier.beating(beat, 0.03f), ringSize = 64.dp, stroke = 9.dp) {
+            Icon(AppIcons.HeartFill, null, tint = AppColors.readable(color), modifier = Modifier.size(20.dp).beating(beat, 0.12f))
         }
         Spacer(Modifier.width(16.dp))
         if (bpm != null) Column(Modifier.weight(1f)) {

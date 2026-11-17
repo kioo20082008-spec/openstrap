@@ -10,7 +10,6 @@ import org.openstrap.app.presentation.Ranges
 import org.openstrap.app.presentation.Units
 import org.openstrap.app.presentation.Pace
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -495,7 +494,7 @@ internal fun ZoneStripPanel(zones: ZoneSeconds, focus: Int? = null, onFocus: ((I
                     Row(
                         Modifier.fillMaxWidth().height(44.dp).clip(RoundedCornerShape(12.dp))
                             .background(if (on) ZONE_COLORS[z].copy(alpha = 0.14f) else Color.Transparent)
-                            .let { m -> if (onFocus != null) m.clickable { onFocus(if (on) null else z) } else m }
+                            .let { m -> if (onFocus != null) m.detailPress(scale = 0.98f) { onFocus(if (on) null else z) } else m }
                             .padding(horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -568,7 +567,7 @@ private fun IndoorHeartCard(readings: List<Pair<Long, Int>>, target: Pair<String
         if (line) Column {
             val range = Ranges.of("${readings.minOf { it.second }}", "${readings.maxOf { it.second }}")
             GlowHeader(stringResource(R.string.glow_summary_heart_rate), range)
-            PlainLine(values, MetricColors.heart, 64.dp, Modifier.padding(top = 8.dp), dots = LineDots.Highest)
+            PlainLine(values, MetricColors.heart, 64.dp, Modifier.padding(top = 8.dp).detailReveal(), dots = LineDots.Highest)
         }
         target?.let { (text, reached) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -613,7 +612,7 @@ private fun HeartLineCard(readings: List<Pair<Long, Int>>, color: Color, settled
         val range = Ranges.of("${readings.minOf { it.second }}", "${readings.maxOf { it.second }}")
         val down = drop?.let { stringResource(R.string.glow_summary_heart_down, it) }
         EdgeTitle(stringResource(R.string.glow_summary_heart_rate), down ?: range)
-        if (chart) PlainLine(values, color, 74.dp, Modifier.padding(top = 14.dp), dots = LineDots.Ends)
+        if (chart) PlainLine(values, color, 74.dp, Modifier.padding(top = 14.dp).detailReveal(), dots = LineDots.Ends)
         if (settled != null) Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             Column(Modifier.weight(1f)) {
                 Text("${settled.first}", color = AppColors.ink, style = ringFigure(20.sp))

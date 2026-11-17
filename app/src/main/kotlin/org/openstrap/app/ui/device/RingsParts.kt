@@ -1,5 +1,10 @@
 package org.openstrap.app.ui.device
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +25,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.CornerRadius
+import org.openstrap.app.ui.glow.rememberLoop
+import org.openstrap.app.ui.glow.rememberPulse
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -109,7 +123,7 @@ fun RingsHeader(
     trailing: (@Composable () -> Unit)? = null,
 ) {
     val switchLabel = stringResource(R.string.glow_page_switch)
-    Row(Modifier.fillMaxWidth().heightIn(min = PageHeaderHeight), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().riseIn().heightIn(min = PageHeaderHeight), verticalAlignment = Alignment.CenterVertically) {
         BackButton(onBack, backEnabled)
         Spacer(Modifier.width(12.dp))
         Column(
@@ -130,7 +144,7 @@ fun RingsHeader(
 @Composable
 fun RingsSection(text: String, modifier: Modifier = Modifier, inset: Dp = 4.dp) {
     Text(
-        text, modifier.padding(start = inset, top = 10.dp), color = AppColors.muted, style = RingsType.section,
+        text, modifier.riseIn().padding(start = inset, top = 10.dp), color = AppColors.muted, style = RingsType.section,
         maxLines = 1, overflow = TextOverflow.Ellipsis,
     )
 }
@@ -144,7 +158,7 @@ fun RingsCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier.fillMaxWidth().clip(RingsShape)
+        modifier.riseIn().fillMaxWidth().clip(RingsShape)
             .let { if (onClick != null) it.pressClickable(onClick, RingsShape, 0.98f) else it }
             .background(color, RingsShape)
             .padding(horizontal = 18.dp, vertical = 16.dp),
@@ -157,7 +171,7 @@ fun RingsCard(
 @Composable
 fun RingsRows(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
-        modifier.fillMaxWidth().clip(RingsShape).background(AppColors.glass, RingsShape)
+        modifier.riseIn().fillMaxWidth().clip(RingsShape).background(AppColors.glass, RingsShape)
             .padding(horizontal = RingsRowInset, vertical = 2.dp),
         content = content,
     )
@@ -211,16 +225,33 @@ fun RingsSegments(
 /** One pill of a choice: filled with the ink when [on], outlined otherwise, 44 dp tall. */
 @Composable
 fun RingsChoice(label: String, on: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, role: Role = Role.RadioButton) {
+    // The chosen fill swells in from the pill's middle while the outline fades, and drains back out when it moves on.
+    val fill by animateFloatAsState(if (on) 1f else 0f, tween(300, easing = FastOutSlowInEasing), label = "choice fill")
+    val word by animateColorAsState(if (on) AppColors.onInk else AppColors.ink, tween(300), label = "choice word")
+    val ink = AppColors.ink
     Box(
         modifier.height(44.dp).clip(CircleShape)
-            .let { if (on) it.background(AppColors.ink, CircleShape) else it.border(1.dp, AppColors.ink.copy(alpha = 0.18f), CircleShape) }
             .pressClickable(onClick, CircleShape, 0.97f)
+            .drawBehind {
+                val f = fill
+                val line = 1.dp.toPx()
+                if (f < 1f) drawRoundRect(
+                    ink.copy(alpha = 0.18f * (1f - f)), Offset(line / 2, line / 2), Size(size.width - line, size.height - line),
+                    CornerRadius((size.height - line) / 2), style = Stroke(line),
+                )
+                if (f > 0f) {
+                    val k = 0.55f + 0.45f * f
+                    val w = size.width * k
+                    val h = size.height * (0.7f + 0.3f * f)
+                    drawRoundRect(ink.copy(alpha = f), Offset((size.width - w) / 2, (size.height - h) / 2), Size(w, h), CornerRadius(h / 2))
+                }
+            }
             .semantics { this.role = role; this.selected = on }
             .padding(horizontal = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            label, color = if (on) AppColors.onInk else AppColors.ink, style = if (on) RingsType.segmentOn else RingsType.segmentOff,
+            label, color = word, style = if (on) RingsType.segmentOn else RingsType.segmentOff,
             maxLines = 1, overflow = TextOverflow.Ellipsis,
         )
     }
@@ -229,10 +260,13 @@ fun RingsChoice(label: String, on: Boolean, onClick: () -> Unit, modifier: Modif
 /** A thin bar in [hue] on its 20% track, filled to [fraction]. */
 @Composable
 fun RingsBar(fraction: Float, hue: Color, modifier: Modifier = Modifier.fillMaxWidth(), thickness: Dp = 6.dp) {
+    // Fills in from empty on first show and eases to any later value; read only in draw.
+    val shown = remember { Animatable(0f) }
+    LaunchedEffect(fraction) { shown.animateTo(fraction.coerceIn(0f, 1f), tween(1000, 150, FastOutSlowInEasing)) }
     Canvas(modifier.height(thickness)) {
         val r = size.height / 2
         drawLine(hue.copy(alpha = 0.2f), Offset(r, r), Offset(size.width - r, r), size.height, StrokeCap.Round)
-        val f = fraction.coerceIn(0f, 1f)
+        val f = shown.value
         if (f > 0f) {
             // From the start edge, so it fills right to left in Arabic.
             val rtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -244,9 +278,24 @@ fun RingsBar(fraction: Float, hue: Color, modifier: Modifier = Modifier.fillMaxW
     }
 }
 
-/** One thick ring in [hue] (round caps, from the top), its 20% track under it; the [content] sits in the middle. */
+/**
+ * One thick ring in [hue] (round caps, from the top), its 20% track under it; the [content] sits in the middle. The
+ * ring sweeps in from empty and eases to each new value. With [shimmer] (work in progress) a bright band travels along
+ * the filled arc and its tip glows softly.
+ */
 @Composable
-fun RingsGauge(fraction: Float, hue: Color, modifier: Modifier, stroke: Dp = 12.dp, content: @Composable () -> Unit = {}) {
+fun RingsGauge(
+    fraction: Float,
+    hue: Color,
+    modifier: Modifier,
+    stroke: Dp = 12.dp,
+    shimmer: Boolean = false,
+    content: @Composable () -> Unit = {},
+) {
+    val shown = remember { Animatable(0f) }
+    LaunchedEffect(fraction) { shown.animateTo(fraction.coerceIn(0f, 1f), tween(700, easing = FastOutSlowInEasing)) }
+    val run: State<Float> = if (shimmer) rememberLoop(1600) else StillState
+    val glow: State<Float> = if (shimmer) rememberPulse(1400) else StillState
     Box(modifier, contentAlignment = Alignment.Center) {
         Canvas(Modifier.fillMaxSize()) {
             val s = stroke.toPx()
@@ -254,10 +303,27 @@ fun RingsGauge(fraction: Float, hue: Color, modifier: Modifier, stroke: Dp = 12.
             if (d > 0f) {
                 val tl = Offset((size.width - d) / 2f, (size.height - d) / 2f)
                 drawArc(hue.copy(alpha = 0.2f), 0f, 360f, false, tl, Size(d, d), style = Stroke(s))
-                val sweep = 360f * fraction.coerceIn(0f, 1f)
-                if (sweep > 0f) drawArc(hue, -90f, sweep, false, tl, Size(d, d), style = Stroke(s, cap = StrokeCap.Round))
+                val sweep = 360f * shown.value
+                if (sweep > 0f) {
+                    drawArc(if (shimmer) hue.copy(alpha = 0.72f) else hue, -90f, sweep, false, tl, Size(d, d), style = Stroke(s, cap = StrokeCap.Round))
+                    if (shimmer) {
+                        // The band: 44 degrees wide, running from before the start to past the tip, cut to the arc.
+                        val band = 44f
+                        val from = -90f - band + (sweep + band) * run.value
+                        val a = maxOf(from, -90f)
+                        val b = minOf(from + band, -90f + sweep)
+                        if (b > a) drawArc(hue, a, b - a, false, tl, Size(d, d), style = Stroke(s))
+                        val tip = Math.toRadians((-90f + sweep).toDouble())
+                        val c = Offset(center.x + (d / 2f) * kotlin.math.cos(tip).toFloat(), center.y + (d / 2f) * kotlin.math.sin(tip).toFloat())
+                        drawCircle(hue.copy(alpha = 0.10f + 0.16f * glow.value), s * (0.8f + 0.35f * glow.value), c)
+                        drawCircle(hue, s / 2f, c)
+                    }
+                }
             }
         }
         content()
     }
 }
+
+/** A resting value for motions that aren't running. */
+private val StillState: State<Float> = mutableFloatStateOf(0f)

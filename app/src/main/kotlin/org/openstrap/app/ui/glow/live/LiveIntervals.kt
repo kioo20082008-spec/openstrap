@@ -286,7 +286,7 @@ private fun HeartStripDark(bpm: Int?, maxHr: Int, paused: Boolean, modifier: Mod
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val zone = WorkoutRecorder.liveZone(bpm, maxHr, heartZones)
-        Canvas(Modifier.size(8.dp)) { drawCircle(zone?.let { ZONE_COLORS[it] } ?: AppColors.ink) }
+        org.openstrap.app.ui.glow.PulseDot(zone?.let { ZONE_COLORS[it] } ?: AppColors.ink, bpm, 8.dp)
         Spacer(Modifier.width(10.dp))
         Text(
             bpm?.let { stringResource(R.string.workout_live_bpm, it) } ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink,

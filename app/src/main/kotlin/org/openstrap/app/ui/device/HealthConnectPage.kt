@@ -61,23 +61,23 @@ fun HealthConnectPage(
             RingsRows {
                 val now = System.currentTimeMillis() / 1000
                 val line = healthConnectLine(auto, now, java.time.ZoneId.systemDefault(), availability = availability)
-                PageSwitchRow(stringResource(R.string.you_hc_auto), line, auto.on, onAuto, divider = false, icon = AppIcons.Refresh04)
+                RingsSwitchRow(stringResource(R.string.you_hc_auto), line, auto.on, onAuto, divider = false, icon = AppIcons.Refresh04)
             }
         }
         item { RingsSection(stringResource(R.string.you_hc_any_time), Modifier.padding(top = 4.dp), PanelLabelInset) }
         item {
             RingsRows {
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_hc_copy_now), stringResource(R.string.you_hc_copy_now_note), onClick = onCopyNow,
                     below = true,
                     divider = false, icon = AppIcons.Heartbeat,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_action_restore), stringResource(R.string.you_hc_restore_note), onClick = onRestore,
                     below = true,
                     icon = AppIcons.ArrowCounterClockwise,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_hc_open), stringResource(R.string.you_hc_open_note), onClick = onOpen, below = true,
                     icon = AppIcons.SlidersHorizontal,
                 )

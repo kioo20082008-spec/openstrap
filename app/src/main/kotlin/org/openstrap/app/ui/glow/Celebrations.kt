@@ -19,7 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -79,6 +85,19 @@ internal fun BadgeArt(
     }
 }
 
+/** Pops in once on a soft spring, from a little small: a celebration's art. */
+@Composable
+private fun Modifier.celebrationPop(): Modifier {
+    val p = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { p.animateTo(1f, spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow)) }
+    return graphicsLayer {
+        val v = p.value
+        scaleX = 0.6f + 0.4f * v
+        scaleY = 0.6f + 0.4f * v
+        alpha = v.coerceIn(0f, 1f)
+    }
+}
+
 /** The close button in a celebration's top corner. */
 @Composable
 private fun CloseRow(title: String?, onClose: () -> Unit) {
@@ -102,16 +121,20 @@ fun BestCardScreen(best: Rewards.NewBest, sportName: String, contentPadding: Pad
     ) {
         CloseRow(stringResource(R.string.glow_celebrate_personal_best), onContinue)
         Spacer(Modifier.height(24.dp))
-        BadgeArt(
-            RewardsCopy.bestShort(best.best.kind), BestColor, 200.dp, Modifier.align(Alignment.CenterHorizontally), dots = true,
-            under = RewardsCopy.bestValue(best.best.kind, best.best.value),
-        )
+        // The best pops in on a spring and bursts: a ring racing out and sparks of its gold, once.
+        Box(Modifier.align(Alignment.CenterHorizontally), contentAlignment = Alignment.Center) {
+            DetailBurst(BestColor, Modifier.matchParentSize(), delayMs = 260)
+            BadgeArt(
+                RewardsCopy.bestShort(best.best.kind), BestColor, 200.dp, Modifier.celebrationPop(), dots = true,
+                under = RewardsCopy.bestValue(best.best.kind, best.best.value),
+            )
+        }
         Spacer(Modifier.height(12.dp))
-        Text(RewardsCopy.bestTitle(best.best.kind), color = AppColors.ink, style = PageTitleStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        Text(RewardsCopy.beatLine(best, now), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.bestTitle(best.best.kind), color = AppColors.ink, style = PageTitleStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().enterRise(3))
+        Text(RewardsCopy.beatLine(best, now), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().enterRise(4))
         Text(
             RewardsCopy.whenSet(best.best.date, sportName), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().enterRise(5),
         )
     }
 }
@@ -132,16 +155,23 @@ fun GoalMomentScreen(count: Int, goal: Int, inARow: Int, weekStarts: List<Long>,
     ) {
         CloseRow(null, onContinue)
         Spacer(Modifier.height(32.dp))
-        DetailRing((count.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f), MetricColors.good, Modifier.align(Alignment.CenterHorizontally)) {
-            Text(dotFormat("%d/%d", count, goal), color = AppColors.ink, style = ringFigure(48.sp), maxLines = 1)
+        // The ring sweeps to the goal, then bursts as it closes.
+        Box(Modifier.align(Alignment.CenterHorizontally), contentAlignment = Alignment.Center) {
+            DetailBurst(MetricColors.good, Modifier.matchParentSize(), delayMs = 1_000)
+            DetailRing((count.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f), MetricColors.good, Modifier.celebrationPop()) {
+                Text(dotFormat("%d/%d", count, goal), color = AppColors.ink, style = ringFigure(48.sp), maxLines = 1)
+            }
         }
         Text(
             stringResource(R.string.glow_celebrate_goal_met), color = AppColors.ink, style = PageTitleStyle, textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp).enterRise(3),
         )
-        Text(RewardsCopy.momentLine(inARow), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(
+            RewardsCopy.momentLine(inARow), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().enterRise(4),
+        )
         Spacer(Modifier.height(8.dp))
-        WeekDaysPanel(weekStarts, note = stringResource(R.string.glow_celebrate_goal_note))
+        Box(Modifier.enterRise(5)) { WeekDaysPanel(weekStarts, note = stringResource(R.string.glow_celebrate_goal_note)) }
     }
 }
 
@@ -189,10 +219,13 @@ fun HistoryBadgesScreen(badges: List<Rewards.Badge>, contentPadding: PaddingValu
         pinned = { WorkoutButton(stringResource(R.string.glow_continue), AppColors.ink, AppColors.onInk, onContinue) },
     ) {
         CloseRow(null, onContinue)
-        Text(
-            stringResource(R.string.glow_celebrate_history_title), color = AppColors.ink, style = PageTitleStyle,
-            modifier = Modifier.padding(start = 4.dp, top = 8.dp),
-        )
+        Box {
+            DetailBurst(MetricColors.good, Modifier.matchParentSize(), delayMs = 200)
+            Text(
+                stringResource(R.string.glow_celebrate_history_title), color = AppColors.ink, style = PageTitleStyle,
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp),
+            )
+        }
         Text(
             pluralStringResource(R.plurals.glow_celebrate_history_badges, badges.size, badges.size),
             color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(start = 4.dp),
@@ -229,10 +262,11 @@ internal fun BadgeRow(badges: List<Pair<Rewards.Badge, String?>>, locked: (Rewar
 @Composable
 internal fun BadgeGrid(badges: List<Pair<Rewards.Badge, String?>>, locked: (Rewards.Badge) -> Boolean = { false }, face: (Rewards.Badge) -> String = { it.short }) {
     QuietPanel {
-        badges.chunked(3).forEach { row ->
+        badges.chunked(3).forEachIndexed { r, row ->
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                row.forEach { (b, note) ->
-                    Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                row.forEachIndexed { k, (b, note) ->
+                    // The badges cascade in, a row at a time and along each row.
+                    Column(Modifier.weight(1f).enterRise(r * 2 + k), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         BadgeArt(face(b), badgeColor(b.group), 64.dp, locked = locked(b))
                         Text(b.title, color = AppColors.ink, style = GlowType.secondary, textAlign = TextAlign.Center, maxLines = 2)
                         note?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.caption, textAlign = TextAlign.Center) }

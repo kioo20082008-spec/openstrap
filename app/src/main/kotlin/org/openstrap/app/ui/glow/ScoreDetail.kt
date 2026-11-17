@@ -6,7 +6,6 @@ import androidx.compose.ui.platform.LocalResources
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.RecoveryCopy
 import org.openstrap.app.presentation.Units
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -278,7 +277,7 @@ private fun ChargeDetail(
                 val known = values.indices.filter { values[it] != null }
                 val hours = if (known.isEmpty()) 0f else (known.last() - known.first()) * step / 3600f
                 GlowLineChart(
-                    values, height = if (hours < SHORT_CURVE_HOURS) 110.dp else 200.dp, labels = HOURS, color = color, showAverage = false, yRange = 0f..100f,
+                    values, Modifier.detailReveal(), height = if (hours < SHORT_CURVE_HOURS) 110.dp else 200.dp, labels = HOURS, color = color, showAverage = false, yRange = 0f..100f,
                     onScrub = { i ->
                         scrub = i?.let { values[it] }?.let { v ->
                             val shown = chargeShown(v)
@@ -293,7 +292,7 @@ private fun ChargeDetail(
             Column {
                 DetailSentence(DetailCopy.charge(now, atWake, TabCopy.drainedAmount(c.drainedExercise + c.drainedStress + c.drainedLiving).toInt(), c.anchored, isToday, LocalTime.now().hour))
                 InfoCopy.chargeNotes(c).firstOrNull()?.let { note ->
-                    Box(Modifier.clickable { info = true }) { CaveatLine(note, color) }
+                    Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color) }
                 }
             }
         }

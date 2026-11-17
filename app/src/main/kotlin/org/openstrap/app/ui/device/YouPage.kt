@@ -157,23 +157,23 @@ fun YouPage(
         item { RingsHeader(stringResource(R.string.you_title), onBack) }
         item {
             RingsRows {
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_profile), profile.summary(), onClick = onProfile, below = true, divider = false,
                     selected = selected == PageRowKeys.PROFILE,
                 )
-                PageRow(
+                RingsRow(
                     org.openstrap.app.ui.workout.HeartZonesCopy.TITLE, org.openstrap.app.ui.workout.HeartZonesCopy.youLine(maxHeartRate), onClick = onHeartZones,
                     below = true, selected = selected == PageRowKeys.HEART_ZONES,
                 )
-                PageRow(stringResource(R.string.you_row_goals), goalsLine(goals), onClick = onGoals, below = true)
-                PageRow(stringResource(R.string.you_row_sleep_goal), sleepGoalLine(goals, sleepNeedMinutes), onClick = onGoals, below = true)
-                PageRow(
+                RingsRow(stringResource(R.string.you_row_goals), goalsLine(goals), onClick = onGoals, below = true)
+                RingsRow(stringResource(R.string.you_row_sleep_goal), sleepGoalLine(goals, sleepNeedMinutes), onClick = onGoals, below = true)
+                RingsRow(
                     stringResource(R.string.you_row_goals_and_bests),
                     pluralStringResource(R.plurals.you_goals_and_bests_line, goals.workoutsPerWeek, goals.workoutsPerWeek),
                     onClick = onGoalsAndBests,
                     below = true, selected = selected == PageRowKeys.GOALS_AND_BESTS,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_weekly_report), stringResource(R.string.you_weekly_report_line), onClick = onWeeklyReport,
                     below = true, selected = selected == PageRowKeys.WEEKLY_REPORT,
                 )
@@ -185,16 +185,16 @@ fun YouPage(
                 // Read again whenever either changes, so "today" and "yesterday" follow the last one.
                 val now = remember(healthConnectAuto, backup) { System.currentTimeMillis() / 1000 }
                 val zone = java.time.ZoneId.systemDefault()
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_health_connect),
                     healthConnectSummary(healthConnectAuto, now, zone, availability = healthConnectAvailability), onClick = onHealthConnect,
                     below = true, divider = false, selected = selected == PageRowKeys.HEALTH_CONNECT,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_backup), BackupCopy.summary(backup, now, zone), onClick = onBackup, below = true,
                     selected = selected == PageRowKeys.BACKUP,
                 )
-                if (deletedSleep > 0) PageRow(
+                if (deletedSleep > 0) RingsRow(
                     stringResource(R.string.you_row_deleted_sleep), org.openstrap.app.ui.dashboard.SleepCopy.deletedCount(deletedSleep),
                     onClick = onDeletedSleep, below = true, selected = selected == PageRowKeys.DELETED_SLEEP,
                 )
@@ -206,15 +206,15 @@ fun YouPage(
         item {
             RingsRows {
                 val now = remember(updates) { System.currentTimeMillis() / 1000 }
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_updates), UpdateCopy.summary(updates, installedVersion, now), onClick = onUpdates,
                     below = true, divider = false, selected = selected == PageRowKeys.UPDATES, dot = updateWaiting,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_row_diagnostics), pluralStringResource(R.plurals.you_diagnostics_line, logLines, logLines),
                     onClick = onDiagnostics, below = true, selected = selected == PageRowKeys.DIAGNOSTICS,
                 )
-                if (onSampleData != null) PageRow(
+                if (onSampleData != null) RingsRow(
                     stringResource(R.string.you_row_sample_data), stringResource(R.string.you_row_sample_data_note), onClick = onSampleData,
                     below = true,
                 )
@@ -223,7 +223,7 @@ fun YouPage(
         item {
             Text(
                 stringResource(R.string.you_footer, BuildConfig.VERSION_NAME),
-                Modifier.fillMaxWidth().padding(top = 4.dp),
+                Modifier.fillMaxWidth().riseIn().padding(top = 4.dp),
                 color = AppColors.muted, style = GlowType.secondary, textAlign = TextAlign.Center,
             )
         }
@@ -244,8 +244,8 @@ private fun AppearanceCard(selected: AppTheme, onPick: (AppTheme) -> Unit) {
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep, RingColors.Steps).forEach { hue ->
-                Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(hue))
+            listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep, RingColors.Steps).forEachIndexed { i, hue ->
+                Box(Modifier.weight(1f).height(8.dp).growIn(i).clip(RoundedCornerShape(4.dp)).background(hue))
             }
         }
         Text(stringResource(R.string.you_appearance_note), color = AppColors.muted, style = GlowType.secondary)

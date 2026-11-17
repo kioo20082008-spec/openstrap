@@ -199,13 +199,25 @@ private const val ARC_GAP = 8f
  * (pattern D2). The number goes in its middle.
  */
 @Composable
-internal fun ZoneArc(bpm: Int?, maxHr: Int, modifier: Modifier) {
+internal fun ZoneArc(bpm: Int?, maxHr: Int, modifier: Modifier, beat: androidx.compose.runtime.State<Float>? = null) {
     val heartZones = LocalHeartZones.current
     val zone = WorkoutRecorder.liveZone(bpm, maxHr, heartZones)
     Canvas(modifier) {
         val stroke = 6.dp.toPx()
         val halo = 9.dp.toPx()
         val r = min(size.width, size.height) / 2 - halo
+        // The beat, read here so it only draws again: a soft light of the zone swelling in the arc's middle on each one.
+        val pulse = beat?.let { lubDub(it.value) } ?: 0f
+        val lit = zone?.let { ZONE_COLORS[it] }
+        if (lit != null && bpm != null) {
+            val glow = r * (0.82f + 0.08f * pulse)
+            drawCircle(
+                androidx.compose.ui.graphics.Brush.radialGradient(
+                    listOf(lit.copy(alpha = 0.16f + 0.14f * pulse), Color.Transparent), center, glow,
+                ),
+                glow, center,
+            )
+        }
         val topLeft = Offset(center.x - r, center.y - r)
         val box = Size(r * 2, r * 2)
         val seg = (ARC_SWEEP - ARC_GAP * (Workouts.ZONES - 1)) / Workouts.ZONES
@@ -220,7 +232,8 @@ internal fun ZoneArc(bpm: Int?, maxHr: Int, modifier: Modifier) {
             val a = Math.toRadians((ARC_START + WorkoutRecorder.zonePosition(bpm, maxHr, heartZones) * ARC_SWEEP).toDouble())
             val at = Offset(center.x + r * cos(a).toFloat(), center.y + r * sin(a).toFloat())
             val dot = zone?.let { ZONE_COLORS[it] } ?: AppColors.ink
-            drawCircle(dot.copy(alpha = 0.3f), radius = halo, center = at)
+            // The point glows with each beat.
+            drawCircle(dot.copy(alpha = 0.3f + 0.25f * pulse), radius = halo * (1f + 0.35f * pulse), center = at)
             drawCircle(AppColors.ink, radius = 5.dp.toPx(), center = at)
         }
     }
@@ -263,14 +276,16 @@ internal fun WorkoutHeartCard(
                 if (values.any { it != null }) {
                     GlowLineChart(values, Modifier.align(Alignment.BottomCenter).alpha(0.45f), height = 120.dp, showAverage = false)
                 }
-                ZoneArc(bpm, r.maxHeartRate, Modifier.matchParentSize())
+                // The arc and the number beat together at the strap's own heart rate.
+                val beat = rememberBeatPhase(bpm)
+                ZoneArc(bpm, r.maxHeartRate, Modifier.matchParentSize().beating(beat, 0.015f), beat)
                 // Sized for three digits inside the arc, whatever the reading, so the number never spills past it
                 // and doesn't jump in size as the heart rate crosses 100.
                 val inside = (minOf(maxWidth, maxHeight) - 18.dp) * 0.78f
                 val scale = dotFitScale("000", DotSize.Live, inside)
                 Column(Modifier.align(Alignment.Center), horizontalAlignment = Alignment.CenterHorizontally) {
                     if (bpm != null) {
-                        DotMatrixText(bpm.toString(), dot = DotSize.Live, scale = scale)
+                        DotMatrixText(bpm.toString(), dot = DotSize.Live, scale = scale, modifier = Modifier.beating(beat, 0.035f))
                         Spacer(Modifier.height(8.dp))
                         Text(
                             stringResource(R.string.workout_live_heart_behind), color = AppColors.ink.copy(alpha = 0.75f),

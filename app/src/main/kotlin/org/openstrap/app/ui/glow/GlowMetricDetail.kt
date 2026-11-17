@@ -6,8 +6,8 @@ import org.openstrap.app.presentation.TimeOfDay
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.Units
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -146,11 +146,15 @@ internal fun DetailTemplate(
     var switching by rememberSaveable { mutableStateOf(false) }
     val gutter = GlowLayout.WideGutter
     // Rows inside a detail open the next one with a crossfade, not by growing (spec 3.5).
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalCardsGrow provides false) {
+    val cascade = remember { DetailCascade() }
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalCardsGrow provides false, LocalDetailCascade provides cascade) {
         ScreenList(contentPadding, list, gutter = gutter) {
             item {
                 // The card tapped grows into this surface (spec 3.5).
-                Column(Modifier.fillMaxWidth().detailSurface(hero = true, RingDetailShape), horizontalAlignment = Alignment.CenterHorizontally) {
+                // The metric's hue drifting faintly behind the hero, so the page breathes round its ring.
+                Box(Modifier.fillMaxWidth().detailSurface(hero = true, RingDetailShape).clip(RingDetailShape)) {
+                AmbientAura(color, Modifier.matchParentSize(), strength = 0.7f)
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     val day = strip.firstOrNull { it.selected }?.date
                     PageHeader(
                         title, onBack, subtitle = day?.let(::dayName),
@@ -169,11 +173,12 @@ internal fun DetailTemplate(
                     HeroRing(shown, color, ringScale, icon, Modifier.padding(top = 10.dp))
                     if (shown.word != null && shown.value != null) DetailStatusPill(shown.word, color, Modifier.padding(top = 14.dp))
                     if (figures.isNotEmpty()) RingFiguresCard(figures, Modifier.padding(top = 18.dp))
-                    if (strip.isNotEmpty()) WeekStrip(strip, color, onDay, Modifier.padding(top = 10.dp))
+                    if (strip.isNotEmpty()) WeekStrip(strip, color, onDay, Modifier.padding(top = 10.dp).detailRise())
+                }
                 }
             }
             if (ranges.size > 1) item {
-                GlowSegments(ranges.map { it.label }, ranges.indexOf(range), { onRange(ranges[it]) }, role = Role.Tab)
+                GlowSegments(ranges.map { it.label }, ranges.indexOf(range), { onRange(ranges[it]) }, Modifier.detailRise(), role = Role.Tab)
             }
             body()
         }
@@ -201,7 +206,7 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
                 v.length == 4 -> 46.sp
                 else -> 54.sp
             }
-            Text(v, Modifier.detailNumber(v), color = AppColors.ink, style = ringFigure(size), maxLines = 1)
+            Text(detailCountUp(v), Modifier.detailNumber(v), color = AppColors.ink, style = ringFigure(size), maxLines = 1)
             if (shown.label.isNotEmpty()) Text(
                 shown.label, color = AppColors.muted, style = RingLabel, textAlign = TextAlign.Center, maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -231,7 +236,7 @@ private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (Loc
             Column(
                 Modifier.width(40.dp).clip(RoundedCornerShape(16.dp))
                     .background(if (d.selected) AppColors.ink else Color.Transparent)
-                    .clickable(onClickLabel = show, role = Role.Button) { onDay(d.date) }
+                    .detailPress(onClickLabel = show, role = Role.Button, scale = 0.92f) { onDay(d.date) }
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(5.dp),
@@ -240,7 +245,8 @@ private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (Loc
                     d.label, color = if (d.selected) AppColors.onInk else AppColors.muted, maxLines = 1,
                     style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal),
                 )
-                Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))
+                if (d.selected && d.hasData) DetailSelectedDot(color)
+                else Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))
             }
         }
     }
@@ -571,7 +577,7 @@ private fun NightChart(metric: Metric, state: DayUiState, color: Color, onScrub:
     val values = remember(series, window) { bucket(series, window, slot) }
     DetailCard {
         GlowLineChart(
-            values, height = 220.dp, labels = listOf(clock(window.first), clock(window.last)), color = color, showAverage = false, format = metric::format,
+            values, Modifier.detailReveal(), height = 220.dp, labels = listOf(clock(window.first), clock(window.last)), color = color, showAverage = false, format = metric::format,
             onScrub = { i ->
                 onScrub(i?.let { values[it] }?.let { v -> scrubAt(metric, v, window.first + i * slot) })
             },
@@ -630,11 +636,11 @@ private fun DayChart(metric: Metric, state: DayUiState, color: Color, hasValue: 
         when (metric) {
             // Holding an hour puts its steps in the headline.
             Metric.Steps -> GlowBars(
-                state.hourlySteps, height = 200.dp, labels = HOURS, accent = color,
+                state.hourlySteps, Modifier.detailGrow(), height = 200.dp, labels = HOURS, accent = color,
                 onScrub = { h -> onScrub(h?.let { hourSteps(it, state.hourlySteps[it]) }) },
             )
             Metric.RestingHr -> if (state.restingTrend.any { it.value != null }) {
-                GlowTrend(state.restingTrend.map { GlowDay(it.label, it.value) }, height = 200.dp)
+                GlowTrend(state.restingTrend.map { GlowDay(it.label, it.value) }, Modifier.detailReveal(), height = 200.dp)
             }
             else -> if (series.isNotEmpty()) {
                 // Readings come every minute for heart rate, sparser for the rest.
@@ -643,7 +649,7 @@ private fun DayChart(metric: Metric, state: DayUiState, color: Color, hasValue: 
                 val labels = if (window == day) HOURS else listOf(clock(window.first), clock(window.last))
                 val band = if (metric == Metric.HeartRate) normalOf(Metric.RestingHr)?.let { it.low..it.high } else null
                 GlowLineChart(
-                    values, height = 220.dp, labels = labels, color = color, showAverage = false, band = band, format = metric::format,
+                    values, Modifier.detailReveal(), height = 220.dp, labels = labels, color = color, showAverage = false, band = band, format = metric::format,
                     onScrub = { i ->
                         onScrub(i?.let { values[it] }?.let { v -> scrubAt(metric, v, window.first + i * slot) })
                     },
@@ -666,7 +672,7 @@ private fun HistoryChart(
     val levels = remember(values, normal) { DetailCopy.levels(values, normal) }
     DetailCard {
     NormalTrend(
-        values, levels, color, labels = labels,
+        values, levels, color, Modifier.detailReveal(), labels = labels,
         band = normal?.let { it.low..it.high }, bandLabel = normal?.let { DetailCopy.bandLabel(it, metric::format) },
         onScrub = { i ->
             onScrub(i?.let { values[it] }?.let { v ->
@@ -769,4 +775,15 @@ internal fun RelatedMetricRow(m: Metric, state: DayUiState, history: DailyHistor
         offNormal = status != null && status != 0, onClick = { onOpen(Detail.OfMetric(m)) }, divider = divider,
         icon = m.rowIcon(),
     )
+}
+
+/** The shown day's dot under its pill, breathing gently so the eye finds the day the page is about. */
+@Composable
+private fun DetailSelectedDot(color: Color) {
+    val p = rememberPulse(1_800)
+    Canvas(Modifier.size(5.dp)) {
+        val r = size.minDimension / 2f
+        drawCircle(color.copy(alpha = 0.35f * (1f - p.value)), r * (1.2f + 1.3f * p.value))
+        drawCircle(color, r * (0.85f + 0.25f * p.value))
+    }
 }

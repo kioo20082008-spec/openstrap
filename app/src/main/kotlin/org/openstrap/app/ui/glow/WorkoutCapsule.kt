@@ -262,16 +262,17 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
 /** A dot in [color] that beats at [bpm]; still without one. */
 @Composable
 fun PulseDot(color: Color, bpm: Int?, size: Dp) {
-    val beat = if (bpm != null) {
-        val period = (60_000 / bpm).coerceIn(250, 2000)
-        rememberInfiniteTransition(label = "beat").animateFloat(
-            1f, 1f,
-            infiniteRepeatable(keyframes { durationMillis = period; 1.5f at period * 15 / 100; 1f at period * 40 / 100 }, RepeatMode.Restart),
-            label = "dot",
-        )
-    } else null
-    // Read while drawing, so the beat doesn't compose the dot again every frame.
-    Canvas(Modifier.size(size).graphicsLayer { val s = beat?.value ?: 1f; scaleX = s; scaleY = s }) { drawCircle(color) }
+    // At the strap's own bpm, lub-dub, with a ring rippling out of it on each beat; read while drawing, so the beat
+    // never composes the dot again.
+    val phase = rememberBeatPhase(bpm)
+    Canvas(Modifier.size(size)) {
+        val r = this.size.minDimension / 2f
+        val p = phase.value
+        if (bpm != null && p > 0f) {
+            drawCircle(color.copy(alpha = 0.45f * (1f - p)), radius = r * (1f + 1.6f * p), style = androidx.compose.ui.graphics.drawscope.Stroke(r * 0.35f))
+        }
+        drawCircle(color, radius = r * (1f + 0.4f * lubDub(p)))
+    }
 }
 
 /**

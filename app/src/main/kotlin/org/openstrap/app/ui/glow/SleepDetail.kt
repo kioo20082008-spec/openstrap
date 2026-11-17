@@ -192,8 +192,8 @@ internal fun SleepScoreDetail(
                     item {
                         DetailCard {
                             // Moved, the strap's whole night shows with what's outside the user's times dimmed.
-                            if (moved && state.strapSleepStages.isNotEmpty()) GlowSleepStages(state.strapSleepStages, 150.dp, kept = session.start..session.end)
-                            else if (state.sleepStages.isNotEmpty()) GlowSleepStages(state.sleepStages, 150.dp)
+                            if (moved && state.strapSleepStages.isNotEmpty()) Box(Modifier.detailReveal()) { GlowSleepStages(state.strapSleepStages, 150.dp, kept = session.start..session.end) }
+                            else if (state.sleepStages.isNotEmpty()) Box(Modifier.detailReveal()) { GlowSleepStages(state.sleepStages, 150.dp) }
                             state.sleepBreakdown?.let { StageBars(it, Modifier.padding(top = 18.dp)) }
                             // Times extended past the strap's have no stages for the added time, so the page says so.
                             if (detected != null && state.sleepBreakdown != null) {
@@ -408,7 +408,7 @@ private fun StageBars(b: Summaries.SleepBreakdown, modifier: Modifier = Modifier
             val secs = b.byStage[st] ?: 0L
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.width(56.dp))
-                FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f), height = 10.dp)
+                FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f).detailReveal(delayMs = 300, fromStart = true), height = 10.dp)
                 Text(
                     Units.duration(secs), color = AppColors.ink, style = GlowType.secondary,
                     modifier = Modifier.padding(start = 12.dp).width(56.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
@@ -461,7 +461,7 @@ private fun ScrubLine(
     val values = remember(points, window) { bucket(points, window, step) }
     val resources = LocalResources.current
     GlowLineChart(
-        values, height = height, labels = labels, color = color, showAverage = false,
+        values, Modifier.detailReveal(), height = height, labels = labels, color = color, showAverage = false,
         onScrub = { i ->
             val headline = i?.let { values[it] }?.let { v ->
                 val at = resources.getString(R.string.glow_sleep_scrub_at, unit, clock(window.first + i * step))

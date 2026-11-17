@@ -70,21 +70,21 @@ fun UpdatesPage(
         item { RingsHeader(stringResource(R.string.you_updates_title), onBack) }
         item {
             RingsRows {
-                if (newest != null) PageRow(
+                if (newest != null) RingsRow(
                     stringResource(R.string.you_updates_release, newest.versionName), UpdateCopy.install(newest, state.install, recording),
                     onClick = { onInstall(newest) }, below = true, divider = false, enabled = !busy && !(recording && newest.apk != null),
                     icon = AppIcons.DownloadSimple,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_updates_check_now), UpdateCopy.checkStatus(state, now), onClick = onCheck, below = true,
                     divider = newest != null,
                     enabled = !state.checking, icon = AppIcons.Refresh04,
                 )
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_updates_daily), stringResource(R.string.you_updates_daily_note), auto, onAuto,
                     icon = AppIcons.CalendarBlank,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_updates_all_releases), stringResource(R.string.you_updates_on_github), onClick = onGitHub,
                     below = true,
                     icon = AppIcons.Info,

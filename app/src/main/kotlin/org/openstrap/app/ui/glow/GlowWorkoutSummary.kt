@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +59,7 @@ import org.openstrap.app.ui.workout.SplitRow
 import org.openstrap.app.ui.workout.ZoneSeconds
 import org.openstrap.app.ui.workout.familyColor
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.openstrap.app.data.Route
 import org.openstrap.app.data.WorkoutAnalysis
 import org.openstrap.app.data.Workouts
@@ -195,33 +197,43 @@ fun GlowWorkoutSummaryScreen(
         val haptics = rememberHaptics()
         val animationsOn = rememberAnimationsOn()
         val swell = remember { Animatable(0f) }
+        val sparks = remember { Animatable(0f) }
         var swelled by rememberSaveable(w.start) { mutableStateOf(false) }
         val anyBest = earned.any { it.kind == EarnedLine.Kind.Best }
         LaunchedEffect(anyBest) {
             if (!anyBest || swelled) return@LaunchedEffect
             swelled = true
+            // Once the ring has swept in: the tick, and the sparks fly while the ring swells and settles.
+            if (animationsOn) delay(900)
             haptics.perform(HapticEvent.PersonalBest)
             if (animationsOn) {
+                launch { sparks.animateTo(1f, tween(1300)) }
                 swell.animateTo(1f, tween(450))
                 swell.animateTo(0f, tween(900))
             }
         }
         val family = FamilySummary.familyOf(w.sportType, summary.structure)
         val effort = Workouts.effort(w.trainingLoad, usualLoad)
-        SummaryHeroCard(hero ?: summaryHero(family, summary, usualLoad), familyColor(family), effort) { swell.value }
+        Box(Modifier.fillMaxWidth().enterRise(0)) {
+            SummaryHeroCard(hero ?: summaryHero(family, summary, usualLoad), familyColor(family), effort, { swell.value }, { sparks.value })
+        }
         // What was done to the times, under the hero that says them.
         TrimNote(summary, trim.undo, Modifier.padding(horizontal = 4.dp), onCard = false)
         val weekStarts = remember(workouts) { goalWeekStarts(workouts) }
-        val sectionOnEdge = FamilySection(family, summary, liveRoute, others, weekStarts, week = rewards?.week)
-        EarnedChips(earned)
+        // What follows rises in after the hero, one card after another.
+        var sectionOnEdge = false
+        Column(Modifier.fillMaxWidth().enterRise(1), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            sectionOnEdge = FamilySection(family, summary, liveRoute, others, weekStarts, week = rewards?.week)
+        }
+        Box(Modifier.fillMaxWidth().enterRise(2)) { EarnedChips(earned) }
         // The drop only with heart rate to show: recorded in the workout, or arriving live after it.
         val live = calmDown?.takeIf { it.start == w.start }
         val dropShown = summary.recorded.isNotEmpty() || !live?.readings.isNullOrEmpty()
-        if (dropShown) CalmDownHero(summary, live, usualDrop, effort, 0f) { info = true }
+        if (dropShown) Box(Modifier.fillMaxWidth().enterRise(3)) { CalmDownHero(summary, live, usualDrop, effort, 0f) { info = true } }
         // Load is lit from the left: what comes before it (the hero, the drop) is lit from below, so two cards in a row
         // never look the same. Under the section's own edge card, lit from the left or right, Load takes the bottom.
         CompositionLocalProvider(LocalEdgeOverride provides EdgeOverride(edge = if (sectionOnEdge && !dropShown) Edge.Bottom else Edge.Left)) {
-            WorkoutLoadCard(a, usualLoad)
+            Box(Modifier.fillMaxWidth().enterRise(4)) { WorkoutLoadCard(a, usualLoad) }
         }
         DeleteWorkout(stringResource(R.string.glow_workout_delete_phone), onDelete)
     }
@@ -239,21 +251,24 @@ fun GlowWorkoutSummaryScreen(
  * card. [swell] lifts the ring a little for a personal best, drawn in the layer so nothing composes again.
  */
 @Composable
-internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swell: () -> Float = { 0f }) {
+internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swell: () -> Float = { 0f }, sparks: () -> Float = { 0f }) {
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+      // The ring sweeps in over a soft breathing light of its colour; a personal best bursts sparks off its edge.
+      Box(Modifier.padding(top = 4.dp), contentAlignment = Alignment.Center) {
+        HeroHalo(color, Modifier.matchParentSize())
         WorkoutRing(
             effort, color,
-            Modifier.padding(top = 4.dp).graphicsLayer {
+            Modifier.graphicsLayer {
                 val k = 1f + 0.06f * swell()
                 scaleX = k
                 scaleY = k
             },
-            ringSize = 210.dp, stroke = 22.dp, icon = AppIcons.HeartFill,
+            ringSize = 210.dp, stroke = 22.dp, icon = AppIcons.HeartFill, alive = true,
         ) {
             Column(Modifier.padding(horizontal = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 val n = hero.value.length
                 Text(
-                    hero.value, color = AppColors.ink, maxLines = 1, softWrap = false,
+                    rememberCountUpText(hero.value), color = AppColors.ink, maxLines = 1, softWrap = false,
                     style = ringFigure(if (n >= 7) 32.sp else if (n >= 5) 40.sp else 50.sp),
                 )
                 if (hero.unit.isNotBlank()) Text(
@@ -261,6 +276,8 @@ internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swe
                 )
             }
         }
+        SparkBurst(sparks, color, Modifier.matchParentSize())
+      }
         hero.sentence?.let {
             Text(
                 it, Modifier.fillMaxWidth().padding(top = 16.dp), color = AppColors.ink, textAlign = TextAlign.Center,
@@ -326,8 +343,12 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
     val span = (BeforeS + WorkoutSession.CALM_S).toFloat()
     val lo = readings.minOf { it.second } - 5f
     val hi = readings.maxOf { it.second } + 5f
+    // The line draws itself in from the left when it first shows.
+    val reveal = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { reveal.animateTo(1f, tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing)) }
     Column(modifier) {
         Canvas(Modifier.fillMaxWidth().height(84.dp)) {
+          clipRect(right = size.width * reveal.value) {
             fun x(t: Long) = (t - first) / span * size.width
             fun y(v: Int) = size.height - (v - lo) / (hi - lo) * size.height
             val endX = x(end)
@@ -342,6 +363,7 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
             }
             stroke(readings.filter { it.first <= end }, AppColors.ink.copy(alpha = 0.45f))
             stroke(readings.filter { it.first >= end }, AppColors.ink)
+          }
         }
         Spacer(Modifier.height(6.dp))
         Ltr {

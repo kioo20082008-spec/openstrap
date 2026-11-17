@@ -39,27 +39,27 @@ fun BackupPage(
         item { RingsHeader(stringResource(R.string.you_backup_title), onBack) }
         item {
             RingsRows {
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_backup_automatic), BackupCopy.status(state, now), state.on, toggle, divider = false,
                     icon = AppIcons.ShieldCheck,
                 )
                 if (state.on) {
-                    PageRow(
+                    RingsRow(
                         stringResource(R.string.you_backup_folder), BackupCopy.folder(state), onClick = onFolder, below = true,
                         icon = AppIcons.FolderOpen,
                     )
-                    PageRow(
+                    RingsRow(
                         stringResource(R.string.you_backup_now),
                         stringResource(if (backingUp) R.string.you_backup_now_running else R.string.you_backup_now_note),
                         onClick = onBackUpNow, below = true, enabled = !backingUp, icon = AppIcons.CloudArrowDown,
                     )
                 }
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_action_restore), stringResource(R.string.you_backup_restore_note), onClick = onRestore,
                     below = true,
                     icon = AppIcons.ArrowCounterClockwise,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_backup_save_copy), stringResource(R.string.you_backup_save_copy_note), onClick = onSaveCopy,
                     below = true,
                     icon = AppIcons.DownloadSimple,

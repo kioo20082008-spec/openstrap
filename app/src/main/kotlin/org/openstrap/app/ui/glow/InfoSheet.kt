@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -140,7 +139,7 @@ private fun Fold(title: String, text: String, divider: Boolean = true) {
             .topHairline(divider, AppColors.hairline),
     ) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClickLabel = clickLabel) { open = !open }.padding(vertical = 16.dp),
+            Modifier.fillMaxWidth().detailPress(onClickLabel = clickLabel, scale = 0.98f) { open = !open }.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(title, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))

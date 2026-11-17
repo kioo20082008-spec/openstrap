@@ -1,5 +1,7 @@
 package org.openstrap.app.ui.firmware
 
+import org.openstrap.app.ui.device.RingsRow
+import org.openstrap.app.ui.device.RingsSwitchRow
 import android.app.Activity
 import org.openstrap.app.ui.device.RingsHeader
 import org.openstrap.app.ui.device.RingsPanel
@@ -121,12 +123,12 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
         item {
             RingsRows {
                 // Update checks need a signed-in Zepp account; its page is a row away, as on the Strap page.
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_zepp),
                     stringResource(if (account != null) R.string.you_strap_signed_in else R.string.you_strap_not_signed_in),
                     onClick = onZeppAccount, divider = false, enabled = !installing,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_firmware_from_file), stringResource(R.string.you_firmware_from_file_note),
                     onClick = { pickFile.launch(arrayOf("*/*")) }, enabled = !installing,
                 )
@@ -312,7 +314,7 @@ private fun AccountPanel(
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         PageField(api, { api = it }, stringResource(R.string.you_zepp_server), Modifier.fillMaxWidth())
-        PageSwitchRow(
+        RingsSwitchRow(
             stringResource(R.string.you_zepp_china), stringResource(R.string.you_zepp_china_note), china, { china = it }, divider = false,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -340,7 +342,7 @@ private fun ConfirmInstall(image: ReadyImage, blockers: List<String>, onDismiss:
         } else {
             image.warnings.forEach { Warning(it) }
             if (image.warnings.isNotEmpty()) {
-                PageSwitchRow(stringResource(R.string.you_firmware_confirm_anyway), null, accepted, { accepted = it }, divider = false)
+                RingsSwitchRow(stringResource(R.string.you_firmware_confirm_anyway), null, accepted, { accepted = it }, divider = false)
             }
         }
     }
@@ -352,7 +354,7 @@ private fun Busy(label: String, fraction: Float?) {
     // the sliding bar.
     if (fraction != null) {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            RingsGauge(fraction, AppColors.ink, Modifier.size(132.dp), stroke = 14.dp) {
+            RingsGauge(fraction, AppColors.ink, Modifier.size(132.dp), stroke = 14.dp, shimmer = true) {
                 Text(
                     stringResource(R.string.you_firmware_percent, (fraction * 100).toInt()), style = RingsType.figure(28.sp),
                     color = AppColors.ink, maxLines = 1,

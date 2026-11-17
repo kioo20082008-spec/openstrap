@@ -56,6 +56,8 @@ fun GlowHealthspanScreen(state: Healthspan.Outcome?, contentPadding: PaddingValu
     BackHandler(onBack = onBack)
     val r = state?.result
     var info by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
+    val cascade = androidx.compose.runtime.remember { DetailCascade() }
+    androidx.compose.runtime.CompositionLocalProvider(LocalDetailCascade provides cascade) {
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item {
             PageHeader(
@@ -66,9 +68,10 @@ fun GlowHealthspanScreen(state: Healthspan.Outcome?, contentPadding: PaddingValu
         // The rings design's detail hero: Habit Age's one ring, its line, and the age scale.
         item { HabitAgeRingHero(state, Modifier.padding(top = 8.dp)) }
         if (r != null) {
-            item { PacePanel(r.pace) }
-            item { TermsPanel(r) }
+            item { Box(Modifier.detailRise()) { PacePanel(r.pace) } }
+            item { Box(Modifier.detailRise()) { TermsPanel(r) } }
         }
+    }
     }
     if (info) HabitAgeInfo(state) { info = false }
 }

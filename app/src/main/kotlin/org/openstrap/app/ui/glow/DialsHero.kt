@@ -75,22 +75,22 @@ internal fun DialsHero(
 ) {
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         val energyTitle = stringResource(R.string.glow_today_energy_title)
-        Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 12.dp, bottom = 14.dp), contentAlignment = Alignment.TopCenter) {
+        Box(Modifier.fillMaxWidth().bounceClick(onClick = onEnergy).padding(top = 12.dp, bottom = 14.dp), contentAlignment = Alignment.TopCenter) {
             TripleRings(energy, recovery, sleep, word = energyTitle)
         }
         // The rings' three figures as cards, each with its own bar: Energy, Recovery, Sleep.
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(Modifier.riseOnShow(1).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             RingStatCard(energyTitle, energy.level, RingColors.Energy, onEnergy, Modifier.weight(1f), AppIcons.Lightning)
             RingStatCard(labels.second, recovery, RingColors.Recovery, onRecovery, Modifier.weight(1f), AppIcons.HeartFill)
             RingStatCard(labels.third, sleep, RingColors.Sleep, onSleep, Modifier.weight(1f), AppIcons.MoonFill)
         }
         Spacer(Modifier.height(10.dp))
-        EnergyDayCard(energy, labels.first)
+        EnergyDayCard(energy, labels.first, Modifier.riseOnShow(2))
         Spacer(Modifier.height(10.dp))
-        RingAdviceCard(planTitle, planNote, RingColors.Energy)
+        RingAdviceCard(planTitle, planNote, RingColors.Energy, Modifier.riseOnShow(3))
         if (plan.isNotEmpty()) {
             Spacer(Modifier.height(12.dp))
-            PlanCard(planTitle, planNote, planChip, plan)
+            Box(Modifier.riseOnShow(4)) { PlanCard(planTitle, planNote, planChip, plan) }
         }
     }
 }

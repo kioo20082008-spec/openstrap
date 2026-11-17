@@ -224,20 +224,28 @@ fun GlowScreenList(
         androidx.compose.runtime.LaunchedEffect(focus, target) {
             if (focus && target != null) { state.animateScrollToItem(target); onFocused() }
         }
-        androidx.compose.runtime.CompositionLocalProvider(LocalPageColumn provides Dp.Unspecified) { ScreenList(contentPadding, state, gutter = gutter) {
-            if (!wide) blocks.forEachIndexed { i, block -> item(keys[i]) { block.content() } }
+        // The tab's cards cascade in the first time it shows; one scrolled to later just shows ([riseOnShow]).
+        val gate = androidx.compose.runtime.remember { RiseGate() }
+        androidx.compose.runtime.CompositionLocalProvider(LocalPageColumn provides Dp.Unspecified) { ScreenList(contentPadding, state, gutter = gutter, opaque = false) {
+            if (!wide) blocks.forEachIndexed { i, block -> item(keys[i]) { Rising(i, gate) { block.content() } } }
             else sections(blocks.indices.toList()) { blocks[it].pane }.forEach { section ->
                 val left = section.filter { blocks[it].pane == Pane.Left }
                 val right = section.filter { blocks[it].pane == Pane.Right }
                 // A full block, or a run with nothing on one side, takes the whole width rather than leave a hole.
-                if (left.isEmpty() || right.isEmpty()) section.forEach { i -> item(keys[i]) { blocks[i].content() } }
+                if (left.isEmpty() || right.isEmpty()) section.forEach { i -> item(keys[i]) { Rising(i, gate) { blocks[i].content() } } }
                 // Two columns are one item, keyed on every block in them.
                 else item(section.joinToString("|") { keys[it] }) {
-                    BalancedColumns(left.map { blocks[it].content }, right.map { blocks[it].content })
+                    Rising(section.first(), gate) { BalancedColumns(left.map { blocks[it].content }, right.map { blocks[it].content }) }
                 }
             }
         } }
     }
+}
+
+/** One dashboard block rising into place, [index] steps into the cascade (one child, as the block was). */
+@Composable
+private fun Rising(index: Int, gate: RiseGate, content: @Composable () -> Unit) {
+    androidx.compose.foundation.layout.Box(Modifier.riseOnShow(index, gate), propagateMinConstraints = true) { content() }
 }
 
 /**

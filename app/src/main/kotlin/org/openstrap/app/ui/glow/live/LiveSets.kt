@@ -56,6 +56,7 @@ import org.openstrap.app.ui.components.HapticEvent
 import org.openstrap.app.ui.components.pressClickable
 import org.openstrap.app.ui.components.rememberHaptics
 import org.openstrap.app.ui.glow.DotMatrixText
+import org.openstrap.app.ui.glow.beating
 import org.openstrap.app.ui.glow.draw.DotSize
 import org.openstrap.app.ui.glow.EdgeCard
 import org.openstrap.app.ui.glow.GlowCard
@@ -386,7 +387,13 @@ private fun SetDots(done: Int, target: Int?, inSet: Boolean, modifier: Modifier 
 private fun HeartLine(bpm: Int?, maxHr: Int, paused: Boolean) {
     val heartZones = LocalHeartZones.current
     Row(verticalAlignment = Alignment.Bottom) {
-        Text(bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink, style = if (bpm != null) org.openstrap.app.ui.workout.ringFigure(22.sp) else GlowType.sentence)
+        // The number beats at itself.
+        val beat = org.openstrap.app.ui.glow.rememberBeatPhase(bpm)
+        Text(
+            bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink,
+            style = if (bpm != null) org.openstrap.app.ui.workout.ringFigure(22.sp) else GlowType.sentence,
+            modifier = Modifier.beating(beat, 0.04f),
+        )
         if (bpm != null) {
             Spacer(Modifier.width(6.dp))
             Text(

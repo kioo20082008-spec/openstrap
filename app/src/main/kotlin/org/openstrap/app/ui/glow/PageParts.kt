@@ -50,6 +50,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -138,8 +141,9 @@ fun RoundIconButton(
 ) {
     Box(modifier.size(size)) {
         Box(
-            Modifier.matchParentSize().clip(CircleShape).background(surface).alpha(if (enabled) 1f else 0.4f)
-                .clickable(enabled = enabled, onClickLabel = clickLabel, role = Role.Button, onClick = onClick),
+            Modifier.matchParentSize()
+                .detailPress(enabled = enabled, onClickLabel = clickLabel, role = Role.Button, scale = 0.9f, onClick = onClick)
+                .clip(CircleShape).background(surface).alpha(if (enabled) 1f else 0.4f),
             contentAlignment = Alignment.Center,
         ) { Icon(icon, label, Modifier.size(iconSize), tint = tint) }
         // On the circle's edge at its top right, ringed in the page's black so it reads apart from the button.
@@ -237,13 +241,13 @@ fun PageRow(
 ) {
     Row(
         Modifier.fillMaxWidth()
+            .let { if (onClick != null) it.detailPress(enabled = enabled, scale = 0.98f, onClick = onClick) else it }
             .let {
                 if (!selected) it else it.semantics { this.selected = true }.drawBehind {
                     val inset = GlowLayout.CardInset.toPx()
                     drawRect(SelectedTint, Offset(-inset, 0f), Size(size.width + 2 * inset, size.height))
                 }
             }
-            .let { if (onClick != null) it.clickable(enabled = enabled, onClick = onClick) else it }
             .topHairline(divider, Hairline)
             .alpha(if (enabled) 1f else 0.45f)
             .padding(vertical = GlowLayout.RowPadding),
@@ -372,7 +376,7 @@ fun <T> PageMenuRow(
         Box(Modifier.fillMaxWidth()) {
             Row(
                 Modifier.fillMaxWidth()
-                    .clickable(enabled = enabled, onClickLabel = changeLabel, role = Role.DropdownList) { open = true }
+                    .detailPress(enabled = enabled, onClickLabel = changeLabel, role = Role.DropdownList, scale = 0.98f) { open = true }
                     .alpha(if (enabled) 1f else 0.45f)
                     .padding(vertical = GlowLayout.RowPadding),
                 verticalAlignment = Alignment.CenterVertically,
@@ -515,9 +519,10 @@ fun PageTextButton(
     color: Color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
 ) {
     Box(
-        modifier.heightIn(min = 44.dp).clip(CircleShape)
+        modifier.heightIn(min = 44.dp)
+            .detailPress(enabled = enabled, role = Role.Button, scale = 0.94f, onClick = onClick)
+            .clip(CircleShape)
             .alpha(if (enabled) 1f else 0.4f)
-            .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
     ) { Text(text, color = AppColors.readable(color), style = GlowType.body, maxLines = 1) }
@@ -666,10 +671,11 @@ fun PageChip(
     description: String? = null,
 ) {
     Box(
-        modifier.heightIn(min = 36.dp).clip(CircleShape)
+        modifier.heightIn(min = 36.dp)
+            .detailPress(enabled = enabled, role = role, scale = 0.93f, onClick = onClick)
+            .clip(CircleShape)
             .background(if (selected) AppColors.ink else if (filled) AppColors.control else AppColors.glass)
             .alpha(if (enabled) 1f else 0.4f)
-            .clickable(enabled = enabled, role = role, onClick = onClick)
             .semantics {
                 this.selected = selected
                 description?.let { contentDescription = it }
@@ -745,19 +751,36 @@ internal fun GlowSegments(
     modifier: Modifier = Modifier,
     role: Role = Role.RadioButton,
 ) {
-    Row(modifier.fillMaxWidth().clip(CircleShape).background(AppColors.glass).padding(4.dp)) {
+    // The chosen pill slides to a new choice rather than jumping, drawn behind the row so only the canvas moves.
+    val at = animateFloatAsState(selected.coerceAtLeast(0).toFloat(), spring(Spring.DampingRatioLowBouncy, Spring.StiffnessMediumLow), label = "segment")
+    val shown = animateFloatAsState(if (selected in options.indices) 1f else 0f, label = "segmentShown")
+    val pill = AppColors.ink
+    Row(
+        modifier.fillMaxWidth().clip(CircleShape).background(AppColors.glass)
+            .drawBehind {
+                val n = options.size
+                if (n == 0 || shown.value <= 0f) return@drawBehind
+                val pad = 4.dp.toPx()
+                val slot = (size.width - 2 * pad) / n
+                val rtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
+                val x = if (rtl) size.width - pad - slot * (at.value + 1f) else pad + slot * at.value
+                val h = size.height - 2 * pad
+                drawRoundRect(pill.copy(alpha = pill.alpha * shown.value), Offset(x, pad), Size(slot, h), CornerRadius(h / 2f))
+            }
+            .padding(4.dp),
+    ) {
         options.forEachIndexed { i, label ->
             val on = i == selected
             Box(
                 Modifier.weight(1f).clip(CircleShape)
-                    .background(if (on) AppColors.ink else Color.Transparent)
                     .pressClickable({ onSelect(i) }, CircleShape, scale = 0.97f)
                     .semantics { this.role = role; this.selected = on }
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center,
             ) {
+                val ink = androidx.compose.animation.animateColorAsState(if (on) AppColors.onInk else AppColors.muted, tween(260), label = "segmentInk")
                 Text(
-                    label, color = if (on) AppColors.onInk else AppColors.muted, maxLines = 1,
+                    label, color = ink.value, maxLines = 1,
                     style = GlowType.body.copy(fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
                 )
             }

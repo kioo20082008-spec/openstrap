@@ -8,7 +8,6 @@ import org.openstrap.app.presentation.Vo2maxCopy
 import org.openstrap.app.presentation.TimeOfDay
 import org.openstrap.app.presentation.DayWords
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -275,7 +274,7 @@ private fun ActiveMinutesDetail(ctx: ActivityDetailContext) {
             val values = week.map { (byDay[it]?.equivalent ?: 0).toFloat() }
             item {
                 DetailCard { GlowBars(
-                    values, height = 200.dp, labels = week.map { DayWords.weekdayShort(it) }, accent = color,
+                    values, Modifier.detailGrow(), height = 200.dp, labels = week.map { DayWords.weekdayShort(it) }, accent = color,
                     onScrub = { i ->
                         scrub = i?.let {
                             val label = Strings.app.format(R.string.glow_activity_minutes_on, DayWords.short(week[it]))
@@ -647,7 +646,7 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
                 Column {
                     DetailSentence(ActivityCopy.caloriesAtRest(Math.round(e.bmrKcal)))
                     InfoCopy.caloriesNotes(e).firstOrNull()?.let { note ->
-                        androidx.compose.foundation.layout.Box(Modifier.clickable { info = true }) { CaveatLine(note, color) }
+                        androidx.compose.foundation.layout.Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color) }
                     }
                 }
             }
@@ -788,6 +787,9 @@ private fun StackedBars(
     var picked by remember(stacks) { mutableStateOf<Int?>(null) }
     var width by remember { mutableStateOf(0f) }
     val tick = rememberScrubHaptics()
+    // The bars grow up from the baseline on first show, and the picked one wears a gently pulsing dot on its top.
+    val grow = rememberDetailOnce(800, 120)
+    val pulse = rememberPulse(1_600)
     fun indexAt(x: Float) = if (width <= 0f || stacks.isEmpty()) null else (x / (width / stacks.size)).toInt().coerceIn(0, stacks.lastIndex)
     Column(modifier) {
         Canvas(
@@ -804,7 +806,8 @@ private fun StackedBars(
         ) {
             val top = headroom.toPx()
             val hi = maxOf(goal ?: 0f, sums.maxOrNull() ?: 0f).coerceAtLeast(1f)
-            fun yOf(v: Float) = top + (size.height - top) * (1f - v / hi)
+            val g = grow.value.let { 1f - (1f - it) * (1f - it) * (1f - it) }
+            fun yOf(v: Float) = top + (size.height - top) * (1f - g * v / hi)
             val slot = size.width / stacks.size.coerceAtLeast(1)
             val w = (slot * 0.6f).coerceAtMost(widest.toPx())
             val r = CornerRadius(minOf(4.dp.toPx(), w / 2))
@@ -827,7 +830,17 @@ private fun StackedBars(
                     }
                 }
             }
-            goal?.let { g -> val y = yOf(g); drawLine(AppColors.ink.copy(alpha = 0.4f), Offset(0f, y), Offset(size.width, y), 1.dp.toPx()) }
+            picked?.let { i ->
+                if (i in sums.indices && sums[i] > 0f) {
+                    val x = slot * i + slot / 2
+                    val y = yOf(sums[i]) - 6.dp.toPx()
+                    val c = colorOf(i, stacks[i].indexOfLast { it > 0f }.coerceAtLeast(0))
+                    val r = 3.dp.toPx()
+                    drawCircle(c.copy(alpha = 0.3f * (1f - pulse.value)), r * (1.4f + 1.4f * pulse.value), Offset(x, y))
+                    drawCircle(c, r, Offset(x, y))
+                }
+            }
+            goal?.let { gl -> val y = top + (size.height - top) * (1f - gl / hi); drawLine(AppColors.ink.copy(alpha = 0.4f), Offset(0f, y), Offset(size.width, y), 1.dp.toPx()) }
         }
         Ltr {
         androidx.compose.foundation.layout.Row(
@@ -964,7 +977,7 @@ internal fun WeekDetail(ctx: ActivityDetailContext) {
         val values = days.map { (it.steps ?: 0).toFloat() }
         if (values.any { it > 0f }) item {
             DetailCard { GlowBars(
-                values, height = 180.dp, labels = days.map { DayWords.weekdayShort(it.date) }, accent = MetricColors.steps,
+                values, Modifier.detailGrow(), height = 180.dp, labels = days.map { DayWords.weekdayShort(it.date) }, accent = MetricColors.steps,
                 onScrub = { i ->
                     scrub = i?.let {
                         val label = Strings.app.format(R.string.glow_activity_steps_on, DayWords.short(days[it].date))

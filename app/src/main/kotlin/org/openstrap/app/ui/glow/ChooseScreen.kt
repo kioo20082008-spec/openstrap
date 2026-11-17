@@ -120,12 +120,13 @@ fun GlowChooseScreen(
             Text(stringResource(R.string.glow_choose_title), color = AppColors.ink, style = RingPageTitle, maxLines = 1)
         }
     }
+    // Each part rises in after the one above it.
     val choose: @Composable ColumnScope.() -> Unit = {
-        StrapLine(connection, liveHeartRate)
-        if (usual != null) UsualRow(usual, { onStartUsual(usual.type) }, { onReady(usual.type) })
+        Box(Modifier.fillMaxWidth().enterRise(1)) { StrapLine(connection, liveHeartRate) }
+        if (usual != null) Box(Modifier.fillMaxWidth().enterRise(2)) { UsualRow(usual, { onStartUsual(usual.type) }, { onReady(usual.type) }) }
         // The search opens a page of its own (board ActivitySearchTyping).
-        SearchEntry(stringResource(R.string.glow_choose_search_all)) { searching = true }
-        if (recent.isNotEmpty()) {
+        Box(Modifier.fillMaxWidth().enterRise(3)) { SearchEntry(stringResource(R.string.glow_choose_search_all)) { searching = true } }
+        if (recent.isNotEmpty()) Column(Modifier.fillMaxWidth().enterRise(4), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             SectionLabel(stringResource(R.string.glow_choose_recent))
             Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 recent.forEach { chip ->
@@ -136,7 +137,9 @@ fun GlowChooseScreen(
                 }
             }
         }
-        SportTiles(stringResource(R.string.glow_choose_all_sports), Workouts.EVERYDAY, Workouts::shortName, { false }, onReady)
+        Box(Modifier.fillMaxWidth().enterRise(5)) {
+            SportTiles(stringResource(R.string.glow_choose_all_sports), Workouts.EVERYDAY, Workouts::shortName, { false }, onReady)
+        }
     }
     BoxWithConstraints(Modifier.fillMaxSize()) {
         // Unfolded (spec 2.4): the rest of the sports, A to Z, in a column of their own beside the tiles, each side
@@ -153,9 +156,9 @@ fun GlowChooseScreen(
                 }
             }
         } else WorkoutPage(Color.Transparent, contentPadding) {
-            header()
+            Box(Modifier.fillMaxWidth().enterRise(0)) { header() }
             choose()
-            MoreSportsRow { more = true }
+            Box(Modifier.fillMaxWidth().enterRise(6)) { MoreSportsRow { more = true } }
         }
     }
 }
@@ -192,7 +195,7 @@ private fun UsualRow(s: ChooseSport, onStart: () -> Unit, onOpen: () -> Unit) {
         WorkoutButton(
             stringResource(R.string.glow_choose_start), StartHue, RingInk,
             { haptics.perform(org.openstrap.app.ui.components.HapticEvent.WorkoutStart); onStart() },
-            Modifier.widthIn(min = 96.dp), icon = AppIcons.PlayFill, height = 48.dp, fill = false,
+            Modifier.widthIn(min = 96.dp), icon = AppIcons.PlayFill, height = 48.dp, fill = false, breathe = true,
         )
     }
 }

@@ -150,7 +150,7 @@ internal fun LiveFrame(
     val landscape = LocalLiveLandscape.current
     // On its side the screen keeps a wider column than a page's, so the content and the controls fit side by side.
     CompositionLocalProvider(LocalPageColumn provides if (landscape) GlowLayout.MaxContentWidth else LocalPageColumn.current) {
-        WorkoutPage(color, contentPadding, scroll = false, backdrop = backdrop) {
+        WorkoutPage(color, contentPadding, scroll = false, backdrop = backdrop, aura = color.takeIf { !quiet }) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 RoundIcon(AppIcons.CaretDown, stringResource(R.string.workout_live_minimize), controls.onMinimize)
                 if (quiet) {
@@ -597,7 +597,9 @@ private const val HOLD_MS = 2000
 /** A live clock in white, its own scope: the second it reads composes it again, not the screen around it. */
 @Composable
 internal fun ClockText(time: () -> Long, style: androidx.compose.ui.text.TextStyle, maxLines: Int = Int.MAX_VALUE) {
-    Text(workoutClock(time()), color = AppColors.ink, style = style, maxLines = maxLines)
+    val seconds = time()
+    // Each second lands with a small tick, so the clock is seen to run.
+    Text(workoutClock(seconds), color = AppColors.ink, style = style, maxLines = maxLines, modifier = Modifier.tickOn(seconds))
 }
 
 /** Now in epoch seconds, ticking on each whole second: the clock every live screen counts from. */
