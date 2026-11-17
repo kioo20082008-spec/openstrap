@@ -248,7 +248,9 @@ fun GlowTodayScreen(
             val wide = maxWidth >= GlowLayout.TwoColumnWidth
             // On columns too narrow for Smalls (the Fold's inner screen) a Small pair spans both (spec 2.4 Unfolded).
             val across = GlowLayout.smallsAcross(maxWidth)
-            val slots = varyLooks(applyEdits(todayCards(moment, facts, morning), edits, moment, unavailable), looksFor, live, wide, across)
+            // Recovery's wide card only repeats the hero's Recovery figure (which opens the same detail): out unless you pinned it.
+            val shownEdits = if (TodayCard.Recovery in edits.pinned) edits else edits.copy(hidden = edits.hidden + TodayCard.Recovery)
+            val slots = varyLooks(applyEdits(todayCards(moment, facts, morning), shownEdits, moment, unavailable), looksFor, live, wide, across)
             val panes = todayPanes(slots, across)
             GlowScreenList(contentPadding, list) {
                 add(Pane.Full, GlowBlocks.HEADER) { header() }

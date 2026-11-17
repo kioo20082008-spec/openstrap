@@ -59,7 +59,7 @@ import org.openstrap.app.data.Weeks
 data class DayPicker(val available: Set<LocalDate> = emptySet(), val onPick: (LocalDate) -> Unit = {})
 
 /** The red full stop from the wordmark marks today. */
-private val TodayDot = Color(0xFFFF4D5E)
+private val TodayDot = Color(0xFFFF5C39)
 
 /**
  * Month calendar in a bottom sheet. Days with data are lit and tappable; the rest are dimmed and can't be
@@ -120,18 +120,19 @@ fun DayCalendarSheet(selected: LocalDate, available: Set<LocalDate>, onPick: (Lo
             Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(Modifier.size(12.dp).background(DayFill, CircleShape))
                 Spacer(Modifier.width(6.dp))
-                Text(stringResource(R.string.day_calendar_has_data), style = GlowType.secondary, color = LegendInk)
+                Text(stringResource(R.string.day_calendar_has_data), style = GlowType.secondary, color = LegendInk, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
                 Spacer(Modifier.width(14.dp))
                 Box(Modifier.size(6.dp).background(TodayDot, CircleShape))
                 Spacer(Modifier.width(6.dp))
-                Text(stringResource(R.string.day_calendar_today), style = GlowType.secondary, color = LegendInk)
-                Spacer(Modifier.weight(1f))
-                if (selected != today) {
-                    PageButton(
-                        stringResource(R.string.day_calendar_go_to_today), { onPick(today); onDismiss() }, icon = AppIcons.CalendarBlank,
-                        size = ButtonSize.Row,
-                    )
-                }
+                Text(stringResource(R.string.day_calendar_today), style = GlowType.secondary, color = LegendInk, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+            }
+            // Under the legend, so the legend's words never share a line with the button.
+            if (selected != today) {
+                Spacer(Modifier.height(8.dp))
+                PageButton(
+                    stringResource(R.string.day_calendar_go_to_today), { onPick(today); onDismiss() }, Modifier.fillMaxWidth(),
+                    icon = AppIcons.CalendarBlank, size = ButtonSize.Row,
+                )
             }
         }
     }
@@ -180,7 +181,7 @@ private fun DayCell(date: LocalDate, selected: Boolean, today: Boolean, enabled:
     }
     Box(
         Modifier
-            .size(42.dp)
+            .size(44.dp)
             .clip(CircleShape)
             .then(
                 when {

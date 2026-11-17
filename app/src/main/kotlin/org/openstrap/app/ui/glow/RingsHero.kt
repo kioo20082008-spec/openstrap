@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -46,6 +47,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -386,7 +388,7 @@ internal fun RingSkyHero(
                     Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(10.dp).clip(CircleShape).background(s.color))
                         Spacer(Modifier.width(10.dp))
-                        Text(s.name, Modifier.width(52.dp), color = AppColors.ink, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
+                        Text(s.name, Modifier.width(68.dp), color = AppColors.ink, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(AppColors.ink.copy(alpha = 0.1f))) {
                             Box(
                                 Modifier.fillMaxWidth(s.share.coerceIn(0.02f, 1f)).fillMaxHeight()
@@ -395,7 +397,7 @@ internal fun RingSkyHero(
                             )
                         }
                         Text(
-                            s.time, Modifier.width(72.dp), color = AppColors.ink, textAlign = TextAlign.End,
+                            s.time, Modifier.widthIn(min = 72.dp), color = AppColors.ink, textAlign = TextAlign.End, maxLines = 1,
                             style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.Medium, fontSize = 15.sp),
                         )
                     }
@@ -458,7 +460,7 @@ internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () ->
                 Icon(icon, null, tint = AppColors.readable(hue), modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(5.dp))
             }
-            Text(label, color = Muted, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1)
+            Text(label, color = Muted, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Spacer(Modifier.height(2.dp))
         RingNumber(if (value != null) shown.toString() else "–", null, 26.sp)

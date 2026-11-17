@@ -103,7 +103,7 @@ private fun Modifier.celebrationPop(): Modifier {
 private fun CloseRow(title: String?, onClose: () -> Unit) {
     Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         SectionLabel(title.orEmpty(), Modifier.weight(1f))
-        RoundIconButton(AppIcons.X, stringResource(R.string.glow_close), onClose, size = 40.dp)
+        RoundIconButton(AppIcons.X, stringResource(R.string.glow_close), onClose, size = 44.dp)
     }
 }
 

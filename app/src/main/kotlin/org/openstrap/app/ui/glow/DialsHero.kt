@@ -84,13 +84,12 @@ internal fun DialsHero(
             RingStatCard(labels.second, recovery, RingColors.Recovery, onRecovery, Modifier.weight(1f), AppIcons.HeartFill)
             RingStatCard(labels.third, sleep, RingColors.Sleep, onSleep, Modifier.weight(1f), AppIcons.MoonFill)
         }
+        // One card for what to do with the day, then its list: Energy's bar and the plan's own header said it all again.
         Spacer(Modifier.height(10.dp))
-        EnergyDayCard(energy, labels.first, Modifier.riseOnShow(2))
-        Spacer(Modifier.height(10.dp))
-        RingAdviceCard(planTitle, planNote, RingColors.Energy, Modifier.riseOnShow(3))
+        RingAdviceCard(planTitle, planNote, RingColors.Energy, Modifier.riseOnShow(2))
         if (plan.isNotEmpty()) {
-            Spacer(Modifier.height(12.dp))
-            Box(Modifier.riseOnShow(4)) { PlanCard(planTitle, planNote, planChip, plan) }
+            Spacer(Modifier.height(10.dp))
+            Box(Modifier.riseOnShow(3)) { PlanCard(plan) }
         }
     }
 }
@@ -122,15 +121,11 @@ private fun Dial(label: String, value: String?, unit: String?, share: Float, col
 }
 
 @Composable
-private fun PlanCard(title: String, note: String, chip: String?, items: List<PlanItem>) {
-    // The advice card above already says [title] and [note]: the plan is a list, headed by its chip.
-    Column(Modifier.fillMaxWidth().ringCard().padding(horizontal = 18.dp, vertical = 2.dp)) {
-        Row(Modifier.fillMaxWidth().height(46.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text(title, Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
-            if (chip != null) StatusPill(chip, RingColors.Recovery)
-        }
-        items.forEach { item ->
-            RingDivider()
+private fun PlanCard(items: List<PlanItem>) {
+    // The advice card above already says the plan's title and note: this is only its list.
+    Column(Modifier.fillMaxWidth().ringCard().padding(horizontal = 18.dp)) {
+        items.forEachIndexed { i, item ->
+            if (i > 0) RingDivider()
             Row(
                 Modifier.fillMaxWidth().heightIn(min = 52.dp).let { m -> item.onClick?.let { m.clickable(onClick = it) } ?: m }.padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -193,7 +188,7 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
             RingDivider()
             Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_all_good), Modifier.padding(vertical = 14.dp), color = Muted, style = MaterialTheme.typography.bodyMedium)
         }
-        tips.take(3).forEach { t ->
+        tips.take(2).forEach { t ->
             RingDivider()
             Spacer(Modifier.height(12.dp))
             // One hue a tone, from the rings palette: a warning in Energy's, calm in Sleep's, good in Recovery's.
@@ -216,11 +211,15 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
                     }
                     if (action != null) {
                         Spacer(Modifier.height(10.dp))
-                        Text(
-                            androidx.compose.ui.res.stringResource(action.first),
-                            Modifier.clip(CircleShape).background(tone).clickable(onClick = action.second).padding(horizontal = 16.dp, vertical = 8.dp),
-                            color = OnHueInk, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
-                        )
+                        Box(
+                            Modifier.heightIn(min = 44.dp).clip(CircleShape).background(tone).clickable(onClick = action.second).padding(horizontal = 18.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                androidx.compose.ui.res.stringResource(action.first),
+                                color = OnHueInk, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
                     }
                 }
             }

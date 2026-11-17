@@ -366,10 +366,6 @@ internal fun HeartCard(
                 values, height = 72.dp, showAverage = false, color = MetricColors.heart, labels = listOf("00", "06", "12", "18", "24"),
                 band = restingRange?.let { it.low..it.high }, onScrub = { picked = it },
             )
-            Text(
-                TodayCopy.heartLineNote(restingRange != null), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp),
-            )
         }
     }
 }
@@ -649,7 +645,7 @@ internal fun LoadList(
 internal fun EditTodayButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Box(modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
         Row(
-            Modifier.glass(CircleShape, onClick, scale = 0.97f).padding(horizontal = 16.dp, vertical = 10.dp),
+            Modifier.glass(CircleShape, onClick, scale = 0.97f).heightIn(min = 44.dp).padding(horizontal = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(AppIcons.SlidersHorizontal, null, tint = AppColors.ink, modifier = Modifier.size(14.dp))

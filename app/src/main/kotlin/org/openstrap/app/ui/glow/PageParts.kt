@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -556,7 +557,7 @@ fun PageField(
             Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
                 .let { if (error) it.border(1.dp, MetricColors.warn, GlowLayout.TileShape) else it }
                 .let {
-                    if (enabled) it.pointerInput(Unit) { androidx.compose.foundation.gestures.detectTapGestures { focus.requestFocus() } } else it
+                    if (enabled) it.pointerInput(Unit) { detectTapGestures { focus.requestFocus() } } else it
                 }
                 .padding(start = 16.dp, end = if (trailing != null) 4.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,

@@ -235,7 +235,7 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         modifier.fillMaxWidth().drawBehind {
             val height = maxOf(TabBarFade.Height.toPx(), size.height)
             drawRect(TabBarFade.brush(size.height - height, size.height), Offset(0f, size.height - height), Size(size.width, height))
-        }.navigationBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
+        }.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         // Where each tab's cell sits in the bar (window pixels), so the chosen pill can glide from one to the next.
@@ -245,7 +245,7 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         Row(
             // Takes every touch inside it, so a tap between two tabs never lands on the card under the bar.
             Modifier.widthIn(max = 480.dp).fillMaxWidth().height(68.dp).clip(CircleShape).background(AppColors.glass)
-                .pointerInput(Unit) {}.padding(horizontal = 8.dp)
+                .pointerInput(Unit) {}.padding(horizontal = 6.dp)
                 .onGloballyPositioned { origin = it.positionInWindow() }
                 // The chosen tab's ink pill, drawn under the cells: it slides and stretches to the tab with a spring.
                 .drawBehind {
@@ -264,7 +264,8 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
             val half = (items.size + 1) / 2
             items.forEachIndexed { i, item ->
                 if (i == half) Box(
-                    Modifier.size(50.dp).clip(CircleShape).background(PlusHue).clickable(onClick = onPlus),
+                    Modifier.size(50.dp).clip(CircleShape).background(PlusHue)
+                        .clickable(onClickLabel = androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.dials_quick_title), onClick = onPlus),
                     contentAlignment = Alignment.Center,
                 ) {
                     androidx.compose.foundation.Canvas(Modifier.size(22.dp)) {
@@ -329,7 +330,7 @@ private fun RingNavCell(item: NavItem, on: Boolean, modifier: Modifier = Modifie
     Row(
         modifier.height(46.dp).widthIn(min = 46.dp).bounceClick(onClick = onClick)
             .animateContentSize(androidx.compose.animation.core.spring(dampingRatio = 0.8f, stiffness = 420f))
-            .padding(horizontal = if (on) 16.dp else 12.dp),
+            .padding(horizontal = if (on) 14.dp else 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -340,8 +341,8 @@ private fun RingNavCell(item: NavItem, on: Boolean, modifier: Modifier = Modifie
         if (on) {
             Spacer(Modifier.width(8.dp))
             Text(
-                item.label, color = tint, maxLines = 1,
-                style = GlowType.caption.copy(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+                item.label, color = tint, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                style = GlowType.caption.copy(fontSize = 13.sp, lineHeight = 20.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
             )
         }
     }
@@ -359,7 +360,7 @@ private fun NavCell(item: NavItem, on: Boolean, modifier: Modifier, verticalArra
             if (on) item.selectedIcon else item.icon, item.label, tint = tint,
             modifier = Modifier.size(22.dp).graphicsLayer { scaleX = iconScale; scaleY = iconScale },
         )
-        Text(item.label, style = GlowType.caption, color = tint, maxLines = 1)
+        Text(item.label, style = GlowType.caption, color = tint, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
     }
 }
 

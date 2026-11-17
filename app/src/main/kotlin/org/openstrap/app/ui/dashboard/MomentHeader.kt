@@ -83,7 +83,7 @@ fun MomentHeader(
     Column(Modifier.fillMaxWidth()) {
         // With no day after this one, the room kept for its peek is empty and may tuck under the right side.
         CentredRow(
-            overhang = if (hasNext) 0.dp else PeekWidth + 16.dp,
+            overhang = 0.dp,
             // You and the Strap page grow out of the button tapped (spec 3.5).
             start = {
                 growClick(onOpenYou).let { g ->
@@ -157,7 +157,7 @@ private fun DaySwitcher(
     val dir = if (androidx.compose.ui.platform.LocalLayoutDirection.current == androidx.compose.ui.unit.LayoutDirection.Rtl) -1f else 1f
     val description = stringResource(R.string.day_header_day_description, title, dateLine(date))
     Row(
-        modifier.height(72.dp)
+        modifier.fillMaxWidth().height(72.dp)
             .pointerInput(threshold, dir) {
                 detectHorizontalDragGestures(
                     onDragStart = { dragging = true },
@@ -175,12 +175,11 @@ private fun DaySwitcher(
                 }
             }
             .graphicsLayer { translationX = shift * dir * 0.4f },
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Peek(peekDay(date.minusDays(1)))
         Column(
-            Modifier.padding(horizontal = 12.dp).widthIn(max = 240.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+            Modifier.widthIn(max = 260.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                 .clickable(onClickLabel = stringResource(R.string.day_header_pick_day), onClick = onPick)
                 .padding(horizontal = 10.dp, vertical = 4.dp)
                 .semantics { contentDescription = description },
@@ -188,7 +187,7 @@ private fun DaySwitcher(
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
-                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
+                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 38.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
             Text(
@@ -196,14 +195,7 @@ private fun DaySwitcher(
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
         }
-        if (hasNext) Peek(peekDay(date.plusDays(1))) else Spacer(Modifier.width(PeekWidth))
     }
-}
-
-@Composable
-private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
-    // The redesign keeps the header clean: the neighbouring days no longer peek in, the swipe still moves between them.
-    Spacer(Modifier.width(PeekWidth))
 }
 
 /** The strap chip: a dot, and words only when they matter. */
@@ -211,7 +203,7 @@ private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
 private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = CircleShape
     Row(
-        modifier.height(44.dp).clip(shape).background(ChipSurface)
+        modifier.height(44.dp).widthIn(max = 160.dp).clip(shape).background(ChipSurface)
             .clickable(onClickLabel = stringResource(R.string.day_header_open_strap), onClick = onClick)
             .semantics { contentDescription = chip.description }
             .padding(horizontal = 14.dp),
@@ -221,7 +213,7 @@ private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modi
         if (chip.text.isNotEmpty()) {
             Spacer(Modifier.width(7.dp))
             Text(
-                chip.text, maxLines = 1, softWrap = false,
+                chip.text, maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
                 color = if (chip.dot == StrapChip.Dot.Warn) AppColors.readable(MetricColors.warn) else AppColors.ink,
                 style = GlowType.secondary,
             )
@@ -239,4 +231,3 @@ private fun chipDotColor(dot: StrapChip.Dot): Color = when (dot) {
 
 private val Avatar: Color get() = AppColors.glass
 private val ChipSurface: Color get() = AppColors.glass
-private val PeekWidth = 34.dp

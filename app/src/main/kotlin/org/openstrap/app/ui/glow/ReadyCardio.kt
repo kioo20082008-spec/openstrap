@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -386,13 +387,14 @@ internal fun <T> Presets(presets: List<Pair<T, String>>, on: T?, onPick: (T) -> 
         presets.forEach { (v, label) ->
             val chosen = v == on
             Box(
-                Modifier.weight(1f).height(36.dp).clip(CircleShape)
+                Modifier.weight(1f).heightIn(min = 44.dp).clip(CircleShape)
                     .then(if (chosen) Modifier.background(AppColors.ink) else Modifier.border(1.dp, AppColors.ink.copy(alpha = 0.15f), CircleShape))
                     .pressClickable({ onPick(v) }, CircleShape).semantics { role = Role.Button; selected = chosen },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
-                    label, color = if (chosen) AppColors.onInk else AppColors.ink, maxLines = 1,
+                    label, color = if (chosen) AppColors.onInk else AppColors.ink, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 4.dp),
                     style = if (chosen) GlowType.secondary.copy(fontWeight = FontWeight.Bold) else GlowType.secondary,
                 )
             }
