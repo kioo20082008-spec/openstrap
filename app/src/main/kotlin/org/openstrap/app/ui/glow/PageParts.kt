@@ -35,6 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -170,18 +172,18 @@ fun PageHeader(
         BackButton(onBack, backEnabled)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
+            // No clip round the title: Arabic descenders reach past a tight line box. A switcher title is at least 44 dp tall to tap.
             Row(
-                Modifier.clip(RoundedCornerShape(8.dp))
-                    .let { if (onTitle != null) it.clickable(onClickLabel = switchLabel, role = Role.Button, onClick = onTitle) else it },
+                Modifier.let { if (onTitle != null) it.heightIn(min = 44.dp).clickable(onClickLabel = switchLabel, role = Role.Button, onClick = onTitle) else it },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(title, color = AppColors.ink, style = PageTitleStyle, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+                Text(title, color = AppColors.ink, style = PageTitleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                 if (onTitle != null) {
                     Spacer(Modifier.width(6.dp))
                     Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(16.dp))
                 }
             }
-            if (subtitle != null) Text(subtitle, color = AppColors.muted, style = GlowType.secondary, maxLines = 1)
+            if (subtitle != null) Text(subtitle, color = AppColors.muted, style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         if (trailing != null) {
             Spacer(Modifier.width(12.dp))
@@ -241,7 +243,7 @@ fun PageRow(
 ) {
     Row(
         Modifier.fillMaxWidth()
-            .let { if (onClick != null) it.detailPress(enabled = enabled, scale = 0.98f, onClick = onClick) else it }
+            .let { if (onClick != null) it.detailPress(enabled = enabled, role = Role.Button, scale = 0.98f, onClick = onClick) else it }
             .let {
                 if (!selected) it else it.semantics { this.selected = true }.drawBehind {
                     val inset = GlowLayout.CardInset.toPx()
@@ -386,7 +388,7 @@ fun <T> PageMenuRow(
                 if (value != null) {
                     Spacer(Modifier.width(RowValueGap))
                     Text(
-                        value, style = GlowType.secondary, maxLines = 1,
+                        value, Modifier.widthIn(max = 200.dp), style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
                         color = if (selected.let(quiet)) AppColors.ink.copy(alpha = 0.4f) else RowValueColor,
                     )
                 }
@@ -481,7 +483,7 @@ fun PageButton(
 ) {
     Row(
         // Dimmed before the pill is drawn, so a disabled button fades whole, pill and label (user, 2026-11-03).
-        modifier.height(size.height).alpha(if (enabled) 1f else 0.4f).clip(CircleShape)
+        modifier.heightIn(min = size.height).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(size.height / 2))
             .let {
                 when {
                     primary -> it.background(AppColors.ink)
@@ -489,7 +491,7 @@ fun PageButton(
                     else -> it.background(AppColors.control)
                 }
             }
-            .let { if (enabled) it.pressClickable(onClick, CircleShape) else it }
+            .let { if (enabled) it.pressClickable(onClick, RoundedCornerShape(size.height / 2)) else it }
             .semantics { role = Role.Button }
             .padding(horizontal = size.padding),
         horizontalArrangement = Arrangement.Center,
@@ -502,7 +504,7 @@ fun PageButton(
             Spacer(Modifier.width(8.dp))
         }
         val style = (if (size == ButtonSize.Row) GlowType.secondary else GlowType.body).let { if (primary) it.copy(fontWeight = FontWeight.Bold) else it }
-        Text(text, color = ink, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, color = ink, style = style, maxLines = if (size == ButtonSize.Row) 1 else 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -546,11 +548,16 @@ fun PageField(
     visualTransformation: VisualTransformation = VisualTransformation.None,
     trailing: (@Composable () -> Unit)? = null,
 ) {
+    // A tap anywhere on the tile, its padding included, puts the cursor in the field.
+    val focus = remember { androidx.compose.ui.focus.FocusRequester() }
     Column(modifier.alpha(if (enabled) 1f else 0.45f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         if (label != null) Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         Row(
             Modifier.fillMaxWidth().heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
                 .let { if (error) it.border(1.dp, MetricColors.warn, GlowLayout.TileShape) else it }
+                .let {
+                    if (enabled) it.pointerInput(Unit) { androidx.compose.foundation.gestures.detectTapGestures { focus.requestFocus() } } else it
+                }
                 .padding(start = 16.dp, end = if (trailing != null) 4.dp else 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -559,7 +566,7 @@ fun PageField(
                     Text(placeholder, color = AppColors.ink.copy(alpha = 0.3f), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
                 BasicTextField(
-                    value, onValueChange, Modifier.fillMaxWidth(), enabled = enabled,
+                    value, onValueChange, Modifier.fillMaxWidth().focusRequester(focus), enabled = enabled,
                     textStyle = GlowType.body.copy(color = AppColors.ink), singleLine = true,
                     keyboardOptions = keyboardOptions, visualTransformation = visualTransformation,
                     cursorBrush = SolidColor(AppColors.ink),
@@ -656,7 +663,7 @@ fun PageConfirm(
 
 /**
  * A chip (spec 2.4, fully round): a hairline and 72% text, or white with black text when [selected]. A [filled] chip
- * sits on the Control surface instead of the hairline, for a lone chip like Live. Secondary type, at least 36 dp tall.
+ * sits on the Control surface instead of the hairline, for a lone chip like Live. Secondary type, at least 40 dp tall.
  * A [description] is what TalkBack reads in place of a [text] too short to say it, like a day's letter.
  */
 @Composable
@@ -671,7 +678,7 @@ fun PageChip(
     description: String? = null,
 ) {
     Box(
-        modifier.heightIn(min = 36.dp)
+        modifier.heightIn(min = 40.dp)
             .detailPress(enabled = enabled, role = role, scale = 0.93f, onClick = onClick)
             .clip(CircleShape)
             .background(if (selected) AppColors.ink else if (filled) AppColors.control else AppColors.glass)
@@ -686,6 +693,7 @@ fun PageChip(
         Text(
             text, color = if (selected) AppColors.onInk else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
             style = GlowType.secondary.copy(fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal), maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = if (description != null) Modifier.clearAndSetSemantics {} else Modifier,
         )
     }
@@ -775,12 +783,12 @@ internal fun GlowSegments(
                 Modifier.weight(1f).clip(CircleShape)
                     .pressClickable({ onSelect(i) }, CircleShape, scale = 0.97f)
                     .semantics { this.role = role; this.selected = on }
-                    .padding(vertical = 9.dp),
+                    .padding(horizontal = 4.dp, vertical = 11.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 val ink = androidx.compose.animation.animateColorAsState(if (on) AppColors.onInk else AppColors.muted, tween(260), label = "segmentInk")
                 Text(
-                    label, color = ink.value, maxLines = 1,
+                    label, color = ink.value, maxLines = 1, overflow = TextOverflow.Ellipsis,
                     style = GlowType.body.copy(fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
                 )
             }
@@ -811,7 +819,10 @@ val PanelLabelInset = 18.dp
 internal fun StatusDot(text: String, dot: Color, modifier: Modifier = Modifier, dotAfter: Boolean = false) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         if (!dotAfter) Canvas(Modifier.size(6.dp)) { drawCircle(dot) }
-        Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+        Text(
+            text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
+            style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
         if (dotAfter) Canvas(Modifier.size(6.dp)) { drawCircle(dot) }
     }
 }

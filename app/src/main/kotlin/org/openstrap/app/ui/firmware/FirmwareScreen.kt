@@ -105,15 +105,9 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
                     c?.batteryPercent?.let { stringResource(R.string.you_firmware_percent, it) }
                         ?: stringResource(R.string.you_firmware_not_connected),
                 )
-                InfoLine(
-                    stringResource(R.string.you_firmware_service),
-                    stringResource(
-                        when (info?.dfuAvailable) {
-                            true -> R.string.you_firmware_service_available
-                            false -> R.string.you_firmware_service_not_found
-                            null -> R.string.you_firmware_service_unknown
-                        },
-                    ),
+                // The update service is said only when it's missing: when it's there (or not read yet) it is not news.
+                if (info?.dfuAvailable == false) InfoLine(
+                    stringResource(R.string.you_firmware_service), stringResource(R.string.you_firmware_service_not_found),
                 )
             }
         }
@@ -138,10 +132,6 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
         item {
             RingsPanel(title = stringResource(R.string.you_firmware_privacy)) {
                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                    Point(
-                        AppIcons.Key, stringResource(R.string.you_firmware_privacy_sign_in),
-                        stringResource(R.string.you_firmware_privacy_sign_in_text),
-                    )
                     Point(
                         AppIcons.CloudArrowDown, stringResource(R.string.you_firmware_privacy_check),
                         stringResource(R.string.you_firmware_privacy_check_text),
@@ -387,8 +377,11 @@ private fun Point(icon: ImageVector, title: String, body: String) {
 @Composable
 private fun InfoLine(label: String, value: String) {
     Row(Modifier.fillMaxWidth()) {
-        Text(label, style = GlowType.body, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.weight(1f))
-        Text(value, style = GlowType.body.copy(fontWeight = FontWeight.Bold), color = AppColors.ink)
+        Text(label, style = GlowType.body, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.padding(end = 12.dp))
+        Text(
+            value, style = GlowType.body.copy(fontWeight = FontWeight.Bold), color = AppColors.ink,
+            textAlign = TextAlign.End, modifier = Modifier.weight(1f),
+        )
     }
 }
 
@@ -396,7 +389,7 @@ private fun InfoLine(label: String, value: String) {
 private fun Warning(text: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Icon(AppIcons.Warning, null, tint = MetricColors.warn, modifier = Modifier.size(20.dp))
-        Text(text, style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
+        Text(text, style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.weight(1f))
     }
 }
 

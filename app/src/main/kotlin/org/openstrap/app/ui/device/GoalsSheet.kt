@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -70,7 +70,7 @@ fun GoalsSheet(goals: Goals, onSave: (Goals) -> Unit, onDismiss: () -> Unit, sug
         ?.takeIf { it in Goals.SLEEP_MINUTES }
     val activeValue = active.toIntOrNull()?.takeIf { it in Goals.ACTIVE_HOURS }
 
-    PageSheet(onDismiss, stringResource(R.string.you_goals_title), note = stringResource(R.string.you_goals_note)) {
+    PageSheet(onDismiss, stringResource(R.string.you_goals_title)) {
         PageNumberField(
             steps, { steps = it }, stringResource(R.string.you_goals_steps_label), stringResource(R.string.you_goals_steps_unit),
             stepsValue == null,
@@ -129,11 +129,11 @@ internal fun WorkoutGoalField(value: Int, onChange: (Int) -> Unit) {
                 AppIcons.Minus, stringResource(R.string.you_goals_workouts_fewer),
                 { onChange((value - 1).coerceIn(Goals.WORKOUTS_PER_WEEK)) }, size = 44.dp,
             )
-            Box(Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(AppColors.control), contentAlignment = Alignment.Center) {
+            Box(Modifier.weight(1f).heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(AppColors.control), contentAlignment = Alignment.Center) {
                 Text(
                     pluralStringResource(R.plurals.you_goals_workouts_value, value, value), color = AppColors.ink,
                     style = GlowType.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
-                    maxLines = 1,
+                    maxLines = 2, textAlign = TextAlign.Center,
                 )
             }
             RoundIconButton(
@@ -179,7 +179,7 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
                 size = 44.dp,
             )
             Box(
-                Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
+                Modifier.weight(1f).heightIn(min = 52.dp).clip(GlowLayout.TileShape).background(AppColors.control)
                     .let {
                         if (typing) it
                         else it.clickable(onClickLabel = typeLabel, role = Role.Button) {
@@ -201,7 +201,8 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
                 } else {
                     Text(
                         stringResource(R.string.you_goals_active_kcal, Units.count(value.toLong())), color = AppColors.ink,
-                        style = GlowType.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1,
+                        style = GlowType.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 2,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -121,7 +122,7 @@ private fun ListNote(note: String, onNote: (() -> Unit)?) {
     Row(
         // Tapped, the note grows into what it opens (spec 3.5).
         cardOpening(onNote).let { o -> Modifier.then(o?.modifier ?: Modifier).clickable(onClick = o?.onClick ?: onNote) }
-            .padding(vertical = 4.dp),
+            .heightIn(min = 44.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(note, color = AppColors.ink, style = GlowType.secondary, maxLines = 1)

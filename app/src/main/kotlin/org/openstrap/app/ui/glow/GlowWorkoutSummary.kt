@@ -7,6 +7,7 @@ import org.openstrap.app.ui.workout.WorkoutRing
 import org.openstrap.app.ui.workout.ringFigure
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import org.openstrap.app.R
 import org.openstrap.app.ui.theme.AppColors
@@ -172,18 +173,18 @@ fun GlowWorkoutSummaryScreen(
         Row(Modifier.padding(start = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 val title = a?.sportName ?: stringResource(R.string.glow_workout_untitled)
-                Text(title, color = AppColors.ink, style = RingPageTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = RingPageTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 if (a != null) Text(
                     FamilySummary.whenLine(a.shownStart, System.currentTimeMillis() / 1000), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp),
                 )
             }
-            // Trim beside Done: the summary has no heart rate card of its own to carry it, as a past workout's page has.
+            // Trim beside the title: the summary has no heart rate card of its own to carry it, as a past workout's page
+            // has. Done is already pinned at the bottom, so it isn't repeated up here.
             if (trim != null) {
-                IconPill(stringResource(R.string.glow_trim), trim.open, icon = AppIcons.Scissors, height = 40.dp, style = TopPillText)
                 Spacer(Modifier.width(8.dp))
+                IconPill(stringResource(R.string.glow_trim), trim.open, icon = AppIcons.Scissors, style = TopPillText)
             }
-            TopDone(done)
         }
         if (summary == null || a == null || trim == null) {
             PageNote(stringResource(R.string.glow_workout_loading))
@@ -272,7 +273,7 @@ internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swe
                     style = ringFigure(if (n >= 7) 32.sp else if (n >= 5) 40.sp else 50.sp),
                 )
                 if (hero.unit.isNotBlank()) Text(
-                    hero.unit, color = AppColors.muted, style = GlowType.secondary, maxLines = 1, textAlign = TextAlign.Center,
+                    hero.unit, color = AppColors.muted, style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
                 )
             }
         }
@@ -542,9 +543,5 @@ internal fun SummaryButtons(onShare: () -> Unit, onDone: () -> Unit) {
     }
 }
 
-/** Done as a small pill beside the title, to leave without scrolling to the bottom. */
-@Composable
-internal fun TopDone(onDone: () -> Unit) = IconPill(stringResource(R.string.glow_done), onDone, height = 40.dp, style = TopPillText)
-
-/** The small pills beside the summary's title, Trim and Done. */
+/** The small pill beside the summary's title, Trim. */
 private val TopPillText = GlowType.secondary.copy(fontWeight = FontWeight.SemiBold)

@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TimePickerDefaults
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -299,7 +300,7 @@ private fun AlarmSheet(alarm: Alarm, isNew: Boolean, onSave: (Alarm) -> Unit, on
                 // Picking a day replaces the strap's own "workdays" calendar with a plain day set.
                 PageChip(stringResource(d), days != Alarm.WORKDAYS && days and bit != 0, {
                     days = (if (days == Alarm.WORKDAYS) 0 else days) xor bit
-                }, Modifier.widthIn(min = 40.dp), description = stringResource(DAY_NAMES[i]))
+                }, Modifier.widthIn(min = 40.dp).heightIn(min = 40.dp), description = stringResource(DAY_NAMES[i]))
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {

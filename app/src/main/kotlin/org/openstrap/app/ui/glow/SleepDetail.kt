@@ -19,9 +19,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -107,7 +109,7 @@ private fun Caption(text: String, modifier: Modifier = Modifier) =
 @Composable
 private fun ChartTitle(title: String, note: String?, modifier: Modifier = Modifier, scrubbed: DetailHeadline? = null) {
     Row(modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+        Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         // While the line is scrubbed, its reading takes the note's place, in white so it reads as the live value.
         if (scrubbed != null) Text(
             stringResource(R.string.glow_sleep_scrubbed, scrubbed.value.toString(), scrubbed.label), color = AppColors.ink,
@@ -121,8 +123,8 @@ private fun ChartTitle(title: String, note: String?, modifier: Modifier = Modifi
 
 /**
  * The Sleep score's detail: the score in its horizon arc, then the night it came from. Day has the stages to scrub
- * with their totals as stage bars, bedtime to wake, the sentence, what shaped the score, and the night's heart rate and
- * breathing lines, each scrub moving the headline. Week has the last 7 nights' scores against your normal of the
+ * with their totals as stage bars, bedtime to wake, the sentence and what shaped the score (the night's heart rate and
+ * breathing are the Sleep tab's vitals, each its own detail). Week has the last 7 nights' scores against your normal of the
  * nights before.
  */
 @Composable
@@ -229,7 +231,6 @@ internal fun SleepScoreDetail(
                             }
                         }
                     }
-                    item { NightLines(state, session.start..session.end) { scrub = it } }
                 }
             } else {
                 item {
@@ -354,12 +355,12 @@ private fun UndoHost(message: String?, contentPadding: PaddingValues, onUndo: ()
             }
             Row(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = contentPadding.calculateBottomPadding() + 16.dp, start = 16.dp, end = 16.dp)
-                    .fillMaxWidth().height(56.dp).background(SnackbarSurface, CircleShape).padding(start = 22.dp, end = 8.dp),
+                    .fillMaxWidth().heightIn(min = 56.dp).background(SnackbarSurface, CircleShape).padding(start = 22.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(message, color = AppColors.onInk, style = GlowType.body, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(message, color = AppColors.onInk, style = GlowType.body, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Row(
-                    Modifier.height(40.dp).clip(CircleShape).background(AppColors.onInk).pressClickable(onUndo, CircleShape)
+                    Modifier.heightIn(min = 44.dp).clip(CircleShape).background(AppColors.onInk).pressClickable(onUndo, CircleShape)
                         .semantics { role = Role.Button }.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -407,46 +408,13 @@ private fun StageBars(b: Summaries.SleepBreakdown, modifier: Modifier = Modifier
         order.forEach { st ->
             val secs = b.byStage[st] ?: 0L
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, modifier = Modifier.width(56.dp))
+                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, maxLines = 1, modifier = Modifier.width(64.dp))
                 FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f).detailReveal(delayMs = 300, fromStart = true), height = 10.dp)
                 Text(
-                    Units.duration(secs), color = AppColors.ink, style = GlowType.secondary,
-                    modifier = Modifier.padding(start = 12.dp).width(56.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                    Units.duration(secs), color = AppColors.ink, style = GlowType.secondary, maxLines = 1,
+                    modifier = Modifier.padding(start = 12.dp).widthIn(min = 64.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
                 )
             }
-        }
-    }
-}
-
-/**
- * The night's heart rate and breathing as lines with scrub (chart kit), each scrub moving the detail's headline
- * ([onScrub], null on release). Either is left out without readings. They sit below the fold, where the headline has
- * scrolled away, so a scrub also puts the reading in the line's own title row.
- */
-@Composable
-private fun NightLines(state: DayUiState, window: LongRange, onScrub: (DetailHeadline?) -> Unit) {
-    // Kept while the readings and the window are, so the lines' own remember holds across scrubs (audit K4).
-    val hr = remember(state.sleepHeartRate, window) { state.sleepHeartRate.filter { it.x in window } }
-    val breath = remember(state.breathRate, window) { state.breathRate.filter { it.x in window } }
-    if (hr.isEmpty() && breath.isEmpty()) return
-    val labels = listOf(clock(window.first), clock(window.last))
-    var hrAt by remember(window) { mutableStateOf<DetailHeadline?>(null) }
-    var breathAt by remember(window) { mutableStateOf<DetailHeadline?>(null) }
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        if (hr.isNotEmpty()) DetailCard {
-            ChartTitle(
-                stringResource(R.string.glow_sleep_heart_rate),
-                stringResource(R.string.glow_sleep_heart_note, hr.minOf { it.y }.toInt(), hr.map { it.y }.average().toInt()),
-                scrubbed = hrAt,
-            )
-            ScrubLine(hr, window, 130.dp, labels, MetricColors.heart, stringResource(R.string.glow_unit_bpm)) { hrAt = it; onScrub(it) }
-        }
-        if (breath.isNotEmpty()) DetailCard {
-            val average = stringResource(R.string.glow_sleep_breathing_note, Units.decimal(breath.map { it.y }.average(), 1))
-            ChartTitle(stringResource(R.string.glow_sleep_breathing_rate), average, scrubbed = breathAt)
-            ScrubLine(
-                breath, window, 100.dp, labels, MetricColors.sleepLight, stringResource(R.string.glow_sleep_unit_breaths), decimals = 1,
-            ) { breathAt = it; onScrub(it) }
         }
     }
 }

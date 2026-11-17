@@ -78,7 +78,7 @@ private fun GoalWeekCard(
     DetailCard {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(end = 8.dp))
                 trailing?.invoke()
             }
             // The week's one ring: the count against the goal, bold in the middle.
@@ -91,7 +91,7 @@ private fun GoalWeekCard(
                 Text(detailCountUp("$count"), color = AppColors.ink, style = ringFigure(48.sp), maxLines = 1)
                 Text(
                     pluralStringResource(R.plurals.glow_goals_of_workouts, goal, goal), color = AppColors.muted, style = RingLabel,
-                    maxLines = 1, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    maxLines = 2, textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }
             }

@@ -201,6 +201,7 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
     DetailRing(share, color, modifier, icon = icon) {
         if (v != null) {
             val size = when {
+                v.length >= 8 -> 24.sp
                 v.length >= 6 -> 32.sp
                 v.length == 5 -> 40.sp
                 v.length == 4 -> 46.sp
@@ -228,8 +229,8 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
 @Composable
 private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(6.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp),
+        modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(4.dp),
+        horizontalArrangement = Arrangement.spacedBy(1.dp),
     ) {
         days.forEach { d ->
             val show = stringResource(R.string.glow_metrics_show_day, d.label)
@@ -241,9 +242,11 @@ private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (Loc
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
+                // Arabic's short day names carry the article ("الأربعاء"): too wide for a seventh of the card, so it goes.
                 Text(
-                    d.label, color = if (d.selected) AppColors.onInk else AppColors.muted, maxLines = 1,
-                    style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
+                    d.label.removePrefix("ال"), color = if (d.selected) AppColors.onInk else AppColors.muted, maxLines = 1,
+                    textAlign = TextAlign.Center,
+                    style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal, fontSize = 11.sp, lineHeight = 18.sp),
                 )
                 if (d.selected && d.hasData) DetailSelectedDot(color)
                 else Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))

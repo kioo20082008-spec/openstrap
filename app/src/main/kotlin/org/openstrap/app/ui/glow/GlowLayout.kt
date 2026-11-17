@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -46,8 +47,9 @@ object GlowLayout {
     /** Every card's corner, on every tier: glow, edge, list, strip and page panels. */
     val CardCorner = 22.dp
     val CardShape = RoundedCornerShape(CardCorner)
-    /** A sheet's top corners match the cards'. */
-    val SheetShape = RoundedCornerShape(topStart = CardCorner, topEnd = CardCorner)
+    /** A sheet's top corners: 28 dp (spec 2.4), a step rounder than a card's. */
+    val SheetCorner = 28.dp
+    val SheetShape = RoundedCornerShape(topStart = SheetCorner, topEnd = SheetCorner)
     /** Sport tiles, chart pills, text fields: rounded, but a step tighter than a card. */
     val TileCorner = 16.dp
     val TileShape = RoundedCornerShape(TileCorner)
@@ -463,7 +465,12 @@ fun GlowHeader(
             CardTitle(title)
             TitleMark(marker, tag)
         } else CardTitle(title, Modifier.weight(1f))
-        if (trailing != null) NoteText(trailing)
+        if (trailing != null) {
+            Spacer(Modifier.width(8.dp))
+            NoteText(trailing)
+        }
+        // Room between the title (or its note) and the button, so a long title never runs into it.
+        Spacer(Modifier.width(8.dp))
         trailingContent()
     }
 }
@@ -471,7 +478,7 @@ fun GlowHeader(
 /** A title row's note, in Secondary on one line. */
 @Composable
 internal fun NoteText(text: String) =
-    Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+    Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
 
 /**
  * A small sync marker next to a card's title, "Up to 09:40" (spec 4.3): amber, as the strap chip, since it's about

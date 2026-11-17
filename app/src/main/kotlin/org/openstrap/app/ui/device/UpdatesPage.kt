@@ -93,7 +93,8 @@ fun UpdatesPage(
         }
         val current = Releases.current(state.releases, installed)
         // A build newer than any release (a developer's) shows the latest release's notes.
-        val shown = newer.ifEmpty { listOfNotNull(current ?: state.releases.firstOrNull()) }
+        // At most the three newest: the rest are on GitHub, one row up, and a long wait would otherwise run to pages.
+        val shown = newer.take(3).ifEmpty { listOfNotNull(current ?: state.releases.firstOrNull()) }
         if (shown.isNotEmpty()) item {
             val title = stringResource(
                 when {
@@ -166,7 +167,7 @@ private fun ReleaseNotesView(release: Release, badge: Int?) {
                 else Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.secondary)
             is NoteBlock.Bullet -> Row {
                 Text("•", color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.body, modifier = Modifier.width(16.dp))
-                Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.secondary, modifier = Modifier.padding(top = 1.dp))
+                Text(spans(block.spans), color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.secondary, modifier = Modifier.weight(1f).padding(top = 1.dp))
             }
         } }
     }

@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +51,7 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -196,7 +199,7 @@ fun RingsPanel(modifier: Modifier = Modifier, title: String? = null, note: Strin
 fun RingsPill(text: String, modifier: Modifier = Modifier, color: Color? = null) {
     val shape = RoundedCornerShape(12.dp)
     Box(
-        modifier.clip(shape).background(color ?: AppColors.ink.copy(alpha = 0.10f), shape).padding(horizontal = 12.dp, vertical = 4.dp),
+        modifier.clip(shape).background(color ?: AppColors.ink.copy(alpha = 0.10f), shape).padding(horizontal = 14.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(text, color = if (color != null) RingsOnHue else AppColors.ink, style = RingsType.pill, maxLines = 1)
@@ -215,14 +218,15 @@ fun RingsSegments(
     modifier: Modifier = Modifier,
     role: Role = Role.RadioButton,
 ) {
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    // As tall as the tallest pill, so one that wraps to two lines doesn't leave its neighbours short.
+    Row(modifier.fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         options.forEachIndexed { i, label ->
-            RingsChoice(label, i == selected, { onSelect(i) }, Modifier.weight(1f), role)
+            RingsChoice(label, i == selected, { onSelect(i) }, Modifier.weight(1f).fillMaxHeight(), role)
         }
     }
 }
 
-/** One pill of a choice: filled with the ink when [on], outlined otherwise, 44 dp tall. */
+/** One pill of a choice: filled with the ink when [on], outlined otherwise, at least 44 dp tall (a long word wraps to two lines). */
 @Composable
 fun RingsChoice(label: String, on: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, role: Role = Role.RadioButton) {
     // The chosen fill swells in from the pill's middle while the outline fades, and drains back out when it moves on.
@@ -230,7 +234,7 @@ fun RingsChoice(label: String, on: Boolean, onClick: () -> Unit, modifier: Modif
     val word by animateColorAsState(if (on) AppColors.onInk else AppColors.ink, tween(300), label = "choice word")
     val ink = AppColors.ink
     Box(
-        modifier.height(44.dp).clip(CircleShape)
+        modifier.heightIn(min = 44.dp).clip(CircleShape)
             .pressClickable(onClick, CircleShape, 0.97f)
             .drawBehind {
                 val f = fill
@@ -247,12 +251,12 @@ fun RingsChoice(label: String, on: Boolean, onClick: () -> Unit, modifier: Modif
                 }
             }
             .semantics { this.role = role; this.selected = on }
-            .padding(horizontal = 14.dp),
+            .padding(horizontal = 14.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             label, color = word, style = if (on) RingsType.segmentOn else RingsType.segmentOff,
-            maxLines = 1, overflow = TextOverflow.Ellipsis,
+            maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
         )
     }
 }

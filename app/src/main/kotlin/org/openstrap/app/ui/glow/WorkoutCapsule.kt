@@ -162,7 +162,11 @@ private fun BarPill(label: String, primary: Boolean, icon: androidx.compose.ui.g
             Canvas(Modifier.size(8.dp)) { drawCircle(MetricColors.heart) }
             Spacer(Modifier.width(6.dp))
         }
-        Text(label, color = if (primary) AppColors.onInk else AppColors.ink, style = MediumBody, maxLines = 1)
+        // Capped, so a long name ("Start set 12") never pushes the two lines out of the bar.
+        Text(
+            label, Modifier.widthIn(max = 132.dp), color = if (primary) AppColors.onInk else AppColors.ink, style = MediumBody,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -205,8 +209,8 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
             if (glance.goal != null || glance.toGo != null) {
                 Spacer(Modifier.height(8.dp))
                 Row {
-                    glance.goal?.let { Text(it, color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.weight(1f)) }
-                    glance.toGo?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary) }
+                    glance.goal?.let { Text(it, color = AppColors.ink, style = GlowType.secondary, modifier = Modifier.weight(1f).padding(end = 8.dp)) }
+                    glance.toGo?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.widthIn(max = 160.dp)) }
                 }
             }
             if (glance.figures.isNotEmpty()) {
@@ -216,7 +220,10 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                         Column(Modifier.weight(1f)) {
                             if (value != null) Text(value, color = AppColors.ink, style = ringFigure(22.sp), maxLines = 1)
                             else WaitingDash(Modifier.padding(vertical = 8.dp))
-                            Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                            Text(
+                                label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                                maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            )
                         }
                     }
                 }
@@ -243,7 +250,7 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                             .padding(horizontal = if (label == null) 0.dp else 18.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (label != null) Text(label, color = AppColors.ink, style = GlowType.body, maxLines = 1)
+                        if (label != null) Text(label, color = AppColors.ink, style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
                         else Icon(
                             actionIcon(a), stringResource(R.string.glow_workout_capsule_pause), tint = AppColors.ink,
                             modifier = Modifier.size(18.dp),

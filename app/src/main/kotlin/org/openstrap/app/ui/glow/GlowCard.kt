@@ -127,7 +127,8 @@ fun GlowCard(
     val context = LocalContext.current
     val density = LocalDensity.current
     // When the system's animator scale is 0 the heart doesn't beat: the core sits at its resting state.
-    val animate = lit.motion is GlowMotion.Heartbeat && remember(context) {
+    // Flat cards have no core to move, so no frame loop runs for them (it would wake every frame for nothing).
+    val animate = !FlatCards && lit.motion is GlowMotion.Heartbeat && remember(context) {
         Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f
     }
     // Read through state, so the running loop follows a newly provided lambda rather than the first one it saw.

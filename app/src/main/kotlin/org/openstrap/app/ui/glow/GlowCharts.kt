@@ -138,7 +138,14 @@ private fun DrawScope.guide(x: Float, bottom: Float) = drawLine(Target, Offset(x
 
 /** [labels] measured in [style], for a chart's cache block. */
 private fun TextMeasurer.measureAll(labels: List<String>, style: TextStyle = axisText): List<TextLayoutResult> =
-    labels.map { measure(it, style) }
+    labels.map { measure(axisName(it, labels.size), style) }
+
+/**
+ * A crowded axis (five labels or more) drops Arabic's article from a long day name ("الأربعاء" to "أربعاء"), so seven of
+ * them fit side by side instead of running into each other. Hours, dates and Latin names are left as they are.
+ */
+private fun axisName(label: String, count: Int): String =
+    if (count >= 5 && label.length > 5 && label.startsWith("ال")) label.substring(2) else label
 
 /** Bottom axis labels, measured, spread evenly from the left edge to the right edge. */
 private fun DrawScope.axis(labels: List<TextLayoutResult>, y: Float) {
@@ -345,7 +352,7 @@ fun GlowTrend(
             val lo = (known.minOrNull() ?: 0f) * 0.85f
             val hi = (known.maxOrNull() ?: 1f).coerceAtLeast(lo + 1f)
             fun yOf(v: Float) = top + (h - top - 6.dp.toPx()) * (1f - (v - lo) / (hi - lo))
-            val names = days.mapIndexed { i, d -> m.measure(d.label, if (i == days.lastIndex) todayAxisText else axisText) }
+            val names = days.mapIndexed { i, d -> m.measure(axisName(d.label, days.size), if (i == days.lastIndex) todayAxisText else axisText) }
             val figures = days.mapIndexed { i, d ->
                 d.value?.let { m.measure(it.roundToInt().toString(), if (i == days.lastIndex) todayValueText else pastValueText) }
             }

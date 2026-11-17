@@ -543,9 +543,8 @@ private fun SuggestionRow(s: org.openstrap.app.data.WorkoutSuggestions.Suggestio
             dash = false, divider = divider, icon = AppIcons.Heartbeat,
         )
         Row(Modifier.fillMaxWidth().padding(start = 20.dp, bottom = 12.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PageButton(stringResource(R.string.glow_save), onSave, primary = true, size = ButtonSize.Row)
-            PageButton(stringResource(R.string.glow_activity_not_a_workout), onDismiss, size = ButtonSize.Row, onCard = true)
-            Box(Modifier.weight(1f))
+            PageButton(stringResource(R.string.glow_save), onSave, Modifier.weight(1f), primary = true, size = ButtonSize.Row)
+            PageButton(stringResource(R.string.glow_activity_not_a_workout), onDismiss, Modifier.weight(1f), size = ButtonSize.Row, onCard = true)
         }
     }
 }

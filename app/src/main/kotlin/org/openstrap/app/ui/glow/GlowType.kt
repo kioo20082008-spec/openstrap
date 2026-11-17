@@ -7,6 +7,7 @@ import androidx.compose.ui.unit.sp
 import org.openstrap.app.ui.theme.FunnelDisplay
 import org.openstrap.app.ui.theme.FunnelSans
 import org.openstrap.app.ui.theme.NumberFamily
+import org.openstrap.app.ui.theme.isArabicUi
 
 /**
  * The type roles of the design system (spec 2.3): Funnel Display for display roles, Funnel Sans for the rest. Every
@@ -14,11 +15,14 @@ import org.openstrap.app.ui.theme.NumberFamily
  * roles drawn dimmed, which name their alpha.
  */
 object GlowType {
+    /** Words are never spaced apart in Arabic: letters that are spaced stop joining. Figures keep their tracking. */
+    private fun TextStyle.words(): TextStyle = if (isArabicUi) copy(letterSpacing = 0.sp) else this
+
     /** You, Strap, every detail and settings page: Display 400, 24 on 28. */
-    val pageTitle get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Normal, fontSize = 24.sp, lineHeight = 28.sp)
+    val pageTitle get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Normal, fontSize = 24.sp, lineHeight = 32.sp)
 
     /** HIIT's phase word over the seconds, WORK or REST (boards HiitWork, HiitRest): Display 500, 30 on 34, spaced out. */
-    val phaseWord get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 34.sp, letterSpacing = 0.14.em)
+    val phaseWord get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 40.sp, letterSpacing = 0.14.em).words()
 
     /** Mind and body's time inside its ring (board LiveMind): Display 300, 72 on 76, tabular. */
     val mindClock get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 72.sp, letterSpacing = (-0.02).em, lineHeight = 76.sp, fontFeatureSettings = "tnum")
@@ -30,13 +34,13 @@ object GlowType {
     val storyStat get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 30.sp, letterSpacing = (-0.01).em, lineHeight = 33.sp, fontFeatureSettings = "tnum")
 
     /** The sport at the top of a share card ("Push day", boards ShareStrength, ShareHiit): Display 500, 30 on 34. */
-    val storyTitle get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 34.sp)
+    val storyTitle get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 30.sp, lineHeight = 38.sp)
 
     /** "OpenStrap" on a share card: Display 500, 14 on 18, spaced out a little. */
-    val storyBrand get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 18.sp, letterSpacing = 0.04.em)
+    val storyBrand get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.04.em).words()
 
     /** The date in the moment header: Display 500, 20 on 24. */
-    val headerDate get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 20.sp, lineHeight = 24.sp)
+    val headerDate get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Medium, fontSize = 20.sp, lineHeight = 28.sp)
 
     /** The moment over the header date ("Waking up"): Sans 500, 13, drawn at [MOMENT_ALPHA] white. */
     val moment get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelSans, fontWeight = FontWeight.Medium, fontSize = 13.sp, lineHeight = 16.sp)
@@ -54,7 +58,7 @@ object GlowType {
      * The sentence that leads a hero ("Slept 7 h 40. Recovered enough for your usual training."): Display 300, 20 on
      * 24.4, three lines at most. Display against the title's Sans, so title and sentence don't run together.
      */
-    val sentence get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 20.sp, letterSpacing = (-0.01).em, lineHeight = 24.4.sp)
+    val sentence get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelDisplay, fontWeight = FontWeight.Light, fontSize = 20.sp, letterSpacing = (-0.01).em, lineHeight = 28.sp).words()
 
     /** Row names, buttons, a sentence on an edge card, the word after a number: Sans 400, 15 on 20. */
     val body get() = TextStyle(textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = FunnelSans, fontWeight = FontWeight.Normal, fontSize = 15.sp, lineHeight = 20.sp)

@@ -51,7 +51,6 @@ import org.openstrap.app.data.WorkoutRecorder
 import org.openstrap.app.data.Workouts
 import org.openstrap.app.ui.components.rememberScrubHaptics
 import org.openstrap.app.ui.components.scrub
-import org.openstrap.app.ui.dashboard.CaloriesCopy
 import org.openstrap.app.presentation.Metric
 import org.openstrap.app.ui.dashboard.Score
 import org.openstrap.app.ui.dashboard.ScreenList
@@ -157,8 +156,8 @@ fun GlowWorkoutDetailScreen(
                 SummaryHeroCard(hero, MetricColors.heart, Workouts.effort(w.trainingLoad, usual))
             }
             if (shown.heartRate.isNotEmpty() || w.averageHeartRate != null) item { HeartRateCard(shown, focus = focus) }
+            // The load, active kcal and highest heart rate are on the cards below, so no strip repeats them.
             val activeKcal = Workouts.activeKcal(shown, bmrPerMinute)
-            item { WorkoutStatStrip(w.trainingLoad, activeKcal.takeIf { bmrPerMinute != null }, w.maxHeartRate) }
             val facts = WorkoutDetailCopy.facts(
                 shown.distanceMeters, shown.distanceFromSteps,
                 0L, w.steps, w.calories,
@@ -169,13 +168,6 @@ fun GlowWorkoutDetailScreen(
             )
             val factsShown = facts.isNotEmpty()
             if (factsShown) item { WorkoutFactsList(facts, null) }
-            // The workout's share of its day, right under its kcal (calories spec 4.2).
-            val today = LocalDate.now()
-            val inDay = activeKcal?.let { k ->
-                val date = Instant.ofEpochSecond(shown.shownStart).atZone(ZoneId.systemDefault()).toLocalDate()
-                CaloriesCopy.inYourDay(WorkoutDetailCopy.sport(w.sportType), k, dayActiveKcal?.roundToInt(), date, today, false)
-            }
-            if (inDay != null) item { InYourDayCard(inDay, onOpenDay) }
             val drop = WorkoutDetailCopy.dropLine(shown.recovery60, shown.recoveryIsMeaningful, usualDrop)
             val loadShown = w.trainingLoad != null || (shown.recoveryMinutes ?: 0) > 0 || drop != null
             if (loadShown) item { WorkoutLoadCard(shown, usual, drop = drop, onInfo = { info = true }) }
@@ -262,7 +254,6 @@ private fun PastSummary(
                     // Always there, even before any heart rate, since it holds Trim.
                     val heartEdge = if (sectionOnEdge) EdgeOverride(edge = Edge.Bottom) else EdgeOverride()
                     CompositionLocalProvider(LocalEdgeOverride provides heartEdge) { HeartRateCard(a, trim, focus) }
-                    WorkoutStatStrip(w.trainingLoad, Workouts.activeKcal(a, null), w.maxHeartRate)
                     val facts = WorkoutDetailCopy.facts(
                         a.distanceMeters, a.distanceFromSteps, (a.durationSeconds - a.activeSeconds).coerceAtLeast(0), w.steps, w.calories,
                         activeKcal = Workouts.activeKcal(a, null),
@@ -273,12 +264,6 @@ private fun PastSummary(
                     // The map is in the route card for a run; any other kind with a kept route has it here.
                     val map = family != Workouts.Family.Distance && Route.mappable(summary.route)
                     if (facts.isNotEmpty() || map) WorkoutFactsList(facts, summary.takeIf { map })
-                    val inDay = Workouts.activeKcal(a, null)?.let { k ->
-                        val date = Instant.ofEpochSecond(a.shownStart).atZone(ZoneId.systemDefault()).toLocalDate()
-                        val sport = WorkoutDetailCopy.sport(w.sportType)
-                        CaloriesCopy.inYourDay(sport, k, dayActiveKcal?.roundToInt(), date, LocalDate.now(), true)
-                    }
-                    if (inDay != null) InYourDayCard(inDay, onOpenDay)
                     val drop = WorkoutDetailCopy.dropLine(a.recovery60, a.recoveryIsMeaningful, null)
                     if (w.trainingLoad != null || (a.recoveryMinutes ?: 0) > 0 || drop != null) {
                         WorkoutLoadCard(a, usual, drop = drop, onInfo = { info = true })
@@ -420,18 +405,6 @@ private fun ZoneHeartLine(
             drawCircle(AppColors.shade.copy(alpha = 0.6f), 6.dp.toPx(), p)
             drawCircle(AppColors.ink, 4.dp.toPx(), p)
         }
-    }
-}
-
-/**
- * In your day: what share of its day's active kcal the workout is ([CaloriesCopy.inYourDay]), lit from the left in
- * Calories' Gold (about the day it's part of). Opens that day's Calories.
- */
-@Composable
-private fun InYourDayCard(text: String, onOpen: (() -> Unit)?) {
-    EdgeCard(MetricColors.calories, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier, onClick = onOpen) {
-        EdgeTitle(stringResource(R.string.glow_workout_in_your_day), null)
-        Text(text, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp))
     }
 }
 

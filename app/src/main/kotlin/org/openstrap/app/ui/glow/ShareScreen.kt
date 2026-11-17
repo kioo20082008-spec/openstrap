@@ -244,8 +244,8 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
                     CompositionLocalProvider(LocalDensity provides Density(density.density * (width / StoryWidth), 1f)) {
                         StoryCardView(card, photo, shown)
                     }
-                    if (photo != null) Box(Modifier.align(Alignment.TopEnd).padding(10.dp)) {
-                        RoundIconButton(AppIcons.X, stringResource(R.string.glow_share_remove_photo), { photoUri = null }, size = 32.dp)
+                    if (photo != null) Box(Modifier.align(Alignment.TopEnd).padding(6.dp)) {
+                        RoundIconButton(AppIcons.X, stringResource(R.string.glow_share_remove_photo), { photoUri = null }, size = 44.dp)
                     }
                 }
                 Spacer(Modifier.height(12.dp))
@@ -259,7 +259,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     stringResource(R.string.glow_share_route), color = AppColors.muted, style = GlowType.secondary,
-                    maxLines = 1, modifier = Modifier.width(84.dp),
+                    maxLines = 1, modifier = Modifier.padding(end = 12.dp),
                 )
                 val routes = StoryRoute.entries
                 val routeNames = routes.map {

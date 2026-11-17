@@ -48,6 +48,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import org.openstrap.app.device.SyncState
@@ -166,7 +167,7 @@ fun PullSyncReveal() {
                 label, transitionSpec = { fadeIn(tween(LABEL_FADE_MS, delayMillis = LABEL_FADE_MS)) togetherWith fadeOut(tween(LABEL_FADE_MS)) },
                 label = "pull label",
             ) {
-                Text(it, style = GlowType.secondary, color = HintInk, maxLines = 1)
+                Text(it, style = GlowType.secondary, color = HintInk, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
         }
     }

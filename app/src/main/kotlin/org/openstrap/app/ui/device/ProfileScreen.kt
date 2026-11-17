@@ -211,10 +211,8 @@ fun ProfileScreen(profile: UserProfile, contentPadding: PaddingValues, onSave: (
                             PageNote(stringResource(R.string.you_profile_activity_note))
                             // Tapping the chosen level again clears it.
                             RingsSegments((1..5).map { "$it" }, activity, { i -> activity = if (activity == i) -1 else i })
-                            PageNote(
-                                if (activity in 0..4) org.openstrap.app.data.Vo2max.ACTIVITY_LEVELS[activity]
-                                else stringResource(R.string.you_profile_activity_pick),
-                            )
+                            // What the chosen level means; nothing to say until one is chosen (the line above asks).
+                            if (activity in 0..4) PageNote(org.openstrap.app.data.Vo2max.ACTIVITY_LEVELS[activity])
                         }
                         RingsSwitchRow(
                             stringResource(R.string.you_profile_beta_blockers), null, betaBlocker, { betaBlocker = it }, divider = false,

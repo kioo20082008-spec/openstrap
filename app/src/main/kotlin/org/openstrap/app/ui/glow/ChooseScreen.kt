@@ -117,7 +117,10 @@ fun GlowChooseScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack)
             Spacer(Modifier.width(12.dp))
-            Text(stringResource(R.string.glow_choose_title), color = AppColors.ink, style = RingPageTitle, maxLines = 1)
+            Text(
+                stringResource(R.string.glow_choose_title), color = AppColors.ink, style = RingPageTitle, maxLines = 1,
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+            )
         }
     }
     // Each part rises in after the one above it.
@@ -344,7 +347,7 @@ private fun SearchEntry(hint: String, onClick: () -> Unit) {
     ) {
         Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(10.dp))
-        Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
+        Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -436,12 +439,12 @@ private fun SearchField(query: String, hint: String, modifier: Modifier = Modifi
                 Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(10.dp))
                 Box(Modifier.weight(1f)) {
-                    if (query.isEmpty()) Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1)
+                    if (query.isEmpty()) Text(hint, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     field()
                 }
                 if (query.isNotEmpty()) Icon(
                     AppIcons.X, stringResource(R.string.glow_choose_clear), tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                    modifier = Modifier.size(28.dp).clip(CircleShape).clickable { onChange("") }.padding(6.dp),
+                    modifier = Modifier.size(44.dp).clip(CircleShape).clickable { onChange("") }.padding(14.dp),
                 )
             }
         },

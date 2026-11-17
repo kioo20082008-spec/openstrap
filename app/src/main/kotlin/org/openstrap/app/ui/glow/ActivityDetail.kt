@@ -625,16 +625,6 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
                 ListPanel(Modifier.padding(top = 8.dp)) { PageRow(ADD_PROFILE, onClick = ctx.onEditProfile, divider = false) }
             }
         } else if (range == Range.Day) {
-            // The day toward the goal: the bar filled to its share, "102 to your goal of 450" under it.
-            item {
-                DetailCard {
-                    FillBar(CaloriesCopy.share(active, goal), color, height = 8.dp)
-                    Text(
-                        CaloriesCopy.toGoal(active, goal), color = AppColors.muted,
-                        style = GlowType.secondary.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), modifier = Modifier.padding(top = 10.dp),
-                    )
-                }
-            }
             item {
                 HourlyKcal(e, color) { h ->
                     scrub = h?.let {
@@ -848,8 +838,11 @@ private fun StackedBars(
             horizontalArrangement = if (spread) androidx.compose.foundation.layout.Arrangement.SpaceBetween else androidx.compose.foundation.layout.Arrangement.Start,
         ) {
             labels.forEach { l ->
+                // Seven Arabic day names side by side: the article goes from the long ones so none is clipped.
                 Text(
-                    l, color = AppColors.ink.copy(alpha = 0.55f), style = GlowType.secondary, maxLines = 1,
+                    if (labels.size >= 5 && l.length > 5) l.removePrefix("ال") else l,
+                    color = AppColors.ink.copy(alpha = 0.55f), style = GlowType.secondary, maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                     modifier = if (spread) Modifier else Modifier.weight(1f), textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
             }

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +41,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -303,18 +305,21 @@ private fun SetsCard(groups: List<ExerciseSets>, maxHr: Int) {
             ) else if (gi == 0) Spacer(Modifier.height(8.dp))
             g.sets.forEach { s ->
                 val share = shares[i++]
-                Row(Modifier.fillMaxWidth().height(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 28.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         "${s.number}", color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.secondary, maxLines = 1,
-                        modifier = Modifier.width(22.dp),
+                        modifier = Modifier.width(24.dp),
                     )
-                    Text(s.text, color = AppColors.ink, style = GlowType.secondary, maxLines = 1, modifier = Modifier.width(100.dp))
+                    Text(
+                        s.text, color = AppColors.ink, style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
                     Text(
                         s.peak?.let { stringResource(R.string.glow_summary_set_peak, it) }.orEmpty(),
                         color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1,
-                        modifier = Modifier.width(72.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp),
                     )
-                    Box(Modifier.weight(1f).height(6.dp)) {
+                    Box(Modifier.width(48.dp).height(6.dp)) {
                         if (share != null) {
                             Box(
                                 Modifier.fillMaxWidth(share).fillMaxHeight().clip(CircleShape)
@@ -504,7 +509,7 @@ internal fun ZoneStripPanel(zones: ZoneSeconds, focus: Int? = null, onFocus: ((I
                             stringResource(R.string.glow_summary_zone_name, z + 1, ZONE_NAMES[z].lowercase()),
                             color = AppColors.ink.copy(alpha = alpha),
                             style = if (on) GlowType.secondary.copy(fontWeight = FontWeight.SemiBold) else GlowType.secondary,
-                            maxLines = 1, modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
+                            maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(horizontal = 10.dp),
                         )
                         Text(
                             stringResource(R.string.glow_summary_minutes, minutes[z]),
@@ -537,11 +542,11 @@ private fun ZonesEdgeCard(zones: ZoneSeconds) {
             )
             zones.indices.filter { zones[it] > 0 }.forEach { z ->
                 val style = if (z == most) GlowType.secondary.copy(fontWeight = FontWeight.SemiBold) else GlowType.secondary
-                Row(Modifier.fillMaxWidth().height(24.dp), verticalAlignment = Alignment.CenterVertically) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 28.dp), verticalAlignment = Alignment.CenterVertically) {
                     Box(Modifier.size(8.dp).background(ZONE_COLORS[z], CircleShape))
                     Text(
                         stringResource(R.string.glow_summary_zone_name, z + 1, ZONE_NAMES[z].lowercase()),
-                        color = AppColors.ink, style = style, maxLines = 1, modifier = Modifier.weight(1f).padding(start = 10.dp),
+                        color = AppColors.ink, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f).padding(start = 10.dp),
                     )
                     Text(
                         stringResource(R.string.glow_summary_minutes, minutes[z]), color = AppColors.ink,

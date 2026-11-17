@@ -48,7 +48,12 @@ fun <S> PushContent(target: S, depth: (S) -> Int, modifier: Modifier = Modifier,
 }
 
 /** Clickable that also shrinks slightly while pressed, so taps feel physical; [shape] clips it and the ripple. */
-fun Modifier.pressClickable(onClick: () -> Unit, shape: androidx.compose.ui.graphics.Shape? = null, scale: Float = 0.97f): Modifier = composed {
+fun Modifier.pressClickable(
+    onClick: () -> Unit,
+    shape: androidx.compose.ui.graphics.Shape? = null,
+    scale: Float = 0.97f,
+    role: androidx.compose.ui.semantics.Role? = androidx.compose.ui.semantics.Role.Button,
+): Modifier = composed {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
     // A spring, so the card presses in and settles back with a small give rather than a flat ease (the alive kit's bounce).
@@ -60,5 +65,5 @@ fun Modifier.pressClickable(onClick: () -> Unit, shape: androidx.compose.ui.grap
     graphicsLayer {
         scaleX = s; scaleY = s
         if (shape != null) { this.shape = shape; clip = true }
-    }.clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(), onClick = onClick)
+    }.clickable(interactionSource = interaction, indication = androidx.compose.material3.ripple(), role = role, onClick = onClick)
 }

@@ -41,6 +41,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
@@ -182,7 +183,8 @@ internal fun WorkoutButton(
             Icon(icon, null, tint = content, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(10.dp))
         }
-        Text(label, color = content, style = ButtonText, maxLines = 1)
+        // Gives way to the icon and ends in an ellipsis rather than spilling over the pill when the label is long.
+        Text(label, if (fill) Modifier.weight(1f, fill = false) else Modifier, color = content, style = ButtonText, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -259,7 +261,7 @@ internal fun SuggestionPanel(
             Icon(AppIcons.Heartbeat, null, tint = ZONE_COLORS[s.zone], modifier = Modifier.padding(top = 2.dp).size(20.dp))
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(stringResource(R.string.glow_workout_suggestion_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+                Text(stringResource(R.string.glow_workout_suggestion_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 2)
                 val day = dayName(Instant.ofEpochSecond(s.start).atZone(ZoneId.systemDefault()).toLocalDate())
                 val times = Ranges.times(s.start, s.end)
                 PageNote(stringResource(R.string.glow_workout_suggestion_text, day, times, s.zone + 1, s.averageHeartRate))
@@ -285,7 +287,7 @@ internal fun OfferPanel(o: org.openstrap.app.data.AutoStart.Offer, onRecord: () 
             Icon(SportIcons.of(o.sportType), null, tint = MetricColors.heart, modifier = Modifier.padding(top = 2.dp).size(20.dp))
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(stringResource(R.string.glow_workout_offer_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+                Text(stringResource(R.string.glow_workout_offer_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 2)
                 PageNote(
                     stringResource(
                         R.string.glow_workout_offer_text, clock(o.start), o.averageHeartRate, Workouts.sportName(o.sportType).lowercase(),

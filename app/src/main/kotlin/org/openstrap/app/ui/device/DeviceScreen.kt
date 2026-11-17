@@ -368,10 +368,7 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
     }
     // The rings theme: a flat solid card, the name in bold, the battery as a bold figure over a bar in the strap's
     // own light, and the strap drawn flat at the card's end.
-    // Alive: while connected a faint wash of the strap's light drifts behind the card.
-    Box(Modifier.fillMaxWidth().riseIn().clip(RingsShape).background(AppColors.glass, RingsShape)) {
-    if (connected != null) AmbientAura(StrapLight, Modifier.matchParentSize(), strength = 0.45f)
-    RingsCard(Modifier.fillMaxWidth(), color = Color.Transparent) {
+    RingsCard(Modifier.fillMaxWidth()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(name, color = AppColors.ink, style = RingsType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -413,7 +410,6 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
             }
         }
     }
-    }
 }
 
 
@@ -438,7 +434,7 @@ fun DiagnosticsScreen(lines: List<String>, contentPadding: PaddingValues, onBack
                 PageButton(stringResource(R.string.you_diagnostics_copy), {
                     context.getSystemService(ClipboardManager::class.java)
                         .setPrimaryClip(ClipData.newPlainText(label, lines.joinToString("\n")))
-                }, Modifier.height(40.dp), icon = AppIcons.Copy)
+                }, Modifier.height(44.dp), icon = AppIcons.Copy)
             }
         }
         item {

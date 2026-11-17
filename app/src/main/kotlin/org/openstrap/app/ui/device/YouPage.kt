@@ -166,7 +166,6 @@ fun YouPage(
                     below = true, selected = selected == PageRowKeys.HEART_ZONES,
                 )
                 RingsRow(stringResource(R.string.you_row_goals), goalsLine(goals), onClick = onGoals, below = true)
-                RingsRow(stringResource(R.string.you_row_sleep_goal), sleepGoalLine(goals, sleepNeedMinutes), onClick = onGoals, below = true)
                 RingsRow(
                     stringResource(R.string.you_row_goals_and_bests),
                     pluralStringResource(R.plurals.you_goals_and_bests_line, goals.workoutsPerWeek, goals.workoutsPerWeek),
@@ -232,7 +231,7 @@ fun YouPage(
 
 /**
  * Appearance in place (T-You): the four themes as pills, the chosen one filled with the ink, a pick applying at once;
- * the four metric hues under them, which stay the same in every theme; and the note that widgets keep their look.
+ * and the note that widgets keep their look.
  */
 @Composable
 private fun AppearanceCard(selected: AppTheme, onPick: (AppTheme) -> Unit) {
@@ -241,11 +240,6 @@ private fun AppearanceCard(selected: AppTheme, onPick: (AppTheme) -> Unit) {
             AppTheme.entries.forEach { theme ->
                 val on = theme == selected
                 RingsChoice(themeName(theme), on, { if (!on) onPick(theme) })
-            }
-        }
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep, RingColors.Steps).forEachIndexed { i, hue ->
-                Box(Modifier.weight(1f).height(8.dp).growIn(i).clip(RoundedCornerShape(4.dp)).background(hue))
             }
         }
         Text(stringResource(R.string.you_appearance_note), color = AppColors.muted, style = GlowType.secondary)

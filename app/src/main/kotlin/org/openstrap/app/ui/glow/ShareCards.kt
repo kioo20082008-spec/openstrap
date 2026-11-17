@@ -365,6 +365,9 @@ private val StoryStatStyle get() = androidx.compose.ui.text.TextStyle(
     textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = NumberFamily,
     fontWeight = FontWeight.ExtraBold, fontSize = 30.sp, lineHeight = 36.sp,
 )
+
+/** Three figures share a card's width (a run's, the week's totals): a step smaller, so the wide face fits whole. */
+private val StoryFigureStyle get() = StoryStatStyle.copy(fontSize = 26.sp, lineHeight = 32.sp)
 private val StoryTitleStyle get() = GlowType.storyTitle.copy(fontWeight = FontWeight.ExtraBold)
 
 /**
@@ -468,7 +471,7 @@ private fun RunStory(card: StoryCard.Run) {
             card.stats.forEach { s ->
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text(s.value, color = Color.White, style = StoryStatStyle, maxLines = 1)
+                        Text(s.value, color = Color.White, style = StoryFigureStyle, maxLines = 1, softWrap = false)
                         s.unit?.let { Text(" $it", color = Color.White, style = GlowType.body, maxLines = 1, modifier = Modifier.padding(bottom = 3.dp)) }
                     }
                     Text(s.label, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
@@ -585,7 +588,7 @@ private fun WeekFigures(figures: List<WeekFigure>) {
             Column(Modifier.weight(1f)) {
                 Icon(f.icon, null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(18.dp))
                 Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(f.value, color = Color.White, style = StoryStatStyle, maxLines = 1)
+                    Text(f.value, color = Color.White, style = StoryFigureStyle, maxLines = 1, softWrap = false)
                     f.unit?.let { Text(" $it", color = Color.White, style = GlowType.body, maxLines = 1, modifier = Modifier.padding(bottom = 3.dp)) }
                 }
                 Text(f.label, color = StoryMuted, style = GlowType.secondary, maxLines = 1)

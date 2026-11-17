@@ -138,6 +138,20 @@ private fun inter(weight: Int) = Font(
     variationSettings = FontVariation.Settings(FontVariation.weight(weight)),
 )
 
+/** Inter drawn at [wght] whatever weight is asked, so a figure never comes out thin (the rings design: figures are always bold). */
+private fun interAs(weight: FontWeight, wght: Int) = Font(
+    R.font.inter,
+    weight = weight,
+    variationSettings = FontVariation.Settings(FontVariation.weight(wght)),
+)
+
+/** Inter for figures: every weight up to Bold draws Bold, as [AlexandriaNumbers] does in Arabic. */
+private val InterNumbers = FontFamily(
+    interAs(FontWeight.ExtraLight, 700), interAs(FontWeight.Light, 700), interAs(FontWeight.Normal, 700),
+    interAs(FontWeight.Medium, 700), interAs(FontWeight.SemiBold, 700), interAs(FontWeight.Bold, 700),
+    interAs(FontWeight.ExtraBold, 800),
+)
+
 /** Inter for Latin text and numbers. Both Inter and Almarai are SIL OFL 1.1. */
 private val InterFamily = FontFamily(inter(200), inter(300), inter(400), inter(500), inter(600), inter(700), inter(800))
 
@@ -175,9 +189,12 @@ private val AlexandriaNumbers = FontFamily(
 
 private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
 
+/** Whether the app is drawing in Arabic right now: letters must not be spaced apart there, or the joins break. */
+internal val isArabicUi: Boolean get() = isArabic
+
 /** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
-/** Numbers stay in Inter in every language. */
-val NumberFamily: FontFamily get() = if (isArabic) AlexandriaNumbers else InterFamily
+/** Figures are bold in every language (spec 2.3): Alexandria in Arabic, Inter otherwise. */
+val NumberFamily: FontFamily get() = if (isArabic) AlexandriaNumbers else InterNumbers
 val FunnelDisplay: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
 val FunnelSans: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
 
@@ -185,7 +202,12 @@ private val Base = Typography()
 
 /** Big numerals use tabular figures so values don't jitter as they update (e.g. live HR). */
 private fun display(style: TextStyle, weight: FontWeight, size: Int, tracking: Float) =
-    style.copy(fontFamily = FunnelDisplay, fontWeight = weight, fontSize = size.sp, letterSpacing = tracking.sp, fontFeatureSettings = "tnum")
+    // A line at least 1.3 times the size (the base styles' lines were made for smaller type), and no letter spacing in
+    // Arabic, where spaced letters stop joining.
+    style.copy(
+        fontFamily = FunnelDisplay, fontWeight = weight, fontSize = size.sp, letterSpacing = if (isArabic) 0.sp else tracking.sp,
+        lineHeight = (size * 1.3f).sp, fontFeatureSettings = "tnum",
+    )
 
 private fun text(style: TextStyle) = style.copy(fontFamily = FunnelSans)
 
@@ -204,7 +226,7 @@ private val AppTypography get() = Typography(
     bodySmall = text(Base.bodySmall),
     labelLarge = text(Base.labelLarge).copy(fontWeight = FontWeight.SemiBold),
     // Uppercase tracked labels ("TIME ASLEEP") are styled with labelMedium.
-    labelMedium = text(Base.labelMedium).copy(fontWeight = FontWeight.SemiBold, letterSpacing = 1.4.sp, fontSize = 11.sp),
+    labelMedium = text(Base.labelMedium).copy(fontWeight = FontWeight.SemiBold, letterSpacing = if (isArabic) 0.sp else 1.4.sp, fontSize = 11.sp, lineHeight = 16.sp),
     labelSmall = text(Base.labelSmall),
 )
 

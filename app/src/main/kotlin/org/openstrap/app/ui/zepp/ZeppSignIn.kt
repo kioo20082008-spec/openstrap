@@ -149,7 +149,7 @@ fun ZeppSignInDialog(
                     Spacer(Modifier.width(12.dp))
                     Text(
                         stringResource(R.string.you_zepp_sign_in_title), color = AppColors.ink, style = org.openstrap.app.ui.device.RingsType.title, maxLines = 1,
-                        modifier = Modifier.weight(1f),
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
                     )
                     if (step is SignInStep.SignIn) {
                         PageTextButton(stringResource(R.string.you_zepp_reset), { clearZeppCookies(); attempt++ })
@@ -159,7 +159,7 @@ fun ZeppSignInDialog(
                     SignInStep.SignIn -> {
                         Column(Modifier.padding(horizontal = GlowLayout.Gutter, vertical = 4.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                             Text(stringResource(R.string.you_zepp_sign_in_text), color = AppColors.ink, style = GlowType.body)
-                            PageNote(stringResource(R.string.you_zepp_sign_in_note))
+                            PageNote(stringResource(R.string.polish_you_zepp_privacy_short))
                         }
                         key(attempt) {
                             ZeppWebView(Modifier.fillMaxWidth().weight(1f).padding(top = 8.dp)) { provider ->
@@ -183,7 +183,8 @@ fun ZeppSignInDialog(
                                 Icon(AppIcons.WarningCircle, null, Modifier.size(20.dp), tint = MetricColors.warn)
                                 Text(
                                     stringResource(if (thirdParty) R.string.you_zepp_use_email else R.string.you_zepp_no_devices),
-                                    color = AppColors.ink, style = org.openstrap.app.ui.device.RingsType.cardTitle, maxLines = 1,
+                                    color = AppColors.ink, style = org.openstrap.app.ui.device.RingsType.cardTitle, maxLines = 2,
+                                    modifier = Modifier.weight(1f),
                                 )
                             }
                             Text(
@@ -247,7 +248,7 @@ private fun FoundStrap(
                             showKey -> strap.authKey
                             else -> "•".repeat(8) + strap.authKey.takeLast(4)
                         },
-                        color = AppColors.ink, style = GlowType.body.copy(fontFamily = FontFamily.Monospace),
+                        color = AppColors.ink, style = GlowType.body.copy(fontFamily = FontFamily.Monospace), maxLines = 1,
                     )
                     if (strap.authKey != null) {
                         PageTextButton(
