@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.openstrap.app.ble.BleScanner
 import org.openstrap.app.data.HealthRepository
 import org.openstrap.app.data.db.OpenStrapDatabase
@@ -44,7 +45,11 @@ class AppContainer(val app: Application) {
     val scanner = BleScanner(app)
     val csv = CsvExporter(database.healthDao())
     val healthConnect = HealthConnectExporter(app, database.healthDao())
-    val strap: StrapController = StrapManager(app, settings, database.healthDao(), scope = appScope)
+    val strap: StrapController = StrapManager(
+        app, settings, database.healthDao(), scope = appScope,
+        // After a sync, the body signals read the same cached Recovery as Today and the widgets.
+        recovery = { d, p -> health.recovery(d, p) },
+    )
     val companion = CompanionLink(app, settings)
     val phoneAlerts = PhoneAlerts(app, settings, strap)
     val autoHealthConnect = org.openstrap.app.health.HealthConnectAutoSync(app, settings, healthConnect, strap, scope = appScope)
@@ -124,8 +129,12 @@ class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
         container.widgets.start()
         // The daily check for a new OpenStrap, unless it was turned off on the Updates page.
         container.updater.start()
-        org.openstrap.app.device.CoachWorker.schedule(this)
-        // Looks for the first morning of the week, for the weekly recap (workouts spec 3.4).
-        org.openstrap.app.device.WeeklyRecap.schedule(this)
+        // WorkManager starts up on first use, which would hold the main thread at launch: the two periodic jobs are
+        // set from the app's own scope (each a no-op when already scheduled).
+        container.appScope.launch {
+            org.openstrap.app.device.CoachWorker.schedule(this@OpenStrapApp)
+            // Looks for the first morning of the week, for the weekly recap (workouts spec 3.4).
+            org.openstrap.app.device.WeeklyRecap.schedule(this@OpenStrapApp)
+        }
     }
 }

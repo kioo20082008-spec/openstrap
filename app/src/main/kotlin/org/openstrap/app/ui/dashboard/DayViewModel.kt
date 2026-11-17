@@ -13,8 +13,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -227,6 +229,10 @@ class DayViewModel(
 
     /** The day's rows as the screens draw them, before the day's false steps come off ([state]). */
     private val dayState: Flow<DayUiState> = shown.flatMapLatest { (date, isToday) -> repo.day(date, isToday) }
+        // A sync makes every table's query answer again, mostly with what it answered before: an equal day isn't worked
+        // into a state again, and while one is being worked only the newest waits.
+        .distinctUntilChanged()
+        .conflate()
         .map(::toUiState)
 
     /**
@@ -263,6 +269,16 @@ class DayViewModel(
     val deletedSleep: StateFlow<List<SleepEdits.Resolved>> = repo.deletedSleep()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    /**
+     * [DayRepository.changes] for the heavy readings: the first at once, so the day's Recovery and Healthspan don't wait
+     * out the settle time on opening, then each burst of a sync's writes as one, [SETTLE_MS] after its last.
+     */
+    @OptIn(FlowPreview::class)
+    private fun settledChanges(): Flow<Unit> = flow {
+        var first = true
+        emitAll(repo.changes().debounce { if (first) { first = false; 0L } else SETTLE_MS })
+    }
+
     /** The last Recovery worked out, for yesterday's score when today's fails. */
     @Volatile private var lastRecovery: RecoveryResult? = null
 
@@ -272,7 +288,7 @@ class DayViewModel(
      */
     @OptIn(FlowPreview::class)
     private val recoveryOutcome: StateFlow<RecoveryOutcome?> =
-        combine(selected, profile, repo.changes().debounce(800), recoveryRetries, liveTicks) { d, p, _, _, _ -> d to p }
+        combine(selected, profile, settledChanges(), recoveryRetries, liveTicks) { d, p, _, _, _ -> d to p }
             .mapLatest { (d, p) ->
                 withContext(work) {
                     // mapLatest cancels this when newer data arrives. That's not a failure, and catching lets it through.
@@ -342,7 +358,7 @@ class DayViewModel(
     /** The weekly Healthspan estimate for the selected day, or why it's withheld; null while loading or on failure. */
     @OptIn(FlowPreview::class)
     val healthspan: StateFlow<org.openstrap.app.data.Healthspan.Outcome?> =
-        combine(selected, profile, repo.changes().debounce(800)) { d, p, _ -> d to p }
+        combine(selected, profile, settledChanges()) { d, p, _ -> d to p }
             .mapLatest { (d, p) ->
                 withContext(work) {
                     catching { repo.healthspan(d, p) }.onFailure { Log.w("OpenStrap", "healthspan failed", it) }.getOrNull()
@@ -367,6 +383,9 @@ class DayViewModel(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ActivityHistory())
 
     companion object {
+        /** How long a sync's writes must be quiet before Recovery and Healthspan are worked out again. */
+        private const val SETTLE_MS = 800L
+
         /**
          * [data] as the screens show it: the heart rate as a chart, the steps by hour, the trends with their weekday
          * labels and the stages as spans.

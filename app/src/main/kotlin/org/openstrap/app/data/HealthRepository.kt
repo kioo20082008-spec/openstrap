@@ -1,6 +1,12 @@
 package org.openstrap.app.data
 
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -119,14 +125,68 @@ class HealthRepository(
         val key = Triple(date, profile, ZoneId.systemDefault())
         val version = dataVersion.get()
         val minute = liveMinute(date, now)
-        return recoveryLock.withLock { recoveries[key]?.takeIf { it.version == version && it.minute == minute }?.result }
-            ?: computeRecovery(date, profile, now).also { r ->
-                recoveryLock.withLock {
-                    recoveries.remove(key)
-                    recoveries[key] = CachedRecovery(version, minute, r)
-                    while (recoveries.size > RECOVERY_CACHE_SIZE) recoveries.remove(recoveries.keys.first())
+        while (true) {
+            var lead: Working? = null
+            var follow: Working? = null
+            val kept = recoveryLock.withLock {
+                val hit = recoveries[key]?.takeIf { it.version == version && it.minute == minute }
+                if (hit != null) return@withLock hit.result
+                // The same day being worked out for another caller right now (Today, the widgets, the notification and
+                // the sync all ask at a sync's end): join it rather than work it out again.
+                val running = working[key]?.takeIf { it.version == version && it.minute == minute && !it.result.isCancelled }
+                if (running != null) follow = running else lead = Working(version, minute).also { working[key] = it }
+                null
+            }
+            if (kept != null) return kept
+            val joined = follow
+            if (joined != null) {
+                // The one working it out failed or was cancelled (a newer request replaced it): look again, as a new ask.
+                val shared = try {
+                    joined.result.await()
+                } catch (e: CancellationException) {
+                    currentCoroutineContext().ensureActive()
+                    null
+                }
+                if (shared != null) return shared
+                continue
+            }
+            return workOut(checkNotNull(lead), key, date, profile, now)
+        }
+    }
+
+    /** A day's Recovery being worked out for [version] and [minute], which others asking for it meanwhile wait for. */
+    private class Working(val version: Long, val minute: Long?) {
+        val result = CompletableDeferred<RecoveryResult>()
+    }
+
+    /** Only read and written under [recoveryLock]. */
+    private val working = HashMap<Triple<LocalDate, UserProfile, ZoneId>, Working>()
+
+    /** Works [date] out as [mine], keeps it, and hands it to the callers waiting. A failure is passed on to nobody. */
+    private suspend fun workOut(
+        mine: Working, key: Triple<LocalDate, UserProfile, ZoneId>, date: LocalDate, profile: UserProfile, now: Long,
+    ): RecoveryResult {
+        var done = false
+        try {
+            val r = computeRecovery(date, profile, now)
+            recoveryLock.withLock {
+                recoveries.remove(key)
+                recoveries[key] = CachedRecovery(mine.version, mine.minute, r)
+                while (recoveries.size > RECOVERY_CACHE_SIZE) recoveries.remove(recoveries.keys.first())
+                if (working[key] === mine) working.remove(key)
+            }
+            mine.result.complete(r)
+            done = true
+            return r
+        } finally {
+            if (!done) {
+                // Even when cancelled: the waiting callers must not be left on it, nor a later one find it still there.
+                withContext(NonCancellable) {
+                    recoveryLock.withLock { if (working[key] === mine) working.remove(key) }
+                    mine.result.cancel()
                 }
             }
+        }
     }
 
     /**

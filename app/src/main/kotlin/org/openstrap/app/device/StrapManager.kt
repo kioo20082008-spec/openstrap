@@ -71,6 +71,8 @@ class StrapManager(
     // Its own scope until AppContainer passes appScope in. Tests pass theirs.
     @Suppress("InjectDispatcher")
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Default),
+    /** The app's cached Recovery for the after-sync work ([SyncCoordinator]); null works it out afresh. */
+    recovery: RecoveryOf? = null,
 ) : StrapController {
     override val log = MutableStateFlow<List<String>>(emptyList())
     override val firmwareUpdating = MutableStateFlow(false)
@@ -100,7 +102,7 @@ class StrapManager(
     private val buzzer: BuzzCoordinator = BuzzCoordinator(scope, connections, firmwareUpdating, commands, ::log)
     private val syncs: SyncCoordinator = SyncCoordinator(
         context, scope, settings, dao, connections, firmwareUpdating,
-        SyncCoordinator.Notifiers(AutoDetectNotifier(context), healthAlerts), ::log,
+        SyncCoordinator.Notifiers(AutoDetectNotifier(context), healthAlerts), ::log, recovery,
     )
     private val live: LiveHeartRateStream =
         LiveHeartRateStream(scope, settings, connections, connections.connection, firmwareUpdating, ::log)

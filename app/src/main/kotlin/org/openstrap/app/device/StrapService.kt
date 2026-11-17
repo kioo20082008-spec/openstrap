@@ -141,7 +141,7 @@ class StrapService : LifecycleService() {
             strap.sync.distinctUntilChangedBy { it is SyncState.Done }.collectLatest {
                 while (true) {
                     // A failed read keeps the figures shown.
-                    figures.value = catching { loadFigures(dao, container.settings, strap) }
+                    figures.value = catching { loadFigures(dao, container.settings, strap, container.health) }
                         .onFailure { e -> (strap as? StrapManager)?.log("service: notification figures not read: $e") }
                         .getOrNull() ?: figures.value
                     delay(FIGURES_REFRESH_MS)
@@ -322,14 +322,15 @@ class StrapService : LifecycleService() {
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
     )
 
-    /** Today's Recovery and Charge, the last sync and your usual sport; the model runs in a few hundred ms. */
-    private suspend fun loadFigures(dao: HealthDao, settings: SettingsStore, strap: StrapController): Figures {
-        val own = settings.calibration.first()
-        val r = org.openstrap.app.data.RecoveryEngine(dao).compute(
-            java.time.LocalDate.now(), settings.profile.first(),
-            tuning = own?.tuning ?: org.openstrap.app.data.ChargeTuning.Default,
-            weights = own?.weights ?: org.openstrap.app.data.ReadinessWeights.Default,
-        )
+    /**
+     * Today's Recovery and Charge, the last sync and your usual sport. Recovery comes through [health]'s cache, so the
+     * notification, Today and the widgets work a day out once between them rather than once each (it uses the same
+     * engine and the same calibration).
+     */
+    private suspend fun loadFigures(
+        dao: HealthDao, settings: SettingsStore, strap: StrapController, health: org.openstrap.app.data.HealthRepository,
+    ): Figures {
+        val r = health.recovery(java.time.LocalDate.now(), settings.profile.first())
         val sport = dao.appWorkoutsAll().maxByOrNull { it.start }?.sportType ?: Workouts.DEFAULT_SPORTS.first()
         val syncedAt = (strap.sync.value as? SyncState.Done)?.atEpochSeconds ?: figures.value?.syncedAt
         return Figures(NotificationCopy.recovery(r), r.charge.latest?.let(::chargeShown), sport, syncedAt)

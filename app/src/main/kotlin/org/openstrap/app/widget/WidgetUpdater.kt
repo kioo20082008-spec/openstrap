@@ -20,6 +20,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.openstrap.app.BuildConfig
 import org.openstrap.app.OpenStrapApp
 import org.openstrap.app.data.MomentInputs
@@ -100,13 +102,37 @@ class WidgetUpdater(
         )
         scope.watchWidgetTriggers(triggers, ::changed, ::stepsChanged)
         // Widgets turn the day over at midnight. Alarms don't survive a reboot or an update, so set it on each start.
-        scheduleMidnight()
+        // Off the main thread: asking the launcher what's placed is seven calls to another process.
+        scope.launch { scheduleMidnight() }
         publishPreviews()
     }
 
-    /** Refreshes the placed widgets of [kinds]. */
+    /** Kinds asked for and not yet refreshed, and whether a refresh is already waiting to take them. Under [pendingLock]. */
+    private val pending = HashSet<WidgetKind>()
+    private var waiting = false
+    private val pendingLock = Any()
+
+    /**
+     * Refreshes the placed widgets of [kinds]. Triggers that fire together (a sync ending, the strap's battery, a
+     * profile change) are joined into one refresh, [JOIN_MS] after the first, which reads once and updates each
+     * kind once.
+     */
     fun changed(kinds: Set<WidgetKind>) {
-        scope.launch { update(kinds) }
+        synchronized(pendingLock) {
+            pending += kinds
+            if (waiting) return
+            waiting = true
+        }
+        scope.launch {
+            delay(JOIN_MS)
+            while (true) {
+                val next = synchronized(pendingLock) {
+                    if (pending.isEmpty()) { waiting = false; return@launch }
+                    pending.toSet().also { pending.clear() }
+                }
+                catching { update(next) }.onFailure { Log.w(WIDGET_TAG, "widgets: $next not refreshed: $it") }
+            }
+        }
     }
 
     /** Refreshes every placed widget: a sync ended, a new day, the strap's state changed. */
@@ -199,7 +225,12 @@ class WidgetUpdater(
     /** [kind]'s receiver and widget, null before it exists: for the debug widget gallery. */
     internal fun registration(kind: WidgetKind): Registration? = WIDGETS[kind]
 
-    internal suspend fun update(kinds: Set<WidgetKind>) {
+    /** One refresh at a time: two at once (a trigger and an alarm) would read twice and draw over each other. */
+    private val refreshing = Mutex()
+
+    internal suspend fun update(kinds: Set<WidgetKind>) = refreshing.withLock { refresh(kinds) }
+
+    private suspend fun refresh(kinds: Set<WidgetKind>) {
         val shown = placed().intersect(kinds)
         if (shown.isEmpty()) return
         // One read for every widget this refresh updates. A session that can't use it reads for itself.
@@ -267,6 +298,9 @@ class WidgetUpdater(
 
         /** Without exact alarms a moment may change this late on a widget (spec 7: a few minutes late is fine). */
         const val ALARM_WINDOW_MS = 5 * 60_000L
+
+        /** Triggers inside this long of the first join its refresh. */
+        private const val JOIN_MS = 300L
 
         /** How long a refresh's read serves the sessions it starts: they render one after another, a few seconds in all. */
         private const val FRESH_MS = 60_000L

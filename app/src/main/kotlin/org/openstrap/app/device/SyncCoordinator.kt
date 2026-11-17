@@ -20,6 +20,9 @@ import org.openstrap.app.data.db.HealthDao
 import org.openstrap.app.data.settings.SettingsStore
 import org.openstrap.protocol.ChannelSession
 
+/** A day's Recovery for a profile, as [org.openstrap.app.data.HealthRepository.recovery] works it out. */
+typealias RecoveryOf = suspend (java.time.LocalDate, org.openstrap.app.data.settings.UserProfile) -> org.openstrap.app.data.RecoveryResult
+
 /**
  * History sync: one at a time, a full sync or the types the strap pushed queued behind it, the auto sync, and
  * the work that follows each sync (body signals, workout gap fill, workout effect, daily calories).
@@ -35,6 +38,11 @@ internal class SyncCoordinator(
     private val firmwareUpdating: StateFlow<Boolean>,
     private val notifiers: Notifiers,
     private val log: (String) -> Unit,
+    /**
+     * Where the day's Recovery is worked out: the app's cached one ([org.openstrap.app.data.HealthRepository.recovery]), so
+     * the sync, Today and the widgets work it out once between them. Without one, it is worked out here afresh.
+     */
+    private val recovery: RecoveryOf? = null,
 ) {
     /** Where a sync's findings go: a detected workout, and the morning's body-signal alert. */
     class Notifiers(val autoDetected: AutoDetectNotifier, val healthAlerts: HealthAlertNotifier)
@@ -175,7 +183,8 @@ internal class SyncCoordinator(
         // By date, so after a flight west the same morning doesn't push again.
         val pushDay = org.openstrap.app.data.DayKey.of(today)
         if ((settings.lastSync(BODY_SIGNALS_PUSHED) ?: 0L) >= pushDay) return
-        val r = org.openstrap.app.data.RecoveryEngine(dao).compute(today, settings.profile.first())
+        val profile = settings.profile.first()
+        val r = recovery?.invoke(today, profile) ?: org.openstrap.app.data.RecoveryEngine(dao).compute(today, profile)
         val body = r.readiness.bodySignals ?: return
         if (body.day != day || body.state != org.openstrap.app.data.BodySignals.State.Alert) return
         notifiers.healthAlerts.showBodySignals(body.families, body.nightsOff)
