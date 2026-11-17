@@ -1,5 +1,7 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.workout.StartHue
+import org.openstrap.app.ui.workout.RingInk
 import android.content.Intent
 import org.openstrap.app.ui.theme.AppColors
 import android.provider.Settings
@@ -221,7 +223,7 @@ fun GlowWorkoutReadyScreen(
     WorkoutPage(
         Color.Transparent, contentPadding,
         // While a goal is typed the keyboard has the bottom of the screen.
-        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), AppColors.ink, AppColors.onInk, start, icon = AppIcons.PlayFill, height = 64.dp) }),
+        pinned = if (typing) null else ({ WorkoutButton(StartCopy.startLabel(type), StartHue, RingInk, start, icon = AppIcons.PlayFill, height = 60.dp) }),
     ) {
         Box(Modifier.fillMaxWidth()) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack, Modifier.align(Alignment.CenterStart))

@@ -52,6 +52,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.animation.animateContentSize
 
 /** One destination in [FloatingNavBar]; [tint] colours its capsule while it's the tab showing (none, plain glass, on Today). */
 data class NavItem(val label: String, val icon: ImageVector, val selectedIcon: ImageVector = icon, val tint: Color? = null)
@@ -94,13 +96,13 @@ fun FloatingNavBar(
                 )
                 Box(
                     Modifier.offset(x = x).width(cell).fillMaxHeight().clip(CircleShape)
-                        .background(capsuleColor(items.getOrNull(selected)?.tint)).border(GlassChipEdge, CircleShape),
+                        .background(AppColors.ink),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
                     items.forEachIndexed { i, item ->
                         NavCell(item, i == selected, modifier = Modifier.clip(CircleShape).clickable { onSelect(i) }
                             .weight(1f)
-                            .padding(vertical = 8.dp))
+                            .padding(vertical = 8.dp), onTint = AppColors.onInk)
                     }
                 }
             }
@@ -132,14 +134,14 @@ fun FloatingNavRail(
                 )
                 Box(
                     Modifier.offset(y = y).height(cell).fillMaxWidth().clip(CircleShape)
-                        .background(capsuleColor(items.getOrNull(selected)?.tint)).border(GlassChipEdge, CircleShape),
+                        .background(AppColors.ink),
                 )
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(gap)) {
                     items.forEachIndexed { i, item ->
                         NavCell(
                             item, i == selected,
                             modifier = Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center,
+                            verticalArrangement = Arrangement.Center, onTint = AppColors.onInk,
                         )
                     }
                 }
@@ -153,7 +155,8 @@ fun FloatingNavRail(
  * so a tap between two tabs never lands on the card under the bar.
  */
 private fun Modifier.glassPill(glass: HazeState): Modifier =
-    clip(CircleShape).hazeBlur(HazeInput.Sources(glass), GlassBlur).border(GlassEdge, CircleShape).pointerInput(Unit) {}
+    // The rings design: a solid pill in the card colour, no blur and no edge. [glass] stays for the callers.
+    clip(CircleShape).background(AppColors.glass).pointerInput(Unit) {}
 
 /** The capsule under the tab showing: its section colour, eased as it slides; plain glass white on Today. */
 @Composable
@@ -218,39 +221,71 @@ fun Modifier.pinnedFade(): Modifier = drawBehind {
 val NavRailWidth = 92.dp
 
 /** One destination's icon and label, tinted for whether it's [on]. */
-/** The redesign's bar: tabs in a navy pill, the selected one in coral, and the coral "+" raised in the middle. */
+/**
+ * The rings design's bar: a solid pill in the card colour, the tab showing as a pill filled with ink (its icon and
+ * name), the others as icons only, and Energy's "+" in the middle. Flat: no glass edge, no glow.
+ */
 @Composable
-private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, onPlus: () -> Unit, modifier: Modifier, glass: HazeState) {
+private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, onPlus: () -> Unit, modifier: Modifier, @Suppress("UNUSED_PARAMETER") glass: HazeState) {
     Box(
         modifier.fillMaxWidth().drawBehind {
             val height = maxOf(TabBarFade.Height.toPx(), size.height)
             drawRect(TabBarFade.brush(size.height - height, size.height), Offset(0f, size.height - height), Size(size.width, height))
-        }.navigationBarsPadding().padding(horizontal = 16.dp, vertical = 10.dp),
+        }.navigationBarsPadding().padding(horizontal = 20.dp, vertical = 10.dp),
         contentAlignment = Alignment.Center,
     ) {
         Row(
-            Modifier.widthIn(max = 480.dp).fillMaxWidth().glassPill(glass).padding(horizontal = 6.dp, vertical = 8.dp),
+            // Takes every touch inside it, so a tap between two tabs never lands on the card under the bar.
+            Modifier.widthIn(max = 480.dp).fillMaxWidth().height(68.dp).clip(CircleShape).background(AppColors.glass)
+                .pointerInput(Unit) {}.padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
             val half = (items.size + 1) / 2
             items.forEachIndexed { i, item ->
-                if (i == half) Spacer(Modifier.width(72.dp))
-                // The rings design: the chosen tab is a pill filled with ink, its icon and label in the page's colour.
-                NavCell(item, i == selected, Modifier.weight(1f).clip(CircleShape).background(if (i == selected) AppColors.ink else Color.Transparent).clickable { onSelect(i) }.padding(vertical = 6.dp), onTint = AppColors.onInk)
+                if (i == half) Box(
+                    Modifier.size(50.dp).clip(CircleShape).background(PlusHue).clickable(onClick = onPlus),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    androidx.compose.foundation.Canvas(Modifier.size(22.dp)) {
+                        val w = 2.6.dp.toPx()
+                        drawLine(PlusInk, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
+                        drawLine(PlusInk, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
+                    }
+                }
+                RingNavCell(item, i == selected) { onSelect(i) }
             }
         }
-        Box(
-            Modifier.size(60.dp)
-                .clip(CircleShape)
-                .background(Color(0xFFFF5C39))
-                .clickable(onClick = onPlus),
-            contentAlignment = Alignment.Center,
-        ) {
-            androidx.compose.foundation.Canvas(Modifier.size(24.dp)) {
-                val w = 3.dp.toPx()
-                drawLine(Color(0xFF0A0A0C), Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
-                drawLine(Color(0xFF0A0A0C), Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
-            }
+    }
+}
+
+/** Energy's hue for the bar's "+", with the dark ink on it. */
+private val PlusHue = Color(0xFFFF5C39)
+private val PlusInk = Color(0xFF0A0A0C)
+
+/** A tab in the rings bar: the one showing is an ink pill with its icon and name; the rest an icon in a 46 dp cell. */
+@Composable
+private fun RingNavCell(item: NavItem, on: Boolean, onClick: () -> Unit) {
+    val tint by androidx.compose.animation.animateColorAsState(
+        if (on) AppColors.onInk else AppColors.ink.copy(alpha = 0.6f), tween(Motion.QUICK), label = "nav tint",
+    )
+    val fill by androidx.compose.animation.animateColorAsState(
+        if (on) AppColors.ink else Color.Transparent, tween(Motion.QUICK), label = "nav pill",
+    )
+    Row(
+        Modifier.height(46.dp).widthIn(min = 46.dp).clip(CircleShape).background(fill).clickable(onClick = onClick)
+            .animateContentSize(tween(Motion.SWIFT, easing = Motion.easing))
+            .padding(horizontal = if (on) 16.dp else 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Icon(if (on) item.selectedIcon else item.icon, item.label, tint = tint, modifier = Modifier.size(22.dp))
+        if (on) {
+            Spacer(Modifier.width(8.dp))
+            Text(
+                item.label, color = tint, maxLines = 1,
+                style = GlowType.caption.copy(fontSize = 13.sp, lineHeight = 16.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
+            )
         }
     }
 }

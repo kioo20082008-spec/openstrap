@@ -1,5 +1,13 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.workout.RingCardShape
+import org.openstrap.app.ui.workout.RingCardTitle
+import org.openstrap.app.ui.workout.RingPageTitle
+import org.openstrap.app.ui.workout.WorkoutRing
+import org.openstrap.app.ui.workout.ringFigure
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import org.openstrap.app.R
 import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Units
@@ -85,9 +93,6 @@ import org.openstrap.app.ui.dashboard.LocalHeartZones
 /** Where Done has got to: the summary, a personal best's card, the goal moment. */
 private enum class SummaryStep { Summary, Best, Moment }
 
-/** How much higher the hero's light reaches at the top of a personal best's swell. */
-private const val SwellLevel = 0.25f
-
 /** The drop line shows the last minute of the workout before the end. */
 private const val BeforeS = 60L
 
@@ -165,7 +170,7 @@ fun GlowWorkoutSummaryScreen(
         Row(Modifier.padding(start = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 val title = a?.sportName ?: stringResource(R.string.glow_workout_untitled)
-                Text(title, color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = RingPageTitle, maxLines = 1)
                 if (a != null) Text(
                     FamilySummary.whenLine(a.shownStart, System.currentTimeMillis() / 1000), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp),
@@ -229,21 +234,45 @@ fun GlowWorkoutSummaryScreen(
 }
 
 /**
- * The summary's hero (workouts spec 2.8): a glow in the workout's [color] lit from below as high as its [effort], the
- * one number in dots, then a sentence or three figures in text. [swell] lifts the light for a personal best.
+ * The summary's hero (workouts spec 2.8) in the rings design: one thick ring in the workout's [color] filled as far as
+ * its [effort], the one number bold in the middle with its unit, then the sentence, and the three figures on a solid
+ * card. [swell] lifts the ring a little for a personal best, drawn in the layer so nothing composes again.
  */
 @Composable
 internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swell: () -> Float = { 0f }) {
-    // The swell is drawn over the card's own light ([GlowSwell]), so the light at rest stays the cache key and a best's
-    // swell neither composes the hero again nor renders a new glow each frame.
-    val lift = remember(effort, swell) { GlowSwell((effort + SwellLevel).coerceAtMost(1f), swell) }
-    GlowCard(effortGlow(color, effort), Modifier.fillMaxWidth(), swell = lift) {
-        Column {
-            HeroValue(hero.value, hero.unit)
-            hero.sentence?.let { HeroSentence(it) }
-            hero.line?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp)) }
-            if (hero.figures.isNotEmpty()) {
-                DetailFigures(hero.figures, Modifier.padding(top = 18.dp), valueStyle = GlowType.rowValue, missing = null, gap = 0.dp)
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        WorkoutRing(
+            effort, color,
+            Modifier.padding(top = 4.dp).graphicsLayer {
+                val k = 1f + 0.06f * swell()
+                scaleX = k
+                scaleY = k
+            },
+            ringSize = 210.dp, stroke = 22.dp, icon = AppIcons.HeartFill,
+        ) {
+            Column(Modifier.padding(horizontal = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                val n = hero.value.length
+                Text(
+                    hero.value, color = AppColors.ink, maxLines = 1, softWrap = false,
+                    style = ringFigure(if (n >= 7) 32.sp else if (n >= 5) 40.sp else 50.sp),
+                )
+                if (hero.unit.isNotBlank()) Text(
+                    hero.unit, color = AppColors.muted, style = GlowType.secondary, maxLines = 1, textAlign = TextAlign.Center,
+                )
+            }
+        }
+        hero.sentence?.let {
+            Text(
+                it, Modifier.fillMaxWidth().padding(top = 16.dp), color = AppColors.ink, textAlign = TextAlign.Center,
+                style = RingCardTitle.copy(fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.ExtraBold),
+            )
+        }
+        hero.line?.let {
+            Text(it, Modifier.fillMaxWidth().padding(top = 6.dp), color = AppColors.muted, style = GlowType.secondary, textAlign = TextAlign.Center)
+        }
+        if (hero.figures.isNotEmpty()) {
+            Box(Modifier.fillMaxWidth().padding(top = 16.dp).clip(RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 14.dp)) {
+                DetailFigures(hero.figures, valueStyle = ringFigure(20.sp), missing = null, gap = 2.dp)
             }
         }
     }
@@ -270,8 +299,8 @@ private fun CalmDownHero(summary: PhoneSummary, live: CalmDown?, usualDrop: Int?
     }
     val line: CalmDownLine = SummaryCopy.calmDown(readings, a.end, now, live != null && now <= live.until, a.maxHeartRate, usualDrop)
     val bpmNow = live?.readings?.lastOrNull()?.takeIf { now <= live.until && now - it.first <= 5 }?.second
-    // A level glow is always at full: its light is the value (spec 2.1).
-    GlowCard(effortGlow(MetricColors.heart, effort + SwellLevel * swell), Modifier.fillMaxWidth()) {
+    // A solid card in the rings design: the effort and the swell no longer light it.
+    Box(Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).padding(horizontal = GlowLayout.CardInset, vertical = 16.dp)) {
         Column {
             GlowHeader(
                 stringResource(R.string.glow_summary_drop_title), trailing = stringResource(R.string.glow_summary_drop_since, clock(a.end)),

@@ -1,5 +1,10 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.workout.RingCardShape
+import org.openstrap.app.ui.workout.RingCardTitle
+import org.openstrap.app.ui.workout.WorkoutRing
+import org.openstrap.app.ui.workout.ringFigure
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.ui.theme.AppColors
 import kotlinx.coroutines.flow.collectLatest
@@ -91,34 +96,29 @@ import org.openstrap.app.ui.workout.readyHero
  * No settings sheet: everything it held is a row here or went with the design.
  */
 
-/** Where Ready's heart light sits, in card heights from the top, and its size in card widths and heights. */
-private const val HEART_LIGHT_BELOW = 1.25f
-private const val HEART_LIGHT_WIDTH = 1.2f
-private const val HEART_LIGHT_HEIGHT = 1.1f
-
-/** Ready's heart light at full strength: 70% in the middle, 18% halfway out. */
-private val HeartLight = listOf(0f to 0.7f, 0.5f to 0.18f)
-
 /**
- * Ready's heart: the live bpm in dots on a card lit from below in [color] (heart red, or the family's colour), as
- * Today's hero, "bpm, live from your strap" beside it. While the strap is away, what's wrong and that you can start
- * anyway, on a dimmer light.
+ * Ready's heart in the rings design: a solid card with a ring in [color] (heart red, or the family's colour), full
+ * while the strap sends a heart rate and only its track while it doesn't, the heart on it, and the live bpm bold
+ * beside it, "bpm, live from your strap" under. While the strap is away, what's wrong and that you can start anyway.
  */
 @Composable
 internal fun ReadyHeartCard(connection: ConnectionState, liveHeartRate: Int?, color: Color = MetricColors.heart) {
     val hero = WorkoutCopy.readyHero(connection, liveHeartRate)
     val bpm = liveHeartRate.takeIf { hero.live }
-    val light = if (bpm != null) 1f else 0.4f
-    // An ellipse 1.2 widths across and 1.1 heights tall, centred a quarter of the height below the card.
-    LitPanel(
-        color, HeartLight.map { (at, alpha) -> at to alpha * light },
-        lightCenter = { Offset(it.width / 2, it.height * HEART_LIGHT_BELOW) },
-        reach = { Size(it.width * HEART_LIGHT_WIDTH, it.height * HEART_LIGHT_HEIGHT) },
+    Row(
+        Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (bpm != null) HeroValue(bpm.toString(), stringResource(R.string.glow_ready_bpm_live), gap = 14.dp)
-        else Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(hero.title, color = AppColors.ink, style = GlowType.sentence)
-            Text(hero.line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        WorkoutRing(if (bpm != null) 1f else 0f, color, ringSize = 64.dp, stroke = 9.dp) {
+            Icon(AppIcons.HeartFill, null, tint = AppColors.readable(color), modifier = Modifier.size(20.dp))
+        }
+        Spacer(Modifier.width(16.dp))
+        if (bpm != null) Column(Modifier.weight(1f)) {
+            Text(bpm.toString(), color = AppColors.ink, style = ringFigure(40.sp), maxLines = 1)
+            Text(stringResource(R.string.glow_ready_bpm_live), color = AppColors.muted, style = GlowType.secondary)
+        } else Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(hero.title, color = AppColors.ink, style = RingCardTitle)
+            Text(hero.line, color = AppColors.muted, style = GlowType.secondary)
         }
     }
 }
@@ -144,7 +144,7 @@ internal fun ReadyWhere(
     keepRoute: Boolean?,
     onKeepRoute: (Boolean) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth().clip(GlowLayout.CardShape).background(ListSurface).padding(horizontal = 18.dp)) {
+    Column(Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp)) {
         var rows = 0
         if (sides != null) {
             PlaceRow(
@@ -288,7 +288,7 @@ private fun ReadyPlanCard(
     onTyping: (Boolean) -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Text(StartCopy.planTitle(family), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp))
+    Text(StartCopy.planTitle(family), color = AppColors.ink, style = RingCardTitle, modifier = Modifier.padding(horizontal = 4.dp))
     val inView = remember { BringIntoViewRequester() }
     val ime = WindowInsets.ime
     val density = LocalDensity.current
@@ -301,7 +301,7 @@ private fun ReadyPlanCard(
         }
     }
     Column(
-        Modifier.fillMaxWidth().bringIntoViewRequester(inView).clip(GlowLayout.CardShape).background(ListSurface).border(1.dp, RowHairline, GlowLayout.CardShape).padding(16.dp),
+        Modifier.fillMaxWidth().bringIntoViewRequester(inView).clip(RingCardShape).background(AppColors.glass).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         var choosing by rememberSaveable { mutableStateOf(false) }
@@ -377,17 +377,23 @@ private fun KindRow(icon: ImageVector, label: String, note: String, on: Boolean,
 internal fun GoalNote(text: String) =
     Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
 
-/** A row of presets under a value, each as wide as the others, on a hairline; the one matching the value ([on]) in white. */
+/** A row of presets under a value, each as wide as the others, outlined; the one matching the value ([on]) a filled pill. */
 @Composable
 internal fun <T> Presets(presets: List<Pair<T, String>>, on: T?, onPick: (T) -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         presets.forEach { (v, label) ->
             val chosen = v == on
             Box(
-                Modifier.weight(1f).height(34.dp).clip(CircleShape).border(1.dp, if (chosen) AppColors.ink else AppColors.ink.copy(alpha = 0.15f), CircleShape)
+                Modifier.weight(1f).height(36.dp).clip(CircleShape)
+                    .then(if (chosen) Modifier.background(AppColors.ink) else Modifier.border(1.dp, AppColors.ink.copy(alpha = 0.15f), CircleShape))
                     .pressClickable({ onPick(v) }, CircleShape).semantics { role = Role.Button; selected = chosen },
                 contentAlignment = Alignment.Center,
-            ) { Text(label, color = if (chosen) AppColors.ink else AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1) }
+            ) {
+                Text(
+                    label, color = if (chosen) AppColors.onInk else AppColors.ink, maxLines = 1,
+                    style = if (chosen) GlowType.secondary.copy(fontWeight = FontWeight.Bold) else GlowType.secondary,
+                )
+            }
         }
     }
 }

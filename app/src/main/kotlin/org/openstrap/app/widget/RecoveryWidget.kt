@@ -29,7 +29,7 @@ import org.openstrap.app.ui.glow.draw.drawWeekBars
 import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.weekBars
 import org.openstrap.app.ui.glow.draw.edgeLight
-import org.openstrap.app.ui.theme.MetricColors
+import org.openstrap.app.ui.theme.AppIcons
 import java.time.LocalDate
 
 /**
@@ -71,106 +71,45 @@ class RecoveryWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Recovery's ink. */
-private val Ink = MetricColors.readiness
+/** Recovery's hue in the rings theme. */
+private val Ink = RingWidget.Recovery
 
 /**
- * The widget at the size Glance lays out: the edge light behind, drawn at the cell's real size, then the size's
- * content. Any size the launcher gives lands on one of the three ([WidgetSizes.bucket]).
+ * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the word, and Recovery's one
+ * ring with the score in the middle ([RingContent]). The Wide adds the three figures beside the ring; the Large the
+ * sentence and the last seven days under it. Any size the launcher gives lands on one of the three ([WidgetSizes.bucket]).
  */
 @Composable
 private fun RecoveryContent(data: RecoveryWidget.Shown) {
     val model = data.model
     val open = openMetric(LocalContext.current, DetailRoutes.RECOVERY, model.date)
     EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Earlier), Ink, data.mood, open, BITMAP_EXTRA) { frame ->
-        when {
-            model.score == null -> WaitingContent(model.title, model.waiting, frame)
-            frame.bucket == WidgetSizes.Small -> SmallContent(model, RecoveryLayout.small(model, frame.contentWidth, frame.contentHeight, frame.fontScale, frame.status), frame)
-            frame.bucket == WidgetSizes.Wide -> WideContent(model, RecoveryLayout.wide(model, frame.contentWidth, frame.contentHeight, frame.fontScale, frame.status), frame)
-            else -> LargeContent(model, RecoveryLayout.large(model, frame.contentWidth, frame.contentHeight, frame.fontScale, frame.status), frame)
-        }
+        if (model.score == null) WaitingContent(model.title, model.waiting, frame) else RingsContent(model, frame)
     }
 }
 
-/** Small: the top row, the score, its word, the dots grown to fill a tall cell. */
+/** The ring layout at [f]'s size, the Large with the sentence and the week under the ring. */
 @Composable
-private fun ColumnScope.SmallContent(m: RecoveryWidgetModel, fit: RecoveryLayout.Fit, f: WidgetFrame) {
-    Edge(fit.spread, f)
-    TopRowView(m.title, null, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    m.score?.let { DotNumber(it, fit.dot, f.density, m.scoreDescription) }
-    if (fit.word) m.word?.let {
-        Gap()
-        if (WidgetRtl) FontText(it, fit.wordSp, Color.White.copy(alpha = 0.72f)) else Text(it, style = WidgetType.word.copy(fontSize = fit.wordSp.sp), maxLines = 1)
+private fun ColumnScope.RingsContent(m: RecoveryWidgetModel, f: WidgetFrame) {
+    val share = (m.score?.toIntOrNull() ?: 0) / 100f
+    val lines = m.figures.map { RingLine(it.label, it.value) }
+    if (f.bucket != WidgetSizes.Large) {
+        RingContent(m.title, m.note, m.word, Ink, Ink, share, m.score, m.scoreDescription, AppIcons.HeartFill, f, lines)
+        return
     }
-    Edge(fit.spread, f)
-}
-
-/** Wide: the top row with "This morning", the score and word, the three figures. */
-@Composable
-private fun ColumnScope.WideContent(m: RecoveryWidgetModel, fit: RecoveryLayout.Fit, f: WidgetFrame) {
-    Edge(fit.spread, f)
-    TopRowView(m.title, m.note, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    ScoreRow(m, fit.dot, f.density)
-    if (fit.figures) {
-        Gap()
-        Figures(m.figures)
-    }
-    Edge(fit.spread, f)
-}
-
-/** Large: the Wide plus the sentence and the last seven days beside the score. */
-@Composable
-private fun ColumnScope.LargeContent(m: RecoveryWidgetModel, fit: RecoveryLayout.Fit, f: WidgetFrame) {
-    Edge(fit.spread, f)
-    TopRowView(m.title, m.note, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    if (fit.sentenceLines > 0) m.sentence?.let {
-        Gap()
-        Text(it, style = WidgetType.hero.copy(fontSize = fit.sentenceSp.sp), maxLines = fit.sentenceLines)
-    }
-    Gap()
-    Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-        ScoreRow(m, fit.dot, f.density)
-        if (fit.week) {
-            Spacer(GlanceModifier.defaultWeight())
-            Week(m.week, fit.weekColumn, f.density)
-        }
-    }
-    if (fit.figures) {
-        Gap()
-        Figures(m.figures)
-    }
-    Edge(fit.spread, f)
-}
-
-/** The score in dots [dot] dp across with its word beside it, read out as "78, Ready". */
-@Composable
-private fun ScoreRow(m: RecoveryWidgetModel, dot: Float, density: Float) {
-    Row(verticalAlignment = Alignment.Bottom) {
-        if (WidgetRtl) {
-            m.word?.let {
-                FontText(it, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
-                Spacer(GlanceModifier.width(RecoveryLayout.WORD_GAP_DP.dp))
+    val sentenceLines = m.sentence?.let { WidgetText.lines(it, WidgetText.SECONDARY_SP, f.contentWidth, f.fontScale).coerceAtMost(2) } ?: 0
+    val sentenceH = sentenceLines * WidgetText.line(WidgetText.SECONDARY_SP, f.fontScale)
+    val week = m.week.isNotEmpty()
+    val weekH = if (week) WeekBarsLook.HEIGHT_DP + 4f + WidgetText.line(WidgetText.CAPTION_SP, f.fontScale) else 0f
+    val belowH = sentenceH + weekH + (if (sentenceLines > 0 && week) RingWidget.BELOW_GAP_DP else 0f)
+    RingContent(m.title, m.note, m.word, Ink, Ink, share, m.score, m.scoreDescription, AppIcons.HeartFill, f, lines, belowH) {
+        // One child of the card's column: Glance drops a column's children past ten.
+        Column(GlanceModifier.fillMaxWidth()) {
+            if (sentenceLines > 0) m.sentence?.let { Text(it, style = WidgetType.secondary, maxLines = sentenceLines) }
+            if (week) {
+                if (sentenceLines > 0) Spacer(GlanceModifier.height(RingWidget.BELOW_GAP_DP.dp))
+                Week(m.week, WeekBarsLook.column(m.week.size, f.contentWidth), f.density)
             }
-            m.score?.let { DotNumber(it, dot, density, m.scoreDescription) }
-            return@Row
-        }
-        m.score?.let { DotNumber(it, dot, density, m.scoreDescription) }
-        m.word?.let {
-            Spacer(GlanceModifier.width(RecoveryLayout.WORD_GAP_DP.dp))
-            Text(it, style = WidgetType.word, maxLines = 1)
-        }
-    }
-}
-
-/** Resting HR, HRV and Sleep in a row, each a Caption over a Body value. */
-@Composable
-private fun Figures(figures: List<RecoveryFigure>) {
-    Row(GlanceModifier.fillMaxWidth()) {
-        figures.forEachIndexed { i, f ->
-            if (i > 0) Spacer(GlanceModifier.width(12.dp))
-            FigureCell(f.label, f.value, GlanceModifier.defaultWeight())
         }
     }
 }

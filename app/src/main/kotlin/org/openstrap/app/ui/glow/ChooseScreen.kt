@@ -66,6 +66,15 @@ import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.SportIcons
 import org.openstrap.app.ui.workout.familyColor
+import org.openstrap.app.ui.workout.RingCardShape
+import org.openstrap.app.ui.workout.RingCardTitle
+import org.openstrap.app.ui.workout.RingGap
+import org.openstrap.app.ui.workout.RingInk
+import org.openstrap.app.ui.workout.RingPageTitle
+import org.openstrap.app.ui.workout.RingSportTile
+import org.openstrap.app.ui.workout.RingTileShape
+import org.openstrap.app.ui.workout.StartHue
+import androidx.compose.foundation.layout.widthIn
 import org.openstrap.app.ui.glow.draw.Edge
 
 /* ---------------------------------------------- Choose ----------------------------------------------- */
@@ -108,7 +117,7 @@ fun GlowChooseScreen(
         Row(verticalAlignment = Alignment.CenterVertically) {
             RoundIcon(AppIcons.X, stringResource(R.string.glow_close), onBack)
             Spacer(Modifier.width(12.dp))
-            Text(stringResource(R.string.glow_choose_title), color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1)
+            Text(stringResource(R.string.glow_choose_title), color = AppColors.ink, style = RingPageTitle, maxLines = 1)
         }
     }
     val choose: @Composable ColumnScope.() -> Unit = {
@@ -152,43 +161,44 @@ fun GlowChooseScreen(
 }
 
 /**
- * Your usual: a slim row lit from its left edge in the sport's colour (not the tall hero, lit from below), its name,
- * what you did last time, and Start at its end. The row itself opens Ready.
+ * Your usual (T-Workouts): a solid card with the sport's mark in its colour, its name, what you did last time, and
+ * Start at its end, the page's one filled button. The card itself opens Ready.
  */
 @Composable
 private fun UsualRow(s: ChooseSport, onStart: () -> Unit, onOpen: () -> Unit) {
     val color = familyColor(Workouts.family(s.type))
     val haptics = org.openstrap.app.ui.components.rememberHaptics()
-    CompositionLocalProvider(LocalEdgeOverride provides EdgeOverride(edge = Edge.Left)) {
-        EdgeCard(color, Modifier.fillMaxWidth(), onClick = onOpen, contentPadding = PaddingValues(start = 18.dp, top = 14.dp, end = 14.dp, bottom = 14.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        stringResource(R.string.glow_choose_your_usual), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                        style = GlowType.secondary,
-                    )
-                    Text(
-                        Workouts.sportName(s.type), color = AppColors.ink, style = GlowType.headerDate, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = 2.dp),
-                    )
-                    if (s.line.isNotEmpty()) Text(
-                        s.line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
-                        maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                Spacer(Modifier.width(12.dp))
-                PageButton(
-                    stringResource(R.string.glow_choose_start),
-                    { haptics.perform(org.openstrap.app.ui.components.HapticEvent.WorkoutStart); onStart() },
-                    primary = true, icon = AppIcons.PlayFill,
-                )
-            }
+    Row(
+        Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).pressClickable(onOpen, RingCardShape)
+            .padding(start = 16.dp, top = 14.dp, end = 14.dp, bottom = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RingSportTile(SportIcons.of(s.type), color)
+        RingGap()
+        Column(Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.glow_choose_your_usual), color = AppColors.muted, style = GlowType.caption,
+            )
+            Text(
+                Workouts.sportName(s.type), color = AppColors.ink, style = RingCardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+            if (s.line.isNotEmpty()) Text(
+                s.line, color = AppColors.muted, style = GlowType.secondary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
         }
+        Spacer(Modifier.width(12.dp))
+        WorkoutButton(
+            stringResource(R.string.glow_choose_start), StartHue, RingInk,
+            { haptics.perform(org.openstrap.app.ui.components.HapticEvent.WorkoutStart); onStart() },
+            Modifier.widthIn(min = 96.dp), icon = AppIcons.PlayFill, height = 48.dp, fill = false,
+        )
     }
 }
 
-/** Choose's quiet chips, a step off black so the usual's glow stays the one lit thing. */
-private val QuietCard get() = ListSurface
+/** Choose's chips: outlined pills on the page (T-Workouts), so Start stays the one filled thing. */
+private val QuietCard get() = Color.Transparent
 
 /** A Recent chip: the sport's icon in its colour and a name, a sport's or a saved workout's, on a quiet pill. */
 @Composable
@@ -218,7 +228,7 @@ internal fun SportTile(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(
-            Modifier.size(SportTileSize).clip(GlowLayout.TileShape).background(if (selected) AppColors.ink else Raised),
+            Modifier.size(SportTileSize).clip(RingTileShape).background(if (selected) AppColors.ink else AppColors.glass),
             contentAlignment = Alignment.Center,
         ) {
             val ink = if (selected) AppColors.onInk else AppColors.ink
@@ -325,8 +335,8 @@ private fun SearchResults(query: String, selected: Int, onPick: (Int) -> Unit) {
 @Composable
 private fun SearchEntry(hint: String, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().height(48.dp).clip(GlowLayout.TileShape).background(Raised)
-            .pressClickable(onClick, GlowLayout.TileShape).semantics { role = Role.Button }.padding(horizontal = 16.dp),
+        Modifier.fillMaxWidth().height(48.dp).clip(CircleShape).background(AppColors.glass)
+            .pressClickable(onClick, CircleShape).semantics { role = Role.Button }.padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))
@@ -417,7 +427,7 @@ private fun SearchField(query: String, hint: String, modifier: Modifier = Modifi
         keyboardActions = KeyboardActions(onSearch = { keyboard?.hide() }),
         decorationBox = { field ->
             Row(
-                Modifier.fillMaxWidth().height(48.dp).clip(GlowLayout.TileShape).background(Raised).padding(horizontal = 16.dp),
+                Modifier.fillMaxWidth().height(48.dp).clip(CircleShape).background(AppColors.glass).padding(horizontal = 16.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(SportIcons.Search, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(18.dp))

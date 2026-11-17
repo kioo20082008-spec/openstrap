@@ -16,15 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.R
 import org.openstrap.app.data.settings.AppTheme
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.glow.PageSheet
 import org.openstrap.app.ui.glow.RowName
 import org.openstrap.app.ui.glow.topHairline
@@ -50,7 +47,7 @@ internal fun themeName(theme: AppTheme): String = stringResource(
 @Composable
 internal fun AppearanceSheet(selected: AppTheme, onPick: (AppTheme) -> Unit, onDismiss: () -> Unit) {
     PageSheet(onDismiss, stringResource(R.string.you_row_appearance), note = stringResource(R.string.you_appearance_note), side = 12.dp) {
-        PageRows {
+        RingsRows {
             AppTheme.entries.forEachIndexed { i, theme ->
                 val on = theme == selected
                 Row(
@@ -71,8 +68,8 @@ internal fun AppearanceSheet(selected: AppTheme, onPick: (AppTheme) -> Unit, onD
 }
 
 /**
- * A theme in miniature, drawn in its own colours whatever the theme showing: its sky with the glow at the top, a
- * glass card with two lines of its ink, and the coral accent. Edged in the showing theme's hairline, so a light swatch
+ * A theme in miniature, drawn flat in its own colours whatever the theme showing: its page, a solid card with two
+ * lines of its ink, and the coral accent. Edged in the showing theme's hairline, so a light swatch
  * stands out on a light sheet and a black one on a black sheet.
  */
 @Composable
@@ -81,17 +78,13 @@ private fun ThemeSwatch(theme: AppTheme) {
     val edge = AppColors.ink.copy(alpha = 0.16f)
     Canvas(Modifier.size(width = 40.dp, height = 56.dp)) {
         val r = CornerRadius(10.dp.toPx())
-        drawRoundRect(Brush.verticalGradient(0f to t.skyTop, 0.45f to t.skyMid, 1f to t.skyLow), cornerRadius = r)
-        drawRoundRect(
-            Brush.radialGradient(listOf(GlowHue.copy(alpha = 0.5f * t.glow), Color.Transparent), Offset(size.width / 2, 0f), size.width * 0.9f),
-            cornerRadius = r,
-        )
+        // Flat, as the rings theme draws every page: its page, a solid card, its ink.
+        drawRoundRect(t.page, cornerRadius = r)
         val pad = 5.dp.toPx()
         val cardTop = size.height * 0.46f
         val card = Size(size.width - pad * 2, size.height - cardTop - pad)
         val cardR = CornerRadius(4.dp.toPx())
         drawRoundRect(t.glass, Offset(pad, cardTop), card, cardR)
-        drawRoundRect(t.hairline, Offset(pad, cardTop), card, cardR, style = Stroke(1.dp.toPx()))
         val line = 2.dp.toPx()
         drawRoundRect(t.ink, Offset(pad * 2, cardTop + pad), Size(card.width * 0.55f, line), CornerRadius(line / 2))
         drawRoundRect(t.ink.copy(alpha = t.mutedAlpha), Offset(pad * 2, cardTop + pad + line * 2.5f), Size(card.width * 0.4f, line), CornerRadius(line / 2))
@@ -99,6 +92,3 @@ private fun ThemeSwatch(theme: AppTheme) {
         drawRoundRect(edge, cornerRadius = r, style = Stroke(1.dp.toPx()))
     }
 }
-
-/** Today's glow, the one in each swatch's sky. */
-private val GlowHue = Color(0xFFFF9662)

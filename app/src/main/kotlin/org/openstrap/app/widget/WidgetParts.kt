@@ -71,19 +71,14 @@ import org.openstrap.app.data.WidgetKind
 import org.openstrap.app.ui.glow.draw.drawIcon
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.MetricColors
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.ui.glow.draw.momentMood
 import org.openstrap.app.ui.glow.draw.EdgeLight
 import org.openstrap.app.ui.glow.draw.GlowMood
 import org.openstrap.app.ui.glow.draw.GlowStyle
-import org.openstrap.app.ui.glow.draw.drawGlow
 import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.WeekBarsLook
 import org.openstrap.app.ui.glow.draw.dotLayout
-import org.openstrap.app.ui.glow.draw.edgePaint
-import org.openstrap.app.ui.glow.draw.edgeLevel
 import org.openstrap.app.ui.glow.draw.renderDots
-import org.openstrap.app.ui.glow.draw.renderEdge
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -270,14 +265,11 @@ class StatusSpot {
 }
 
 /**
- * An edge card widget at the size Glance lays out ([LocalSize]): [light] in [ink] at [mood] behind, drawn at the
- * cell's real size, the whole widget opening [open], the content inside the padding. [bitmapExtra] is the room the
- * content's bitmaps take beside the backgrounds in the budget (spec 6.2): every size's bitmaps go to the launcher at
- * once and are scaled down together if they'd pass the limit. [sidePadding] narrower than the card's 20 dp lets a row
- * reach into the padding (Start's centred captions); the content then pads itself back to 20 dp, and [WidgetFrame]'s
- * content sizes stay those inside the full padding. A [level] (0 to 1, for a
- * [org.openstrap.app.ui.glow.draw.EdgeKind.Level] light) fills the light across to it, as the app's level cards do,
- * in place of the edge's glow.
+ * A metric widget at the size Glance lays out ([LocalSize]) in the rings theme: a flat near-black card
+ * ([flatBackground]), no light, no gradient. [light], [ink], [mood] and [level] are kept for the callers and no longer
+ * drawn. The whole widget opens [open], the content inside the padding. [bitmapExtra] is the room the content's
+ * bitmaps take beside the backgrounds in the budget (spec 6.2). [sidePadding] narrower than the card's 20 dp lets a row
+ * reach into the padding (Start's centred captions); [WidgetFrame]'s content sizes stay those inside the full padding.
  */
 @Composable
 internal fun EdgeWidget(
@@ -288,16 +280,16 @@ internal fun EdgeWidget(
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
 ) = CardWidget(
     open, bitmapExtra, sidePadding, showStatus,
-    { w, h, corner, density -> edgeBackground(light, ink, mood, w, h, corner, density, level) }, content,
+    { w, h, corner, density -> flatBackground(w, h, corner, density) }, content,
 )
 
 /**
- * A glow card widget (Moment, spec 2.2): [style] behind, its mood already set, drawn at the cell's real size as the
- * app's GlowCard draws it ([drawGlow]), the rest as [EdgeWidget].
+ * Moment's widget (spec 2.2): the same flat card as [EdgeWidget] in the rings theme; [style] is kept for the caller
+ * and no longer drawn.
  */
 @Composable
 internal fun GlowWidget(style: GlowStyle, open: Intent, bitmapExtra: Double, showStatus: Boolean = true, content: @Composable ColumnScope.(WidgetFrame) -> Unit) =
-    CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { w, h, corner, density -> glowBackground(style, w, h, corner, density) }, content)
+    CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { w, h, corner, density -> flatBackground(w, h, corner, density) }, content)
 
 /**
  * A widget card with [background] (dp width, dp height, dp corner, px per dp) behind: what [EdgeWidget] and [GlowWidget]
@@ -327,7 +319,7 @@ private fun CardWidget(
         GlanceModifier.fillMaxSize()
             .appWidgetBackground()
             .cornerRadius(corner.dp)
-            .background(ImageProvider(background(w, h, corner, density).let { if (WidgetRtl) mirrored(it) else it }), ContentScale.FillBounds)
+            .background(ImageProvider(background(w, h, corner, density)), ContentScale.FillBounds)
             .clickable(actionStartActivity(open)),
     ) {
         Column(
@@ -370,24 +362,6 @@ private fun statusAction(status: StrapStatus): Action? {
         is StrapStatus.StaleSync -> actionRunCallback<SyncNowAction>()
         StrapStatus.Syncing -> null
     }
-}
-
-/** A glow card's light ([style], its mood set) for a widget [w] by [h] dp with [corner] dp corners, at [density] px per dp. */
-private fun glowBackground(style: GlowStyle, w: Float, h: Float, corner: Float, density: Float): Bitmap {
-    val pw = w * density
-    val ph = h * density
-    return renderToBitmap(pw, ph) { drawGlow(it, style.copy(radius = corner.dp), pw, ph, density) }
-}
-
-/**
- * An edge card's light ([light] in [ink] at [mood]) for a widget [w] by [h] dp, with [corner] dp corners, at
- * [density] px per dp: the same [edgePaint] the app's edge cards draw, filled across to [level] when there is one.
- */
-private fun edgeBackground(
-    light: EdgeLight, ink: Color, mood: GlowMood, w: Float, h: Float, corner: Float, density: Float, level: Float? = null,
-): Bitmap {
-    val paint = edgePaint(light, ink, edgeLevel(level), mood, w * density, h * density, density)
-    return renderEdge(paint.copy(radius = corner * density))
 }
 
 /** The launcher's widget corner, dp, or null when the system doesn't say. */
@@ -436,12 +410,12 @@ private fun reportedSizes(options: Bundle, context: Context): List<Pair<Float, F
 /** The v2 type roles in the system sans (spec 6.2): sizes and weights as the app's, colours as its alphas. */
 internal object WidgetType {
     val title = TextStyle(color = ColorProvider(Color.White), fontSize = WidgetText.TITLE_SP.sp, fontWeight = FontWeight.Medium)
-    val hero = TextStyle(color = ColorProvider(Color.White), fontSize = WidgetText.HERO_SP.sp, fontFamily = FontFamily("sans-serif-light"))
+    val hero = TextStyle(color = ColorProvider(Color.White), fontSize = WidgetText.HERO_SP.sp, fontFamily = FontFamily.SansSerif)
     val body = TextStyle(color = ColorProvider(Color.White), fontSize = WidgetText.BODY_SP.sp)
-    val word = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.72f)), fontSize = WidgetText.BODY_SP.sp)
-    val secondary = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.72f)), fontSize = WidgetText.SECONDARY_SP.sp)
+    val word = TextStyle(color = ColorProvider(RingWidget.Muted), fontSize = WidgetText.BODY_SP.sp)
+    val secondary = TextStyle(color = ColorProvider(RingWidget.Muted), fontSize = WidgetText.SECONDARY_SP.sp)
     val secondaryShown = secondary.copy(color = ColorProvider(Color.White))
-    val caption = TextStyle(color = ColorProvider(Color.White.copy(alpha = 0.50f)), fontSize = WidgetText.CAPTION_SP.sp, fontWeight = FontWeight.Medium)
+    val caption = TextStyle(color = ColorProvider(RingWidget.Muted), fontSize = WidgetText.CAPTION_SP.sp, fontWeight = FontWeight.Medium)
     val captionShown = caption.copy(color = ColorProvider(Color.White))
 }
 
@@ -456,7 +430,7 @@ internal fun TopRowView(title: String, note: String?, top: TopRow, f: WidgetFram
     if (line != null) f.spot.put(above + (top.height - StatusButton.SIZE_DP) / 2, line)
     Row(GlanceModifier.fillMaxWidth().height(top.height.dp), verticalAlignment = Alignment.CenterVertically) {
         if (WidgetRtl) {
-            if (line != null) StatusButtonView(line, f) else if (note != null && top.note) FontText(note, WidgetText.SECONDARY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
+            if (line != null) StatusButtonView(line, f) else if (note != null && top.note) FontText(note, WidgetText.SECONDARY_SP.toFloat(), RingWidget.Muted)
             Spacer(GlanceModifier.defaultWeight())
             FontText(title, top.titleSp, Color.White, strong = true, maxWidthDp = f.contentWidth * 0.7f)
             return@Row
@@ -514,7 +488,7 @@ private fun statusButtonBitmap(icon: ImageVector?, color: Color, density: Float)
     val s = StatusButton.SIZE_DP * density
     val i = StatusButton.ICON_DP * density
     return renderToBitmap(s, s) { c ->
-        c.drawCircle(s / 2, s / 2, s / 2, android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { this.color = ControlSurface.toArgb() })
+        c.drawCircle(s / 2, s / 2, s / 2, android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply { this.color = RingWidget.Card.toArgb() })
         icon?.let { drawIcon(c, it, color, (s - i) / 2, (s - i) / 2, i) }
     }
 }
@@ -623,23 +597,22 @@ internal object WidgetHost {
     }
 }
 
-/** The app's fonts for widgets, which Glance can't use as text: Inter for numbers, Almarai for words. */
-private object WidgetFonts {
+/** The app's fonts for widgets, which Glance can't use as text: Alexandria, extra bold for numbers (the rings theme). */
+internal object WidgetFonts {
     @Volatile private var number: android.graphics.Typeface? = null
     @Volatile private var bold: android.graphics.Typeface? = null
     @Volatile private var regular: android.graphics.Typeface? = null
 
     fun number(c: Context): android.graphics.Typeface = number ?: (
-        androidx.core.content.res.ResourcesCompat.getFont(c, R.font.inter)?.let { android.graphics.Typeface.create(it, 800, false) }
-            ?: android.graphics.Typeface.DEFAULT_BOLD
+        androidx.core.content.res.ResourcesCompat.getFont(c, R.font.alexandria_extrabold) ?: android.graphics.Typeface.DEFAULT_BOLD
         ).also { number = it }
 
     fun text(c: Context, strong: Boolean): android.graphics.Typeface =
-        if (strong) bold ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.almarai_bold) ?: android.graphics.Typeface.DEFAULT_BOLD).also { bold = it }
-        else regular ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.almarai_regular) ?: android.graphics.Typeface.DEFAULT).also { regular = it }
+        if (strong) bold ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.alexandria_bold) ?: android.graphics.Typeface.DEFAULT_BOLD).also { bold = it }
+        else regular ?: (androidx.core.content.res.ResourcesCompat.getFont(c, R.font.alexandria_regular) ?: android.graphics.Typeface.DEFAULT).also { regular = it }
 }
 
-/** [text] in bold Inter, as tall as a [w] by [h] px box and no wider, against its start (the right in Arabic). */
+/** [text] in extra bold Alexandria, as tall as a [w] by [h] px box and no wider, against its start (the right in Arabic). */
 private fun renderNumber(context: Context, text: String, w: Float, h: Float): Bitmap {
     val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
         typeface = WidgetFonts.number(context); color = android.graphics.Color.WHITE
@@ -651,7 +624,7 @@ private fun renderNumber(context: Context, text: String, w: Float, h: Float): Bi
     return renderToBitmap(w, h) { c -> c.drawText(text, if (WidgetRtl) w - drawn else 0f, h, paint) }
 }
 
-/** [text] drawn in the app's Almarai at [sp], as an image: Glance offers only the system's fonts for its own text. */
+/** [text] drawn in the app's Alexandria at [sp], as an image: Glance offers only the system's fonts for its own text. */
 @Composable
 internal fun FontText(text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier, maxWidthDp: Float = 220f) {
     val context = LocalContext.current

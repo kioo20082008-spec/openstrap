@@ -2,7 +2,6 @@ package org.openstrap.app.ui.glow
 
 import androidx.compose.ui.graphics.Shape
 import org.openstrap.app.ui.theme.AppColors
-import androidx.compose.foundation.border
 import org.openstrap.app.ui.theme.MetricColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +23,10 @@ import org.openstrap.app.ui.components.pressClickable
  * special.
  */
 
-/** A quiet panel: the [ListPanel] surface and its 6% hairline, [GlowLayout.CardPadding] inside, blocks 14 dp apart. */
+/**
+ * A quiet panel in the rings theme: the [ListPanel] surface, flat and solid with no edge, 22 dp corners,
+ * [GlowLayout.CardPadding] inside, blocks 14 dp apart.
+ */
 @Composable
 fun QuietPanel(
     modifier: Modifier = Modifier,
@@ -34,9 +36,8 @@ fun QuietPanel(
     Column(
         modifier
             .fillMaxWidth()
-            .let { if (onClick != null) it.pressClickable(onClick, GlowLayout.CardShape) else it }
-            .background(ListSurface, GlowLayout.CardShape)
-            .border(1.dp, RowHairline, GlowLayout.CardShape)
+            .let { if (onClick != null) it.pressClickable(onClick, QuietShape) else it }
+            .background(ListSurface, QuietShape)
             .padding(GlowLayout.CardPadding),
         verticalArrangement = Arrangement.spacedBy(14.dp),
         content = content,
@@ -44,9 +45,8 @@ fun QuietPanel(
 }
 
 /**
- * A card that is only its outline, 1.5 dp of white at 20% on black, for something on hold or gone with nothing lit:
- * the rest between sets, a deleted night. Not [GlowCard]'s outline, which draws the card's colour at 70%, louder
- * than these want.
+ * A card for something on hold or gone with nothing lit (the rest between sets, a deleted night): in the rings theme
+ * a flat fill of the ink at 4%, quieter than a solid card and with no edge.
  */
 @Composable
 internal fun OutlineCard(
@@ -56,8 +56,8 @@ internal fun OutlineCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier.fillMaxWidth().clip(GlowLayout.CardShape)
-            .border(1.5.dp, AppColors.ink.copy(alpha = 0.2f), GlowLayout.CardShape).padding(20.dp),
+        modifier.fillMaxWidth().clip(QuietShape)
+            .background(AppColors.ink.copy(alpha = 0.04f), QuietShape).padding(20.dp),
         verticalArrangement = verticalArrangement,
         horizontalAlignment = horizontalAlignment,
         content = content,
@@ -65,14 +65,16 @@ internal fun OutlineCard(
 }
 
 /**
- * The glass surface every control inside a quiet panel wears (rows, pills, buttons): a faint white fill
- * and hairline, so it reads as something to press against the panel. With [onClick] it
- * presses like the rest of the glow controls.
+ * The surface every control inside a quiet panel wears (rows, pills, buttons): in the rings theme a flat fill of the
+ * ink at 8%, no edge, so it reads as something to press against the panel. With [onClick] it presses like the rest
+ * of the controls.
  */
 fun Modifier.glass(shape: Shape, onClick: (() -> Unit)? = null, scale: Float = 0.98f): Modifier =
     background(AppColors.ink.copy(alpha = 0.08f), shape)
-        .border(1.dp, AppColors.ink.copy(alpha = 0.12f), shape)
         .let { if (onClick != null) it.pressClickable(onClick, shape, scale) else it }
+
+/** The rings theme's card corners, 22 dp. */
+private val QuietShape = androidx.compose.foundation.shape.RoundedCornerShape(22.dp)
 
 /** A change for the better, or a GPS fix good enough: the app's good green. */
 internal val TrendGood: Color get() = AppColors.readable(MetricColors.good)

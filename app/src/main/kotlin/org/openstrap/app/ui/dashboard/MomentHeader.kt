@@ -91,7 +91,7 @@ fun MomentHeader(
                         AppIcons.User,
                         stringResource(if (updateWaiting) R.string.day_header_you_update else R.string.day_header_you),
                         g.onClick, g.modifier,
-                        surface = Avatar, iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_you), dot = updateWaiting,
+                        surface = Avatar, size = 44.dp, iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_you), dot = updateWaiting,
                     )
                 }
             },
@@ -100,7 +100,7 @@ fun MomentHeader(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (onOpenAllMetrics != null) {
                         RoundIconButton(
-                            AppIcons.ChartBar, stringResource(R.string.day_header_all_metrics), onOpenAllMetrics, surface = Avatar,
+                            AppIcons.ChartBar, stringResource(R.string.day_header_all_metrics), onOpenAllMetrics, surface = Avatar, size = 44.dp,
                             iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_all_metrics),
                         )
                         Spacer(Modifier.width(8.dp))
@@ -211,13 +211,13 @@ private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
 private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = CircleShape
     Row(
-        modifier.clip(shape).background(ChipSurface).border(1.dp, AppColors.ink.copy(alpha = 0.07f), shape)
+        modifier.height(44.dp).clip(shape).background(ChipSurface)
             .clickable(onClickLabel = stringResource(R.string.day_header_open_strap), onClick = onClick)
             .semantics { contentDescription = chip.description }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(7.dp).background(chipDotColor(chip.dot), CircleShape))
+        Box(Modifier.size(8.dp).background(chipDotColor(chip.dot), CircleShape))
         if (chip.text.isNotEmpty()) {
             Spacer(Modifier.width(7.dp))
             Text(
@@ -237,6 +237,6 @@ private fun chipDotColor(dot: StrapChip.Dot): Color = when (dot) {
     StrapChip.Dot.Quiet -> AppColors.ink.copy(alpha = 0.3f)
 }
 
-private val Avatar: Color get() = AppColors.control
-private val ChipSurface: Color get() = if (AppColors.light) AppColors.glass else androidx.compose.ui.graphics.lerp(AppColors.page, AppColors.control, 0.3f)
+private val Avatar: Color get() = AppColors.glass
+private val ChipSurface: Color get() = AppColors.glass
 private val PeekWidth = 34.dp

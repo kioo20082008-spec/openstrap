@@ -2,16 +2,21 @@ package org.openstrap.app.ui.device
 
 import androidx.activity.compose.BackHandler
 import org.openstrap.app.ui.theme.AppColors
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import org.openstrap.app.ui.glow.RingColors
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -32,13 +37,8 @@ import java.util.concurrent.TimeUnit.MINUTES
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.update.UpdateCopy
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PanelLabelInset
-import org.openstrap.app.ui.glow.SectionLabel
-import org.openstrap.app.ui.glow.PageRows
-import org.openstrap.app.ui.theme.AppIcons
 
 /** The Goals row's value: "8,000 steps, 300 active kcal, 8 active hours". */
 fun goalsLine(goals: Goals, locale: java.util.Locale = java.util.Locale.getDefault(), strings: Strings = Strings.app): String =
@@ -106,7 +106,7 @@ fun healthConnectSummary(
 /**
  * The You page (spec 3.4), from the avatar on any tab: who you are and what happens to your data, things visited
  * monthly. A page like the Strap page rather than a sheet, because most rows open pages of their own and Back from
- * those should come back here. Every row shows its current value under its name, with an icon on its left.
+ * those should come back here. Every row shows its current value under its name; the theme is picked in place.
  */
 @Composable
 fun YouPage(
@@ -146,92 +146,77 @@ fun YouPage(
     onBack: () -> Unit,
     /** The row whose page is open beside the list on a wide screen, by its key in [PageRowKeys], or null. */
     selected: String? = null,
-    /** The colour theme, said on the Appearance row, which opens the picker; a pick applies at once. */
+    /** The colour theme, picked in place on the Appearance card; a pick applies at once. */
     appTheme: AppTheme = AppTheme.Default,
     onAppTheme: (AppTheme) -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
-    var pickingTheme by rememberSaveable { mutableStateOf(false) }
-    if (pickingTheme) AppearanceSheet(appTheme, onAppTheme, onDismiss = { pickingTheme = false })
+    // The rings theme (T-You): sections named over flat cards of rows with a hairline between them, and the theme
+    // chosen in place, the chosen one an ink pill, with the four metric hues under it.
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_title), onBack) }
         item {
-            PageRows {
+            RingsRows {
                 PageRow(
                     stringResource(R.string.you_row_profile), profile.summary(), onClick = onProfile, below = true, divider = false,
-                    icon = AppIcons.User,
                     selected = selected == PageRowKeys.PROFILE,
                 )
                 PageRow(
                     org.openstrap.app.ui.workout.HeartZonesCopy.TITLE, org.openstrap.app.ui.workout.HeartZonesCopy.youLine(maxHeartRate), onClick = onHeartZones,
-                    below = true, icon = AppIcons.Heartbeat, selected = selected == PageRowKeys.HEART_ZONES,
+                    below = true, selected = selected == PageRowKeys.HEART_ZONES,
                 )
-                PageRow(stringResource(R.string.you_row_goals), goalsLine(goals), onClick = onGoals, below = true, icon = AppIcons.Target)
-                PageRow(
-                    stringResource(R.string.you_row_sleep_goal), sleepGoalLine(goals, sleepNeedMinutes), onClick = onGoals, below = true,
-                    icon = AppIcons.Moon,
-                )
+                PageRow(stringResource(R.string.you_row_goals), goalsLine(goals), onClick = onGoals, below = true)
+                PageRow(stringResource(R.string.you_row_sleep_goal), sleepGoalLine(goals, sleepNeedMinutes), onClick = onGoals, below = true)
                 PageRow(
                     stringResource(R.string.you_row_goals_and_bests),
                     pluralStringResource(R.plurals.you_goals_and_bests_line, goals.workoutsPerWeek, goals.workoutsPerWeek),
                     onClick = onGoalsAndBests,
-                    below = true, icon = AppIcons.FlagCheckered, selected = selected == PageRowKeys.GOALS_AND_BESTS,
+                    below = true, selected = selected == PageRowKeys.GOALS_AND_BESTS,
                 )
                 PageRow(
                     stringResource(R.string.you_row_weekly_report), stringResource(R.string.you_weekly_report_line), onClick = onWeeklyReport,
-                    below = true, icon = AppIcons.ChartLineUp, selected = selected == PageRowKeys.WEEKLY_REPORT,
+                    below = true, selected = selected == PageRowKeys.WEEKLY_REPORT,
                 )
             }
         }
-        item { SectionLabel(stringResource(R.string.you_section_your_data), Modifier.padding(top = 4.dp), PanelLabelInset) }
+        item { RingsSection(stringResource(R.string.you_section_your_data)) }
         item {
-            PageRows {
+            RingsRows {
                 // Read again whenever either changes, so "today" and "yesterday" follow the last one.
                 val now = remember(healthConnectAuto, backup) { System.currentTimeMillis() / 1000 }
                 val zone = java.time.ZoneId.systemDefault()
                 PageRow(
                     stringResource(R.string.you_row_health_connect),
                     healthConnectSummary(healthConnectAuto, now, zone, availability = healthConnectAvailability), onClick = onHealthConnect,
-                    below = true, divider = false,
-                    icon = AppIcons.Heartbeat, selected = selected == PageRowKeys.HEALTH_CONNECT,
+                    below = true, divider = false, selected = selected == PageRowKeys.HEALTH_CONNECT,
                 )
                 PageRow(
                     stringResource(R.string.you_row_backup), BackupCopy.summary(backup, now, zone), onClick = onBackup, below = true,
-                    icon = AppIcons.ShieldCheck, selected = selected == PageRowKeys.BACKUP,
+                    selected = selected == PageRowKeys.BACKUP,
                 )
                 if (deletedSleep > 0) PageRow(
                     stringResource(R.string.you_row_deleted_sleep), org.openstrap.app.ui.dashboard.SleepCopy.deletedCount(deletedSleep),
-                    onClick = onDeletedSleep, below = true,
-                    icon = AppIcons.Trash, selected = selected == PageRowKeys.DELETED_SLEEP,
+                    onClick = onDeletedSleep, below = true, selected = selected == PageRowKeys.DELETED_SLEEP,
                 )
             }
         }
-        item { SectionLabel(stringResource(R.string.you_section_app), Modifier.padding(top = 4.dp), PanelLabelInset) }
+        item { RingsSection(stringResource(R.string.you_row_appearance)) }
+        item { AppearanceCard(appTheme, onAppTheme) }
+        item { RingsSection(stringResource(R.string.you_section_help)) }
         item {
-            PageRows {
-                PageRow(
-                    stringResource(R.string.you_row_appearance), themeName(appTheme), onClick = { pickingTheme = true }, below = true,
-                    divider = false, icon = AppIcons.Image,
-                )
-            }
-        }
-        item { SectionLabel(stringResource(R.string.you_section_help), Modifier.padding(top = 4.dp), PanelLabelInset) }
-        item {
-            PageRows {
+            RingsRows {
                 val now = remember(updates) { System.currentTimeMillis() / 1000 }
                 PageRow(
                     stringResource(R.string.you_row_updates), UpdateCopy.summary(updates, installedVersion, now), onClick = onUpdates,
-                    below = true, divider = false,
-                    icon = AppIcons.ArrowCircleUp, selected = selected == PageRowKeys.UPDATES, dot = updateWaiting,
+                    below = true, divider = false, selected = selected == PageRowKeys.UPDATES, dot = updateWaiting,
                 )
                 PageRow(
                     stringResource(R.string.you_row_diagnostics), pluralStringResource(R.plurals.you_diagnostics_line, logLines, logLines),
-                    onClick = onDiagnostics, below = true, icon = AppIcons.Bug, selected = selected == PageRowKeys.DIAGNOSTICS,
+                    onClick = onDiagnostics, below = true, selected = selected == PageRowKeys.DIAGNOSTICS,
                 )
                 if (onSampleData != null) PageRow(
                     stringResource(R.string.you_row_sample_data), stringResource(R.string.you_row_sample_data_note), onClick = onSampleData,
                     below = true,
-                    icon = AppIcons.Flask,
                 )
             }
         }
@@ -239,8 +224,30 @@ fun YouPage(
             Text(
                 stringResource(R.string.you_footer, BuildConfig.VERSION_NAME),
                 Modifier.fillMaxWidth().padding(top = 4.dp),
-                color = AppColors.ink.copy(alpha = 0.45f), style = GlowType.secondary, textAlign = TextAlign.Center,
+                color = AppColors.muted, style = GlowType.secondary, textAlign = TextAlign.Center,
             )
         }
+    }
+}
+
+/**
+ * Appearance in place (T-You): the four themes as pills, the chosen one filled with the ink, a pick applying at once;
+ * the four metric hues under them, which stay the same in every theme; and the note that widgets keep their look.
+ */
+@Composable
+private fun AppearanceCard(selected: AppTheme, onPick: (AppTheme) -> Unit) {
+    RingsCard {
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            AppTheme.entries.forEach { theme ->
+                val on = theme == selected
+                RingsChoice(themeName(theme), on, { if (!on) onPick(theme) })
+            }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(RingColors.Energy, RingColors.Recovery, RingColors.Sleep, RingColors.Steps).forEach { hue ->
+                Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(hue))
+            }
+        }
+        Text(stringResource(R.string.you_appearance_note), color = AppColors.muted, style = GlowType.secondary)
     }
 }

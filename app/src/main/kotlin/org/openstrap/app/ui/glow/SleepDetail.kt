@@ -101,19 +101,19 @@ private fun sleepDays(state: DayUiState, history: DailyHistory): Set<LocalDate> 
 /** The lines in a detail's body that aren't the one sentence: a reading's caption, a chart's title. */
 @Composable
 private fun Caption(text: String, modifier: Modifier = Modifier) =
-    Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, modifier = modifier)
+    Text(text, color = AppColors.muted, style = GlowType.secondary, modifier = modifier)
 
 /** A chart's title inside a detail's body, with an optional [note] on the right. */
 @Composable
 private fun ChartTitle(title: String, note: String?, modifier: Modifier = Modifier, scrubbed: DetailHeadline? = null) {
-    Row(modifier.fillMaxWidth().padding(top = 18.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+    Row(modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, modifier = Modifier.weight(1f))
         // While the line is scrubbed, its reading takes the note's place, in white so it reads as the live value.
         if (scrubbed != null) Text(
             stringResource(R.string.glow_sleep_scrubbed, scrubbed.value.toString(), scrubbed.label), color = AppColors.ink,
             style = GlowType.secondary, maxLines = 1,
         )
-        else if (note != null) Text(note, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
+        else if (note != null) Text(note, color = AppColors.muted, style = RingLabel)
     }
 }
 
@@ -170,11 +170,13 @@ internal fun SleepScoreDetail(
             contentPadding = contentPadding, headline = headline,
             strip = DetailCopy.strip(state.date, today, sleepDays(state, history)), onDay = onSelectDay,
             ranges = ranges, range = range, onRange = { rangeIndex = ranges.indexOf(it) },
-            // The horizon arc (chart kit, spec 2.7) holds the night's score, centred, the number under its crest. A
-            // scrub takes its place in the hero alone, so the rest of the detail stays put (audit K4).
-            heroValue = if (range == Range.Day && score != null) {
-                { HorizonArc(score / 100f, color, key = state.date) { DetailScoreNumber(score) } }
-            } else null,
+            // The ring holds the night's score out of 100; a scrub takes the middle in the hero alone (audit K4).
+            ringScale = 100f,
+            // The night's three key figures: asleep, awake and how long, under the ring.
+            figures = if (range == Range.Day && session != null) listOf(
+                clock(session.start) to SleepCopy.FELL_ASLEEP, clock(session.end) to SleepCopy.WOKE,
+                Units.duration(state.asleepSeconds ?: (session.end - session.start)) to SleepCopy.ASLEEP,
+            ) else emptyList(),
             scrubbed = { scrub },
         ) {
             if (range == Range.Day) {
@@ -188,7 +190,7 @@ internal fun SleepScoreDetail(
                     val detected = state.sleepAsDetected
                     val moved = detected != null && (detected.start != session.start || detected.end != session.end)
                     item {
-                        Column(Modifier.padding(top = 8.dp)) {
+                        DetailCard {
                             // Moved, the strap's whole night shows with what's outside the user's times dimmed.
                             if (moved && state.strapSleepStages.isNotEmpty()) GlowSleepStages(state.strapSleepStages, 150.dp, kept = session.start..session.end)
                             else if (state.sleepStages.isNotEmpty()) GlowSleepStages(state.sleepStages, 150.dp)
@@ -199,13 +201,6 @@ internal fun SleepScoreDetail(
                                     Caption(it, Modifier.padding(top = 12.dp))
                                 }
                             }
-                            DetailFigures(
-                                listOf(
-                                    clock(session.start) to SleepCopy.FELL_ASLEEP, clock(session.end) to SleepCopy.WOKE,
-                                    Units.duration(asleep) to SleepCopy.ASLEEP,
-                                ),
-                                Modifier.padding(top = 20.dp),
-                            )
                             if (detected != null) SleepEditActions(
                                 if (moved) SleepCopy.yourTimes(clock(detected.start), clock(detected.end)) else null,
                                 onAdjust = { adjusting = true }, onDelete = { deleting = true }, Modifier.padding(top = 20.dp),
@@ -239,7 +234,7 @@ internal fun SleepScoreDetail(
             } else {
                 item {
                     if (known.isEmpty()) DetailEmpty(stringResource(R.string.glow_sleep_no_scores_week))
-                    else Column {
+                    else DetailCard {
                         val values = week.map { it.second }
                         NormalTrend(
                             values, DetailCopy.levels(values, normal), color, labels = week.map { DayWords.weekdayShort(it.first) },
@@ -437,8 +432,8 @@ private fun NightLines(state: DayUiState, window: LongRange, onScrub: (DetailHea
     val labels = listOf(clock(window.first), clock(window.last))
     var hrAt by remember(window) { mutableStateOf<DetailHeadline?>(null) }
     var breathAt by remember(window) { mutableStateOf<DetailHeadline?>(null) }
-    Column {
-        if (hr.isNotEmpty()) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (hr.isNotEmpty()) DetailCard {
             ChartTitle(
                 stringResource(R.string.glow_sleep_heart_rate),
                 stringResource(R.string.glow_sleep_heart_note, hr.minOf { it.y }.toInt(), hr.map { it.y }.average().toInt()),
@@ -446,7 +441,7 @@ private fun NightLines(state: DayUiState, window: LongRange, onScrub: (DetailHea
             )
             ScrubLine(hr, window, 130.dp, labels, MetricColors.heart, stringResource(R.string.glow_unit_bpm)) { hrAt = it; onScrub(it) }
         }
-        if (breath.isNotEmpty()) {
+        if (breath.isNotEmpty()) DetailCard {
             val average = stringResource(R.string.glow_sleep_breathing_note, Units.decimal(breath.map { it.y }.average(), 1))
             ChartTitle(stringResource(R.string.glow_sleep_breathing_rate), average, scrubbed = breathAt)
             ScrubLine(
@@ -509,10 +504,17 @@ internal fun RegularityDetail(
         contentPadding = contentPadding, headline = headline,
         strip = DetailCopy.strip(state.date, today, sleepDays(state, history)), onDay = onSelectDay,
         ranges = listOf(Range.Week), range = Range.Week, onRange = {},
+        ringScale = 100f,
+        figures = w?.usual?.let { u ->
+            listOf(
+                TimeOfDay.minutes(u.bedtime) to stringResource(R.string.glow_sleep_usually_asleep),
+                TimeOfDay.minutes(u.wake) to stringResource(R.string.glow_sleep_usually_up),
+            )
+        }.orEmpty(),
     ) {
         item {
             if (w == null) DetailEmpty(stringResource(R.string.glow_sleep_none_week))
-            else Column(Modifier.padding(top = 8.dp)) {
+            else DetailCard {
                 SleepWindows(w.nights, w.usual, zone, selected = state.date, onNight = onSelectDay, height = 200.dp)
                 val night = state.sleep
                 val u = w.usual
@@ -520,13 +522,6 @@ internal fun RegularityDetail(
                     if (night == null) SleepCopy.noNight(isToday)
                     else SleepCopy.regularityNight(minutesOf(night.start, zone), minutesOf(night.end, zone), u?.bedtime, isToday),
                     Modifier.padding(top = 14.dp),
-                )
-                if (u != null) DetailFigures(
-                    listOf(
-                        TimeOfDay.minutes(u.bedtime) to stringResource(R.string.glow_sleep_usually_asleep),
-                        TimeOfDay.minutes(u.wake) to stringResource(R.string.glow_sleep_usually_up),
-                    ),
-                    Modifier.padding(top = 18.dp),
                 )
             }
         }
@@ -582,12 +577,9 @@ internal fun NapsDetail(
             }
             else {
                 item { DetailSentence(SleepCopy.naps(naps.size, total)) }
-                naps.forEachIndexed { i, nap ->
+                naps.forEach { nap ->
                     item(key = nap.start) {
-                        Column(
-                            Modifier.fillMaxWidth().padding(top = 12.dp)
-                                .topHairline(i > 0, RowHairline),
-                        ) {
+                        DetailCard {
                             ChartTitle(Ranges.of(clock(nap.start), clock(nap.end)), Units.duration(nap.end - nap.start))
                             val detected = state.napsAsDetected[nap.start]
                             val stages = state.napStages[nap.start].orEmpty()

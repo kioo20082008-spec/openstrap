@@ -56,11 +56,11 @@ fun QuickSheet(title: String, actions: List<QuickAction>, onDismiss: () -> Unit)
 private fun Tile(a: QuickAction, close: () -> Unit, modifier: Modifier) {
     val shape = RoundedCornerShape(22.dp)
     Column(
-        modifier.clip(shape).background(AppColors.control).border(1.dp, AppColors.ink.copy(alpha = 0.12f), shape)
+        modifier.clip(shape).background(AppColors.control)
             .clickable { close(); a.onClick() }.padding(16.dp),
     ) {
-        Box(Modifier.size(44.dp).clip(CircleShape).background(AppPalette.Coral.copy(alpha = 0.16f)), contentAlignment = Alignment.Center) {
-            Icon(a.icon, null, tint = AppPalette.Coral, modifier = Modifier.size(22.dp))
+        Box(Modifier.size(44.dp).clip(CircleShape).background(RingColors.Energy), contentAlignment = Alignment.Center) {
+            Icon(a.icon, null, tint = OnHueInk, modifier = Modifier.size(22.dp))
         }
         Spacer(Modifier.height(12.dp))
         Text(a.label, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))

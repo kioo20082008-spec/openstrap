@@ -23,17 +23,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.data.Rewards
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.app.presentation.RewardsCopy
 import org.openstrap.app.presentation.dotFormat
-import org.openstrap.app.ui.glow.draw.DotSize
 
 /*
  * The celebrations (workouts spec 3.4, boards GoalMoment and BadgeUnlocked): the full screen goal moment, once a week,
@@ -64,23 +64,17 @@ internal fun BadgeArt(
 ) {
     Box(
         modifier.size(size).alpha(if (locked) 0.35f else 1f)
-            .let { m ->
-                if (ring) m else m.background(
-                    if (locked) Brush.radialGradient(listOf(AppColors.ink.copy(alpha = 0.06f), AppColors.ink.copy(alpha = 0.02f)))
-                    else Brush.verticalGradient(listOf(AppColors.stage, color.copy(alpha = 0.55f))),
-                    CircleShape,
-                )
-            }
-            .border(if (ring) 2.dp else 1.dp, if (locked) AppColors.ink.copy(alpha = if (ring) 0.5f else 0.12f) else color.copy(alpha = if (ring) 1f else 0.8f), CircleShape),
+            // The rings design: flat, the badge's hue as one thick ring round a faint fill of it; locked, a plain solid disc.
+            .background(if (locked) AppColors.glass else color.copy(alpha = if (ring) 0f else 0.16f), CircleShape)
+            .let { m -> if (locked && !ring) m else m.border(if (ring) 3.dp else size * 0.07f, if (locked) AppColors.ink.copy(alpha = 0.3f) else color, CircleShape) },
         contentAlignment = Alignment.Center,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            if (dots) DotMatrixText(short, dot = DotSize.Hero)
-            else Text(
+            Text(
                 short, color = if (ring && !locked) AppColors.readable(color) else AppColors.ink, maxLines = 1,
-                style = if (size >= 80.dp) GlowType.pageTitle else GlowType.cardTitle,
+                style = ringFigure(if (dots) 44.sp else if (size >= 80.dp) 26.sp else 17.sp),
             )
-            under?.let { Text(it, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(top = 6.dp)) }
+            under?.let { Text(it, color = AppColors.ink, style = ringFigure(17.sp, FontWeight.Bold), modifier = Modifier.padding(top = 6.dp)) }
         }
     }
 }
@@ -113,8 +107,8 @@ fun BestCardScreen(best: Rewards.NewBest, sportName: String, contentPadding: Pad
             under = RewardsCopy.bestValue(best.best.kind, best.best.value),
         )
         Spacer(Modifier.height(12.dp))
-        Text(RewardsCopy.bestTitle(best.best.kind), color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
-        Text(RewardsCopy.beatLine(best, now), color = AppColors.ink, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.bestTitle(best.best.kind), color = AppColors.ink, style = PageTitleStyle, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.beatLine(best, now), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Text(
             RewardsCopy.whenSet(best.best.date, sportName), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
@@ -138,14 +132,14 @@ fun GoalMomentScreen(count: Int, goal: Int, inARow: Int, weekStarts: List<Long>,
     ) {
         CloseRow(null, onContinue)
         Spacer(Modifier.height(32.dp))
-        DotMatrixText(
-            dotFormat("%d/%d", count, goal), Modifier.align(Alignment.CenterHorizontally), dot = DotSize.Hero, color = MetricColors.good,
-        )
+        DetailRing((count.toFloat() / goal.coerceAtLeast(1)).coerceIn(0f, 1f), MetricColors.good, Modifier.align(Alignment.CenterHorizontally)) {
+            Text(dotFormat("%d/%d", count, goal), color = AppColors.ink, style = ringFigure(48.sp), maxLines = 1)
+        }
         Text(
-            stringResource(R.string.glow_celebrate_goal_met), color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center,
+            stringResource(R.string.glow_celebrate_goal_met), color = AppColors.ink, style = PageTitleStyle, textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
         )
-        Text(RewardsCopy.momentLine(inARow), color = AppColors.ink, style = GlowType.sentence, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(RewardsCopy.momentLine(inARow), color = AppColors.ink, style = GlowType.body.copy(fontSize = 17.sp), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Spacer(Modifier.height(8.dp))
         WeekDaysPanel(weekStarts, note = stringResource(R.string.glow_celebrate_goal_note))
     }
@@ -196,7 +190,7 @@ fun HistoryBadgesScreen(badges: List<Rewards.Badge>, contentPadding: PaddingValu
     ) {
         CloseRow(null, onContinue)
         Text(
-            stringResource(R.string.glow_celebrate_history_title), color = AppColors.ink, style = GlowType.pageTitle,
+            stringResource(R.string.glow_celebrate_history_title), color = AppColors.ink, style = PageTitleStyle,
             modifier = Modifier.padding(start = 4.dp, top = 8.dp),
         )
         Text(

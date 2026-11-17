@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow.live
 
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
@@ -128,8 +129,8 @@ private fun PeriodRow(r: WorkoutState.Recording, periods: Structure.Periods, pha
         else -> stringResource(R.string.workout_live_game_full_time) to workoutClock(active())
     }
     Row(Modifier.fillMaxWidth()) {
-        Text(title, color = AppColors.ink, style = GlowType.pageTitle, modifier = Modifier.weight(1f))
-        Text(clock, color = AppColors.ink, style = GlowType.pageTitle.copy(fontFeatureSettings = "tnum"))
+        Text(title, color = AppColors.ink, style = GlowType.pageTitle.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), modifier = Modifier.weight(1f))
+        Text(clock, color = AppColors.ink, style = org.openstrap.app.ui.workout.ringFigure(24.sp))
     }
 }
 

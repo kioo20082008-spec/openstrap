@@ -26,7 +26,6 @@ import org.openstrap.app.presentation.chargeShown
 import org.openstrap.app.data.DailyMetric
 import org.openstrap.app.data.Recovery
 import org.openstrap.app.data.RecoveryResult
-import org.openstrap.app.ui.components.detailNumber
 import org.openstrap.app.ui.dashboard.ActivityHistory
 import org.openstrap.app.ui.dashboard.DailyHistory
 import org.openstrap.app.ui.dashboard.DayUiState
@@ -42,7 +41,6 @@ import org.openstrap.app.presentation.TodayCopy
 import org.openstrap.app.ui.theme.MetricColors
 import java.time.LocalDate
 import java.time.LocalTime
-import org.openstrap.app.ui.glow.draw.DotSize
 
 /*
  * Recovery's and Charge's details (spec 6.1) in the same template as a metric's, and the way to the Sleep tab's
@@ -142,10 +140,12 @@ private fun RecoveryDetail(
         contentPadding = contentPadding, headline = headline,
         strip = DetailCopy.strip(state.date, today, withData), onDay = onSelectDay,
         ranges = ranges, range = range, onRange = { rangeIndex = ranges.indexOf(it) }, scrubbed = { scrub },
-        // The arc gauge (chart kit, spec 2.7) holds the day's score, centred, the number inside the half circle.
-        heroValue = (score ?: estimate)?.takeIf { range == Range.Day }?.let { shown ->
-            { ArcGauge(shown / 100f, color, key = state.date) { DetailScoreNumber(shown) } }
-        },
+        // The ring holds the score out of 100; under it the two readings Recovery leans on most, or the week's range.
+        ringScale = 100f,
+        figures = if (range == Range.Day) listOf(Metric.Hrv, Metric.RestingHr).map { m -> dayValue(m, state)?.let { m.format(it) } to m.title }
+        else if (known.isNotEmpty()) listOf(
+            known.min().toString() to stringResource(R.string.glow_recovery_lowest), known.max().toString() to stringResource(R.string.glow_recovery_highest),
+        ) else emptyList(),
     ) {
         if (range == Range.Day) {
             item {
@@ -176,7 +176,7 @@ private fun RecoveryDetail(
         } else {
             item {
                 if (known.isEmpty()) DetailEmpty(stringResource(R.string.glow_recovery_none_week))
-                else {
+                else DetailCard {
                     val values = week.map { it.second?.toFloat() }
                     // TODO(step 6): your normal as a band, once the app keeps a normal of the score; every day stays dim until then.
                     NormalTrend(
@@ -258,10 +258,20 @@ private fun ChargeDetail(
         contentPadding = contentPadding, headline = headline,
         strip = DetailCopy.strip(state.date, today, withData), onDay = onSelectDay,
         ranges = listOf(Range.Day), range = Range.Day, onRange = {}, scrubbed = { scrub },
+        ringScale = 100f,
+        // Where the day started and how high and low it went; a figure the day doesn't have (no waking without a
+        // night's sleep) is left out, the others share the card.
+        figures = if (c == null || now == null) emptyList() else listOf(
+            atWake?.toString() to stringResource(
+                if (c.strapOffOvernight) R.string.glow_recovery_at_start else R.string.glow_recovery_at_waking,
+            ),
+            c.highest?.let(::chargeShown)?.toString() to stringResource(R.string.glow_recovery_highest),
+            c.lowest?.let(::chargeShown)?.toString() to stringResource(R.string.glow_recovery_lowest),
+        ).filter { it.first != null },
     ) {
         item {
             if (c == null || now == null || c.points.size < 2) DetailEmpty(TabCopy.chargeLine(now, atWake, c?.anchored == true))
-            else Column(Modifier.padding(top = 8.dp)) {
+            else DetailCard {
                 // The Charge curve (chart kit): sleep fills it, the day drains it. Scrubbing moves the number.
                 // A curve covering only a few hours gets a short chart, so it doesn't stand tall and empty; the axis stays
                 // the whole day, so the gap reads as time without a Charge.
@@ -277,15 +287,6 @@ private fun ChargeDetail(
                         }
                     },
                 )
-                // A figure the day doesn't have (no waking without a night's sleep) is left out, the others share the row.
-                val figures = listOf(
-                    atWake?.toString() to stringResource(
-                        if (c.strapOffOvernight) R.string.glow_recovery_at_start else R.string.glow_recovery_at_waking,
-                    ),
-                    c.highest?.let(::chargeShown)?.toString() to stringResource(R.string.glow_recovery_highest),
-                    c.lowest?.let(::chargeShown)?.toString() to stringResource(R.string.glow_recovery_lowest),
-                ).filter { it.first != null }
-                if (figures.isNotEmpty()) DetailFigures(figures, Modifier.padding(top = 18.dp))
             }
         }
         if (now != null) item {
@@ -339,7 +340,4 @@ private fun ScoreRelated(score: Score, state: DayUiState, r: RecoveryResult?, hi
     }
 }
 
-/** The score in a score gauge on a detail header ([ArcGauge], [HorizonArc]): the header's one dotted number. */
-@Composable
-internal fun DetailScoreNumber(score: Int) =
-    DotMatrixText(score.toString(), Modifier.detailNumber(score.toString()), dot = DotSize.Detail)
+

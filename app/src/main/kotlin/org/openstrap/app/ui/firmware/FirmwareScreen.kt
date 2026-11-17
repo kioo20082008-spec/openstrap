@@ -1,6 +1,9 @@
 package org.openstrap.app.ui.firmware
 
 import android.app.Activity
+import org.openstrap.app.ui.device.RingsHeader
+import org.openstrap.app.ui.device.RingsPanel
+import org.openstrap.app.ui.device.RingsRows
 import org.openstrap.app.ui.theme.AppColors
 import android.view.WindowManager
 import androidx.activity.compose.BackHandler
@@ -48,11 +51,14 @@ import org.openstrap.app.ui.glow.PageButton
 import org.openstrap.app.ui.glow.PageConfirm
 import org.openstrap.app.ui.glow.PageField
 import org.openstrap.app.ui.glow.PageProgress
-import org.openstrap.app.ui.glow.PageHeader
+import org.openstrap.app.ui.device.RingsGauge
+import org.openstrap.app.ui.device.RingsType
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import org.openstrap.app.ui.glow.PageNote
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.glow.PageSwitchRow
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.theme.MetricColors
@@ -82,10 +88,10 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
     confirm?.let { image -> ConfirmInstall(image, vm.blockers(), onDismiss = { confirm = null }, onInstall = { confirm = null; vm.install(image) }) }
 
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_firmware_title), { vm.reset(); onBack() }, backEnabled = !installing) }
+        item { RingsHeader(stringResource(R.string.you_firmware_title), { vm.reset(); onBack() }, backEnabled = !installing) }
 
         item {
-            PagePanel(title = stringResource(R.string.you_firmware_this_strap)) {
+            RingsPanel(title = stringResource(R.string.you_firmware_this_strap)) {
                 val c = connection as? ConnectionState.Connected
                 InfoLine(
                     stringResource(R.string.you_firmware_title),
@@ -113,7 +119,7 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
         item { StepPanel(step, vm, onInstall = { confirm = it }) }
 
         item {
-            PageRows {
+            RingsRows {
                 // Update checks need a signed-in Zepp account; its page is a row away, as on the Strap page.
                 PageRow(
                     stringResource(R.string.you_strap_row_zepp),
@@ -128,7 +134,7 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
         }
 
         item {
-            PagePanel(title = stringResource(R.string.you_firmware_privacy)) {
+            RingsPanel(title = stringResource(R.string.you_firmware_privacy)) {
                 Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                     Point(
                         AppIcons.Key, stringResource(R.string.you_firmware_privacy_sign_in),
@@ -150,7 +156,7 @@ fun FirmwareScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBack:
 
 @Composable
 private fun StepPanel(step: FirmwareStep, vm: FirmwareViewModel, onInstall: (ReadyImage) -> Unit) {
-    PagePanel {
+    RingsPanel {
         when (step) {
             FirmwareStep.Idle -> {
                 CardTitle(stringResource(R.string.you_firmware_updates))
@@ -243,7 +249,7 @@ fun ZeppAccountScreen(vm: FirmwareViewModel, contentPadding: PaddingValues, onBa
     val account by vm.account.collectAsStateWithLifecycle()
     val installing = vm.step.collectAsStateWithLifecycle().value is FirmwareStep.Installing
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_zepp_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_zepp_title), onBack) }
         item { AccountPanel(account, enabled = !installing, onSave = vm::saveAccount, onClear = vm::clearAccount, onSignIn = vm::saveSignIn) }
     }
 }
@@ -266,7 +272,7 @@ private fun AccountPanel(
             onConfirm = { listing, strap -> signIn = false; onSignIn(listing, strap) },
         )
     }
-    PagePanel {
+    RingsPanel {
         if (!editing) {
             Body(
                 when {
@@ -290,7 +296,7 @@ private fun AccountPanel(
                     )
                 }
             }
-            return@PagePanel
+            return@RingsPanel
         }
         var token by rememberSaveable { mutableStateOf("") }
         var user by rememberSaveable { mutableStateOf(account?.userId.orEmpty()) }
@@ -342,13 +348,22 @@ private fun ConfirmInstall(image: ReadyImage, blockers: List<String>, onDismiss:
 
 @Composable
 private fun Busy(label: String, fraction: Float?) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(label, style = GlowType.body, color = AppColors.ink, modifier = Modifier.weight(1f))
-        fraction?.let {
-            Text(stringResource(R.string.you_firmware_percent, (it * 100).toInt()), style = GlowType.body, color = AppColors.ink)
+    // The rings theme: how far it has got as one thick ring with the share bold in its middle; while that isn't known,
+    // the sliding bar.
+    if (fraction != null) {
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            RingsGauge(fraction, AppColors.ink, Modifier.size(132.dp), stroke = 14.dp) {
+                Text(
+                    stringResource(R.string.you_firmware_percent, (fraction * 100).toInt()), style = RingsType.figure(28.sp),
+                    color = AppColors.ink, maxLines = 1,
+                )
+            }
         }
+        Text(label, style = GlowType.body, color = AppColors.ink, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+    } else {
+        Text(label, style = GlowType.body, color = AppColors.ink)
+        PageProgress(null)
     }
-    PageProgress(fraction)
 }
 
 @Composable
@@ -371,7 +386,7 @@ private fun Point(icon: ImageVector, title: String, body: String) {
 private fun InfoLine(label: String, value: String) {
     Row(Modifier.fillMaxWidth()) {
         Text(label, style = GlowType.body, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), modifier = Modifier.weight(1f))
-        Text(value, style = GlowType.body, color = AppColors.ink)
+        Text(value, style = GlowType.body.copy(fontWeight = FontWeight.Bold), color = AppColors.ink)
     }
 }
 

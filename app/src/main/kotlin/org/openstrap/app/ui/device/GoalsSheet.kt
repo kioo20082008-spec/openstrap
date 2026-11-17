@@ -131,7 +131,8 @@ internal fun WorkoutGoalField(value: Int, onChange: (Int) -> Unit) {
             )
             Box(Modifier.weight(1f).height(52.dp).clip(GlowLayout.TileShape).background(AppColors.control), contentAlignment = Alignment.Center) {
                 Text(
-                    pluralStringResource(R.plurals.you_goals_workouts_value, value, value), color = AppColors.ink, style = GlowType.body,
+                    pluralStringResource(R.plurals.you_goals_workouts_value, value, value), color = AppColors.ink,
+                    style = GlowType.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold),
                     maxLines = 1,
                 )
             }
@@ -200,7 +201,7 @@ private fun CalorieGoalField(value: Int, onChange: (Int) -> Unit, suggested: Int
                 } else {
                     Text(
                         stringResource(R.string.you_goals_active_kcal, Units.count(value.toLong())), color = AppColors.ink,
-                        style = GlowType.body, maxLines = 1,
+                        style = GlowType.body.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1,
                     )
                 }
             }

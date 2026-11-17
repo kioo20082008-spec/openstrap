@@ -86,8 +86,9 @@ import org.openstrap.app.R
  * middle and the two figures either side, in Display Light. The only two sizes on the workout pages no role has; a
  * live clock read at arm's length isn't one of spec 2.3's.
  */
-internal val LiveClock = GlowType.sentence.copy(fontSize = 46.sp, lineHeight = 50.sp, letterSpacing = (-0.02).em, fontFeatureSettings = "tnum")
-internal val LiveFigure = GlowType.sentence.copy(fontSize = 26.sp, lineHeight = 30.sp, letterSpacing = (-0.02).em, fontFeatureSettings = "tnum")
+// Bold in the rings design, in the number face.
+internal val LiveClock get() = org.openstrap.app.ui.workout.ringFigure(46.sp).copy(lineHeight = 50.sp, letterSpacing = (-0.02).em)
+internal val LiveFigure get() = org.openstrap.app.ui.workout.ringFigure(26.sp).copy(lineHeight = 30.sp, letterSpacing = (-0.02).em)
 
 /** What every live screen can do to the workout, passed down as one. */
 @androidx.compose.runtime.Immutable
@@ -175,7 +176,7 @@ internal fun LiveFrame(
                     val lines = status.takeIf { !r.paused }.orEmpty() + (strap to if (connected) TrendGood else TrendBad)
                     if (time != null && smallTime) {
                         // The total, small, where a set or a round's clock is the screen's number.
-                        ClockText(time, GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
+                        ClockText(time, org.openstrap.app.ui.workout.ringFigure(20.sp), maxLines = 1)
                         // Under it, the GPS where there is one (run reps), else that it's the total.
                         val total = stringResource(R.string.workout_live_status_total)
                         val (under, dot) = status.firstOrNull() ?: (total to if (connected) TrendGood else TrendBad)

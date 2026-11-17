@@ -70,6 +70,8 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import org.openstrap.app.ui.components.GlassSheet
 import org.openstrap.app.ui.components.pressClickable
@@ -83,9 +85,9 @@ import java.time.ZoneId
  * app doesn't turn into another product at the strap's boundary.
  */
 
-private val PanelShape = GlowLayout.CardShape
+private val PanelShape = RoundedCornerShape(22.dp)
 private val PanelSurface get() = ListSurface
-private val Hairline: Color get() = AppColors.ink.copy(alpha = 0.08f)
+private val Hairline: Color get() = AppColors.hairline
 /** A [PageRow] whose page is open beside the list. */
 private val SelectedTint: Color get() = AppColors.ink.copy(alpha = 0.08f)
 
@@ -108,7 +110,7 @@ val PageHeaderHeight = 64.dp
 @Composable
 fun BackButton(onBack: () -> Unit, enabled: Boolean = true) =
     RoundIconButton(
-        AppIcons.ArrowLeft, stringResource(R.string.glow_back), onBack, size = BackButtonSize, surface = AppColors.control, iconSize = 20.dp,
+        AppIcons.ArrowLeft, stringResource(R.string.glow_back), onBack, size = BackButtonSize, surface = AppColors.glass, iconSize = 18.dp,
         enabled = enabled,
     )
 
@@ -169,13 +171,13 @@ fun PageHeader(
                     .let { if (onTitle != null) it.clickable(onClickLabel = switchLabel, role = Role.Button, onClick = onTitle) else it },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(title, color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
+                Text(title, color = AppColors.ink, style = PageTitleStyle, maxLines = 1, modifier = Modifier.weight(1f, fill = false))
                 if (onTitle != null) {
                     Spacer(Modifier.width(6.dp))
                     Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(16.dp))
                 }
             }
-            if (subtitle != null) Text(subtitle, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+            if (subtitle != null) Text(subtitle, color = AppColors.muted, style = GlowType.secondary, maxLines = 1)
         }
         if (trailing != null) {
             Spacer(Modifier.width(12.dp))
@@ -183,6 +185,9 @@ fun PageHeader(
         }
     }
 }
+
+/** A page's title in the rings design: ExtraBold, 26 sp. */
+internal val PageTitleStyle: TextStyle get() = GlowType.pageTitle.copy(fontWeight = FontWeight.ExtraBold, fontSize = 26.sp, lineHeight = 32.sp)
 
 /**
  * A grouped panel for free content (text, fields, buttons): a [QuietPanel] with an optional [title] row and [note]
@@ -200,7 +205,7 @@ fun PagePanel(modifier: Modifier = Modifier, title: String? = null, note: String
 fun PageRows(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Column(
         // Clipped, so a selected row's tint keeps to the panel's corners.
-        modifier.fillMaxWidth().clip(PanelShape).background(PanelSurface, PanelShape).border(1.dp, AppColors.ink.copy(alpha = 0.06f), PanelShape)
+        modifier.fillMaxWidth().clip(PanelShape).background(PanelSurface, PanelShape)
             .padding(GlowLayout.ListPadding),
         content = content,
     )
@@ -476,7 +481,7 @@ fun PageButton(
             .let {
                 when {
                     primary -> it.background(AppColors.ink)
-                    onCard -> it.background(AppColors.ink.copy(alpha = 0.08f)).border(1.dp, AppColors.ink.copy(alpha = 0.12f), CircleShape)
+                    onCard -> it.background(AppColors.ink.copy(alpha = 0.10f))
                     else -> it.background(AppColors.control)
                 }
             }
@@ -492,7 +497,7 @@ fun PageButton(
             Icon(icon, null, Modifier.size(size.icon), tint = ink)
             Spacer(Modifier.width(8.dp))
         }
-        val style = if (size == ButtonSize.Row) GlowType.secondary else GlowType.body
+        val style = (if (size == ButtonSize.Row) GlowType.secondary else GlowType.body).let { if (primary) it.copy(fontWeight = FontWeight.Bold) else it }
         Text(text, color = ink, style = style, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
@@ -662,8 +667,7 @@ fun PageChip(
 ) {
     Box(
         modifier.heightIn(min = 36.dp).clip(CircleShape)
-            .background(if (selected) AppColors.ink else if (filled) AppColors.control else Color.Transparent)
-            .let { if (selected || filled) it else it.border(1.dp, AppColors.ink.copy(alpha = 0.16f), CircleShape) }
+            .background(if (selected) AppColors.ink else if (filled) AppColors.control else AppColors.glass)
             .alpha(if (enabled) 1f else 0.4f)
             .clickable(enabled = enabled, role = role, onClick = onClick)
             .semantics {
@@ -675,7 +679,7 @@ fun PageChip(
     ) {
         Text(
             text, color = if (selected) AppColors.onInk else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-            style = GlowType.secondary, maxLines = 1,
+            style = GlowType.secondary.copy(fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal), maxLines = 1,
             modifier = if (description != null) Modifier.clearAndSetSemantics {} else Modifier,
         )
     }
@@ -741,18 +745,21 @@ internal fun GlowSegments(
     modifier: Modifier = Modifier,
     role: Role = Role.RadioButton,
 ) {
-    Row(modifier.fillMaxWidth().clip(CircleShape).background(AppColors.ink.copy(alpha = 0.06f)).padding(4.dp)) {
+    Row(modifier.fillMaxWidth().clip(CircleShape).background(AppColors.glass).padding(4.dp)) {
         options.forEachIndexed { i, label ->
             val on = i == selected
             Box(
                 Modifier.weight(1f).clip(CircleShape)
-                    .background(if (on) AppColors.ink.copy(alpha = 0.16f) else Color.Transparent)
+                    .background(if (on) AppColors.ink else Color.Transparent)
                     .pressClickable({ onSelect(i) }, CircleShape, scale = 0.97f)
                     .semantics { this.role = role; this.selected = on }
                     .padding(vertical = 9.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, color = if (on) AppColors.ink else AppColors.ink.copy(alpha = 0.6f), style = GlowType.body, maxLines = 1)
+                Text(
+                    label, color = if (on) AppColors.onInk else AppColors.muted, maxLines = 1,
+                    style = GlowType.body.copy(fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
+                )
             }
         }
     }

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -122,34 +123,24 @@ private fun Dial(label: String, value: String?, unit: String?, share: Float, col
 
 @Composable
 private fun PlanCard(title: String, note: String, chip: String?, items: List<PlanItem>) {
-    val shape = RoundedCornerShape(26.dp)
-    Column(Modifier.fillMaxWidth().clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(horizontal = 20.dp, vertical = 18.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(title, Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
-            if (chip != null) Row(
-                Modifier.clip(CircleShape).background(AppColors.raised).padding(horizontal = 12.dp, vertical = 6.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Box(Modifier.size(8.dp).clip(CircleShape).background(AppColors.ink))
-                Spacer(Modifier.width(8.dp))
-                Text(chip, color = AppColors.ink, style = MaterialTheme.typography.labelLarge)
-            }
+    // The advice card above already says [title] and [note]: the plan is a list, headed by its chip.
+    Column(Modifier.fillMaxWidth().ringCard().padding(horizontal = 18.dp, vertical = 2.dp)) {
+        Row(Modifier.fillMaxWidth().height(46.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(title, Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), maxLines = 1)
+            if (chip != null) StatusPill(chip, RingColors.Recovery)
         }
-        Spacer(Modifier.height(6.dp))
-        Text(note, color = Muted, style = MaterialTheme.typography.bodyMedium)
         items.forEach { item ->
-            Spacer(Modifier.height(12.dp))
-            Box(Modifier.fillMaxWidth().height(1.dp).background(PlanEdge))
+            RingDivider()
             Row(
-                Modifier.fillMaxWidth().let { m -> item.onClick?.let { m.clickable(onClick = it) } ?: m }.padding(top = 12.dp),
+                Modifier.fillMaxWidth().heightIn(min = 52.dp).let { m -> item.onClick?.let { m.clickable(onClick = it) } ?: m }.padding(vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
                         item.title, color = if (item.done) Muted else AppColors.ink,
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, textDecoration = if (item.done) TextDecoration.LineThrough else null),
+                        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold, textDecoration = if (item.done) TextDecoration.LineThrough else null),
                     )
-                    Text(item.note, color = Muted, style = MaterialTheme.typography.bodyMedium)
+                    Text(item.note, color = Muted, style = MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.width(12.dp))
                 Tick(item.done)
@@ -160,17 +151,17 @@ private fun PlanCard(title: String, note: String, chip: String?, items: List<Pla
 
 @Composable
 private fun Tick(done: Boolean) {
-    Canvas(Modifier.size(30.dp)) {
+    Canvas(Modifier.size(26.dp)) {
         val r = size.minDimension / 2
         if (done) {
-            drawCircle(AppPalette.Coral, r)
+            drawCircle(RingColors.Energy, r)
             val p = Path().apply {
                 moveTo(size.width * 0.30f, size.height * 0.52f)
                 lineTo(size.width * 0.44f, size.height * 0.66f)
                 lineTo(size.width * 0.71f, size.height * 0.38f)
             }
-            drawPath(p, AppPalette.Navy, style = Stroke(2.6.dp.toPx(), cap = StrokeCap.Round))
-        } else drawCircle(AppColors.ink.copy(alpha = 0.4f), r - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
+            drawPath(p, OnHueInk, style = Stroke(2.6.dp.toPx(), cap = StrokeCap.Round))
+        } else drawCircle(AppColors.raised, r)
     }
 }
 
@@ -187,36 +178,35 @@ val LocalStrapBattery = androidx.compose.runtime.compositionLocalOf<Pair<Int?, B
 @Composable
 internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, live: Boolean, onWorkout: () -> Unit) {
     val breathe = LocalOpenBreathe.current
-    val shape = RoundedCornerShape(26.dp)
-    Column(Modifier.fillMaxWidth().padding(top = 14.dp).clip(shape).background(PlanSurface).border(1.dp, PlanEdge, shape).padding(horizontal = 20.dp, vertical = 16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_title), Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+    Column(Modifier.fillMaxWidth().padding(top = 10.dp).ringCard().padding(horizontal = 18.dp, vertical = 2.dp)) {
+        Row(Modifier.fillMaxWidth().height(46.dp), verticalAlignment = Alignment.CenterVertically) {
+            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_title), Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold))
             if (live) {
                 val blink = androidx.compose.animation.core.rememberInfiniteTransition(label = "live")
                 val a by blink.animateFloat(1f, 0.25f, androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse), label = "a")
-                Box(Modifier.size(8.dp).clip(CircleShape).background(AppPalette.Coral.copy(alpha = a)))
+                Box(Modifier.size(8.dp).clip(CircleShape).background(RingColors.Energy.copy(alpha = a)))
                 Spacer(Modifier.width(6.dp))
-                Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_live), color = AppPalette.Coral, style = MaterialTheme.typography.labelLarge)
+                Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_live), color = AppColors.readable(RingColors.Energy), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold))
             }
         }
         if (tips.isEmpty()) {
-            Spacer(Modifier.height(8.dp))
-            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_all_good), color = Muted, style = MaterialTheme.typography.bodyMedium)
+            RingDivider()
+            Text(androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.coach_all_good), Modifier.padding(vertical = 14.dp), color = Muted, style = MaterialTheme.typography.bodyMedium)
         }
         tips.take(3).forEach { t ->
+            RingDivider()
             Spacer(Modifier.height(12.dp))
-            Box(Modifier.fillMaxWidth().height(1.dp).background(PlanEdge))
-            Spacer(Modifier.height(12.dp))
+            // One hue a tone, from the rings palette: a warning in Energy's, calm in Sleep's, good in Recovery's.
             val tone = when (t.tone) {
-                org.openstrap.app.presentation.Coach.Tone.Warn -> AppPalette.Coral
-                org.openstrap.app.presentation.Coach.Tone.Calm -> Color(0xFFF5B657)
-                org.openstrap.app.presentation.Coach.Tone.Good -> Color(0xFF5FD3A6)
+                org.openstrap.app.presentation.Coach.Tone.Warn -> RingColors.Energy
+                org.openstrap.app.presentation.Coach.Tone.Calm -> RingColors.Sleep
+                org.openstrap.app.presentation.Coach.Tone.Good -> RingColors.Recovery
             }
             Row(verticalAlignment = Alignment.Top) {
                 Box(Modifier.padding(top = 7.dp).size(9.dp).clip(CircleShape).background(tone))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text(t.title, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+                    Text(t.title, color = AppColors.ink, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold))
                     Spacer(Modifier.height(3.dp))
                     Text(t.body, color = Muted, style = MaterialTheme.typography.bodyMedium)
                     val action = when (t.action) {
@@ -228,12 +218,13 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
                         Spacer(Modifier.height(10.dp))
                         Text(
                             androidx.compose.ui.res.stringResource(action.first),
-                            Modifier.clip(CircleShape).background(tone.copy(alpha = 0.16f)).clickable(onClick = action.second).padding(horizontal = 14.dp, vertical = 7.dp),
-                            color = tone, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                            Modifier.clip(CircleShape).background(tone).clickable(onClick = action.second).padding(horizontal = 16.dp, vertical = 8.dp),
+                            color = OnHueInk, style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
                         )
                     }
                 }
             }
+            Spacer(Modifier.height(12.dp))
         }
     }
 }

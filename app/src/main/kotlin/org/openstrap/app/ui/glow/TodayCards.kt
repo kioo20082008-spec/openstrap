@@ -201,8 +201,8 @@ internal fun StartWorkoutStrip(sport: Int, onStart: (Int) -> Unit, modifier: Mod
                 )
             }
             Spacer(Modifier.width(12.dp))
-            Box(Modifier.size(44.dp).clip(CircleShape).background(AppColors.ink), contentAlignment = Alignment.Center) {
-                Icon(AppIcons.PlayFill, null, tint = AppColors.onInk, modifier = Modifier.size(18.dp))
+            Box(Modifier.size(44.dp).clip(CircleShape).background(RingColors.Energy), contentAlignment = Alignment.Center) {
+                Icon(AppIcons.PlayFill, null, tint = OnHueInk, modifier = Modifier.size(18.dp))
             }
         }
     }

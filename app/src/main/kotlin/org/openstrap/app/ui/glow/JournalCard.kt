@@ -71,12 +71,11 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
     val mine = journal.tags[day].orEmpty()
     val evening = time.hour >= EVENING_FROM_HOUR || time.hour < NIGHT_UNTIL_HOUR
     if (!isToday || !(evening || mine.isNotEmpty())) return
-    val shape = RoundedCornerShape(26.dp)
     Column(
-        Modifier.fillMaxWidth().padding(top = 14.dp).clip(shape).background(AppColors.glass).border(1.dp, AppColors.hairline, shape)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+        Modifier.fillMaxWidth().padding(top = 10.dp).ringCard()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
     ) {
-        Text(stringResource(R.string.journal_title), color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+        Text(stringResource(R.string.journal_title), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
         Spacer(Modifier.height(4.dp))
         Text(stringResource(R.string.journal_hint), color = AppColors.muted, style = MaterialTheme.typography.bodyMedium)
         Spacer(Modifier.height(12.dp))
@@ -97,13 +96,13 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
             }
         } else {
             Spacer(Modifier.height(6.dp))
-            Box(Modifier.fillMaxWidth().height(1.dp).background(AppColors.hairline))
+            RingDivider()
             Spacer(Modifier.height(12.dp))
             Text(stringResource(R.string.journal_found), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
             result.findings.forEach { f ->
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.Top) {
-                    Box(Modifier.padding(top = 7.dp).size(9.dp).clip(CircleShape).background(if (f.good) Color(0xFF5FD3A6) else AppPalette.Coral))
+                    Box(Modifier.padding(top = 7.dp).size(9.dp).clip(CircleShape).background(if (f.good) RingColors.Recovery else RingColors.Energy))
                     Spacer(Modifier.width(10.dp))
                     Text(
                         stringResource(R.string.journal_finding, tagName(f.tag), effect(f), f.withDays, f.withoutDays),
@@ -119,15 +118,14 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
 
 @Composable
 private fun Chip(text: String, on: Boolean, modifier: Modifier, onClick: () -> Unit) {
-    val tint = if (on) AppPalette.Coral else AppColors.ink
+    // The rings design's choice: the chosen pill filled with the ink, the rest on the raised surface.
     Box(
-        modifier.clip(CircleShape).background(tint.copy(alpha = if (on) 0.16f else 0.06f))
-            .border(1.dp, if (on) AppPalette.Coral.copy(alpha = 0.6f) else AppColors.hairline, CircleShape)
+        modifier.clip(PillShape).background(if (on) AppColors.ink else AppColors.raised)
             .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 9.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text, color = if (on) AppPalette.Coral else AppColors.ink,
+            text, color = if (on) AppColors.onInk else AppColors.ink,
             style = MaterialTheme.typography.labelLarge.copy(fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
         )
     }

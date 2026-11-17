@@ -46,7 +46,6 @@ import org.openstrap.app.data.WidgetKind
 import org.openstrap.app.data.WorkoutRecorder
 import org.openstrap.app.data.Workouts
 import org.openstrap.app.device.WorkoutState
-import org.openstrap.app.ui.theme.ControlSurface
 import org.openstrap.app.ui.glow.draw.EdgeKind
 import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.GlowMood
@@ -131,8 +130,8 @@ private val OpenStyle = WidgetType.body.copy(color = ColorProvider(Color.Black),
 /** Back to the card's 20 dp side padding, for every row but the tile captions, which may run into it. */
 private val Inset = GlanceModifier.padding(horizontal = StartLayout.CAPTION_BLEED_DP.dp)
 
-/** The Large's hairline: white at 8%, at full strength in every mood (spec 2.2). */
-private const val HAIRLINE_ALPHA = 0.08f
+/** The Large's hairline: the rings theme's divider, white at 13% on the card. */
+private const val HAIRLINE_ALPHA = 0.13f
 
 /**
  * The widget at the size Glance lays out, lit from the right ([EdgeKind.Live]'s edge). The whole widget opens Ready
@@ -178,7 +177,7 @@ private fun ColumnScope.SmallContent(m: StartWidgetModel, f: WidgetFrame) {
     val words: @Composable () -> Unit = {
         if (WidgetRtl) {
             FontText(fit.words.name, WidgetText.BODY_SP, Color.White, strong = true)
-            fit.words.line?.let { FontText(it, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f)) }
+            fit.words.line?.let { FontText(it, WidgetText.SECONDARY_SP, RingWidget.Muted) }
         } else {
             Text(fit.words.name, style = NameStyle, maxLines = 1)
             fit.words.line?.let { Text(it, style = WidgetType.secondary, maxLines = 1) }
@@ -311,7 +310,7 @@ private fun UsualRow(m: StartWidgetModel, b: StartLayout.Block, f: WidgetFrame) 
                     if (words.mark) {
                         Spacer(GlanceModifier.width(StartLayout.MARK_GAP_DP.dp))
                         Image(
-                            ImageProvider(iconBitmap(SportIcons.Location, Color.White.copy(alpha = 0.72f), StartLayout.MARK_DP, f.density)),
+                            ImageProvider(iconBitmap(SportIcons.Location, RingWidget.Muted, StartLayout.MARK_DP, f.density)),
                             contentDescription = null,
                             modifier = GlanceModifier.size(StartLayout.MARK_DP.dp),
                             contentScale = ContentScale.FillBounds,
@@ -572,21 +571,24 @@ internal fun tileBitmap(icon: ImageVector, sizeDp: Float, cornerDp: Float, iconD
     val r = cornerDp * density
     val i = iconDp * density
     return renderToBitmap(s, s) { c ->
-        c.drawRoundRect(0f, 0f, s, s, r, r, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = ControlSurface.toArgb() })
+        c.drawRoundRect(0f, 0f, s, s, r, r, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = RingWidget.Card.toArgb() })
         drawIcon(c, icon, Color.White, (s - i) / 2, (s - i) / 2, i)
     }
 }
 
-/** The play button at [sz]: a white circle with the black play triangle, as Ready's Start. */
+/** The play button at [sz]: Energy's hue with the dark play triangle. */
 private fun playBitmap(sz: StartLayout.Sizes, density: Float): Bitmap = playBitmap(sz.play, sz.playIcon, density)
 
-/** The play button [sizeDp] across with its triangle [iconDp]: a white circle, the black play icon in the middle. */
+/**
+ * The play button [sizeDp] across with its triangle [iconDp]: the rings theme's one main call to action, a circle in
+ * Energy's hue with the play icon in dark ink.
+ */
 internal fun playBitmap(sizeDp: Float, iconDp: Float, density: Float): Bitmap {
     val s = sizeDp * density
     val i = iconDp * density
     return renderToBitmap(s, s) { c ->
-        c.drawCircle(s / 2, s / 2, s / 2, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.White.toArgb() })
-        drawIcon(c, AppIcons.PlayFill, Color.Black, (s - i) / 2, (s - i) / 2, i)
+        c.drawCircle(s / 2, s / 2, s / 2, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = RingWidget.Energy.toArgb() })
+        drawIcon(c, AppIcons.PlayFill, RingWidget.Ink, (s - i) / 2, (s - i) / 2, i)
     }
 }
 

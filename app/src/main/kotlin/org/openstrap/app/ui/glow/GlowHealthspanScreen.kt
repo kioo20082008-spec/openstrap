@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -53,18 +55,22 @@ private fun updatedText(asOf: Long): String {
 fun GlowHealthspanScreen(state: Healthspan.Outcome?, contentPadding: PaddingValues, onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     val r = state?.result
+    var info by androidx.compose.runtime.saveable.rememberSaveable { androidx.compose.runtime.mutableStateOf(false) }
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(
+        item {
+            PageHeader(
                 stringResource(R.string.glow_healthspan_title), onBack,
                 subtitle = r?.let { updatedText(it.asOf) } ?: stringResource(R.string.glow_healthspan_updated_weekly),
-            ) }
-        // The page is what the card opens, so here it opens nothing: no caret.
-        item { HabitAgeEdgeCard(state, onClick = null, onOpenProfile = null) }
+            ) { if (state != null) InfoButton(stringResource(R.string.glow_healthspan_about), { info = true }) }
+        }
+        // The rings design's detail hero: Habit Age's one ring, its line, and the age scale.
+        item { HabitAgeRingHero(state, Modifier.padding(top = 8.dp)) }
         if (r != null) {
             item { PacePanel(r.pace) }
             item { TermsPanel(r) }
         }
     }
+    if (info) HabitAgeInfo(state) { info = false }
 }
 
 /**

@@ -44,7 +44,7 @@ object GlowLayout {
     val Gutter = 20.dp
 
     /** Every card's corner, on every tier: glow, edge, list, strip and page panels. */
-    val CardCorner = 28.dp
+    val CardCorner = 22.dp
     val CardShape = RoundedCornerShape(CardCorner)
     /** A sheet's top corners match the cards'. */
     val SheetShape = RoundedCornerShape(topStart = CardCorner, topEnd = CardCorner)
@@ -63,7 +63,7 @@ object GlowLayout {
     /** The 1 dp hairline round a glow or edge card, and a chart's grid: white at 8% (spec 2.2, 2.7). */
     const val HairlineAlpha = 0.08f
     /** A list panel's border and the divider between its rows: white at 6%. */
-    const val DividerAlpha = 0.06f
+    const val DividerAlpha = 0.09f
 
     /** Title row to the hero number. */
     val TitleGap = 14.dp
@@ -337,12 +337,12 @@ internal const val ROW_CARET_ALPHA = 0.3f
 @Composable
 internal fun CardTitle(title: String, modifier: Modifier = Modifier) {
     if (!LocalCardOpens.current) {
-        Text(title, modifier, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(title, modifier, color = AppColors.ink, style = RingType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
         return
     }
     Layout(
         content = {
-            Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, color = AppColors.ink, style = RingType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
             TapCaret(CARD_CARET_ALPHA)
         },
         modifier = modifier,
@@ -471,7 +471,10 @@ internal fun NoteText(text: String) =
  */
 @Composable
 internal fun StateMarker(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier, color = AppColors.readable(MetricColors.warn), style = GlowType.caption, maxLines = 1)
+    Text(
+        text, modifier.clip(PillShape).background(MetricColors.warn.copy(alpha = 0.2f)).padding(horizontal = 10.dp, vertical = 3.dp),
+        color = AppColors.readable(MetricColors.warn), style = GlowType.caption, maxLines = 1,
+    )
 }
 
 /**
@@ -494,13 +497,14 @@ internal fun TitleMark(marker: String?, tag: TitleTag?, modifier: Modifier = Mod
  */
 @Composable
 internal fun OutlineTag(text: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
-    val shape = RoundedCornerShape(50)
+    val shape = PillShape
     val about = stringResource(R.string.glow_tag_about, text.lowercase())
+    // The rings design: a status word is a filled pill, never an outline.
     Text(
         text,
-        modifier.clip(shape).border(1.dp, AppColors.ink.copy(alpha = 0.22f), shape)
+        modifier.clip(shape).background(AppColors.raised)
             .let { if (onClick != null) it.clickable(onClickLabel = about, onClick = onClick) else it }
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-        color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, maxLines = 1,
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+        color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1,
     )
 }

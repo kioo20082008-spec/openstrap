@@ -38,7 +38,7 @@ import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.weekBars
 import org.openstrap.app.ui.glow.draw.weekStub
 import org.openstrap.app.ui.glow.draw.edgeLight
-import org.openstrap.app.ui.theme.MetricColors
+import org.openstrap.app.ui.theme.AppIcons
 
 /**
  * The Steps widget (widgets spec 3.3): today's steps against the goal, glanceable all day. The Wide adds what's to go
@@ -86,137 +86,31 @@ class StepsWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Steps' lime, as Today's Steps card. */
-private val Ink = MetricColors.steps
+/** Steps' hue in the rings theme. */
+private val Ink = RingWidget.Steps
 
-/** The goal bar's track (the mockup's): white at 10%. */
-private const val TRACK_ALPHA = 0.10f
-
-/** The widget at the size Glance lays out, lit from the bottom as Today's Steps card ([EdgeKind.Progress]). */
+/**
+ * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the share of the goal, and
+ * Steps' one ring filled toward the goal with the steps in the middle ([RingContent]). The Wide adds what's to go
+ * beside the ring; the Large this week under it.
+ */
 @Composable
 private fun StepsContent(data: StepsWidget.Shown) {
     val m = data.model
     val open = openMetric(LocalContext.current, DetailRoutes.STEPS, m.date)
     EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Progress), Ink, data.mood, open, BITMAP_EXTRA) { frame ->
-        when (frame.bucket) {
-            WidgetSizes.Small -> SmallContent(m, frame)
-            WidgetSizes.Wide -> WideContent(m, frame)
-            else -> LargeContent(m, frame)
-        }
-    }
-}
-
-/** Small: the top row, then the steps with "today", then the goal bar and the share of the goal. */
-@Composable
-private fun ColumnScope.SmallContent(m: StepsWidgetModel, f: WidgetFrame) {
-    val fit = StepsLayout.small(m.smallText, m.share, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    Edge(fit.spread, f)
-    TopRowView(m.title, null, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    // Each block one child of the column: Glance drops a column's children past ten.
-    Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
-        DotNumber(m.smallText, fit.dot, f.density, m.description)
-        if (fit.word) {
-            Spacer(GlanceModifier.height(StepsLayout.SMALL_WORD_GAP_DP.dp))
-            if (WidgetRtl) FontText(m.word, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f)) else Text(m.word, style = WidgetType.word, maxLines = 1)
-        }
-    }
-    Gap()
-    Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
-        GoalBar(m.progress, f)
-        if (fit.share) {
-            Spacer(GlanceModifier.height(StepsLayout.SMALL_BAR_GAP_DP.dp))
-            if (WidgetRtl) FontText(m.share, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f)) else Text(m.share, style = WidgetType.secondary, maxLines = 1)
-        }
-    }
-    Edge(fit.spread, f)
-}
-
-/** Wide: the top row with the goal, the steps with what's to go, the day so far as a line (or the goal bar). */
-@Composable
-private fun ColumnScope.WideContent(m: StepsWidgetModel, f: WidgetFrame) {
-    val fit = StepsLayout.wide(m, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    Edge(fit.spread, f)
-    TopRowView(m.title, m.goalNote, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    NumberRow(m, fit.row, f)
-    Gap()
-    StepsLine(m, fit.line, f)
-    Edge(fit.spread, f)
-}
-
-/** Large: the Wide plus this week, day by day against the goal. */
-@Composable
-private fun ColumnScope.LargeContent(m: StepsWidgetModel, f: WidgetFrame) {
-    val fit = StepsLayout.large(m, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    Edge(fit.spread, f)
-    TopRowView(m.title, m.goalNote, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    NumberRow(m, fit.row, f)
-    Gap()
-    StepsLine(m, fit.line, f)
-    Gap()
-    fit.week?.let { WeekRow(m, it, f.density) }
-    Edge(fit.spread, f)
-}
-
-/** The steps in dots with "today" beside them when it fits, what's to go (or "Goal met") on the right. */
-@Composable
-private fun NumberRow(m: StepsWidgetModel, row: StepsLayout.NumberRow, f: WidgetFrame) {
-    Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-        if (WidgetRtl) {
-            FontText(m.toGo, WidgetText.SECONDARY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
-            Spacer(GlanceModifier.defaultWeight())
-            if (row.word) {
-                FontText(m.word, WidgetText.BODY_SP.toFloat(), Color.White.copy(alpha = 0.72f))
-                Spacer(GlanceModifier.width(StepsLayout.WORD_GAP_DP.dp))
+        val small = frame.bucket == WidgetSizes.Small
+        val number = if (small) m.smallText else m.stepsText
+        val lines = listOf(RingLine(m.toGo))
+        if (frame.bucket != WidgetSizes.Large) {
+            RingContent(m.title, m.goalNote, m.share, RingWidget.Muted, Ink, m.progress, number, m.description, AppIcons.SneakerMoveFill, frame, lines)
+        } else {
+            val week = StepsLayout.week(m.weekLine, frame.contentWidth, frame.fontScale, m.week.size)
+            RingContent(m.title, m.goalNote, m.share, RingWidget.Muted, Ink, m.progress, number, m.description, AppIcons.SneakerMoveFill, frame, lines, week.height) {
+                WeekRow(m, week, frame.density)
             }
-            DotNumber(m.stepsText, row.dot, f.density, m.description)
-            return@Row
         }
-        DotNumber(m.stepsText, row.dot, f.density, m.description)
-        if (row.word) {
-            Spacer(GlanceModifier.width(StepsLayout.WORD_GAP_DP.dp))
-            Text(m.word, style = WidgetType.word, maxLines = 1)
-        }
-        Spacer(GlanceModifier.defaultWeight())
-        Text(m.toGo, style = WidgetType.secondary, maxLines = 1)
     }
-}
-
-/**
- * The day so far as the Steps card's line, solid in lime and ending in its dot, [height] dp high with the goal at the
- * top, so it fills as the day reaches the goal. The goal bar instead when there's no room or no step yet.
- */
-@Composable
-private fun StepsLine(m: StepsWidgetModel, height: Float?, f: WidgetFrame) {
-    if (!m.showLine || height == null) {
-        // No line (a large font, or none to draw): the goal bar shows the progress instead.
-        GoalBar(m.progress, f)
-        return
-    }
-    val w = f.drawContentWidth * f.density
-    val h = height * f.density
-    val bitmap = renderToBitmap(w, h) { c ->
-        ghostLineGeometry(m.line, null, m.lineMax, w, h, f.density)?.let { drawGhostLine(c, it, Ink, f.density) }
-    }
-    Image(
-        ImageProvider(bitmap),
-        contentDescription = LocalContext.current.getString(R.string.system_widget_steps_line_description, m.share),
-        modifier = GlanceModifier.fillMaxWidth().height(height.dp),
-        contentScale = ContentScale.FillBounds,
-    )
-}
-
-/** The goal bar: 4 dp, lime on white at 10%, as far as the goal, full past it. */
-@Composable
-private fun GoalBar(progress: Float, f: WidgetFrame) {
-    Image(
-        ImageProvider(goalBar(progress, f.drawContentWidth, f.density).let { if (WidgetRtl) mirrored(it) else it }),
-        contentDescription = null,
-        modifier = GlanceModifier.fillMaxWidth().height(StepsLayout.BAR_DP.dp),
-        contentScale = ContentScale.FillBounds,
-    )
 }
 
 /** "This week" and how many days met the goal on one line, then a bar a day under it, from the week's first day. */
@@ -244,19 +138,6 @@ private fun WeekRow(m: StepsWidgetModel, week: StepsLayout.Week, density: Float)
 
 /** Room for the dots, the line, the bar and the week beside the backgrounds, in the bitmap budget. */
 private const val BITMAP_EXTRA = 1.35
-
-/** The goal bar [width] dp wide at [density]: the track, then the fill as far as [progress]. */
-private fun goalBar(progress: Float, width: Float, density: Float): Bitmap {
-    val w = width * density
-    val h = StepsLayout.BAR_DP * density
-    val r = h / 2
-    return renderToBitmap(w, h) { c ->
-        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        c.drawRoundRect(0f, 0f, w, h, r, r, paint.apply { color = Color.White.copy(alpha = TRACK_ALPHA).toArgb() })
-        val fill = w * progress.coerceIn(0f, 1f)
-        if (fill > 0f) c.drawRoundRect(0f, 0f, fill.coerceAtLeast(h), h, r, r, paint.apply { color = Ink.toArgb() })
-    }
-}
 
 /** This week's bars: a met day lime, a missed one white at 30%, today white, a day to come a stub at 12%. */
 private fun weekBitmap(m: StepsWidgetModel, column: Float, density: Float): Bitmap {

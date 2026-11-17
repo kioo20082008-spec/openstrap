@@ -204,15 +204,9 @@ private val OverGlow: Color get() = AppColors.ink.copy(alpha = 0.16f)
 private val WorkGlow by lazy { phaseGlow(WorkRed, fromTop = false) }
 private val RestGlow by lazy { phaseGlow(RestGreen, fromTop = true) }
 
-private fun phaseGlow(color: Color, fromTop: Boolean) = object : ShaderBrush() {
-    override fun createShader(size: Size) = RadialGradientShader(
-        Offset(size.width / 2f, if (fromTop) -size.height * 0.08f else size.height * 1.08f),
-        size.height * if (fromTop) 0.7f else 0.88f,
-        // A white-hot core in the phase's colour, as on the boards.
-        listOf(lerp(color, Color.White, 0.6f), color.copy(alpha = 0.85f), color.copy(alpha = 0.3f), Color.Transparent),
-        listOf(0f, 0.3f, 0.62f, 1f),
-    )
-}
+// Flat in the rings design: the phase's colour as a quiet wash over the whole screen, no gradient.
+@Suppress("UNUSED_PARAMETER")
+private fun phaseGlow(color: Color, fromTop: Boolean): androidx.compose.ui.graphics.Brush = androidx.compose.ui.graphics.SolidColor(color.copy(alpha = 0.16f))
 
 /** Skip, Done ([done], with a tick) or Skip rest on the controls row's left, labelled under it. */
 @Composable
@@ -270,14 +264,14 @@ private fun ColumnScope.PhaseFigure(
     }
     if (compact) {
         Row(Modifier.fillMaxWidth().then(if (shortLandscape(compact)) Modifier else Modifier.weight(1f)), horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally), verticalAlignment = Alignment.CenterVertically) {
-            Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord, maxLines = 1)
+            Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), maxLines = 1)
             if (seconds != null) DotMatrixText(seconds, dot = DotSize.Detail)
             action?.invoke()
         }
         return
     }
     Column(Modifier.fillMaxWidth().weight(1f), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterVertically)) {
-        Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord)
+        Text(word.uppercase(), color = AppColors.ink, style = GlowType.phaseWord.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold))
         if (seconds != null) DotMatrixText(seconds, dot = DotSize.Live, scale = 1.4f)
         if (line.isNotEmpty()) Text(line, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, textAlign = TextAlign.Center)
     }

@@ -1,6 +1,14 @@
 package org.openstrap.app.ui.glow
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDirection
+import androidx.compose.ui.unit.sp
+import org.openstrap.app.ui.theme.NumberFamily
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,10 +28,6 @@ import androidx.compose.ui.unit.dp
 import org.openstrap.app.R
 import org.openstrap.app.ui.dashboard.DayUiState
 import org.openstrap.app.ui.theme.MetricColors
-import org.openstrap.app.ui.glow.draw.GlowMotion
-import org.openstrap.app.ui.glow.draw.GlowStyle
-import org.openstrap.app.ui.glow.draw.DotSize
-import org.openstrap.app.ui.glow.draw.chart
 
 /**
  * The top half of a foldable standing half-open on a table: your heart rate, big enough to read from across
@@ -39,9 +43,10 @@ fun GlowTabletopHeart(
     modifier: Modifier = Modifier,
 ) {
     val now = live ?: state.latestHeartRate
-    val style = GlowStyle.chart(MetricColors.heart).copy(motion = GlowMotion.Heartbeat(now ?: 62))
+    // The rings theme: one flat solid card, the number bold, no glow.
+    val hue = MetricColors.heart
     Column(modifier.statusBarsPadding().padding(horizontal = GlowLayout.Gutter, vertical = 12.dp)) {
-        GlowCard(style, Modifier.fillMaxSize()) {
+        Column(Modifier.fillMaxSize().clip(TabletopCard).background(AppColors.glass, TabletopCard).padding(horizontal = 20.dp, vertical = 18.dp)) {
             Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
                 GlowHeader(
                     stringResource(R.string.glow_tabletop_heart_rate),
@@ -54,16 +59,16 @@ fun GlowTabletopHeart(
                                     style = GlowType.secondary,
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                GlowSwitch(on, onLiveToggle, accent = style.color)
+                                GlowSwitch(on, onLiveToggle, accent = hue)
                             }
                         }
                     },
                 )
                 Row(verticalAlignment = Alignment.Bottom) {
-                    DotMatrixText(now?.toString() ?: "-", dot = DotSize.Live)
+                    Text(now?.toString() ?: "-", color = AppColors.ink, style = TabletopNumber, maxLines = 1)
                     Column(Modifier.padding(start = 12.dp).weight(1f)) {
                         Text(
-                            stringResource(R.string.glow_unit_bpm), color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.cardTitle,
+                            stringResource(R.string.glow_unit_bpm), color = AppColors.readable(hue), style = GlowType.cardTitle,
                             maxLines = 1,
                         )
                     }
@@ -87,3 +92,13 @@ fun GlowTabletopHeart(
         }
     }
 }
+
+/** The tabletop card's corners, the rings theme's 22 dp. */
+private val TabletopCard = RoundedCornerShape(22.dp)
+
+/** The heart rate across the room: bold, left to right, tabular. */
+private val TabletopNumber
+    get() = TextStyle(
+        textDirection = TextDirection.Ltr, fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = 112.sp,
+        lineHeight = 112.sp, fontFeatureSettings = "tnum",
+    )

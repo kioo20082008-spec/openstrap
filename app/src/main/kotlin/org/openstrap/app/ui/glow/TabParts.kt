@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -95,42 +96,36 @@ internal fun <T> GridRowBlock(row: GridRow<T>, draw: @Composable (T, Modifier) -
 }
 
 /**
- * A contributor bar (chart kit): the [name] on its own line, so it never wraps beside the bar, then a bar filled to
- * [fraction] (0..1) with the [word] after it. Bar and word take [color] only when [offNormal]; otherwise they stay
- * white. [detail] is a dim line under the name (the reading behind it), [onClick] opens what the row is part of (with
- * the tap caret at the end), and [divider] draws the hairline above the row.
+ * A contributor row in the rings design: the [name] (with its [detail] under it, the reading behind it) at the start and
+ * its [word] as a pill at the end, in Energy's hue when [offNormal] and neutral otherwise. [fraction] stays for the
+ * callers; the pill carries the meaning. [onClick] opens what the row is part of (with the tap caret at the end), and
+ * [divider] draws the hairline above the row.
  */
 @Composable
 internal fun ContributorRow(
-    name: String, color: Color, word: String, fraction: Float, offNormal: Boolean = false, divider: Boolean = true,
-    detail: String? = null, onClick: (() -> Unit)? = null,
+    name: String, @Suppress("UNUSED_PARAMETER") color: Color, word: String, @Suppress("UNUSED_PARAMETER") fraction: Float,
+    offNormal: Boolean = false, divider: Boolean = true, detail: String? = null, onClick: (() -> Unit)? = null,
 ) {
-    val accent = if (offNormal) AppColors.readable(color) else AppColors.ink.copy(alpha = 0.7f)
     // Tapped, the row grows into what it opens (spec 3.5).
     val opening = cardOpening(onClick)
     Row(
         Modifier.fillMaxWidth()
+            .heightIn(min = 46.dp)
             .then(opening?.modifier ?: Modifier)
             .let { if (onClick != null) it.clickable(onClick = opening?.onClick ?: onClick) else it }
             .topHairline(divider, RowHairline)
-            .padding(vertical = GlowLayout.RowPadding),
+            .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
             Text(name, color = AppColors.ink, style = GlowType.body, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis)
             if (detail != null) Text(
-                detail, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary.copy(fontSize = 11.5.sp), maxLines = 2,
+                detail, color = AppColors.muted, style = GlowType.secondary.copy(fontSize = 11.5.sp), maxLines = 2,
                 modifier = Modifier.padding(top = 2.dp),
             )
-            Row(Modifier.fillMaxWidth().padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-                val shape = RoundedCornerShape(3.dp)
-                Box(Modifier.weight(1f).height(6.dp).background(AppColors.ink.copy(alpha = 0.07f), shape)) {
-                    Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).height(6.dp).background(accent, shape))
-                }
-                Spacer(Modifier.width(12.dp))
-                Text(word, color = if (offNormal) accent else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
-            }
         }
+        Spacer(Modifier.width(12.dp))
+        StatusPill(word, if (offNormal) RingColors.Energy else null)
         if (onClick != null) {
             Spacer(Modifier.width(RowCaretGap))
             TapCaret(ROW_CARET_ALPHA)

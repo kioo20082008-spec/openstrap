@@ -4,7 +4,6 @@ import org.openstrap.app.R
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.DayWords
 import androidx.compose.ui.res.stringResource
-import org.openstrap.app.ui.glow.draw.EdgeSurface
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
@@ -25,6 +24,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.widthIn
+import org.openstrap.app.ui.theme.NumberFamily
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -319,17 +321,18 @@ internal object StoryRouteShape {
 }
 
 /**
- * The card for [card], at [StoryWidth] by [StoryHeight] in whatever density it's given: over [photo] with the dark
- * fade, else lit from below in its colour, and a run's [route] as a glowing white line when there is one.
+ * The card for [card], at [StoryWidth] by [StoryHeight] in whatever density it's given, in the rings theme: over
+ * [photo] with the dark fade, else flat near-black with no light, the card's figures bold in its one hue, and a run's
+ * [route] as a solid line in that hue when there is one.
  */
 @Composable
 internal fun StoryCardView(card: StoryCard, photo: ImageBitmap?, route: List<Route.Point>, modifier: Modifier = Modifier) {
-    Box(modifier.size(StoryWidth, StoryHeight).background(EdgeSurface)) {
+    Box(modifier.size(StoryWidth, StoryHeight).background(StoryPage)) {
         if (photo != null) {
             Image(photo, null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
             if (card is StoryCard.Big) BigFade() else PhotoFade(top = card !is StoryCard.Run && card !is StoryCard.Game)
-        } else StoryGlow(storyColor(card), if (card is StoryCard.Calm) 0.6f else 0.95f)
-        if (route.size >= 2) RouteLine(route, Modifier.fillMaxWidth().padding(horizontal = 48.dp).padding(top = 110.dp).height(240.dp))
+        }
+        if (route.size >= 2) RouteLine(route, storyColor(card), Modifier.fillMaxWidth().padding(horizontal = 48.dp).padding(top = 110.dp).height(240.dp))
         Box(Modifier.fillMaxSize().padding(24.dp)) {
             when (card) {
                 is StoryCard.Run -> RunStory(card)
@@ -352,32 +355,52 @@ private fun storyColor(card: StoryCard): Color = when (card) {
     else -> familyColor(card.family)
 }
 
-/** Where the board's light sits, in card heights from the top, and its size in card widths and heights. */
-private const val STORY_LIGHT_BELOW = 1.12f
-private const val STORY_LIGHT_WIDTH = 1.3f
-private const val STORY_LIGHT_HEIGHT = 0.65f
+/** The rings theme's share card: flat near-black, its chips on the card grey, its dimmer text muted grey. */
+private val StoryPage = Color(0xFF0A0A0C)
+private val StoryCardGrey = Color(0xFF17171B)
+private val StoryMuted = Color(0xFFA7A7B0)
 
-/** The light's middle stop, as a share of its strength, and its fixed rim before it fades out. */
-private const val STORY_LIGHT_MID_AT = 0.38f
-private const val STORY_LIGHT_MID = 0.47f
-private const val STORY_LIGHT_RIM_AT = 0.7f
-private const val STORY_LIGHT_RIM = 0.08f
+/** The rings theme's figures: bold in the numbers' face, Western digits left to right. */
+private val StoryStatStyle get() = androidx.compose.ui.text.TextStyle(
+    textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = NumberFamily,
+    fontWeight = FontWeight.ExtraBold, fontSize = 30.sp, lineHeight = 36.sp,
+)
+private val StoryTitleStyle get() = StoryTitleStyle.copy(fontWeight = FontWeight.ExtraBold)
 
 /**
- * The board's light from below: an ellipse wider than the card centred under its foot, from [strength] of [color] to
- * black at its edge.
+ * A card's one big figure, [value] bold in [color] with [unit] after it on its baseline in muted grey, shrunk to
+ * [maxWidth] when long. Replaces the dotted number of the old look.
  */
 @Composable
-private fun StoryGlow(color: Color, strength: Float) {
-    Box(
-        Modifier.fillMaxSize().drawBehind {
-            drawCardLight(
-                color, Offset(size.width / 2, size.height * STORY_LIGHT_BELOW),
-                size.width * STORY_LIGHT_WIDTH, size.height * STORY_LIGHT_HEIGHT,
-                listOf(0f to strength, STORY_LIGHT_MID_AT to strength * STORY_LIGHT_MID, STORY_LIGHT_RIM_AT to STORY_LIGHT_RIM),
-            )
-        },
-    )
+private fun StoryHero(value: String, unit: String, color: Color, maxWidth: androidx.compose.ui.unit.Dp, size: androidx.compose.ui.unit.TextUnit = 64.sp) {
+    Row(Modifier.widthIn(max = maxWidth), verticalAlignment = Alignment.Bottom) {
+        Text(
+            value, color = color, maxLines = 1, softWrap = false,
+            style = StoryStatStyle.copy(fontSize = size, lineHeight = size),
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        if (unit.isNotBlank()) Text(unit, color = StoryMuted, style = GlowType.body, maxLines = 1, modifier = Modifier.padding(start = 10.dp, bottom = 8.dp))
+    }
+}
+
+/**
+ * The week's ring: one thick ring in [color], [share] of it from the top, round capped, with [count] bold in the
+ * middle (the rings theme's hero, as [RingStatCard]'s).
+ */
+@Composable
+private fun StoryRing(count: String, share: Float, color: Color, modifier: Modifier = Modifier) {
+    Box(modifier.size(220.dp), contentAlignment = Alignment.Center) {
+        Canvas(Modifier.size(220.dp)) {
+            val w = 26.dp.toPx()
+            val d = size.minDimension - w
+            val tl = Offset((size.width - d) / 2f, (size.height - d) / 2f)
+            val arc = androidx.compose.ui.geometry.Size(d, d)
+            drawArc(color.copy(alpha = 0.2f), 0f, 360f, false, tl, arc, style = Stroke(w))
+            val sweep = 360f * share.coerceIn(0f, 1f)
+            if (sweep > 0f) drawArc(color, -90f, sweep, false, tl, arc, style = Stroke(w, cap = StrokeCap.Round))
+        }
+        Text(count, color = Color.White, maxLines = 1, style = StoryStatStyle.copy(fontSize = 72.sp, lineHeight = 72.sp))
+    }
 }
 
 /** The dark fade over a photo: up from the foot so the figures read, and down from the top when the card has text there. */
@@ -395,26 +418,14 @@ private fun PhotoFade(top: Boolean) {
     }
 }
 
-/** The route as a white line with a soft white glow round it, fitted into the space it's given. */
+/** The route as one solid line in [color], round capped, fitted into the space it's given: no glow in the rings theme. */
 @Composable
-private fun RouteLine(route: List<Route.Point>, modifier: Modifier) {
+private fun RouteLine(route: List<Route.Point>, color: Color, modifier: Modifier) {
     Canvas(modifier) {
         val points = StoryRouteShape.fit(route, size.width, size.height)
         if (points.size < 2) return@Canvas
         val path = Path().apply { moveTo(points[0].x, points[0].y); points.drop(1).forEach { lineTo(it.x, it.y) } }
-        // The glow: one blurred stroke under the line, so it fades smoothly instead of in steps.
-        drawIntoCanvas { canvas ->
-            val glow = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-                style = android.graphics.Paint.Style.STROKE
-                strokeWidth = 8.dp.toPx()
-                strokeCap = android.graphics.Paint.Cap.ROUND
-                strokeJoin = android.graphics.Paint.Join.ROUND
-                color = android.graphics.Color.argb(150, 255, 255, 255)
-                maskFilter = android.graphics.BlurMaskFilter(8.dp.toPx(), android.graphics.BlurMaskFilter.Blur.NORMAL)
-            }
-            canvas.nativeCanvas.drawPath(path.asAndroidPath(), glow)
-        }
-        drawPath(path, Color.White, style = Stroke(4.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
+        drawPath(path, color, style = Stroke(5.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round))
     }
 }
 
@@ -430,12 +441,12 @@ private fun Brand(ring: Boolean = false) {
     }
 }
 
-/** A best or the weekly goal on a dark pill, its icon in its colour. */
+/** A best or the weekly goal as a status pill on the card grey, 12 dp round, its icon in its colour. */
 @Composable
 private fun StoryChipView(chip: StoryChip) {
     val (icon, tint) = if (chip.best) AppIcons.FlagCheckered to MetricColors.calories else AppIcons.Target to if (chip.met) MetricColors.good else Color.White
     Row(
-        Modifier.height(30.dp).clip(CircleShape).background(Color.Black.copy(alpha = 0.45f)).padding(start = 10.dp, end = 12.dp),
+        Modifier.height(30.dp).clip(RoundedCornerShape(12.dp)).background(StoryCardGrey).padding(start = 10.dp, end = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(icon, null, tint = tint, modifier = Modifier.size(15.dp))
@@ -457,15 +468,15 @@ private fun RunStory(card: StoryCard.Run) {
             card.stats.forEach { s ->
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text(s.value, color = Color.White, style = GlowType.storyStat, maxLines = 1)
+                        Text(s.value, color = Color.White, style = StoryStatStyle, maxLines = 1)
                         s.unit?.let { Text(" $it", color = Color.White, style = GlowType.body, maxLines = 1, modifier = Modifier.padding(bottom = 3.dp)) }
                     }
-                    Text(s.label, color = Color.White.copy(alpha = StoryDim), style = GlowType.secondary, maxLines = 1)
+                    Text(s.label, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
                 }
             }
         }
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Text(card.footer, color = Color.White.copy(alpha = StoryDim), style = GlowType.secondary, maxLines = 1, modifier = Modifier.weight(1f))
+            Text(card.footer, color = StoryMuted, style = GlowType.secondary, maxLines = 1, modifier = Modifier.weight(1f))
             Brand()
         }
     }
@@ -474,8 +485,8 @@ private fun RunStory(card: StoryCard.Run) {
 /** When, then the sport large, as the strength and HIIT cards open. */
 @Composable
 private fun StoryHeading(whenLine: String, sport: String) {
-    Text(whenLine, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
-    Text(sport, color = Color.White, style = GlowType.storyTitle, maxLines = 1, modifier = Modifier.padding(top = 4.dp))
+    Text(whenLine, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
+    Text(sport, color = Color.White, style = StoryTitleStyle, maxLines = 1, modifier = Modifier.padding(top = 4.dp))
 }
 
 /** Board ShareStrength: kg lifted in dots, each exercise and the total as rows, the best and the brand at the foot. */
@@ -483,7 +494,7 @@ private fun StoryHeading(whenLine: String, sport: String) {
 private fun LiftStory(card: StoryCard.Lift) {
     Column(Modifier.fillMaxSize()) {
         StoryHeading(card.whenLine, card.sport)
-        Box(Modifier.padding(top = 30.dp)) { HeroValue(card.value, card.unit, dot = DotSize.Detail, gap = 10.dp, maxWidth = 250.dp) }
+        Box(Modifier.padding(top = 30.dp)) { StoryHero(card.value, card.unit, storyColor(card), 250.dp) }
         Column(Modifier.padding(top = 26.dp)) {
             card.rows.forEachIndexed { i, (name, text) ->
                 if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.12f)))
@@ -513,15 +524,15 @@ private fun IndoorStory(card: StoryCard.Indoor) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f)) { Brand() }
-            Text(card.date, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+            Text(card.date, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
         }
         Spacer(Modifier.weight(1f))
         Text(card.sport, color = Color.White, style = GlowType.cardTitle, maxLines = 1, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         Box(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 10.dp), contentAlignment = Alignment.Center) {
-            DotMatrixText(card.time, dot = DotSize.Detail, scale = dotFitScale(card.time, DotSize.Detail, 310.dp))
+            StoryHero(card.time, "", storyColor(card), 310.dp, 80.sp)
         }
         Text(
-            stringResource(R.string.glow_share_workout_time), color = Color.White.copy(alpha = StoryDim), style = GlowType.secondary,
+            stringResource(R.string.glow_share_workout_time), color = StoryMuted, style = GlowType.secondary,
             maxLines = 1, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
         )
         Spacer(Modifier.weight(1f))
@@ -541,17 +552,18 @@ private fun WeekStory(card: StoryCard.Week) {
     Column(Modifier.fillMaxSize()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Box(Modifier.weight(1f)) { Brand() }
-            Text(card.range, color = Color.White.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+            Text(card.range, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
         }
         Spacer(Modifier.weight(1f))
         Text(
             stringResource(R.string.glow_share_my_week), color = Color.White, style = GlowType.cardTitle, maxLines = 1,
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth(),
         )
-        Box(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 10.dp), contentAlignment = Alignment.Center) {
-            DotMatrixText(card.count, dot = DotSize.Live, scale = dotFitScale(card.count, DotSize.Live, 310.dp))
+        Box(Modifier.fillMaxWidth().padding(top = 18.dp, bottom = 14.dp), contentAlignment = Alignment.Center) {
+            val share = if (card.days.isEmpty()) 0f else card.days.count { it.second } / card.days.size.toFloat()
+            StoryRing(card.count, share, storyColor(card))
         }
-        Text(card.goalLine, color = Color.White.copy(alpha = StoryDim), style = GlowType.secondary, maxLines = 1, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+        Text(card.goalLine, color = StoryMuted, style = GlowType.secondary, maxLines = 1, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
         WeekDots(card.days, Color.White, Modifier.padding(top = 28.dp), dot = 34.dp)
         Spacer(Modifier.weight(1f))
         if (card.totals.isNotEmpty()) WeekFigures(card.totals)
@@ -573,10 +585,10 @@ private fun WeekFigures(figures: List<WeekFigure>) {
             Column(Modifier.weight(1f)) {
                 Icon(f.icon, null, tint = Color.White.copy(alpha = 0.85f), modifier = Modifier.size(18.dp))
                 Row(Modifier.padding(top = 8.dp), verticalAlignment = Alignment.Bottom) {
-                    Text(f.value, color = Color.White, style = GlowType.storyStat, maxLines = 1)
+                    Text(f.value, color = Color.White, style = StoryStatStyle, maxLines = 1)
                     f.unit?.let { Text(" $it", color = Color.White, style = GlowType.body, maxLines = 1, modifier = Modifier.padding(bottom = 3.dp)) }
                 }
-                Text(f.label, color = Color.White.copy(alpha = StoryDim), style = GlowType.secondary, maxLines = 1)
+                Text(f.label, color = StoryMuted, style = GlowType.secondary, maxLines = 1)
             }
         }
     }
@@ -587,7 +599,7 @@ private fun WeekFigures(figures: List<WeekFigure>) {
 private fun RoundsStory(card: StoryCard.Rounds) {
     Column(Modifier.fillMaxSize()) {
         StoryHeading(card.whenLine, card.sport)
-        Box(Modifier.padding(top = 30.dp)) { HeroValue(card.done, card.unit, dot = DotSize.Detail, gap = 10.dp, maxWidth = 200.dp) }
+        Box(Modifier.padding(top = 30.dp)) { StoryHero(card.done, card.unit, storyColor(card), 200.dp) }
         if (card.peaks.isNotEmpty()) {
             val heartZones = LocalHeartZones.current
             // Each round's peak in its zone's colour, white once it reached the top zone.
@@ -605,9 +617,9 @@ private fun RoundsStory(card: StoryCard.Rounds) {
 private fun CalmStory(card: StoryCard.Calm) {
     Column(Modifier.fillMaxSize()) {
         Text(card.sport, color = Color.White.copy(alpha = 0.85f), style = GlowType.body.copy(fontWeight = FontWeight.Medium), maxLines = 1)
-        Text(card.whenLine, color = Color.White.copy(alpha = 0.55f), style = GlowType.secondary, maxLines = 1, modifier = Modifier.padding(top = 2.dp))
+        Text(card.whenLine, color = StoryMuted, style = GlowType.secondary, maxLines = 1, modifier = Modifier.padding(top = 2.dp))
         Spacer(Modifier.weight(1f))
-        HeroValue(card.minutes, card.unit, dot = DotSize.Detail, gap = 10.dp, maxWidth = 250.dp)
+        StoryHero(card.minutes, card.unit, storyColor(card), 250.dp)
         card.line?.let { Text(it, color = Color.White, style = GlowType.sentence, maxLines = 1, modifier = Modifier.padding(top = 16.dp)) }
         // The heart rate through the session as one soft white line.
         PlainLine(card.heart, Color.White.copy(alpha = 0.55f), 40.dp, Modifier.padding(top = 16.dp), smooth = false, stroke = 2.dp)
@@ -621,7 +633,7 @@ private fun CalmStory(card: StoryCard.Calm) {
 private fun GameStory(card: StoryCard.Game) {
     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {
         Text(card.sport, color = Color.White, style = GlowType.body.copy(fontWeight = FontWeight.Medium), maxLines = 1)
-        Box(Modifier.padding(top = 12.dp)) { HeroValue(card.minutes, card.unit, gap = 10.dp, maxWidth = 250.dp) }
+        Box(Modifier.padding(top = 12.dp)) { StoryHero(card.minutes, card.unit, Color.White, 250.dp, 80.sp) }
         card.load?.let { GameLine(it, Modifier.padding(top = 14.dp)) }
         card.peak?.let { GameLine(it, Modifier.padding(top = 2.dp)) }
         Box(Modifier.padding(top = 16.dp)) { Brand(ring = true) }
@@ -649,7 +661,7 @@ private fun BigFade() {
 @Composable
 private fun BigStory(card: StoryCard.Big) {
     val shadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(alpha = 0.45f), blurRadius = with(androidx.compose.ui.platform.LocalDensity.current) { 10.dp.toPx() })
-    val number = GlowType.flaskNumber.copy(shadow = shadow)
+    val number = GlowType.flaskNumber.copy(fontWeight = FontWeight.ExtraBold, shadow = shadow)
     Column(Modifier.fillMaxSize().padding(vertical = 4.dp), verticalArrangement = Arrangement.SpaceBetween) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Text(card.sport, color = Color.White, style = GlowType.body.copy(fontWeight = FontWeight.Bold, shadow = shadow), maxLines = 1, modifier = Modifier.weight(1f))
@@ -659,13 +671,13 @@ private fun BigStory(card: StoryCard.Big) {
             )
         }
         Column {
-            Text(card.minutes, color = Color.White, style = number.copy(fontSize = 150.sp, lineHeight = 150.sp, letterSpacing = (-7).sp), maxLines = 1, softWrap = false)
+            Text(card.minutes, color = Color.White, style = number.copy(fontSize = 128.sp, lineHeight = 132.sp, letterSpacing = (-4).sp), maxLines = 1, softWrap = false)
             Text(card.line, color = Color.White, style = GlowType.cardTitle.copy(fontWeight = FontWeight.Bold, shadow = shadow), maxLines = 1)
             Box(Modifier.padding(top = 10.dp).fillMaxWidth().height(1.dp).background(Color.White.copy(alpha = 0.5f)))
             Row(Modifier.padding(top = 10.dp), horizontalArrangement = Arrangement.spacedBy(22.dp), verticalAlignment = Alignment.CenterVertically) {
                 card.stats.forEach { s ->
                     Row(verticalAlignment = Alignment.Bottom) {
-                        Text(s.value, color = Color.White, style = number.copy(fontWeight = FontWeight.Light, fontSize = 20.sp, lineHeight = 24.sp, letterSpacing = 0.sp), maxLines = 1)
+                        Text(s.value, color = Color.White, style = number.copy(fontWeight = FontWeight.Bold, fontSize = 20.sp, lineHeight = 24.sp, letterSpacing = 0.sp), maxLines = 1)
                         Text(s.label, color = Color.White, style = GlowType.secondary.copy(shadow = shadow), maxLines = 1, modifier = Modifier.padding(start = 5.dp, bottom = 2.dp))
                     }
                 }

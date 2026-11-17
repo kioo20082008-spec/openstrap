@@ -196,7 +196,7 @@ internal fun RingSkyHero(
 ) {
     val share = animatedShare((score ?: 0) / 100f)
     val hue = RingColors.Sleep
-    val glass = RoundedCornerShape(24.dp)
+    val glass = RoundedCornerShape(22.dp)
     Column(
         Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onOpen).padding(vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -220,14 +220,14 @@ internal fun RingSkyHero(
         Spacer(Modifier.height(14.dp))
         Text(line, Modifier.fillMaxWidth(), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), textAlign = TextAlign.Center)
         Spacer(Modifier.height(14.dp))
-        Row(Modifier.fillMaxWidth().clip(glass).background(GlassFill).border(1.dp, GlassEdge, glass).padding(horizontal = 18.dp, vertical = 12.dp)) {
+        Row(Modifier.fillMaxWidth().clip(glass).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 12.dp)) {
             Text(start, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
             Spacer(Modifier.weight(1f))
             Text(end, color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
         }
         if (stages.isNotEmpty()) {
             Spacer(Modifier.height(10.dp))
-            Column(Modifier.fillMaxWidth().clip(glass).background(GlassFill).border(1.dp, GlassEdge, glass).padding(horizontal = 16.dp, vertical = 8.dp)) {
+            Column(Modifier.fillMaxWidth().clip(glass).background(AppColors.glass).padding(horizontal = 16.dp, vertical = 8.dp)) {
                 // The night in one bar, each stage as wide as its share.
                 Row(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 6.dp).height(22.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     stages.forEach { s -> Box(Modifier.weight(s.share.coerceAtLeast(0.02f)).fillMaxHeight().clip(RoundedCornerShape(7.dp)).background(s.color)) }

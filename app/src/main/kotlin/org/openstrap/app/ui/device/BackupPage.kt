@@ -10,9 +10,7 @@ import org.openstrap.app.data.settings.BackupState
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.PageSwitchRow
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.theme.AppIcons
 
 /**
@@ -38,9 +36,9 @@ fun BackupPage(
     val now = remember(state, backingUp) { System.currentTimeMillis() / 1000 }
     val toggle = { on: Boolean -> if (on) onTurnOn() else onTurnOff() }
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_backup_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_backup_title), onBack) }
         item {
-            PageRows {
+            RingsRows {
                 PageSwitchRow(
                     stringResource(R.string.you_backup_automatic), BackupCopy.status(state, now), state.on, toggle, divider = false,
                     icon = AppIcons.ShieldCheck,

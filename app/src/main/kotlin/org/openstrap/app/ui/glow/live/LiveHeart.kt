@@ -286,7 +286,7 @@ internal fun WorkoutHeartCard(
                 if (zone != null) {
                     // "Zone 3, aerobic": two text elements, the name a step quieter.
                     val (name, word) = WorkoutCopy.zoneTitle(zone)
-                    Text(name, color = AppColors.ink, style = GlowType.sentence)
+                    Text(name, color = AppColors.ink, style = GlowType.sentence.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold))
                     Spacer(Modifier.width(6.dp))
                     Text(word, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.sentence, modifier = Modifier.weight(1f))
                     Text(zoneRange(zone, r.maxHeartRate), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary)

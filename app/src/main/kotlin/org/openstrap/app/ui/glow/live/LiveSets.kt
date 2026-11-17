@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow.live
 
+import androidx.compose.ui.unit.sp
 import org.openstrap.app.presentation.WorkoutColors
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.Canvas
@@ -385,7 +386,7 @@ private fun SetDots(done: Int, target: Int?, inSet: Boolean, modifier: Modifier 
 private fun HeartLine(bpm: Int?, maxHr: Int, paused: Boolean) {
     val heartZones = LocalHeartZones.current
     Row(verticalAlignment = Alignment.Bottom) {
-        Text(bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink, style = GlowType.sentence)
+        Text(bpm?.toString() ?: WorkoutCopy.noHeartRate(paused), color = AppColors.ink, style = if (bpm != null) org.openstrap.app.ui.workout.ringFigure(22.sp) else GlowType.sentence)
         if (bpm != null) {
             Spacer(Modifier.width(6.dp))
             Text(
@@ -498,7 +499,7 @@ private fun LogStepper(label: String, value: String, less: String, more: String,
     Column(modifier.clip(GlowLayout.CardShape).background(org.openstrap.app.ui.glow.ListSurface).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         MinusPlus(less, more, onLess, onMore) {
-            Text(value, color = AppColors.ink, style = GlowType.pageTitle, textAlign = TextAlign.Center)
+            Text(value, color = AppColors.ink, style = org.openstrap.app.ui.workout.ringFigure(24.sp), textAlign = TextAlign.Center)
         }
     }
 }
@@ -518,7 +519,7 @@ private fun ExerciseSheet(current: String?, used: List<String>, onPick: (String?
             keyboardActions = KeyboardActions(onDone = { if (typed.isNotBlank()) onPick(typed) }),
             decorationBox = { field ->
                 Row(
-                    Modifier.fillMaxWidth().height(48.dp).clip(GlowLayout.TileShape).background(Raised).padding(horizontal = 16.dp),
+                    Modifier.fillMaxWidth().height(48.dp).clip(CircleShape).background(Raised).padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(Modifier.weight(1f)) {

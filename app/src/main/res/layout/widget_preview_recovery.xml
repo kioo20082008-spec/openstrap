@@ -31,7 +31,7 @@
         android:text="78"
         android:textSize="40sp"
         android:textColor="#FFFFFFFF"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="sans-serif-black"
         android:maxLines="1"
         android:includeFontPadding="true" />
     <TextView
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:text="Recovered"
         android:textSize="15sp"
-        android:textColor="#B8FFFFFF"
+        android:textColor="#FFA7A7B0"
         android:maxLines="1"
         android:includeFontPadding="true" />
 </LinearLayout>

@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.style.TextAlign
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import org.openstrap.app.data.Healthspan
@@ -180,6 +182,58 @@ fun HabitAgeEdgeCard(state: Healthspan.Outcome?, onClick: (() -> Unit)?, onOpenP
             onDismiss = { info = false },
         )
     }
+}
+
+/**
+ * Habit Age as its page's hero in the rings design (T-Detail): one thick orchid ring with the age bold in its middle,
+ * the line against last week under it (a pill when the number moved), then the age scale on a solid card. The same
+ * states as [HabitAgeEdgeCard]: your own age stands in before the first estimate, and without a birth year it says so
+ * with no number. The (i) is the page header's ([HabitAgeInfo]).
+ */
+@Composable
+internal fun HabitAgeRingHero(state: Healthspan.Outcome?, modifier: Modifier = Modifier) {
+    state ?: return
+    val r = state.result
+    val withheld = state.withheld
+    val needsProfile = r == null && state.missing.isNotEmpty() && withheld?.profile == true
+    val line = r?.let { TabCopy.habitAgeLine(it.estimate, state.lastWeek, it.low, it.high) }
+    val waiting = when {
+        r != null -> null
+        needsProfile -> profileReminder(state.missing)
+        state.firstEstimate != null -> TabCopy.firstEstimate(dateOf(state.firstEstimate))
+        else -> withheld?.reason
+    }
+    val shown = r?.estimate?.roundToInt() ?: state.age
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        DetailRing(if (shown != null) 1f else 0f, Orchid, icon = org.openstrap.app.ui.dashboard.Detail.Healthspan.rowIcon()) {
+            Text(
+                shown?.toString() ?: "–", color = if (shown != null) AppColors.ink else AppColors.ink.copy(alpha = 0.3f),
+                style = ringFigure(54.sp), maxLines = 1,
+            )
+            if (shown != null) Text(stringResource(R.string.glow_healthspan_years), color = AppColors.muted, style = RingLabel, maxLines = 1)
+        }
+        val text = line?.text ?: if (shown != null) TabCopy.habitAgeForNow(waiting) else waiting
+        if (text != null) {
+            Spacer(Modifier.height(14.dp))
+            if (line?.moved == true) DetailStatusPill(text, Orchid)
+            else Text(text, color = AppColors.muted, style = GlowType.secondary, textAlign = TextAlign.Center)
+        }
+        if (r != null) {
+            Spacer(Modifier.height(18.dp))
+            DetailCard { AgeScale(r.age, r.low, r.high, r.estimate) }
+        }
+    }
+}
+
+/** Habit Age's info sheet: the method, and where your estimate sits against your age. */
+@Composable
+internal fun HabitAgeInfo(state: Healthspan.Outcome?, onDismiss: () -> Unit) {
+    val r = state?.result
+    val here = r?.let { org.openstrap.app.ui.dashboard.InfoCopy.habitAgeBar(it.age - it.estimate.roundToInt()) }
+    InfoSheet(
+        org.openstrap.app.ui.dashboard.InfoCopy.HABIT_AGE, Orchid, here, here?.let { org.openstrap.app.ui.dashboard.InfoCopy.HERE },
+        onDismiss = onDismiss,
+    )
 }
 
 /**
