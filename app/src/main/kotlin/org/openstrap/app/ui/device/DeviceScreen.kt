@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -60,8 +62,6 @@ import org.openstrap.app.ui.alarms.phoneAlertsSummary
 import org.openstrap.app.ui.dashboard.agoText
 import org.openstrap.app.ui.glow.draw.CoreShape
 import org.openstrap.app.ui.glow.DestructiveInk
-import org.openstrap.app.ui.glow.HeroValue
-import org.openstrap.app.ui.glow.GlowCard
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.draw.GlowStyle
 import org.openstrap.app.ui.glow.PageSwitchRow
@@ -74,12 +74,11 @@ import org.openstrap.app.ui.glow.PageNote
 import org.openstrap.app.ui.glow.PageProgress
 import org.openstrap.app.ui.glow.PageSheet
 import org.openstrap.app.ui.glow.PageTextButton
-import org.openstrap.app.ui.glow.PageHeader
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.glow.StrapDrawing
 import org.openstrap.app.ui.glow.StrapLight
+import org.openstrap.app.ui.glow.AmbientAura
+import org.openstrap.app.ui.glow.rememberCountUp
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.app.ui.theme.AppIcons
@@ -192,7 +191,7 @@ fun DeviceScreen(
     }
 
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_strap_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_strap_title), onBack) }
 
         val device = paired
         if (device == null) {
@@ -203,7 +202,7 @@ fun DeviceScreen(
         val failed = connection as? ConnectionState.Failed
         if (failed?.keyRejected == true) item { KeyRejectedPanel(failed.reason, onPairAgain = vm::forget) }
         else item {
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(Modifier.fillMaxWidth().riseIn(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 when (connection) {
                     is ConnectionState.Connected -> {
                         PageButton(
@@ -226,34 +225,34 @@ fun DeviceScreen(
             val connected = connection is ConnectionState.Connected
             // What the strap holds is read from it; until then, or without it, the row just opens its page.
             val waiting = stringResource(if (connected) R.string.you_strap_reading else R.string.you_strap_on_strap)
-            PageRows {
-                PageRow(
+            RingsRows {
+                RingsRow(
                     stringResource(R.string.you_strap_row_alarms), alarmsSummary(alarms) ?: waiting, onClick = onAlarms, divider = false,
                     icon = AppIcons.Alarm, selected = selected == PageRowKeys.ALARMS,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_phone_alerts), phoneAlertsSummary(calls, notifications), onClick = onPhoneAlerts,
                     icon = AppIcons.Vibrate, selected = selected == PageRowKeys.PHONE_ALERTS,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_health_alerts), healthAlertsSummary(alarms) ?: waiting, onClick = onHealthAlerts,
                     icon = AppIcons.Heartbeat, selected = selected == PageRowKeys.HEALTH_ALERTS,
                 )
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_strap_row_off_body), null, wearReminder, vm::setWearReminder, icon = AppIcons.HandPalm,
                 )
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_strap_row_auto_detect), null, autoStart, vm::setAutoStartWorkouts,
                     icon = AppIcons.PersonSimpleRun,
                 )
                 KeepConnectedRow(vm, keepConnected, device.address)
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_firmware),
                     info?.firmware ?: (connection as? ConnectionState.Connected)?.firmware
                         ?: stringResource(R.string.you_strap_check_for_updates),
                     onClick = onFirmware, icon = AppIcons.Cpu, selected = selected == PageRowKeys.FIRMWARE,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_zepp),
                     stringResource(if (zeppSignedIn) R.string.you_strap_signed_in else R.string.you_strap_not_signed_in),
                     onClick = onZeppAccount, icon = AppIcons.Key, selected = selected == PageRowKeys.ZEPP_ACCOUNT,
@@ -261,23 +260,23 @@ fun DeviceScreen(
             }
         }
         item {
-            PageRows {
+            RingsRows {
                 var first = true
                 if (connection is ConnectionState.Connected) {
-                    PageRow(
+                    RingsRow(
                         stringResource(R.string.you_strap_disconnect), onClick = { confirmDisconnect = true }, divider = false,
                         icon = AppIcons.LinkBreak,
                     )
                     first = false
                 }
                 if (connection is ConnectionState.Connected && info?.canRestart == true) {
-                    PageRow(
+                    RingsRow(
                         stringResource(R.string.you_strap_row_restart), onClick = { confirmRestart = true }, divider = !first,
                         icon = AppIcons.ShutDown,
                     )
                     first = false
                 }
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_strap_row_forget), onClick = { confirmForget = true }, divider = !first,
                     titleColor = DestructiveInk,
                     icon = AppIcons.Trash,
@@ -338,9 +337,9 @@ private fun KeepConnectedRow(vm: DeviceViewModel, keepConnected: KeepConnected, 
     val failed = stringResource(R.string.you_strap_battery_settings_failed)
     val icon = AppIcons.Bluetooth
     when {
-        associated -> PageRow(title, on, icon = icon)
-        vm.companionSupported && !declined -> PageRow(title, off, onClick = { keepConnected.associate(address) }, icon = icon)
-        !ignoringBattery -> PageRow(title, off, icon = icon, onClick = {
+        associated -> RingsRow(title, on, icon = icon)
+        vm.companionSupported && !declined -> RingsRow(title, off, onClick = { keepConnected.associate(address) }, icon = icon)
+        !ignoringBattery -> RingsRow(title, off, icon = icon, onClick = {
             runCatching {
                 context.startActivity(
                     android.content.Intent(android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
@@ -348,7 +347,7 @@ private fun KeepConnectedRow(vm: DeviceViewModel, keepConnected: KeepConnected, 
                 )
             }.onFailure { vm.showMessage(failed) }
         })
-        else -> PageRow(title, on, icon = icon)
+        else -> RingsRow(title, on, icon = icon)
     }
 }
 
@@ -367,50 +366,53 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
     val now by androidx.compose.runtime.produceState(System.currentTimeMillis() / 1000) {
         while (true) { kotlinx.coroutines.delay(30_000); value = System.currentTimeMillis() / 1000 }
     }
-    GlowCard(StrapGlow, Modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxWidth()) {
-            Column(Modifier.fillMaxWidth().padding(end = 112.dp)) {
-                Text(name, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(
-                    strapStateLine(connection, sync, lastSeen, now), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                    style = GlowType.secondary, modifier = Modifier.padding(top = 4.dp),
-                )
-            }
-            // 5 dp under it, so the space below the battery matches the space the title's line height leaves above it.
-            // Clear of the strap on the right too, which sits centred and so lower as this grows.
-            Column(Modifier.fillMaxWidth().padding(top = 128.dp, bottom = 5.dp, end = 112.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                // The card's one dotted number (spec 2.3); the word after it sits on the digits' baseline in Body at 72%.
-                if (battery != null) HeroValue("$battery%", stringResource(R.string.you_firmware_battery))
-                if (sync is SyncState.Running) {
-                    PageProgress()
-                    Text(sync.step, style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
-                }
-                when {
-                    connection is ConnectionState.Failed && !connection.keyRejected -> {
-                        Text(connection.reason, color = AppColors.readable(MetricColors.warn), style = GlowType.secondary)
+    // The rings theme: a flat solid card, the name in bold, the battery as a bold figure over a bar in the strap's
+    // own light, and the strap drawn flat at the card's end.
+    // Alive: while connected a faint wash of the strap's light drifts behind the card.
+    Box(Modifier.fillMaxWidth().riseIn().clip(RingsShape).background(AppColors.glass, RingsShape)) {
+    if (connected != null) AmbientAura(StrapLight, Modifier.matchParentSize(), strength = 0.45f)
+    RingsCard(Modifier.fillMaxWidth(), color = Color.Transparent) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(name, color = AppColors.ink, style = RingsType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(strapStateLine(connection, sync, lastSeen, now), color = AppColors.muted, style = GlowType.secondary)
+                if (battery != null) {
+                    Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(top = 6.dp)) {
+                        val shownBattery = rememberCountUp(battery)
+                        Text("$shownBattery%", color = AppColors.ink, style = RingsType.figure(34.sp), maxLines = 1)
                         Text(
-                            stringResource(R.string.you_strap_retrying),
-                            style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
+                            stringResource(R.string.you_firmware_battery), color = AppColors.muted, style = GlowType.body,
+                            maxLines = 1, modifier = Modifier.padding(start = 8.dp, bottom = 5.dp),
                         )
                     }
-                    sync is SyncState.Failed -> {
-                        Text(
-                            stringResource(R.string.you_strap_sync_stopped, sync.reason), color = AppColors.readable(MetricColors.warn),
-                            style = GlowType.secondary,
-                        )
-                        Text(
-                            stringResource(R.string.you_strap_sync_retry, DATA_ON_STRAP),
-                            style = GlowType.secondary, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                        )
-                    }
+                    RingsBar(battery / 100f, AppColors.readable(if (battery <= 15) MetricColors.warn else StrapLight))
                 }
             }
-            // The strap at the card's right, centred top to bottom.
+            Spacer(Modifier.width(12.dp))
             StrapDrawing(
                 led, lit = connected != null || connection is ConnectionState.Failed, syncing = connected != null && sync is SyncState.Running,
-                Modifier.align(Alignment.CenterEnd).size(width = 100.dp, height = 125.dp),
+                Modifier.size(width = 88.dp, height = 110.dp),
+                alive = connected != null && sync !is SyncState.Failed,
             )
         }
+        if (sync is SyncState.Running) {
+            SyncTrail(AppColors.readable(StrapLight))
+            Text(sync.step, style = GlowType.secondary, color = AppColors.muted)
+        }
+        when {
+            connection is ConnectionState.Failed && !connection.keyRejected -> {
+                Text(connection.reason, color = AppColors.readable(MetricColors.warn), style = GlowType.secondary)
+                Text(stringResource(R.string.you_strap_retrying), style = GlowType.secondary, color = AppColors.muted)
+            }
+            sync is SyncState.Failed -> {
+                Text(
+                    stringResource(R.string.you_strap_sync_stopped, sync.reason), color = AppColors.readable(MetricColors.warn),
+                    style = GlowType.secondary,
+                )
+                Text(stringResource(R.string.you_strap_sync_retry, DATA_ON_STRAP), style = GlowType.secondary, color = AppColors.muted)
+            }
+        }
+    }
     }
 }
 
@@ -432,7 +434,7 @@ fun DiagnosticsScreen(lines: List<String>, contentPadding: PaddingValues, onBack
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item {
             val label = stringResource(R.string.you_diagnostics_clip_label)
-            PageHeader(stringResource(R.string.you_diagnostics_title), onBack) {
+            RingsHeader(stringResource(R.string.you_diagnostics_title), onBack) {
                 PageButton(stringResource(R.string.you_diagnostics_copy), {
                     context.getSystemService(ClipboardManager::class.java)
                         .setPrimaryClip(ClipData.newPlainText(label, lines.joinToString("\n")))
@@ -440,7 +442,7 @@ fun DiagnosticsScreen(lines: List<String>, contentPadding: PaddingValues, onBack
             }
         }
         item {
-            PagePanel(
+            RingsPanel(
                 title = stringResource(R.string.you_diagnostics_log),
                 note = pluralStringResource(R.plurals.you_diagnostics_lines, lines.size, lines.size),
             ) {
@@ -477,7 +479,7 @@ private fun PairPanel(vm: DeviceViewModel, scan: ScanUiState, onRequestBluetooth
         )
     }
 
-    PagePanel(title = stringResource(R.string.you_pair_title)) {
+    RingsPanel(title = stringResource(R.string.you_pair_title)) {
         StepText(stringResource(R.string.you_pair_intro))
         PairStep(1, stringResource(R.string.you_pair_step_link)) {
             StepText(stringResource(R.string.you_pair_step_link_text))
@@ -506,10 +508,10 @@ private fun PairPanel(vm: DeviceViewModel, scan: ScanUiState, onRequestBluetooth
 internal fun PairStep(number: Int, title: String, content: @Composable () -> Unit) {
     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         Box(
-            Modifier.size(28.dp).clip(CircleShape).background(AppColors.ink.copy(alpha = 0.1f)),
+            Modifier.size(28.dp).clip(CircleShape).background(AppColors.ink),
             contentAlignment = Alignment.Center,
         ) {
-            Text("$number", style = GlowType.secondary, color = AppColors.ink)
+            Text("$number", style = RingsType.pill, color = AppColors.onInk)
         }
         Column(Modifier.weight(1f).padding(top = 3.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Text(title, style = GlowType.body, color = AppColors.ink)
@@ -551,10 +553,10 @@ private fun ManualPairSheet(
         }
         scan.error?.let { PageNote(stringResource(R.string.you_pair_scan_failed, it), color = MetricColors.warn) }
         if (scan.scanning && scan.found.isEmpty()) PageNote(stringResource(R.string.you_pair_scan_looking))
-        if (scan.found.isNotEmpty()) PageRows {
+        if (scan.found.isNotEmpty()) RingsRows {
             scan.found.forEachIndexed { i, d ->
                 val selected = d.address == address
-                PageRow(
+                RingsRow(
                     d.name, if (selected) stringResource(R.string.you_pair_chosen) else stringResource(R.string.you_pair_rssi, d.rssi),
                     onClick = { address = d.address; name = d.name },
                     divider = i > 0, icon = AppIcons.Watch,
@@ -591,7 +593,7 @@ private fun ManualPairSheet(
 /** Shown under the status when the strap turned the key down: retrying can't help, so offer to start pairing over. */
 @Composable
 private fun KeyRejectedPanel(reason: String, onPairAgain: () -> Unit) {
-    PagePanel(title = stringResource(R.string.you_pair_key_rejected_title)) {
+    RingsPanel(title = stringResource(R.string.you_pair_key_rejected_title)) {
         StepText(reason)
         PageButton(stringResource(R.string.you_pair_again), onPairAgain, Modifier.fillMaxWidth(), primary = true)
         ComputerGuideButton()

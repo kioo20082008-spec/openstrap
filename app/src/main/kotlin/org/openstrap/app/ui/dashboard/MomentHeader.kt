@@ -91,7 +91,7 @@ fun MomentHeader(
                         AppIcons.User,
                         stringResource(if (updateWaiting) R.string.day_header_you_update else R.string.day_header_you),
                         g.onClick, g.modifier,
-                        surface = Avatar, iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_you), dot = updateWaiting,
+                        surface = Avatar, size = 44.dp, iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_you), dot = updateWaiting,
                     )
                 }
             },
@@ -100,7 +100,7 @@ fun MomentHeader(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (onOpenAllMetrics != null) {
                         RoundIconButton(
-                            AppIcons.ChartBar, stringResource(R.string.day_header_all_metrics), onOpenAllMetrics, surface = Avatar,
+                            AppIcons.ChartBar, stringResource(R.string.day_header_all_metrics), onOpenAllMetrics, surface = Avatar, size = 44.dp,
                             iconSize = 20.dp, clickLabel = stringResource(R.string.day_header_open_all_metrics),
                         )
                         Spacer(Modifier.width(8.dp))
@@ -128,15 +128,16 @@ private fun CentredRow(
         val sp = s.first().measure(loose)
         val ep = e.first().measure(loose)
         val over = overhang.roundToPx()
-        val room = (constraints.maxWidth - sp.width - ep.width + over).coerceAtLeast(0)
+        val gap = 8.dp.roundToPx()
+        val room = (constraints.maxWidth - sp.width - ep.width - gap + over).coerceAtLeast(0)
         val cp = c.first().measure(loose.copy(maxWidth = room))
         val w = constraints.maxWidth
         val h = constraints.maxHeight
         layout(w, h) {
-            sp.placeRelative(0, (h - sp.height) / 2)
-            ep.placeRelative(w - ep.width, (h - ep.height) / 2)
-            val x = ((w - cp.width) / 2).coerceIn(sp.width, (w - ep.width - cp.width + over).coerceAtLeast(sp.width))
-            cp.placeRelative(x, (h - cp.height) / 2)
+            // The rings design: the avatar at the far end, the strap chip beside it, the day at the start.
+            sp.placeRelative(w - sp.width, (h - sp.height) / 2)
+            ep.placeRelative(w - sp.width - gap - ep.width, (h - ep.height) / 2)
+            cp.placeRelative(0, (h - cp.height) / 2)
         }
     }
 }
@@ -183,15 +184,15 @@ private fun DaySwitcher(
                 .clickable(onClickLabel = stringResource(R.string.day_header_pick_day), onClick = onPick)
                 .padding(horizontal = 10.dp, vertical = 4.dp)
                 .semantics { contentDescription = description },
-            horizontalAlignment = Alignment.CenterHorizontally,
+            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(1.dp),
         ) {
             Text(
-                dateLine(date), color = AppColors.ink.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
+                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                title, color = AppColors.ink, style = GlowType.headerDate.copy(fontSize = 28.sp, lineHeight = 32.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold),
+                dateLine(date), color = AppColors.ink.copy(alpha = GlowType.MOMENT_ALPHA), style = GlowType.moment,
                 maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis,
             )
         }
@@ -210,13 +211,13 @@ private fun Peek(@Suppress("UNUSED_PARAMETER") text: String) {
 private fun StrapChipButton(chip: StrapChip, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = CircleShape
     Row(
-        modifier.clip(shape).background(ChipSurface).border(1.dp, AppColors.ink.copy(alpha = 0.07f), shape)
+        modifier.height(44.dp).clip(shape).background(ChipSurface)
             .clickable(onClickLabel = stringResource(R.string.day_header_open_strap), onClick = onClick)
             .semantics { contentDescription = chip.description }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(7.dp).background(chipDotColor(chip.dot), CircleShape))
+        Box(Modifier.size(8.dp).background(chipDotColor(chip.dot), CircleShape))
         if (chip.text.isNotEmpty()) {
             Spacer(Modifier.width(7.dp))
             Text(
@@ -236,6 +237,6 @@ private fun chipDotColor(dot: StrapChip.Dot): Color = when (dot) {
     StrapChip.Dot.Quiet -> AppColors.ink.copy(alpha = 0.3f)
 }
 
-private val Avatar: Color get() = AppColors.control
-private val ChipSurface: Color get() = if (AppColors.light) AppColors.glass else androidx.compose.ui.graphics.lerp(AppColors.page, AppColors.control, 0.3f)
+private val Avatar: Color get() = AppColors.glass
+private val ChipSurface: Color get() = AppColors.glass
 private val PeekWidth = 34.dp

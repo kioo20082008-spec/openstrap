@@ -23,9 +23,9 @@ import androidx.compose.ui.unit.sp
  */
 object MetricColors {
     val heart = Color(0xFFFF5A5F)
-    val steps = Color(0xFFC3F53C)
-    val sleepDeep = Color(0xFF4C6FFF)
-    val sleepLight = Color(0xFF8FA8FF)
+    val steps = Color(0xFF3DD6FF)
+    val sleepDeep = Color(0xFF8B7BFF)
+    val sleepLight = Color(0xFFB3A8FF)
     val sleepRem = Color(0xFFB37CFF)
     val sleepAwake = Color(0xFFFFB547)
     val spo2 = Color(0xFF38BDF8)
@@ -33,9 +33,9 @@ object MetricColors {
     val hrv = Color(0xFF2DD4BF)
     val temperature = Color(0xFFFF8A3D)
     /** Recovery: one teal on every surface. */
-    val readiness = Color(0xFFFF6B5B)
+    val readiness = Color(0xFFC8FF3D)
     /** Charge: Ember orange on every surface, whatever the level. */
-    val charge = Color(0xFFF66C28)
+    val charge = Color(0xFFFF5C39)
     /**
      * Calories: Gold (hue 48), between Charge's orange and Steps' lime and lighter than the warning amber, so Calories
      * and Steps read as two metrics side by side on Activity.
@@ -63,11 +63,11 @@ object MetricColors {
 
 /** The OpenStrap palette: navy pages, cream ink, one coral accent. The app draws through [AppColors]; widgets keep these. */
 object AppPalette {
-    val Navy = Color(0xFF14213D)
-    val NavyRaised = Color(0xFF1C2C50)
-    val NavyHigh = Color(0xFF243760)
-    val Cream = Color(0xFFF4EDE0)
-    val Coral = Color(0xFFFF6B5B)
+    val Navy = Color(0xFF0A0A0C)
+    val NavyRaised = Color(0xFF17171B)
+    val NavyHigh = Color(0xFF2B2B31)
+    val Cream = Color(0xFFFFFFFF)
+    val Coral = Color(0xFFFF5C39)
 }
 
 /** Material's colours for one theme, for what Material draws itself (menus, pickers, dialogs, text selection). */
@@ -151,13 +151,35 @@ private val AlmaraiFamily = FontFamily(
     Font(R.font.almarai_extrabold, FontWeight.ExtraBold),
 )
 
+/** The rings design's face: Alexandria (SIL OFL 1.1), Arabic and Latin merged in one file a weight. */
+private val AlexandriaFamily = FontFamily(
+    Font(R.font.alexandria_regular, FontWeight.ExtraLight),
+    Font(R.font.alexandria_regular, FontWeight.Light),
+    Font(R.font.alexandria_regular, FontWeight.Normal),
+    Font(R.font.alexandria_medium, FontWeight.Medium),
+    Font(R.font.alexandria_bold, FontWeight.SemiBold),
+    Font(R.font.alexandria_bold, FontWeight.Bold),
+    Font(R.font.alexandria_extrabold, FontWeight.ExtraBold),
+)
+
+/** Alexandria for figures: every weight up to Bold draws bold, so no thin numeral is left from the old look. */
+private val AlexandriaNumbers = FontFamily(
+    Font(R.font.alexandria_bold, FontWeight.ExtraLight),
+    Font(R.font.alexandria_bold, FontWeight.Light),
+    Font(R.font.alexandria_bold, FontWeight.Normal),
+    Font(R.font.alexandria_bold, FontWeight.Medium),
+    Font(R.font.alexandria_bold, FontWeight.SemiBold),
+    Font(R.font.alexandria_bold, FontWeight.Bold),
+    Font(R.font.alexandria_extrabold, FontWeight.ExtraBold),
+)
+
 private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
 
 /** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
 /** Numbers stay in Inter in every language. */
-val NumberFamily: FontFamily get() = InterFamily
-val FunnelDisplay: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
-val FunnelSans: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
+val NumberFamily: FontFamily get() = if (isArabic) AlexandriaNumbers else InterFamily
+val FunnelDisplay: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
+val FunnelSans: FontFamily get() = if (isArabic) AlexandriaFamily else InterFamily
 
 private val Base = Typography()
 

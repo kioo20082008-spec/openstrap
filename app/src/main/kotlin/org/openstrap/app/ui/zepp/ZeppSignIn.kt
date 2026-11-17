@@ -1,6 +1,7 @@
 package org.openstrap.app.ui.zepp
 
 import android.annotation.SuppressLint
+import org.openstrap.app.ui.device.RingsPanel
 import org.openstrap.app.ui.theme.AppColors
 import android.util.Log
 import android.webkit.CookieManager
@@ -57,7 +58,6 @@ import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
 import org.openstrap.app.ui.glow.OptionButton
 import org.openstrap.app.ui.glow.PageNote
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageProgress
 import org.openstrap.app.ui.glow.PageTextButton
 import org.openstrap.app.ui.theme.MetricColors
@@ -148,7 +148,7 @@ fun ZeppSignInDialog(
                     ) { Icon(AppIcons.X, close, Modifier.size(20.dp), tint = AppColors.ink) }
                     Spacer(Modifier.width(12.dp))
                     Text(
-                        stringResource(R.string.you_zepp_sign_in_title), color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1,
+                        stringResource(R.string.you_zepp_sign_in_title), color = AppColors.ink, style = org.openstrap.app.ui.device.RingsType.title, maxLines = 1,
                         modifier = Modifier.weight(1f),
                     )
                     if (step is SignInStep.SignIn) {
@@ -178,12 +178,12 @@ fun ZeppSignInDialog(
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         val thirdParty = s is SignInStep.ThirdParty
-                        PagePanel {
+                        RingsPanel {
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                                 Icon(AppIcons.WarningCircle, null, Modifier.size(20.dp), tint = MetricColors.warn)
                                 Text(
                                     stringResource(if (thirdParty) R.string.you_zepp_use_email else R.string.you_zepp_no_devices),
-                                    color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
+                                    color = AppColors.ink, style = org.openstrap.app.ui.device.RingsType.cardTitle, maxLines = 1,
                                 )
                             }
                             Text(
@@ -224,7 +224,7 @@ private fun FoundStrap(
     val canConfirm = strap != null && (strap.authKey != null || !requireKey)
     var showKey by remember { mutableStateOf(false) }
     Column(Modifier.verticalScroll(rememberScrollState()).padding(GlowLayout.Gutter), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        PagePanel(title = stringResource(if (strap != null) R.string.you_zepp_found else R.string.you_zepp_not_found)) {
+        RingsPanel(title = stringResource(if (strap != null) R.string.you_zepp_found else R.string.you_zepp_not_found)) {
             if (strap == null) {
                 Text(
                     if (listing.devices.isEmpty()) {

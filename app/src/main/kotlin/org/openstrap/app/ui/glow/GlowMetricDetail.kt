@@ -6,14 +6,15 @@ import org.openstrap.app.presentation.TimeOfDay
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.Units
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -38,20 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.R
 import org.openstrap.app.data.DayStat
@@ -78,7 +75,6 @@ import org.openstrap.app.ui.dashboard.colorOf
 import org.openstrap.app.ui.dashboard.SleepCopy
 import org.openstrap.app.ui.dashboard.siblingsOf
 import java.time.LocalDate
-import org.openstrap.app.ui.glow.draw.DotSize
 
 /* ------------------------------------------- Shared pieces ------------------------------------------ */
 
@@ -115,13 +111,14 @@ internal fun siblings(detail: Detail, onSwitch: (Detail) -> Unit): List<DetailSi
 
 
 /**
- * The metric detail template (spec 6.1), one for every number. The hero, tinted with [color] and fading to black,
- * carries back, the switcher across [siblings] ([title] on it), the (i) that opens the info sheet ([onInfo]), the
- * [headline] and the seven-day [strip] ([onDay] picks a day). Under it the [ranges] as pills when there's more than
- * one, then [body]: the chart, the sentence and the rows. [heroValue] replaces the value row with a score gauge (the
- * Recovery arc, the Sleep horizon), centred with its label and status word under it; [heroSide] sits to the right of
- * a plain value row (heart rate's Live switch). While a chart is scrubbed, [scrubbed] gives the reading under the
- * finger in the headline's place, on the value row in the gauge's place. It's read only inside the hero.
+ * The metric detail template (spec 6.1) in the rings design (T-Detail), one for every number: back, the [title] (the
+ * switcher across [siblings] when there's more than one) over the day shown, and the (i) ([onInfo]); then the metric's
+ * one thick ring in [color] with the [headline]'s value bold in its middle and the status word as a pill under it; the
+ * card of key [figures]; the seven-day [strip] ([onDay] picks a day); the [ranges] as pills when there's more than one;
+ * then [body]: the charts in solid cards, the sentence and the lists. [ringScale] is what a full ring stands for (100
+ * for a score); without one the ring is whole while there's a value. [icon] sits on the ring's start. [heroSide] sits
+ * in the header before the (i) (heart rate's Live switch). While a chart is scrubbed, [scrubbed] gives the reading
+ * under the finger in the ring's middle. It's read only inside the hero.
  */
 @Composable
 internal fun DetailTemplate(
@@ -137,7 +134,9 @@ internal fun DetailTemplate(
     ranges: List<Range>,
     range: Range,
     onRange: (Range) -> Unit,
-    heroValue: (@Composable () -> Unit)? = null,
+    ringScale: Float? = null,
+    figures: List<Pair<String?, String>> = emptyList(),
+    icon: ImageVector? = siblings.firstOrNull { it.current }?.icon,
     heroSide: (@Composable () -> Unit)? = null,
     scrubbed: () -> DetailHeadline? = { null },
     body: LazyListScope.() -> Unit,
@@ -147,60 +146,39 @@ internal fun DetailTemplate(
     var switching by rememberSaveable { mutableStateOf(false) }
     val gutter = GlowLayout.WideGutter
     // Rows inside a detail open the next one with a crossfade, not by growing (spec 3.5).
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalCardsGrow provides false) {
+    val cascade = remember { DetailCascade() }
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalCardsGrow provides false, LocalDetailCascade provides cascade) {
         ScreenList(contentPadding, list, gutter = gutter) {
             item {
-                DetailHero(color, gutter) {
-                    // A scrub is read here, so only the hero follows the finger, not the whole detail (audit K4).
-                    val scrub = scrubbed()
-                    val shown = scrub ?: headline
-                    // A scrubbed reading takes the gauge's place, as the value row.
-                    val gauge = heroValue.takeIf { scrub == null }
-                    DetailNav(title, siblings.size > 1, onBack, onInfo, onSwitch = { switching = true })
-                    // A score gauge, its label and status word make one block, centred in the header (spec 6.1).
-                    if (gauge != null) Column(
-                        Modifier.fillMaxWidth().padding(top = 22.dp), horizontalAlignment = Alignment.CenterHorizontally,
+                // The card tapped grows into this surface (spec 3.5).
+                // The metric's hue drifting faintly behind the hero, so the page breathes round its ring.
+                Box(Modifier.fillMaxWidth().detailSurface(hero = true, RingDetailShape).clip(RingDetailShape)) {
+                AmbientAura(color, Modifier.matchParentSize(), strength = 0.7f)
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    val day = strip.firstOrNull { it.selected }?.date
+                    PageHeader(
+                        title, onBack, subtitle = day?.let(::dayName),
+                        onTitle = if (siblings.size > 1) ({ switching = true }) else null,
                     ) {
-                        gauge()
-                        Text(
-                            shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                            style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp),
-                        )
-                        if (shown.word != null && shown.value != null) StatusWord(shown.word, color, Modifier.padding(top = 12.dp))
-                    } else Row(Modifier.fillMaxWidth().padding(top = 22.dp), verticalAlignment = Alignment.Bottom) {
-                        Box(Modifier.weight(1f)) {
-                            when {
-                                // No number: the state in words, large in the value's place, as a Small does.
-                                shown.value == null -> Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Text(
-                                        shown.word ?: stringResource(R.string.glow_no_reading), color = AppColors.ink,
-                                        style = GlowType.pageTitle,
-                                    )
-                                    Text(
-                                        shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
-                                    )
-                                }
-                                else -> Row(verticalAlignment = Alignment.Bottom) {
-                                    DotMatrixText(shown.value, Modifier.detailNumber(shown.value), dot = DotSize.Detail)
-                                    Text(
-                                        shown.label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                                        style = GlowType.secondary, modifier = Modifier.padding(start = 10.dp, bottom = 2.dp),
-                                    )
-                                }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (heroSide != null) {
+                                heroSide()
+                                Spacer(Modifier.width(8.dp))
                             }
+                            InfoButton(stringResource(R.string.glow_metrics_about, title), onInfo)
                         }
-                        heroSide?.invoke()
                     }
-                    if (gauge == null && shown.word != null && shown.value != null) {
-                        StatusWord(shown.word, color, Modifier.padding(top = 12.dp))
-                    }
-                    if (strip.isNotEmpty()) WeekStrip(strip, color, onDay, Modifier.padding(top = 20.dp))
+                    // A scrub is read here, so only the hero follows the finger, not the whole detail (audit K4).
+                    val shown = scrubbed() ?: headline
+                    HeroRing(shown, color, ringScale, icon, Modifier.padding(top = 10.dp))
+                    if (shown.word != null && shown.value != null) DetailStatusPill(shown.word, color, Modifier.padding(top = 14.dp))
+                    if (figures.isNotEmpty()) RingFiguresCard(figures, Modifier.padding(top = 18.dp))
+                    if (strip.isNotEmpty()) WeekStrip(strip, color, onDay, Modifier.padding(top = 10.dp).detailRise())
+                }
                 }
             }
             if (ranges.size > 1) item {
-                GlowSegments(
-                    ranges.map { it.label }, ranges.indexOf(range), { onRange(ranges[it]) }, Modifier.padding(top = 6.dp), role = Role.Tab,
-                )
+                GlowSegments(ranges.map { it.label }, ranges.indexOf(range), { onRange(ranges[it]) }, Modifier.detailRise(), role = Role.Tab)
             }
             body()
         }
@@ -208,72 +186,67 @@ internal fun DetailTemplate(
     if (switching) SwitcherSheet(siblings, color, onDismiss = { switching = false })
 }
 
-/** The hero's tint: the metric's colour at the top fading to black, rounded at the foot, as wide as the screen. */
-@Composable
-private fun DetailHero(color: Color, gutter: Dp, content: @Composable () -> Unit) {
-    val shape = RoundedCornerShape(bottomStart = GlowLayout.CardCorner, bottomEnd = GlowLayout.CardCorner)
-    Column(
-        Modifier
-            // Out to the screen's edges, past the list's gutter.
-            .layout { measurable, constraints ->
-                val extra = gutter.roundToPx() * 2
-                val w = constraints.maxWidth + extra
-                val placeable = measurable.measure(constraints.copy(minWidth = w, maxWidth = w))
-                layout(constraints.maxWidth, placeable.height) { placeable.place(-extra / 2, 0) }
-            }
-            // The card tapped grows into this surface (spec 3.5).
-            .detailSurface(hero = true, shape)
-            .clip(shape)
-            .drawBehind {
-                drawRect(Brush.verticalGradient(listOf(lerp(AppColors.shade, color, 0.2f), AppColors.shade)))
-                drawRect(Brush.radialGradient(listOf(color.copy(alpha = 0.4f), Color.Transparent), Offset(size.width / 2, -size.height * 0.1f), size.width * 0.7f))
-                // The hairline along the foot; its top is above the clip, so only the foot and its corners show.
-                val r = GlowLayout.CardCorner.toPx()
-                drawRoundRect(
-                    AppColors.ink.copy(alpha = 0.07f), Offset(0.5f, -r), Size(size.width - 1f, size.height + r - 0.5f), CornerRadius(r),
-                    style = Stroke(1.dp.toPx()),
-                )
-            }
-            .padding(start = gutter, end = gutter, top = 4.dp, bottom = 22.dp),
-    ) { content() }
-}
-
 /**
- * The detail's page header ([PageHeader], spec 3.4 and 6.1): back, the title, which opens the switcher when there's
- * something to switch to, and the (i).
+ * The hero's ring: the value bold in the middle with its label under it, the ring filled to the value over [scale]
+ * (whole without one). With no value, the state in words in the value's place and why under it, never a lone dash.
  */
 @Composable
-private fun DetailNav(title: String, switchable: Boolean, onBack: () -> Unit, onInfo: () -> Unit, onSwitch: () -> Unit) {
-    PageHeader(title, onBack, onTitle = if (switchable) onSwitch else null) {
-        InfoButton(stringResource(R.string.glow_metrics_about, title), onInfo)
+private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: ImageVector?, modifier: Modifier = Modifier) {
+    val v = shown.value
+    val share = when {
+        v == null -> 0f
+        scale == null || scale <= 0f -> 1f
+        else -> (v.replace(",", "").toFloatOrNull() ?: 0f) / scale
+    }
+    DetailRing(share, color, modifier, icon = icon) {
+        if (v != null) {
+            val size = when {
+                v.length >= 6 -> 32.sp
+                v.length == 5 -> 40.sp
+                v.length == 4 -> 46.sp
+                else -> 54.sp
+            }
+            Text(detailCountUp(v), Modifier.detailNumber(v), color = AppColors.ink, style = ringFigure(size), maxLines = 1)
+            if (shown.label.isNotEmpty()) Text(
+                shown.label, color = AppColors.muted, style = RingLabel, textAlign = TextAlign.Center, maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+        } else {
+            Text(
+                shown.word ?: stringResource(R.string.glow_no_reading), color = AppColors.ink, textAlign = TextAlign.Center, maxLines = 2,
+                style = GlowType.cardTitle.copy(fontWeight = FontWeight.Bold),
+            )
+            if (shown.label.isNotEmpty()) Text(
+                shown.label, Modifier.padding(top = 4.dp), color = AppColors.muted, style = RingLabel, textAlign = TextAlign.Center, maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
-/** The status word under the value, in the metric's colour with a soft glow of it. */
-@Composable
-private fun StatusWord(word: String, color: Color, modifier: Modifier = Modifier) {
-    Text(
-        word, modifier = modifier, color = AppColors.readable(lerp(color, AppColors.ink, 0.25f)),
-        style = GlowType.cardTitle.copy(shadow = Shadow(color.copy(alpha = 0.8f), blurRadius = 16f)), maxLines = 1,
-    )
-}
-
-/** The seven days: each day's short name, a dot under days with data, the day shown on a soft pill. */
+/** The seven days on a solid card: each day's short name, a dot under days with data, the day shown on a filled pill. */
 @Composable
 private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+    Row(
+        modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
         days.forEach { d ->
             val show = stringResource(R.string.glow_metrics_show_day, d.label)
             Column(
-                Modifier.width(40.dp).clip(RoundedCornerShape(14.dp))
-                    .background(if (d.selected) AppColors.ink.copy(alpha = 0.10f) else Color.Transparent)
-                    .clickable(onClickLabel = show, role = Role.Button) { onDay(d.date) }
+                Modifier.width(40.dp).clip(RoundedCornerShape(16.dp))
+                    .background(if (d.selected) AppColors.ink else Color.Transparent)
+                    .detailPress(onClickLabel = show, role = Role.Button, scale = 0.92f) { onDay(d.date) }
                     .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
-                Text(d.label, color = if (d.selected) AppColors.ink else AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary, maxLines = 1)
-                Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))
+                Text(
+                    d.label, color = if (d.selected) AppColors.onInk else AppColors.muted, maxLines = 1,
+                    style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal),
+                )
+                if (d.selected && d.hasData) DetailSelectedDot(color)
+                else Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))
             }
         }
     }
@@ -295,23 +268,26 @@ private fun SwitcherSheet(siblings: List<DetailSibling>, color: Color, onDismiss
     }
 }
 
-/** The one time-aware sentence under the chart. */
+/** The one time-aware sentence under the chart, in regular type. */
 @Composable
 internal fun DetailSentence(text: String) {
-    Text(text, color = AppColors.ink, style = GlowType.sentence, modifier = Modifier.padding(top = 4.dp))
+    Text(
+        text, color = AppColors.ink.copy(alpha = 0.86f), style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp),
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+    )
 }
 
 /**
- * A detail's second figures side by side, each in an equal share of the width: the value as text in Body, its name
- * under it in Secondary. Text, not dots, since the header's number is the detail's one dotted number (spec 2.3). A
- * figure without a value shows [missing] ("No reading") in its place, or the waiting dash when [missing] is null. A
- * workout's hero shows its three figures larger ([valueStyle] Row value) and close under them ([gap]).
+ * A detail's second figures side by side, each in an equal share of the width: the value bold, its name under it in
+ * the muted ink. A figure without a value shows [missing] ("No reading") in its place, or the waiting dash when
+ * [missing] is null. A workout's hero shows its three figures larger ([valueStyle] Row value) and close under them
+ * ([gap]).
  */
 @Composable
 internal fun DetailFigures(
     figures: List<Pair<String?, String>>,
     modifier: Modifier = Modifier,
-    valueStyle: TextStyle = GlowType.body.copy(fontFeatureSettings = "tnum"),
+    valueStyle: TextStyle = ringFigure(18.sp),
     missing: String? = stringResource(R.string.glow_no_reading),
     gap: Dp = 4.dp,
 ) {
@@ -323,21 +299,23 @@ internal fun DetailFigures(
                 verticalArrangement = Arrangement.spacedBy(gap),
             ) {
                 when {
-                    value != null -> Text(value, color = AppColors.ink, style = valueStyle, maxLines = 1)
+                    value != null -> Text(value, color = AppColors.ink, style = valueStyle.copy(fontWeight = FontWeight.ExtraBold), maxLines = 1)
                     missing != null -> Text(missing, color = AppColors.ink.copy(alpha = 0.3f), style = valueStyle, maxLines = 1)
                     // As tall as a Row value line, so a missing figure keeps its label level with the others.
                     else -> WaitingDash(Modifier.padding(vertical = 10.5.dp))
                 }
-                Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+                Text(label, color = AppColors.muted, style = RingLabel, maxLines = 1)
             }
         }
     }
 }
 
-/** What a chart says while there's nothing to draw. */
+/** What a chart says while there's nothing to draw: the words on the chart's own solid card. */
 @Composable
 internal fun DetailEmpty(text: String) {
-    Text(text, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, modifier = Modifier.padding(vertical = 24.dp))
+    DetailCard {
+        Text(text, color = AppColors.muted, style = GlowType.secondary, modifier = Modifier.padding(vertical = 18.dp))
+    }
 }
 
 /* ------------------------------------------- Metric detail ------------------------------------------ */
@@ -440,6 +418,9 @@ fun GlowMetricDetailScreen(
         contentPadding = contentPadding, headline = headline,
         strip = DetailCopy.strip(end, today, withData), onDay = onSelectDay,
         ranges = Range.entries, range = range, onRange = { rangeIndex = it.ordinal }, scrubbed = { scrub },
+        ringScale = ringScaleOf(metric, org.openstrap.app.ui.dashboard.LocalGoals.current.steps),
+        figures = remember(metric, night, range, state, summary, nightWeek) { lowHigh(metric, night, range, state, summary, nightWeek) }
+            .map { (v, high) -> v to stringResource(if (high) R.string.glow_recovery_highest else R.string.glow_recovery_lowest) },
         heroSide = if (!night && metric == Metric.HeartRate && isToday && canUseLive && range == Range.Day) {
             {
                 PageChip(
@@ -465,7 +446,7 @@ fun GlowMetricDetailScreen(
                 if (values.all { it == null }) {
                     DetailEmpty(stringResource(R.string.glow_metrics_none_last_7_nights))
                 }
-                else Column {
+                else DetailCard {
                     NormalTrend(
                         values, DetailCopy.levels(values, nightNormal), color, labels = nightWeek.map { DayWords.weekdayShort(it.first) },
                         band = nightNormal?.let { it.low..it.high }, bandLabel = nightNormal?.let { DetailCopy.bandLabel(it, metric::format) },
@@ -540,6 +521,38 @@ fun GlowMetricDetailScreen(
 }
 
 
+/** What a full ring stands for on [metric]'s detail: the step goal, 100 for a share; null where there's no top (the ring is whole). */
+private fun ringScaleOf(metric: Metric, stepGoal: Int): Float? = when (metric) {
+    Metric.Steps -> stepGoal.toFloat().takeIf { it > 0f }
+    Metric.Spo2, Metric.Stress -> 100f
+    else -> null
+}
+
+/**
+ * The hero's two figures for [metric]: the lowest and highest of what the range shows (the day's or night's
+ * readings, the last 7 nights, the range's days), each with whether it's the highest. None without readings.
+ */
+private fun lowHigh(
+    metric: Metric, night: Boolean, range: Range, state: DayUiState, summary: History.Summary?, nightWeek: List<Pair<LocalDate, Float?>>,
+): List<Pair<String, Boolean>> {
+    val values: List<Float> = when {
+        night && range == Range.Day -> SleepCopy.nightSeries(state, metric).map { it.y }
+        night && range == Range.Week -> nightWeek.mapNotNull { it.second }
+        range == Range.Day -> when (metric) {
+            Metric.HeartRate -> state.heartRate
+            Metric.Hrv -> state.hrv
+            Metric.Spo2 -> state.spo2
+            Metric.Stress -> state.stress
+            Metric.SkinTemperature -> state.skinTemperature
+            Metric.Breathing -> state.breathRate
+            else -> emptyList<ChartPoint>()
+        }.map { it.y }
+        else -> summary?.let { listOf(it.lowest.value, it.highest.value) }.orEmpty()
+    }
+    if (values.isEmpty()) return emptyList()
+    return listOf(metric.format(values.min()) to false, metric.format(values.max()) to true)
+}
+
 /**
  * The night's readings of [metric] while asleep as a line to scrub, from falling asleep to waking ([SleepCopy.nightSeries]);
  * scrubbing moves the headline.
@@ -562,9 +575,9 @@ private fun NightChart(metric: Metric, state: DayUiState, color: Color, onScrub:
     // Heart rate and breathing come every few minutes in sleep, the rest more sparsely.
     val slot = if (metric == Metric.HeartRate || metric == Metric.Breathing) 5 * 60L else 15 * 60L
     val values = remember(series, window) { bucket(series, window, slot) }
-    Column(Modifier.padding(top = 8.dp)) {
+    DetailCard {
         GlowLineChart(
-            values, height = 220.dp, labels = listOf(clock(window.first), clock(window.last)), color = color, showAverage = false, format = metric::format,
+            values, Modifier.detailReveal(), height = 220.dp, labels = listOf(clock(window.first), clock(window.last)), color = color, showAverage = false, format = metric::format,
             onScrub = { i ->
                 onScrub(i?.let { values[it] }?.let { v -> scrubAt(metric, v, window.first + i * slot) })
             },
@@ -619,15 +632,15 @@ private fun DayChart(metric: Metric, state: DayUiState, color: Color, hasValue: 
         )
         return
     }
-    Column(Modifier.padding(top = 8.dp)) {
+    DetailCard {
         when (metric) {
             // Holding an hour puts its steps in the headline.
             Metric.Steps -> GlowBars(
-                state.hourlySteps, height = 200.dp, labels = HOURS, accent = color,
+                state.hourlySteps, Modifier.detailGrow(), height = 200.dp, labels = HOURS, accent = color,
                 onScrub = { h -> onScrub(h?.let { hourSteps(it, state.hourlySteps[it]) }) },
             )
             Metric.RestingHr -> if (state.restingTrend.any { it.value != null }) {
-                GlowTrend(state.restingTrend.map { GlowDay(it.label, it.value) }, height = 200.dp)
+                GlowTrend(state.restingTrend.map { GlowDay(it.label, it.value) }, Modifier.detailReveal(), height = 200.dp)
             }
             else -> if (series.isNotEmpty()) {
                 // Readings come every minute for heart rate, sparser for the rest.
@@ -636,7 +649,7 @@ private fun DayChart(metric: Metric, state: DayUiState, color: Color, hasValue: 
                 val labels = if (window == day) HOURS else listOf(clock(window.first), clock(window.last))
                 val band = if (metric == Metric.HeartRate) normalOf(Metric.RestingHr)?.let { it.low..it.high } else null
                 GlowLineChart(
-                    values, height = 220.dp, labels = labels, color = color, showAverage = false, band = band, format = metric::format,
+                    values, Modifier.detailReveal(), height = 220.dp, labels = labels, color = color, showAverage = false, band = band, format = metric::format,
                     onScrub = { i ->
                         onScrub(i?.let { values[it] }?.let { v -> scrubAt(metric, v, window.first + i * slot) })
                     },
@@ -657,8 +670,9 @@ private fun HistoryChart(
 ) {
     val (values, labels, dates) = remember(stats, range, start, end) { series(range, stats, start, end) }
     val levels = remember(values, normal) { DetailCopy.levels(values, normal) }
+    DetailCard {
     NormalTrend(
-        values, levels, color, labels = labels,
+        values, levels, color, Modifier.detailReveal(), labels = labels,
         band = normal?.let { it.low..it.high }, bandLabel = normal?.let { DetailCopy.bandLabel(it, metric::format) },
         onScrub = { i ->
             onScrub(i?.let { values[it] }?.let { v ->
@@ -679,8 +693,9 @@ private fun HistoryChart(
     )
     if (normal == null) Text(
         DetailCopy.learningNormal(stats.count { it.date in end.minusDays(History.NORMAL_DAYS - 1L)..end }, nightly),
-        color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary,
+        color = AppColors.muted, style = GlowType.secondary, modifier = Modifier.padding(top = 8.dp),
     )
+    }
 }
 
 /** Evenly spaced values for the chart: one a day, or one a week over a year; gaps are null. Also axis labels and each point's date. */
@@ -760,4 +775,15 @@ internal fun RelatedMetricRow(m: Metric, state: DayUiState, history: DailyHistor
         offNormal = status != null && status != 0, onClick = { onOpen(Detail.OfMetric(m)) }, divider = divider,
         icon = m.rowIcon(),
     )
+}
+
+/** The shown day's dot under its pill, breathing gently so the eye finds the day the page is about. */
+@Composable
+private fun DetailSelectedDot(color: Color) {
+    val p = rememberPulse(1_800)
+    Canvas(Modifier.size(5.dp)) {
+        val r = size.minDimension / 2f
+        drawCircle(color.copy(alpha = 0.35f * (1f - p.value)), r * (1.2f + 1.3f * p.value))
+        drawCircle(color, r * (0.85f + 0.25f * p.value))
+    }
 }

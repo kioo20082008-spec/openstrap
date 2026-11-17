@@ -48,10 +48,20 @@ internal fun MainActivity.handleDebugIntent(previews: DebugPreviews) {
  * is paired, so the screens show a paired phone. Pair with `simulate_hr` to have it connected.
  */
 private fun MainActivity.demoData() {
-    if (!intent.getBooleanExtra("demo_data", false)) return
+    // The draft app (-PdemoApp, org.openstrap.app.demo) never pairs a strap: it refills itself with sample data once a
+    // day, so today always has a night, steps and scores to show the design with.
+    val draft = packageName.endsWith(".demo")
+    val prefs = getSharedPreferences("demo", android.content.Context.MODE_PRIVATE)
+    val today = java.time.LocalDate.now().toString()
+    val asked = intent.getBooleanExtra("demo_data", false)
+    if (!asked && !(draft && prefs.getString("filled", null) != today)) return
     intent.removeExtra("demo_data")
     val container = container
     lifecycleScope.launch {
+        if (draft) {
+            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) { container.database.clearAllTables() }
+            prefs.edit().putString("filled", today).apply()
+        }
         DemoData.fill(container.database.healthDao())
         if (container.settings.pairedDevice.first() == null) {
             container.settings.savePairedDevice(PairedDevice("00:00:00:00:00:00", "00", "Helio Strap"))

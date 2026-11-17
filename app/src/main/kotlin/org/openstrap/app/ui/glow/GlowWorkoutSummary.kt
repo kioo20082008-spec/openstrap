@@ -1,5 +1,13 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.workout.RingCardShape
+import org.openstrap.app.ui.workout.RingCardTitle
+import org.openstrap.app.ui.workout.RingPageTitle
+import org.openstrap.app.ui.workout.WorkoutRing
+import org.openstrap.app.ui.workout.ringFigure
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import org.openstrap.app.R
 import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.presentation.Units
@@ -41,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +59,7 @@ import org.openstrap.app.ui.workout.SplitRow
 import org.openstrap.app.ui.workout.ZoneSeconds
 import org.openstrap.app.ui.workout.familyColor
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.openstrap.app.data.Route
 import org.openstrap.app.data.WorkoutAnalysis
 import org.openstrap.app.data.Workouts
@@ -84,9 +94,6 @@ import org.openstrap.app.ui.dashboard.LocalHeartZones
 
 /** Where Done has got to: the summary, a personal best's card, the goal moment. */
 private enum class SummaryStep { Summary, Best, Moment }
-
-/** How much higher the hero's light reaches at the top of a personal best's swell. */
-private const val SwellLevel = 0.25f
 
 /** The drop line shows the last minute of the workout before the end. */
 private const val BeforeS = 60L
@@ -165,7 +172,7 @@ fun GlowWorkoutSummaryScreen(
         Row(Modifier.padding(start = 4.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 val title = a?.sportName ?: stringResource(R.string.glow_workout_untitled)
-                Text(title, color = AppColors.ink, style = GlowType.pageTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = RingPageTitle, maxLines = 1)
                 if (a != null) Text(
                     FamilySummary.whenLine(a.shownStart, System.currentTimeMillis() / 1000), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                     style = GlowType.secondary, modifier = Modifier.padding(top = 2.dp),
@@ -190,33 +197,43 @@ fun GlowWorkoutSummaryScreen(
         val haptics = rememberHaptics()
         val animationsOn = rememberAnimationsOn()
         val swell = remember { Animatable(0f) }
+        val sparks = remember { Animatable(0f) }
         var swelled by rememberSaveable(w.start) { mutableStateOf(false) }
         val anyBest = earned.any { it.kind == EarnedLine.Kind.Best }
         LaunchedEffect(anyBest) {
             if (!anyBest || swelled) return@LaunchedEffect
             swelled = true
+            // Once the ring has swept in: the tick, and the sparks fly while the ring swells and settles.
+            if (animationsOn) delay(900)
             haptics.perform(HapticEvent.PersonalBest)
             if (animationsOn) {
+                launch { sparks.animateTo(1f, tween(1300)) }
                 swell.animateTo(1f, tween(450))
                 swell.animateTo(0f, tween(900))
             }
         }
         val family = FamilySummary.familyOf(w.sportType, summary.structure)
         val effort = Workouts.effort(w.trainingLoad, usualLoad)
-        SummaryHeroCard(hero ?: summaryHero(family, summary, usualLoad), familyColor(family), effort) { swell.value }
+        Box(Modifier.fillMaxWidth().enterRise(0)) {
+            SummaryHeroCard(hero ?: summaryHero(family, summary, usualLoad), familyColor(family), effort, { swell.value }, { sparks.value })
+        }
         // What was done to the times, under the hero that says them.
         TrimNote(summary, trim.undo, Modifier.padding(horizontal = 4.dp), onCard = false)
         val weekStarts = remember(workouts) { goalWeekStarts(workouts) }
-        val sectionOnEdge = FamilySection(family, summary, liveRoute, others, weekStarts, week = rewards?.week)
-        EarnedChips(earned)
+        // What follows rises in after the hero, one card after another.
+        var sectionOnEdge = false
+        Column(Modifier.fillMaxWidth().enterRise(1), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            sectionOnEdge = FamilySection(family, summary, liveRoute, others, weekStarts, week = rewards?.week)
+        }
+        Box(Modifier.fillMaxWidth().enterRise(2)) { EarnedChips(earned) }
         // The drop only with heart rate to show: recorded in the workout, or arriving live after it.
         val live = calmDown?.takeIf { it.start == w.start }
         val dropShown = summary.recorded.isNotEmpty() || !live?.readings.isNullOrEmpty()
-        if (dropShown) CalmDownHero(summary, live, usualDrop, effort, 0f) { info = true }
+        if (dropShown) Box(Modifier.fillMaxWidth().enterRise(3)) { CalmDownHero(summary, live, usualDrop, effort, 0f) { info = true } }
         // Load is lit from the left: what comes before it (the hero, the drop) is lit from below, so two cards in a row
         // never look the same. Under the section's own edge card, lit from the left or right, Load takes the bottom.
         CompositionLocalProvider(LocalEdgeOverride provides EdgeOverride(edge = if (sectionOnEdge && !dropShown) Edge.Bottom else Edge.Left)) {
-            WorkoutLoadCard(a, usualLoad)
+            Box(Modifier.fillMaxWidth().enterRise(4)) { WorkoutLoadCard(a, usualLoad) }
         }
         DeleteWorkout(stringResource(R.string.glow_workout_delete_phone), onDelete)
     }
@@ -229,21 +246,50 @@ fun GlowWorkoutSummaryScreen(
 }
 
 /**
- * The summary's hero (workouts spec 2.8): a glow in the workout's [color] lit from below as high as its [effort], the
- * one number in dots, then a sentence or three figures in text. [swell] lifts the light for a personal best.
+ * The summary's hero (workouts spec 2.8) in the rings design: one thick ring in the workout's [color] filled as far as
+ * its [effort], the one number bold in the middle with its unit, then the sentence, and the three figures on a solid
+ * card. [swell] lifts the ring a little for a personal best, drawn in the layer so nothing composes again.
  */
 @Composable
-internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swell: () -> Float = { 0f }) {
-    // The swell is drawn over the card's own light ([GlowSwell]), so the light at rest stays the cache key and a best's
-    // swell neither composes the hero again nor renders a new glow each frame.
-    val lift = remember(effort, swell) { GlowSwell((effort + SwellLevel).coerceAtMost(1f), swell) }
-    GlowCard(effortGlow(color, effort), Modifier.fillMaxWidth(), swell = lift) {
-        Column {
-            HeroValue(hero.value, hero.unit)
-            hero.sentence?.let { HeroSentence(it) }
-            hero.line?.let { Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(top = 6.dp)) }
-            if (hero.figures.isNotEmpty()) {
-                DetailFigures(hero.figures, Modifier.padding(top = 18.dp), valueStyle = GlowType.rowValue, missing = null, gap = 0.dp)
+internal fun SummaryHeroCard(hero: SummaryHero, color: Color, effort: Float, swell: () -> Float = { 0f }, sparks: () -> Float = { 0f }) {
+    Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+      // The ring sweeps in over a soft breathing light of its colour; a personal best bursts sparks off its edge.
+      Box(Modifier.padding(top = 4.dp), contentAlignment = Alignment.Center) {
+        HeroHalo(color, Modifier.matchParentSize())
+        WorkoutRing(
+            effort, color,
+            Modifier.graphicsLayer {
+                val k = 1f + 0.06f * swell()
+                scaleX = k
+                scaleY = k
+            },
+            ringSize = 210.dp, stroke = 22.dp, icon = AppIcons.HeartFill, alive = true,
+        ) {
+            Column(Modifier.padding(horizontal = 30.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                val n = hero.value.length
+                Text(
+                    rememberCountUpText(hero.value), color = AppColors.ink, maxLines = 1, softWrap = false,
+                    style = ringFigure(if (n >= 7) 32.sp else if (n >= 5) 40.sp else 50.sp),
+                )
+                if (hero.unit.isNotBlank()) Text(
+                    hero.unit, color = AppColors.muted, style = GlowType.secondary, maxLines = 1, textAlign = TextAlign.Center,
+                )
+            }
+        }
+        SparkBurst(sparks, color, Modifier.matchParentSize())
+      }
+        hero.sentence?.let {
+            Text(
+                it, Modifier.fillMaxWidth().padding(top = 16.dp), color = AppColors.ink, textAlign = TextAlign.Center,
+                style = RingCardTitle.copy(fontSize = 19.sp, lineHeight = 26.sp, fontWeight = FontWeight.ExtraBold),
+            )
+        }
+        hero.line?.let {
+            Text(it, Modifier.fillMaxWidth().padding(top = 6.dp), color = AppColors.muted, style = GlowType.secondary, textAlign = TextAlign.Center)
+        }
+        if (hero.figures.isNotEmpty()) {
+            Box(Modifier.fillMaxWidth().padding(top = 16.dp).clip(RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp, vertical = 14.dp)) {
+                DetailFigures(hero.figures, valueStyle = ringFigure(20.sp), missing = null, gap = 2.dp)
             }
         }
     }
@@ -270,8 +316,8 @@ private fun CalmDownHero(summary: PhoneSummary, live: CalmDown?, usualDrop: Int?
     }
     val line: CalmDownLine = SummaryCopy.calmDown(readings, a.end, now, live != null && now <= live.until, a.maxHeartRate, usualDrop)
     val bpmNow = live?.readings?.lastOrNull()?.takeIf { now <= live.until && now - it.first <= 5 }?.second
-    // A level glow is always at full: its light is the value (spec 2.1).
-    GlowCard(effortGlow(MetricColors.heart, effort + SwellLevel * swell), Modifier.fillMaxWidth()) {
+    // A solid card in the rings design: the effort and the swell no longer light it.
+    Box(Modifier.fillMaxWidth().clip(RingCardShape).background(AppColors.glass).padding(horizontal = GlowLayout.CardInset, vertical = 16.dp)) {
         Column {
             GlowHeader(
                 stringResource(R.string.glow_summary_drop_title), trailing = stringResource(R.string.glow_summary_drop_since, clock(a.end)),
@@ -297,8 +343,12 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
     val span = (BeforeS + WorkoutSession.CALM_S).toFloat()
     val lo = readings.minOf { it.second } - 5f
     val hi = readings.maxOf { it.second } + 5f
+    // The line draws itself in from the left when it first shows.
+    val reveal = remember { Animatable(0f) }
+    LaunchedEffect(Unit) { reveal.animateTo(1f, tween(1200, easing = androidx.compose.animation.core.FastOutSlowInEasing)) }
     Column(modifier) {
         Canvas(Modifier.fillMaxWidth().height(84.dp)) {
+          clipRect(right = size.width * reveal.value) {
             fun x(t: Long) = (t - first) / span * size.width
             fun y(v: Int) = size.height - (v - lo) / (hi - lo) * size.height
             val endX = x(end)
@@ -313,6 +363,7 @@ private fun DropLine(readings: List<Pair<Long, Int>>, end: Long, modifier: Modif
             }
             stroke(readings.filter { it.first <= end }, AppColors.ink.copy(alpha = 0.45f))
             stroke(readings.filter { it.first >= end }, AppColors.ink)
+          }
         }
         Spacer(Modifier.height(6.dp))
         Ltr {

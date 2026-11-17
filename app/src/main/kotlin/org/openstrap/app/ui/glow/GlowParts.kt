@@ -53,13 +53,13 @@ fun DotMatrixText(
     /** Shrinks the dots below [dot] where the number must fit a space (the live workout's arc), 0..1. */
     scale: Float = 1f,
 ) {
-    // The redesign draws numbers as bold Inter rather than dots, at the height the dots took.
+    // The rings design draws numbers bold rather than as dots, at the height the dots took.
     val size = (dot.dot.value * scale * 9f).sp
     Text(
         // A metric's hue as a big number: taken dark enough to read on the light theme.
         text, modifier.semantics { contentDescription = text }, color = AppColors.readable(color), maxLines = 1, softWrap = false,
         style = TextStyle(
-            fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = if (dot.dot.value >= 3.6f) androidx.compose.ui.text.font.FontWeight.ExtraLight else androidx.compose.ui.text.font.FontWeight.Light,
+            fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = if (dot.dot.value >= 3.6f) androidx.compose.ui.text.font.FontWeight.ExtraBold else androidx.compose.ui.text.font.FontWeight.Bold,
             fontSize = size, lineHeight = size, letterSpacing = (-0.02f).em,
             textDirection = androidx.compose.ui.text.style.TextDirection.Ltr,
         ),

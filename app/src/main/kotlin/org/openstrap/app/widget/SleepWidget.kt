@@ -40,7 +40,7 @@ import org.openstrap.app.ui.glow.draw.drawStageBar
 import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.edgeLight
 import org.openstrap.app.ui.glow.draw.stageColor
-import org.openstrap.app.ui.theme.MetricColors
+import org.openstrap.app.ui.theme.AppIcons
 
 /**
  * The Sleep widget (widgets spec 3.2): last night's score, time asleep and stages, as the Sleep tab's hero tells them.
@@ -78,128 +78,55 @@ class SleepWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Sleep's ink, as the Sleep tab and Today's Last night card. */
-private val Ink = MetricColors.sleepDeep
+/** Sleep's hue in the rings theme. */
+private val Ink = RingWidget.Sleep
 
-/** The legend's labels: Caption size and weight, at Secondary's 72% (the mockup's). */
-private val LegendStyle = WidgetType.caption.copy(color = ColorProvider(Color.White.copy(alpha = 0.72f)))
+/** The legend's labels: Caption size and weight, in the theme's muted grey. */
+private val LegendStyle = WidgetType.caption.copy(color = ColorProvider(RingWidget.Muted))
 
 /**
- * The widget at the size Glance lays out, lit from the top in the night mood whatever the moment ([EdgeKind.Sleep],
- * spec 2.2). A night opens its Sleep score; while waiting, the Sleep screen.
+ * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the score's word, and
+ * Sleep's one ring with the score in the middle ([RingContent]). The Wide adds time asleep and how often you woke beside
+ * the ring with the stage bar under it; the Large the time in each stage. A night opens its Sleep score; while waiting,
+ * the Sleep screen.
  */
 @Composable
 private fun SleepContent(m: SleepWidgetModel) {
     val context = LocalContext.current
     val open = if (m.date != null) openMetric(context, DetailRoutes.SLEEP_SCORE, m.date) else openMetric(context, DetailRoutes.SLEEP, null)
     EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Sleep), Ink, GlowMood.Night, open, BITMAP_EXTRA) { frame ->
-        when {
-            m.waiting != null -> WaitingContent(m.title, m.waiting, frame)
-            frame.bucket == WidgetSizes.Small -> SmallContent(m, frame)
-            frame.bucket == WidgetSizes.Wide -> WideContent(m, frame)
-            else -> LargeContent(m, frame)
-        }
+        if (m.waiting != null) WaitingContent(m.title, m.waiting, frame) else RingsContent(m, frame)
     }
 }
 
-/** Small: the top row, the score and its word, then time asleep and the stage bar. */
+/** The ring layout at [f]'s size. */
 @Composable
-private fun ColumnScope.SmallContent(m: SleepWidgetModel, f: WidgetFrame) {
-    val fit = SleepLayout.small(m, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    Edge(fit.spread, f)
-    TopRowView(m.title, null, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    ScoreRow(m, fit.row, SleepLayout.SMALL_WORD_GAP_DP, f.density)
-    if (fit.lines.isNotEmpty() || fit.bar) {
-        Gap()
-        // One child of the column, its rows inside: Glance drops a column's children past ten.
-        Column(GlanceModifier.fillMaxWidth(), horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start) {
-            fit.lines.forEachIndexed { i, line ->
-                if (i > 0) Spacer(GlanceModifier.height(SleepLayout.SMALL_GAP_DP.dp))
-                if (WidgetRtl && line.lines == 1) FontText(line.text, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f))
-                else Text(line.text, style = WidgetType.secondary, maxLines = line.lines)
-            }
-            if (fit.bar) {
-                if (fit.lines.isNotEmpty()) Spacer(GlanceModifier.height(SleepLayout.SMALL_GAP_DP.dp))
-                StageBar(m, SleepLayout.SMALL_BAR_DP, f)
+private fun ColumnScope.RingsContent(m: SleepWidgetModel, f: WidgetFrame) {
+    val share = (m.score?.toIntOrNull() ?: 0) / 100f
+    val number = m.score ?: "–"
+    val lines = listOfNotNull(m.asleep?.let { RingLine(it) }, m.woke?.let { RingLine(it) })
+    when (f.bucket) {
+        WidgetSizes.Small -> {
+            // The word with time asleep, "Fair · 8 h 26", as the mockup's.
+            val word = listOfNotNull(m.word, m.asleep).joinToString(" · ").ifEmpty { null }
+            RingContent(m.title, null, word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f)
+        }
+        WidgetSizes.Wide -> if (m.totals.isEmpty()) {
+            RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines)
+        } else {
+            RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines, SleepLayout.BAR_DP) {
+                StageBar(m, SleepLayout.BAR_DP, f)
             }
         }
-    }
-    Edge(fit.spread, f)
-}
-
-/** Wide: the top row with bedtime to waking, the score with time asleep, the stage bar with its legend. */
-@Composable
-private fun ColumnScope.WideContent(m: SleepWidgetModel, f: WidgetFrame) {
-    val fit = SleepLayout.wide(m, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    Edge(fit.spread, f)
-    TopRowView(m.title, m.note, fit.top, f, fit.spread.edge(f.drawContentHeight))
-    Gap()
-    ScoreRow(m, fit.row, SleepLayout.WORD_GAP_DP, f.density)
-    if (fit.bar) {
-        Gap()
-        Stages(m, fit.legendRows, f)
-    }
-    Edge(fit.spread, f)
-}
-
-/** Large: the top row, the tab's sentence, the score with how often you woke, then the time in each stage. */
-@Composable
-private fun ColumnScope.LargeContent(m: SleepWidgetModel, f: WidgetFrame) {
-    val fit = SleepLayout.large(m, f.contentWidth, f.contentHeight, f.fontScale, f.status)
-    val spread = SleepLayout.largeSpread(fit, m.stages.size, f.fontScale)
-    Edge(spread, f)
-    TopRowView(m.title, m.note, fit.top, f, spread.edge(f.drawContentHeight))
-    if (fit.sentenceLines > 0 && m.sentence != null) {
-        Gap()
-        Text(m.sentence, style = WidgetType.hero, maxLines = fit.sentenceLines)
-    }
-    Gap()
-    ScoreRow(m, fit.row, SleepLayout.WORD_GAP_DP, f.density)
-    when {
-        fit.stages -> { Gap(); StageRows(m.stages, f) }
-        fit.bar -> { Gap(); StageBar(m, SleepLayout.BAR_DP, f) }
-    }
-    Edge(spread, f)
-}
-
-/**
- * The score in dots with its word beside it and [SleepLayout.ScoreRow.right] on the right; without a score, the
- * words saying so in its place.
- */
-@Composable
-private fun ScoreRow(m: SleepWidgetModel, row: SleepLayout.ScoreRow, wordGap: Float, density: Float) {
-    Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
-        val score = m.score
-        if (WidgetRtl) {
-            // Arabic: what's on the side first, then the word, the score at the right edge.
-            row.right?.let {
-                FontText(it, WidgetText.SECONDARY_SP, Color.White.copy(alpha = 0.72f))
-                Spacer(GlanceModifier.width(SleepLayout.SIDE_GAP_DP.dp))
-            }
-            Spacer(GlanceModifier.defaultWeight())
-            if (row.dot > 0f && score != null) {
-                row.word?.let {
-                    FontText(it, WidgetText.BODY_SP, Color.White.copy(alpha = 0.72f))
-                    Spacer(GlanceModifier.width(wordGap.dp))
-                }
-                DotNumber(score, row.dot, density, m.scoreDescription)
-            } else row.word?.let { FontText(it, WidgetText.BODY_SP, Color.White.copy(alpha = 0.72f)) }
-            return@Row
-        }
-        if (row.dot > 0f && score != null) {
-            DotNumber(score, row.dot, density, m.scoreDescription)
-            row.word?.let {
-                Spacer(GlanceModifier.width(wordGap.dp))
-                Text(it, style = WidgetType.word, maxLines = 1)
-            }
-            Spacer(GlanceModifier.defaultWeight())
-        } else row.word?.let {
-            Text(it, style = WidgetType.word, maxLines = row.wordLines, modifier = GlanceModifier.defaultWeight())
-        }
-        row.right?.let {
-            Spacer(GlanceModifier.width(SleepLayout.SIDE_GAP_DP.dp))
-            Text(it, style = WidgetType.secondary, maxLines = 1)
+        else -> when {
+            m.stages.isNotEmpty() -> RingContent(
+                m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines,
+                SleepLayout.stagesHeight(m.stages.size, f.fontScale),
+            ) { StageRows(m.stages, f) }
+            m.totals.isNotEmpty() -> RingContent(
+                m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines, SleepLayout.BAR_DP,
+            ) { StageBar(m, SleepLayout.BAR_DP, f) }
+            else -> RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines)
         }
     }
 }
@@ -306,7 +233,7 @@ private fun stageRowBar(r: SleepStageRow, widthDp: Float, density: Float): Bitma
     val h = SleepLayout.STAGE_BAR_DP * density
     return renderToBitmap(w, h) { c ->
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-        paint.color = android.graphics.Color.argb(26, 255, 255, 255)
+        paint.color = Ink.copy(alpha = RingWidget.TRACK_ALPHA).toArgb()
         c.drawRoundRect(0f, 0f, w, h, h / 2, h / 2, paint)
         paint.color = stageColor(r.stage).toArgb()
         val fill = (w * r.share).coerceIn(h, w)

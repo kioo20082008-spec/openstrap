@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.dp
-import org.openstrap.app.ui.glow.draw.EdgeSurface
+import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.ui.glow.draw.GlowStyle
 import org.openstrap.app.ui.glow.draw.LightAngle
 import org.openstrap.app.ui.glow.draw.chart
@@ -57,12 +57,8 @@ internal fun LitPanel(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier.fillMaxWidth().clip(GlowLayout.CardShape).background(EdgeSurface)
-            .drawBehind {
-                val r = reach(size)
-                drawCardLight(color, lightCenter(size), r.width, r.height, stops)
-            }
-            .border(1.dp, color.copy(alpha = 0.3f), GlowLayout.CardShape)
+        // The rings design: a flat solid card, no light and no edge; the arguments stay for the callers.
+        modifier.fillMaxWidth().clip(GlowLayout.CardShape).background(AppColors.glass)
             .padding(horizontal = 20.dp, vertical = 18.dp),
         verticalArrangement = verticalArrangement,
         content = content,

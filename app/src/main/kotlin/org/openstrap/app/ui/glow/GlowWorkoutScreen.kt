@@ -525,7 +525,7 @@ fun GlowWorkoutsScreen(workouts: List<WorkoutAnalysis>, contentPadding: PaddingV
 private val ListItemGap = 12.dp
 
 /**
- * One stretch of a list split over several lazy items: the [ListPanel] surface and hairline, rounded at the top on
+ * One stretch of a list split over several lazy items: the [ListPanel] surface, rounded at the top on
  * the [first] and at the bottom on the [last], and reaching down through the gap to the next stretch otherwise, so
  * the stretches read as one panel.
  */
@@ -535,17 +535,13 @@ private fun ListSegment(first: Boolean, last: Boolean, content: @Composable Colu
         Modifier.fillMaxWidth()
             .drawBehind {
                 val r = GlowLayout.CardCorner.toPx()
-                val stroke = 1.dp.toPx()
                 val bottom = if (last) size.height else size.height + ListItemGap.toPx()
                 // The rounded panel drawn past the ends that join another stretch, then cut back to this one's span.
                 val top = if (first) 0f else -r
                 val end = if (last) bottom else bottom + r
                 clipRect(top = 0f, bottom = bottom) {
+                    // A solid card, no edge (the rings design).
                     drawRoundRect(ListSurface, Offset(0f, top), Size(size.width, end - top), CornerRadius(r))
-                    drawRoundRect(
-                        RowHairline, Offset(stroke / 2, top + stroke / 2), Size(size.width - stroke, end - top - stroke),
-                        CornerRadius(r - stroke / 2), style = Stroke(stroke),
-                    )
                 }
             }
             .padding(horizontal = GlowLayout.CardInset)

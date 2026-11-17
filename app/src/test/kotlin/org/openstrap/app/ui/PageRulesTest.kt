@@ -67,7 +67,7 @@ class PageRulesTest {
         val profile = File(uiRoot, "device/ProfileScreen.kt").readText()
         assertTrue("no round sex buttons", "SexToggle" !in profile && "GenderFemale" !in profile && "GenderMale" !in profile)
         // The words are in res/values (i18n), so the segments read them from there.
-        val segments = Regex("""GlowSegments\(\s*listOf\(stringResource\(R\.string\.you_profile_sex_female\), stringResource\(R\.string\.you_profile_sex_male\)\)""")
+        val segments = Regex("""(Glow|Rings)Segments\(\s*listOf\(stringResource\(R\.string\.you_profile_sex_female\), stringResource\(R\.string\.you_profile_sex_male\)\)""")
         assertTrue("Female and Male as segments", segments.containsMatchIn(profile))
     }
 

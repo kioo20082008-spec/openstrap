@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.Brush
 import kotlin.math.PI
 import kotlin.math.sin
 import androidx.compose.animation.core.animateFloat
@@ -30,7 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -52,7 +50,7 @@ import org.openstrap.app.ui.theme.MetricColors
 
 /**
  * The pairing stage (E3): this phone, a line across, and the strap, lit, on the right as on the Strap page. The line
- * is always a solid 1 dp hairline (spec 2.7), and each [step] moves in its own way: still while it waits; ripples out of
+ * is always a solid 2 dp line with round caps, flat as the rings theme has it, and each [step] moves in its own way: still while it waits; ripples out of
  * the phone while it searches; the strap answering with a pulse once it's in reach; sparks running along the line while
  * they connect; the line lighting up from the phone to the strap with a flash at the pod when connected; and the line
  * broken in the middle, amber, when it couldn't.
@@ -85,28 +83,22 @@ internal fun PairingStage(step: PairStep, modifier: Modifier = Modifier) {
         Spacer(Modifier.matchParentSize().drawWithCache {
             val y = size.height / 2
             val gap = 8.dp.toPx()
-            val hair = 1.dp.toPx()
+            val hair = 2.dp.toPx()
             val phoneX = PhoneWidth.toPx() / 2
             val start = PhoneWidth.toPx() + gap
             val sw = strapWidth.toPx()
             val podX = size.width - sw + sw * POD_LEFT + sw / 2
             val end = size.width - sw * (1f - 2 * POD_LEFT) - gap
             val reach = 46.dp.toPx()
-            val sparkGlow = 9.dp.toPx()
-            // One glow for every spark, centred on the origin and moved to each: a gradient a spark a frame is garbage.
-            val sparkBrush = Brush.radialGradient(
-                listOf(StrapLight.copy(alpha = 0.55f), StrapLight.copy(alpha = 0f)), Offset.Zero, sparkGlow,
-            )
             onDrawBehind {
             val t = cycle.value
             fun ripple(cx: Float, phase: Float, color: Color, from: Float) {
                 val r = from + (reach - from) * phase
                 drawCircle(color.copy(alpha = color.alpha * (1f - phase) * 0.7f), r, Offset(cx, y), style = Stroke(hair))
             }
-            // The glow is the same at every spark (its colour's alpha is set, not scaled). Only the dot fades.
+            // A spark is a solid dot, no glow (the rings theme); only its alpha fades.
             fun spark(x: Float, alpha: Float = 1f) {
-                translate(x, y) { drawCircle(sparkBrush, sparkGlow, Offset.Zero) }
-                drawCircle(StrapLight.copy(alpha = alpha), 2.dp.toPx(), Offset(x, y))
+                drawCircle(StrapLight.copy(alpha = alpha), 3.dp.toPx(), Offset(x, y))
             }
             when (step) {
                 PairStep.Ready -> drawLine(AppColors.ink.copy(alpha = 0.22f), Offset(start, y), Offset(end, y), hair, StrokeCap.Round)
@@ -136,7 +128,6 @@ internal fun PairingStage(step: PairStep, modifier: Modifier = Modifier) {
                     if (fill.value < 1f) spark(head)
                     if (flash.value in 0.001f..0.999f) {
                         ripple(podX, flash.value, StrapLight, 20.dp.toPx())
-                        drawCircle(StrapLight.copy(alpha = 0.35f * (1f - flash.value)), 30.dp.toPx(), Offset(podX, y))
                     }
                 }
                 PairStep.Failed, PairStep.KeyRejected -> {
@@ -176,18 +167,19 @@ private const val POD_LEFT = 34f / 120f
 /** The pairing stage's height: the strap drawing's, which sets the hero's. */
 private val StageHeight = 92.dp
 
-/** This phone, drawn in line like the strap: its outline and the speaker slot. */
+/** This phone, flat like the strap: a solid body with its screen set in and the speaker slot. */
 @Composable
 private fun PhoneDrawing(modifier: Modifier) {
     Canvas(modifier) {
-        val stroke = 1.5.dp.toPx()
+        drawRoundRect(AppColors.raised, cornerRadius = CornerRadius(7.dp.toPx()))
+        val inset = 3.dp.toPx()
         drawRoundRect(
-            AppColors.ink.copy(alpha = 0.8f), Offset(stroke / 2, stroke / 2), Size(size.width - stroke, size.height - stroke),
-            CornerRadius(6.dp.toPx()), style = Stroke(stroke),
+            AppColors.page, Offset(inset, inset * 3), Size(size.width - inset * 2, size.height - inset * 4),
+            CornerRadius(4.dp.toPx()),
         )
         val slot = size.width * 0.3f
         drawLine(
-            AppColors.ink.copy(alpha = 0.45f), Offset((size.width - slot) / 2, 5.dp.toPx()), Offset((size.width + slot) / 2, 5.dp.toPx()),
+            AppColors.ink.copy(alpha = 0.45f), Offset((size.width - slot) / 2, 4.5.dp.toPx()), Offset((size.width + slot) / 2, 4.5.dp.toPx()),
             1.2.dp.toPx(), StrokeCap.Round,
         )
     }

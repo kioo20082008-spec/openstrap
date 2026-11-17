@@ -3,7 +3,6 @@ package org.openstrap.app.ui.glow
 import androidx.activity.compose.BackHandler
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,12 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -59,56 +60,59 @@ fun HeartZonesScreen(
     BackHandler(onBack = onBack)
     var editing by rememberSaveable { mutableStateOf<Int?>(null) }
     var settingMax by rememberSaveable { mutableStateOf(false) }
+    val cascade = remember { DetailCascade() }
+    CompositionLocalProvider(LocalDetailCascade provides cascade) {
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item { PageHeader(HeartZonesCopy.TITLE, onBack) }
         item { MaxHero(max) { settingMax = true } }
         item {
-            PageRows {
+            PageRows(Modifier.detailRise()) {
                 (0 until Workouts.ZONES).forEach { z ->
                     ZoneRow(z, if (max != null) HeartZonesCopy.zoneBpm(zones, z, max.bpm) else "", divider = z > 0) { if (max != null) editing = z }
                 }
             }
         }
-        item { Text(HeartZonesCopy.NOTE, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.padding(horizontal = 4.dp)) }
+        item { Text(HeartZonesCopy.NOTE, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, modifier = Modifier.detailRise().padding(horizontal = 4.dp)) }
         if (!zones.standard) item {
-            PageButton(HeartZonesCopy.RESET, { onZones(HeartZones.STANDARD) }, Modifier.fillMaxWidth(), icon = AppIcons.ArrowCounterClockwise)
+            PageButton(HeartZonesCopy.RESET, { onZones(HeartZones.STANDARD) }, Modifier.detailRise().fillMaxWidth(), icon = AppIcons.ArrowCounterClockwise)
         }
+    }
     }
     val zone = editing
     if (zone != null && max != null) ZoneSheet(zone, zones, max.bpm, onZones) { editing = null }
     if (settingMax && max != null) MaxSheet(max, { onMax(it); settingMax = false }) { settingMax = false }
 }
 
-/** The max as the page's hero: its Doto number on heart red lit from the left, where it comes from, and Set it myself. */
+/** The max as the page's hero in the rings design: one thick heart-red ring with the bpm bold in it, where it comes from, and Set it myself. */
 @Composable
 private fun MaxHero(max: MaxHeartRate?, onSet: () -> Unit) {
-    LitPanel(
-        MetricColors.heart, HeroLight,
-        lightCenter = { Offset(0f, it.height / 2) }, reach = { Size(it.width * HERO_LIGHT_REACH, it.width * HERO_LIGHT_REACH) },
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(HeartZonesCopy.MAX_TITLE, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.body)
-        HeroValue(
-            max?.bpm?.toString() ?: "0", stringResource(R.string.glow_unit_bpm),
-            color = if (max != null) AppColors.ink else AppColors.ink.copy(alpha = 0.2f),
+    Box(Modifier.fillMaxWidth().clip(RingDetailShape)) {
+    // The heart's red drifting faintly behind, and the ring beating like one.
+    AmbientAura(MetricColors.heart, Modifier.matchParentSize(), strength = 0.7f)
+    Column(Modifier.fillMaxWidth().padding(vertical = 8.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(HeartZonesCopy.MAX_TITLE, color = AppColors.muted, style = GlowType.body)
+        DetailRing(if (max != null) 1f else 0f, MetricColors.heart, icon = AppIcons.HeartFill, life = DetailRingLife.Heartbeat) {
+            Text(
+                detailCountUp(max?.bpm?.toString() ?: "–"), color = if (max != null) AppColors.ink else AppColors.ink.copy(alpha = 0.3f),
+                style = ringFigure(54.sp), maxLines = 1,
+            )
+            Text(stringResource(R.string.glow_unit_bpm), color = AppColors.muted, style = RingLabel, maxLines = 1)
+        }
+        if (max != null) Text(
+            HeartZonesCopy.source(max), color = AppColors.muted, style = GlowType.secondary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
-        if (max != null) Text(HeartZonesCopy.source(max), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary)
         PageButton(HeartZonesCopy.SET_IT, onSet, enabled = max != null, icon = AppIcons.PencilEdit)
     }
+    }
 }
-
-/** How far the max hero's light reaches from the left edge, in card widths. */
-private const val HERO_LIGHT_REACH = 1.1f
-
-/** The max hero's light: heart red at 55% on the edge, 12% halfway out. */
-private val HeroLight = listOf(0f to 0.55f, 0.5f to 0.12f)
 
 /** A zone on the list: its colour as a short bar, its number and name, and its heart rates. */
 @Composable
 private fun ZoneRow(zone: Int, bpm: String, divider: Boolean, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick)
-            .topHairline(divider, RowHairline)
+        Modifier.fillMaxWidth().detailPress(scale = 0.98f, onClick = onClick)
+            .topHairline(divider, AppColors.hairline)
             .padding(vertical = GlowLayout.RowPadding),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -118,7 +122,7 @@ private fun ZoneRow(zone: Int, bpm: String, divider: Boolean, onClick: () -> Uni
             RowName(HeartZonesCopy.zoneName(zone))
             Text(ZONE_NAMES[zone], color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary)
         }
-        Text(bpm, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
+        Text(bpm, color = AppColors.ink, style = ringFigure(15.sp, FontWeight.Bold), maxLines = 1)
         Spacer(Modifier.width(RowCaretGap))
         TapCaret(ROW_CARET_ALPHA)
     }
@@ -144,7 +148,7 @@ private fun BpmStepper(label: String, bpm: Int, onLess: () -> Unit, onMore: () -
         Text(label, color = AppColors.ink, style = GlowType.body, modifier = Modifier.weight(1f))
         RoundIcon(AppIcons.Minus, stringResource(R.string.glow_metrics_zone_lower, label), onLess)
         Text(
-            stringResource(R.string.glow_metrics_zone_bpm, bpm), color = AppColors.ink, style = GlowType.sentence,
+            stringResource(R.string.glow_metrics_zone_bpm, bpm), color = AppColors.ink, style = ringFigure(20.sp),
             modifier = Modifier.width(110.dp),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )

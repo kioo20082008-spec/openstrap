@@ -141,7 +141,7 @@ internal fun MindRing(time: () -> Long, length: Long?, ring: Boolean = true) {
 private fun MindClock(time: () -> Long, length: Long?) {
     val active = time()
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(workoutClock(active), color = AppColors.ink.copy(alpha = 0.9f), style = GlowType.mindClock, maxLines = 1)
+        Text(workoutClock(active), color = AppColors.ink.copy(alpha = 0.9f), style = GlowType.mindClock.copy(fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1)
         Text(
             length?.let {
                 stringResource(if (active >= it) R.string.workout_live_mind_length_up else R.string.workout_live_mind_length, it / 60)

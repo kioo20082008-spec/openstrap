@@ -1,6 +1,11 @@
 package org.openstrap.app.ui.alarms
 
+import org.openstrap.app.ui.device.RingsRow
+import org.openstrap.app.ui.device.RingsSwitchRow
 import android.Manifest
+import org.openstrap.app.ui.device.RingsHeader
+import org.openstrap.app.ui.device.RingsPanel
+import org.openstrap.app.ui.device.RingsSegments
 import org.openstrap.app.ui.theme.AppColors
 import android.content.ComponentName
 import android.content.Intent
@@ -42,13 +47,10 @@ import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageNote
 import org.openstrap.app.ui.glow.PageRow
 import org.openstrap.app.ui.glow.PageSheet
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageSwitchRow
-import org.openstrap.app.ui.glow.GlowSegments
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.app.presentation.ClockSetting
 import org.openstrap.app.presentation.Ranges
@@ -123,10 +125,10 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
     }
 
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_phone_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_phone_title), onBack) }
         item {
-            PagePanel {
-                PageSwitchRow(
+            RingsPanel {
+                RingsSwitchRow(
                     stringResource(R.string.you_phone_calls), stringResource(R.string.you_phone_calls_note),
                     calls && callPermission,
                     { on ->
@@ -147,11 +149,11 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.you_phone_call_buzz), style = GlowType.body, color = AppColors.ink)
                         // Picking one plays it for a few seconds, so the two can be compared on the wrist.
-                        GlowSegments(CallBuzz.entries.map { it.label }, callStyle.ordinal, { i -> vm.pickCallBuzz(CallBuzz.entries[i]) })
+                        RingsSegments(CallBuzz.entries.map { it.label }, callStyle.ordinal, { i -> vm.pickCallBuzz(CallBuzz.entries[i]) })
                         callPreviewError?.let { PageNote(it, color = MetricColors.warn) }
                     }
                 }
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_phone_notifications), stringResource(R.string.you_phone_notifications_note),
                     notifications && notificationAccess,
                     { on ->
@@ -167,21 +169,21 @@ fun PhoneAlertsScreen(vm: PhoneAlertsViewModel, contentPadding: PaddingValues, o
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(stringResource(R.string.you_phone_pattern), style = GlowType.body, color = AppColors.ink)
                         // Picking a pattern plays it once, so it can be felt before the next notification.
-                        GlowSegments(BuzzPattern.entries.map { it.label }, pattern.ordinal, { i -> vm.pickPattern(BuzzPattern.entries[i]) })
+                        RingsSegments(BuzzPattern.entries.map { it.label }, pattern.ordinal, { i -> vm.pickPattern(BuzzPattern.entries[i]) })
                         previewError?.let { PageNote(it, color = MetricColors.warn) }
                     }
-                    PageSwitchRow(
+                    RingsSwitchRow(
                         stringResource(R.string.you_phone_quiet), quietHoursSummary(quiet, calls && callPermission), quiet.on,
                         { on -> vm.updateQuietHours { it.copy(on = on) } },
                     )
                     if (quiet.on) {
-                        PageRow(
+                        RingsRow(
                             stringResource(R.string.you_phone_quiet_from), quietClock(quiet.from), onClick = { pickingFrom = true },
                             divider = false,
                         )
-                        PageRow(stringResource(R.string.you_phone_quiet_to), quietClock(quiet.to), onClick = { pickingFrom = false })
+                        RingsRow(stringResource(R.string.you_phone_quiet_to), quietClock(quiet.to), onClick = { pickingFrom = false })
                         if (calls && callPermission) {
-                            PageSwitchRow(
+                            RingsSwitchRow(
                                 stringResource(R.string.you_phone_quiet_calls), stringResource(R.string.you_phone_quiet_calls_note),
                                 quiet.calls,
                                 { on -> vm.updateQuietHours { it.copy(calls = on) } },

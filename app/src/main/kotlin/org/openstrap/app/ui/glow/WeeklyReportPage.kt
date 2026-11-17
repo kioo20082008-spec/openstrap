@@ -3,7 +3,6 @@ package org.openstrap.app.ui.glow
 import android.content.Intent
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,8 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import java.time.LocalDate
 import java.util.Locale
 import kotlin.math.roundToInt
 import org.openstrap.app.R
@@ -53,13 +52,23 @@ private fun signed(n: Int) = String.format(Locale.ROOT, "%+d", n)
 fun WeeklyReportPage(vm: WeeklyReportViewModel, contentPadding: PaddingValues, onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     val state by vm.state.collectAsStateWithLifecycle()
+    val cascade = androidx.compose.runtime.remember { DetailCascade() }
+    androidx.compose.runtime.CompositionLocalProvider(LocalDetailCascade provides cascade) {
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.report_title), onBack) }
+        item {
+            // The week's dates under the title, as every detail's subtitle.
+            val ready = (state as? WeeklyReportViewModel.State.Ready)?.report
+            PageHeader(
+                stringResource(R.string.report_title), onBack,
+                subtitle = ready?.let { stringResource(R.string.report_range, DayWords.short(it.first), DayWords.short(it.last)) },
+            )
+        }
         when (val s = state) {
             WeeklyReportViewModel.State.Loading -> item { Note(stringResource(R.string.report_loading)) }
             WeeklyReportViewModel.State.Unavailable -> item { Note(stringResource(R.string.report_unavailable)) }
             is WeeklyReportViewModel.State.Ready -> reportItems(s.report)
         }
+    }
     }
 }
 
@@ -69,7 +78,6 @@ private fun Note(text: String) {
 }
 
 private fun androidx.compose.foundation.lazy.LazyListScope.reportItems(r: WeeklyReport.Report) {
-    item { Range(r.first, r.last) }
     item { AdviceCard(r) }
     item { Trio(r) }
     item { Figures(r) }
@@ -77,21 +85,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.reportItems(r: Weekly
     item { PageNote(stringResource(R.string.report_foot)) }
 }
 
-@Composable
-private fun Range(first: LocalDate, last: LocalDate) {
-    Text(
-        stringResource(R.string.report_range, DayWords.short(first), DayWords.short(last)),
-        color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp),
-    )
-}
-
-@Composable
-private fun Panel(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    val shape = RoundedCornerShape(26.dp)
-    Column(modifier.fillMaxWidth().clip(shape).background(FlatSurface).border(1.dp, FlatHairline, shape).padding(horizontal = 20.dp, vertical = 18.dp)) {
-        content()
-    }
-}
 
 /** What to do next week, in one line with its reason. */
 @Composable
@@ -109,32 +102,45 @@ private fun adviceText(r: WeeklyReport.Report): Pair<String, String> = when (r.a
 @Composable
 private fun AdviceCard(r: WeeklyReport.Report) {
     val (title, body) = adviceText(r)
-    Panel {
-        Text(stringResource(R.string.report_next_week), color = AppColors.muted, style = MaterialTheme.typography.labelLarge)
+    // The page's one call to action: filled in Recovery's hue, in dark ink (the rings design).
+    Column(Modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(RingColors.Recovery).padding(horizontal = 20.dp, vertical = 16.dp)) {
+        Text(stringResource(R.string.report_next_week), color = RingOnHue.copy(alpha = 0.7f), style = MaterialTheme.typography.labelLarge)
         Spacer(Modifier.height(6.dp))
-        Text(title, color = AppColors.ink, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
+        Text(title, color = RingOnHue, style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.ExtraBold))
         Spacer(Modifier.height(6.dp))
-        Text(body, color = AppColors.muted, style = MaterialTheme.typography.bodyMedium)
+        Text(body, color = RingOnHue, style = MaterialTheme.typography.bodyMedium)
     }
 }
 
-/** Recovery, sleep score and steps, large and thin, each with how it moved. */
+/** Recovery, sleep score and steps, each its metric's ring with the week's figure bold in it and how it moved. */
 @Composable
 private fun Trio(r: WeeklyReport.Report) {
-    Panel {
+    val goal = org.openstrap.app.ui.dashboard.LocalGoals.current.steps.coerceAtLeast(1)
+    DetailCard {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-            Big(stringResource(R.string.report_readiness), r.readiness.value?.roundToInt()?.toString(), r.readiness.change?.roundToInt()?.let(::signed))
-            Big(stringResource(R.string.report_sleep_score), r.sleepScore.value?.roundToInt()?.toString(), r.sleepScore.change?.roundToInt()?.let(::signed))
-            Big(stringResource(R.string.report_steps), r.steps.value?.roundToInt()?.let { Units.count(it) }, r.steps.change?.roundToInt()?.let(::signed))
+            Big(
+                stringResource(R.string.report_readiness), r.readiness.value?.roundToInt()?.toString(), r.readiness.change?.roundToInt()?.let(::signed),
+                RingColors.Recovery, (r.readiness.value ?: 0f) / 100f,
+            )
+            Big(
+                stringResource(R.string.report_sleep_score), r.sleepScore.value?.roundToInt()?.toString(), r.sleepScore.change?.roundToInt()?.let(::signed),
+                RingColors.Sleep, (r.sleepScore.value ?: 0f) / 100f,
+            )
+            Big(
+                stringResource(R.string.report_steps), r.steps.value?.roundToInt()?.let { Units.count(it) }, r.steps.change?.roundToInt()?.let(::signed),
+                RingColors.Steps, (r.steps.value ?: 0f) / goal,
+            )
         }
     }
 }
 
 @Composable
-private fun Big(label: String, value: String?, change: String?) {
+private fun Big(label: String, value: String?, change: String?, hue: Color, share: Float) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Ltr { Text(value ?: "–", color = AppColors.ink, style = GlowType.storyStat, textAlign = TextAlign.Center) }
-        Spacer(Modifier.height(2.dp))
+        DetailRing(share, hue, diameter = 88.dp, stroke = 9.dp) {
+            Ltr { Text(detailCountUp(value ?: "–"), color = AppColors.ink, style = ringFigure(if ((value?.length ?: 1) > 4) 15.sp else 20.sp), maxLines = 1, textAlign = TextAlign.Center) }
+        }
+        Spacer(Modifier.height(8.dp))
         Text(label, color = AppColors.muted, style = MaterialTheme.typography.labelMedium, textAlign = TextAlign.Center)
         if (change != null) Ltr { Text(change, color = AppColors.muted, style = MaterialTheme.typography.labelMedium) }
     }
@@ -145,7 +151,7 @@ private fun Figures(r: WeeklyReport.Report) {
     val min = stringResource(R.string.report_min)
     val asleep = r.asleepMinutes
     val asleepText = asleep.value?.let { Units.duration(it.roundToInt() * SECONDS_A_MINUTE) + change(asleep.change, min) }
-    PageRows {
+    PageRows(Modifier.detailRise()) {
         PageRow(stringResource(R.string.report_asleep), asleepText, below = true, divider = false, icon = AppIcons.Moon)
         PageRow(stringResource(R.string.report_rhr), figure(r.restingHr), below = true, icon = AppIcons.Heartbeat)
         PageRow(stringResource(R.string.report_hrv), figure(r.hrv), below = true, icon = AppIcons.ChartLineUp)
@@ -181,6 +187,6 @@ private fun ShareButton(r: WeeklyReport.Report) {
             val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
             context.startActivity(Intent.createChooser(send, chooser))
         },
-        modifier = Modifier.fillMaxWidth(), icon = AppIcons.UploadSimple,
+        modifier = Modifier.detailRise().fillMaxWidth(), icon = AppIcons.UploadSimple,
     )
 }

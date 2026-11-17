@@ -166,7 +166,7 @@ private fun RecoveryHero(
     // The redesign: with a score, the Pulse hero; before one, the card that says why there's none.
     if (score != null && !firstNights && !firstScore && TabCopy.learning(ready.phase, ready.baselineNights) == null) {
         val vs = TabCopy.vsYesterday(score, yesterday)
-        PulseHero(
+        RingPulseHero(
             score = score, word = TodayCopy.recoveryWord(score, alert),
             line = listOfNotNull(restingHr?.let { stringResource(R.string.dials_pulse_resting, it) }, vs).joinToString(" · "),
             sentence = TabCopy.recovery(score, alert, ready.contributors),

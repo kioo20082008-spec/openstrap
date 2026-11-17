@@ -17,10 +17,8 @@ import org.openstrap.app.ui.dashboard.SleepCopy
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageNote
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.theme.AppIcons
 import java.time.ZoneId
 import org.openstrap.app.presentation.DayWords
@@ -42,14 +40,14 @@ fun DeletedSleepPage(
     val now = System.currentTimeMillis() / 1000
     fun clock(t: Long) = TimeOfDay.format(t, zone)
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_deleted_sleep_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_deleted_sleep_title), onBack) }
         item { Text(SleepCopy.DELETED_INTRO, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
         // Once the last one is restored the page stays open, saying so, with no empty panel under it.
         if (deleted.isEmpty()) item { Text(SleepCopy.DELETED_NONE, color = AppColors.ink, style = GlowType.body, modifier = Modifier.padding(horizontal = 4.dp)) }
         else item {
-            PageRows {
+            RingsRows {
                 deleted.forEachIndexed { i, r ->
-                    PageRow(
+                    RingsRow(
                         SleepCopy.deletedName(r.strap.nap, DayWords.short(SleepCopy.deletedDay(r, zone))),
                         SleepCopy.deletedLine(clock(r.start), clock(r.end), r.edit?.let { SleepEdits.daysLeft(it, now) } ?: SleepEdits.KEEP_DAYS),
                         below = true, divider = i > 0, icon = AppIcons.Moon,

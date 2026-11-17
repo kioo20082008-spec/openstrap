@@ -220,7 +220,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
         Box(Modifier.fillMaxWidth().height(44.dp), contentAlignment = Alignment.Center) {
             val close = stringResource(R.string.glow_close)
             Box(Modifier.align(Alignment.CenterStart)) { RoundIconButton(AppIcons.X, close, onClose, size = 44.dp) }
-            Text(stringResource(R.string.glow_share), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+            Text(stringResource(R.string.glow_share), color = AppColors.ink, style = GlowType.cardTitle.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), maxLines = 1)
             // The picture for Save and Share: the same card at 1080 by 1920, recorded but never drawn on screen.
             if (export != null) Box(
                 Modifier.layout { measurable, _ ->
@@ -240,7 +240,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
             val width = height * 9f / 16f
             val density = LocalDensity.current
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(Modifier.size(width, height).clip(GlowLayout.TileShape)) {
+                Box(Modifier.size(width, height).clip(androidx.compose.foundation.shape.RoundedCornerShape(22.dp))) {
                     CompositionLocalProvider(LocalDensity provides Density(density.density * (width / StoryWidth), 1f)) {
                         StoryCardView(card, photo, shown)
                     }
@@ -258,7 +258,7 @@ private fun ShareScreen(card: StoryCard, route: List<Route.Point>, fileName: Str
         if (hasRoute) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    stringResource(R.string.glow_share_route), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary,
+                    stringResource(R.string.glow_share_route), color = AppColors.muted, style = GlowType.secondary,
                     maxLines = 1, modifier = Modifier.width(84.dp),
                 )
                 val routes = StoryRoute.entries

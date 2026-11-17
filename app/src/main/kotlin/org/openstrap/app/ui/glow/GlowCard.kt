@@ -1,6 +1,5 @@
 package org.openstrap.app.ui.glow
 
-import androidx.compose.foundation.border
 import org.openstrap.app.ui.theme.AppColors
 import android.graphics.Paint
 import android.graphics.RectF
@@ -95,10 +94,10 @@ val LocalGlowPaused = staticCompositionLocalOf<() -> Boolean> { { false } }
  * [LocalGlowPaused] so a screen's own scroll state doesn't override it. Cores hold still then, so a swipe between
  * tabs gets every frame to itself and the pages kept ready either side don't animate unseen.
  */
-/** The redesign: cards are flat navy panels with a hairline, no glow. */
+/** The rings design: cards are flat solid panels, no edge, no glow. */
 internal const val FlatCards = true
 internal val FlatSurface: Color get() = AppColors.glass
-internal val FlatHairline: Color get() = AppColors.hairline
+internal val FlatHairline: Color get() = Color.Transparent
 
 val LocalGlowPagePaused = staticCompositionLocalOf<() -> Boolean> { { false } }
 
@@ -113,7 +112,7 @@ fun GlowCard(
     content: @Composable BoxScope.() -> Unit,
 ) {
     val lit = style.copy(mood = LocalGlowMood.current)
-    val shape = remember(lit.radius) { RoundedCornerShape(lit.radius) }
+    val shape = if (FlatCards) GlowLayout.CardShape else remember(lit.radius) { RoundedCornerShape(lit.radius) }
     val palette = remember(lit) { GlowPalette(lit) }
     val core = remember(lit) { lit.light().core }
     val slab = remember(palette) { lerp(palette.mid, Color.Black, 0.55f) }
@@ -233,8 +232,7 @@ fun GlowCard(
             Box(Modifier.padding(contentPadding), content = content)
         }
         // Grain and the hairline edge, on top of everything; static.
-        if (FlatCards) Spacer(Modifier.matchParentSize().border(1.dp, FlatHairline, shape))
-        else Spacer(Modifier.matchParentSize().drawWithCache { overlay(lit, grainSeed) })
+        if (!FlatCards) Spacer(Modifier.matchParentSize().drawWithCache { overlay(lit, grainSeed) })
     }
 }
 

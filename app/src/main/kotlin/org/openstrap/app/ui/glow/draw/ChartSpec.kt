@@ -476,8 +476,8 @@ fun stageStripSegments(spans: List<org.openstrap.app.presentation.StageSpan>, wi
 
 /** A sleep stage's colour, as on the strap's own charts. */
 internal fun stageColor(stage: Int): Color = when (stage) {
-    org.openstrap.app.data.db.SleepStage.DEEP -> MetricColors.sleepDeep
-    org.openstrap.app.data.db.SleepStage.REM -> MetricColors.sleepRem
-    org.openstrap.app.data.db.SleepStage.AWAKE -> MetricColors.sleepAwake
-    else -> MetricColors.sleepLight
+    org.openstrap.app.data.db.SleepStage.DEEP -> Color(0xFF5B45FF)
+    org.openstrap.app.data.db.SleepStage.REM -> Color(0xFF8B7BFF)
+    org.openstrap.app.data.db.SleepStage.AWAKE -> Color(0xFFFF5C39)
+    else -> Color(0xFFD2CCFF)
 }

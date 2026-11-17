@@ -161,10 +161,10 @@ fun GlassOverlay(host: GlassHost, haze: dev.chrisbanes.haze.HazeState) {
     }
 }
 
-/** The glass panel a popup sits on: see-through dark over the blurred page, with a lit top edge. */
+/** The panel a popup sits on, in the rings design: the theme's sheet colour, solid, with no edge. */
 @Composable
 fun GlassPanel(modifier: Modifier = Modifier, shape: androidx.compose.ui.graphics.Shape = org.openstrap.app.ui.glow.GlowLayout.CardShape, content: @Composable () -> Unit) {
-    Surface(shape = shape, color = GlassTint, border = GlassEdge, contentColor = AppColors.ink, modifier = modifier, content = content)
+    Surface(shape = shape, color = GlassTint.copy(alpha = 1f), contentColor = AppColors.ink, modifier = modifier, content = content)
 }
 
 /**

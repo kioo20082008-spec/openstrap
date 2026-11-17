@@ -162,6 +162,8 @@ class AppUpdater(
     suspend fun dailyCheck() = autoUpdate()
 
     suspend fun autoUpdate() {
+        // The draft app (org.openstrap.app.demo) must not fetch and install the real app's releases.
+        if (app.packageName.endsWith(".demo")) return
         if (!check()) return
         val newest = Releases.newer(_state.value.releases, installed).firstOrNull() ?: return
         // One automatic try per release: a declined or failed install isn't pushed again, Updates still offers it.

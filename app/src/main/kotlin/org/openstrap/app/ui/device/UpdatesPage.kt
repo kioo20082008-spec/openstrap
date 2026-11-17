@@ -3,8 +3,6 @@ package org.openstrap.app.ui.device
 import androidx.activity.compose.BackHandler
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,10 +30,7 @@ import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.PageSwitchRow
 import org.openstrap.app.ui.glow.GlowType
-import org.openstrap.app.ui.glow.PageHeader
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageRow
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.update.Install
 import org.openstrap.app.update.NoteBlock
@@ -72,24 +67,24 @@ fun UpdatesPage(
     val newest = newer.firstOrNull()
     val busy = state.install is Install.Downloading || state.install is Install.Installing
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_updates_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_updates_title), onBack) }
         item {
-            PageRows {
-                if (newest != null) PageRow(
+            RingsRows {
+                if (newest != null) RingsRow(
                     stringResource(R.string.you_updates_release, newest.versionName), UpdateCopy.install(newest, state.install, recording),
                     onClick = { onInstall(newest) }, below = true, divider = false, enabled = !busy && !(recording && newest.apk != null),
                     icon = AppIcons.DownloadSimple,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_updates_check_now), UpdateCopy.checkStatus(state, now), onClick = onCheck, below = true,
                     divider = newest != null,
                     enabled = !state.checking, icon = AppIcons.Refresh04,
                 )
-                PageSwitchRow(
+                RingsSwitchRow(
                     stringResource(R.string.you_updates_daily), stringResource(R.string.you_updates_daily_note), auto, onAuto,
                     icon = AppIcons.CalendarBlank,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_updates_all_releases), stringResource(R.string.you_updates_on_github), onClick = onGitHub,
                     below = true,
                     icon = AppIcons.Info,
@@ -107,7 +102,7 @@ fun UpdatesPage(
                     else -> R.string.you_updates_latest
                 },
             )
-            PagePanel(title = title) {
+            RingsPanel(title = title) {
                 shown.forEachIndexed { i, release ->
                     if (i > 0) Box(Modifier.fillMaxWidth().height(1.dp).background(AppColors.ink.copy(alpha = 0.08f)))
                     ReleaseNotesView(
@@ -147,11 +142,7 @@ private fun ReleaseNotesView(release: Release, badge: Int?) {
                 stringResource(R.string.you_updates_version, release.versionName), color = AppColors.ink,
                 style = GlowType.body.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f), textAlign = TextAlign.Start,
             )
-            if (badge != null) Text(
-                stringResource(badge), color = AppColors.ink,
-                style = GlowType.secondary.copy(fontWeight = FontWeight.Medium),
-                modifier = Modifier.clip(CircleShape).background(AppColors.ink.copy(alpha = 0.10f)).padding(horizontal = 12.dp, vertical = 4.dp),
-            )
+            if (badge != null) RingsPill(stringResource(badge))
         }
         release.publishedAt?.let {
             Text(

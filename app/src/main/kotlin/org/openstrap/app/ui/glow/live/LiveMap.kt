@@ -134,7 +134,7 @@ internal fun LiveMapScreen(
                 LiveStat(figures[0].second, Modifier.weight(1f)) { LiveValue(figures[0].first) }
                 StatRule()
                 val moving = stringResource(R.string.workout_live_moving_time)
-                LiveStat(moving, Modifier.weight(1.3f)) { ClockText(time, GlowType.mapClock, maxLines = 1) }
+                LiveStat(moving, Modifier.weight(1.3f)) { ClockText(time, GlowType.mapClock.copy(fontFamily = org.openstrap.app.ui.theme.NumberFamily, fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), maxLines = 1) }
                 StatRule()
                 LiveStat(figures[1].second, Modifier.weight(1f)) { LiveValue(figures[1].first) }
             }

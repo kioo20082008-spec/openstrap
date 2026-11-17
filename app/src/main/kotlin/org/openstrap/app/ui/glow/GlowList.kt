@@ -45,7 +45,7 @@ import org.openstrap.app.ui.components.cardOpening
  * for lists of things (workouts, contributors, settings). No glow at all, so the cards above it keep the light.
  */
 
-internal val ListSurface: Color get() = AppColors.list
+internal val ListSurface: Color get() = AppColors.glass
 internal val RowHairline: Color get() = AppColors.ink.copy(alpha = GlowLayout.DividerAlpha)
 
 /**
@@ -74,7 +74,7 @@ fun ListPanel(
             start = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        title.orEmpty(), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
+                        title.orEmpty(), color = AppColors.ink, style = RingType.cardTitle, maxLines = 1,
                         overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false),
                     )
                     if (marked) TitleMark(marker, tag, Modifier.padding(start = 8.dp))
@@ -96,7 +96,6 @@ fun ListPanel(
             .fillMaxWidth()
             .clip(GlowLayout.CardShape)
             .background(ListSurface, GlowLayout.CardShape)
-            .border(1.dp, RowHairline, GlowLayout.CardShape)
             .padding(GlowLayout.ListPadding),
         content = rows,
     )
@@ -193,7 +192,7 @@ fun ListRow(
         }
         Spacer(Modifier.width(12.dp))
         if (value != null) CompositionLocalProvider(LocalCardNumbers provides opening?.numbers) {
-            Text(value, Modifier.cardNumber(value), color = accent, style = GlowType.rowValue, maxLines = 1)
+            Text(value, Modifier.cardNumber(value), color = accent, style = RingType.rowValue, maxLines = 1)
         }
         else if (dash) WaitingDash()
         if (onClick != null) {
