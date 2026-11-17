@@ -94,7 +94,7 @@ fun GlowSleepScreen(
     val slots = sleepCards(SleepFacts(breathing = breathing != null || firstNights, naps = state.naps.isNotEmpty(), hasNight = state.sleep != null))
     var breathingInfo by rememberSaveable { mutableStateOf(false) }
     // The Sleep tab is always at night (spec 2.6): calm glow, light from below only.
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalGlowMood provides GlowMood.Night) {
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalGlowMood provides GlowMood.Night, LocalEntryScreen provides "sleep") {
         GlowScreenList(contentPadding, list) {
             full { header() }
             // With naps and a breathing summary the two are a Small pair; alone, either is a Wide.

@@ -131,19 +131,28 @@ fun FloatingNavBar(
 @Composable
 fun FloatingNavRail(
     items: List<NavItem>, selected: Int, onSelect: (Int) -> Unit, modifier: Modifier = Modifier, glass: HazeState,
+    /** The coral "+" in the middle of the rail, as the bar has it; null leaves the plain rail. */
+    onPlus: (() -> Unit)? = null,
 ) {
+    // The "+" sits between the two halves of the tabs, as in the bar, and is a cell of its own: the tabs share the rest.
+    val half = (items.size + 1) / 2
+    val quickTitle = androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.dials_quick_title)
     Box(
         modifier.fillMaxHeight().systemBarsPadding().displayCutoutPadding().padding(horizontal = 10.dp, vertical = 20.dp),
         contentAlignment = Alignment.Center,
     ) {
-        Box(Modifier.width(NavRailWidth - 20.dp).heightIn(max = 380.dp).fillMaxHeight().glassPill(glass)) {
+        Box(Modifier.width(NavRailWidth - 20.dp).heightIn(max = if (onPlus != null) 440.dp else 380.dp).fillMaxHeight().glassPill(glass)) {
             var barHeight by remember { mutableIntStateOf(0) }
             val density = androidx.compose.ui.platform.LocalDensity.current
             Box(Modifier.padding(6.dp).onSizeChanged { barHeight = it.height }) {
                 val gap = 2.dp
-                val cell = (with(density) { barHeight.toDp() } - gap * (items.size - 1)) / items.size
+                val plusH = if (onPlus != null) PlusSize else 0.dp
+                val cells = items.size + if (onPlus != null) 1 else 0
+                val cell = (with(density) { barHeight.toDp() } - plusH - gap * (cells - 1)) / items.size
+                // The capsule skips over the "+" for a tab after it.
+                val after = if (onPlus != null && selected >= half) plusH + gap else 0.dp
                 val y by androidx.compose.animation.core.animateDpAsState(
-                    (cell + gap) * selected, tween(Motion.SWIFT, easing = Motion.easing), label = "nav pill",
+                    (cell + gap) * selected + after, tween(Motion.SWIFT, easing = Motion.easing), label = "nav pill",
                 )
                 Box(
                     Modifier.offset(y = y).height(cell).fillMaxWidth().clip(NavCellShape)
@@ -151,6 +160,7 @@ fun FloatingNavRail(
                 )
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(gap)) {
                     items.forEachIndexed { i, item ->
+                        if (onPlus != null && i == half) PlusButton(onPlus, quickTitle, Modifier.align(Alignment.CenterHorizontally))
                         NavCell(
                             item, i == selected,
                             modifier = Modifier.clip(NavCellShape).clickable { onSelect(i) }.weight(1f).fillMaxWidth(),
@@ -273,18 +283,7 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         ) {
             val half = (items.size + 1) / 2
             items.forEachIndexed { i, item ->
-                if (i == half) Box(
-                    Modifier.size(50.dp).clip(CircleShape).background(PlusHue)
-                        .semantics { contentDescription = quickTitle }
-                        .clickable(onClickLabel = quickTitle, onClick = onPlus),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    androidx.compose.foundation.Canvas(Modifier.size(22.dp)) {
-                        val w = 2.6.dp.toPx()
-                        drawLine(PlusInk, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
-                        drawLine(PlusInk, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
-                    }
-                }
+                if (i == half) PlusButton(onPlus, quickTitle)
                 RingNavCell(
                     item, i == selected,
                     Modifier.onGloballyPositioned { c ->
@@ -296,6 +295,25 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         }
     }
 }
+
+/** The coral "+" of the bar and the rail: Energy's hue with the dark ink, opening the quick actions. */
+@Composable
+private fun PlusButton(onPlus: () -> Unit, title: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier.size(PlusSize).clip(CircleShape).background(PlusHue)
+            .semantics { contentDescription = title }
+            .clickable(onClickLabel = title, onClick = onPlus),
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.foundation.Canvas(Modifier.size(22.dp)) {
+            val w = 2.6.dp.toPx()
+            drawLine(PlusInk, Offset(size.width / 2, 0f), Offset(size.width / 2, size.height), w, androidx.compose.ui.graphics.StrokeCap.Round)
+            drawLine(PlusInk, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w, androidx.compose.ui.graphics.StrokeCap.Round)
+        }
+    }
+}
+
+private val PlusSize = 50.dp
 
 /** Energy's hue for the bar's "+", with the dark ink on it. */
 private val PlusHue = Color(0xFFFF5C39)

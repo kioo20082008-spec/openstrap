@@ -23,7 +23,7 @@
     <string name="glow_today_steps">خطوة</string>
     <string name="glow_today_energy_left">تبقّى ⁨%1$d⁩ من الطاقة</string>
     <string name="glow_today_pair_title">اربط Helio Strap</string>
-    <string name="glow_today_find_strap">اربط السترب</string>
+    <string name="glow_today_find_strap">ربط السوار</string>
     <string name="glow_today_sync_now">زامن الآن</string>
     <string name="glow_today_body_morning">جسمك هذا الصباح</string>
     <string name="glow_today_resting_hr">نبض الراحة</string>

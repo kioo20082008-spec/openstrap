@@ -51,4 +51,13 @@
     <string name="breathe_again">مرة أخرى</string>
     <string name="dials_quick_breathe">جلسة تنفّس</string>
     <plurals name="day_sleep_naps_count"><item quantity="zero">لا قيلولة</item><item quantity="one">قيلولة واحدة</item><item quantity="two">قيلولتان</item><item quantity="few">⁨%d⁩ قيلولات</item><item quantity="many">⁨%d⁩ قيلولة</item><item quantity="other">⁨%d⁩ قيلولة</item></plurals>
+    <string name="today_status_ready">جسمك جاهز، خذها بقوة</string>
+    <string name="today_status_steady">يوم متوسط، تمرّن بهدوء</string>
+    <string name="today_status_rest">اليوم يوم راحة</string>
+    <string name="today_status_strained">إشارات جسمك خارج المعتاد، خفّف اليوم</string>
+    <string name="today_status_low_energy">طاقتك منخفضة، خذ استراحة قصيرة</string>
+    <string name="today_status_wind_down">اقترب وقت الراحة، اجعل ليلتك هادئة</string>
+    <string name="level_great">ممتاز</string>
+    <string name="level_good">جيد</string>
+    <string name="level_low">منخفض</string>
 </resources>

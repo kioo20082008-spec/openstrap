@@ -36,6 +36,8 @@ import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -81,7 +83,7 @@ private val Ink: Color get() = AppColors.ink
 private val Muted: Color get() = AppColors.ink.copy(alpha = 0.55f)
 /** Grid rows and stage guides: solid, the theme's ink at 8%, 1 dp. ([ChartInk] keeps the widgets' white.) */
 private val Grid: Color get() = AppColors.ink.copy(alpha = ChartInk.Grid.alpha)
-/** A target, goal or average across a chart: solid, white at 40%, 1 dp. */
+/** A target, goal or average across a chart: dashed ([dashed]), the ink at 40%, 1 dp. */
 private val Target: Color get() = AppColors.ink.copy(alpha = ChartInk.Target.alpha)
 
 private val axisText get() = TextStyle(color = Muted, fontSize = 10.sp, fontFamily = FunnelSans)
@@ -135,6 +137,22 @@ private fun DrawScope.readout(m: TextMeasurer, s: String, x: Float, anchorY: Flo
 
 /** A solid vertical guide under the finger. */
 private fun DrawScope.guide(x: Float, bottom: Float) = drawLine(Target, Offset(x, 0f), Offset(x, bottom), strokeWidth = 1.dp.toPx())
+
+/** The one marker every chart puts on the reading under the finger: a dark halo with the reading's dot on it. */
+private fun DrawScope.scrubMarker(p: Offset, color: Color) {
+    drawCircle(AppColors.shade.copy(alpha = 0.6f), 8.dp.toPx(), p)
+    drawCircle(color, 5.dp.toPx(), p)
+}
+
+/** A dash 5 dp long with a 4 dp gap, built once per chart in its cache block ([dashed]). */
+private fun Density.dashEffect(): PathEffect = PathEffect.dashPathEffect(floatArrayOf(5.dp.toPx(), 4.dp.toPx()))
+
+/**
+ * A target, goal or average across a chart: the same hairline as a grid row but dashed, so a line the data is held
+ * against never reads as one of its rows. [dash] is [dashEffect], made once and reused by every draw.
+ */
+private fun DrawScope.dashed(y: Float, dash: PathEffect, color: Color = Target, x0: Float = 0f, x1: Float = size.width) =
+    drawLine(color, Offset(x0, y), Offset(x1, y), strokeWidth = ChartInk.HAIRLINE_DP * density, pathEffect = dash)
 
 /** [labels] measured in [style], for a chart's cache block. */
 private fun TextMeasurer.measureAll(labels: List<String>, style: TextStyle = axisText): List<TextLayoutResult> =
@@ -221,13 +239,14 @@ fun GlowLineChart(
                     null
                 }
                 val axisLabels = m.measureAll(labels)
+                val dash = dashEffect()
                 val h = g.plotBottom
                 onDrawBehind {
                     drawLineChartBody(g, paths, color)
 
                     if (average != null) {
                         val y = g.averageY
-                        gridLine(y, Target)
+                        dashed(y, dash)
                         text(average, size.width, y - 16.dp.toPx(), align = 1f)
                     }
 
@@ -243,8 +262,7 @@ fun GlowLineChart(
                         if (i != null) {
                             val p = Offset(g.xOf(i), g.yOf(values[i]!!))
                             guide(p.x, h)
-                            drawCircle(AppColors.shade.copy(alpha = 0.6f), 6.dp.toPx(), p)
-                            drawCircle(color, 4.dp.toPx(), p)
+                            scrubMarker(p, color)
                             if (describe != null) readout(m, describe(i, values[i]!!), p.x, p.y)
                         }
                     }
@@ -331,7 +349,8 @@ data class GlowDay(val label: String, val value: Float?)
 
 /**
  * A week as solid stems rising to each day's value, the value printed above. Today (the last day) gets a glowing
- * ring. A day with no value is left empty. [average] draws a solid line across.
+ * ring. A day with no value is left empty. [average] draws a dashed line across. Drag across it to read a day (its
+ * name and value, as [describe] says them), with a light tick as the finger moves to the next.
  */
 @Composable
 fun GlowTrend(
@@ -339,10 +358,22 @@ fun GlowTrend(
     modifier: Modifier = Modifier,
     height: Dp = 130.dp,
     average: Float? = null,
+    /** Text for the touch readout on a day; the day's name and value by default. */
+    describe: (index: Int, value: Float) -> String = { i, v -> "${days[i].label} ${v.roundToInt()}" },
 ) {
     val m = rememberTextMeasurer()
+    var touchX by remember { mutableStateOf<Float?>(null) }
+    var width by remember { mutableStateOf(0f) }
+    val values = remember(days) { days.map { it.value } }
+    val tick = rememberScrubHaptics()
     Spacer(
-        modifier.fillMaxWidth().height(height).drawWithCache {
+        modifier.fillMaxWidth().height(height).onSizeChanged { width = it.width.toFloat() }
+            .scrub(values) { x ->
+                touchX = x
+                val i = x?.takeIf { days.isNotEmpty() && width > 0f }?.let { tx -> (tx / (width / days.size)).toInt().coerceIn(0, days.size - 1) }
+                tick(i, values, null, true)
+            }
+            .drawWithCache {
             if (days.isEmpty()) return@drawWithCache nothing()
             val axisH = 18.dp.toPx()
             val top = 22.dp.toPx()
@@ -356,25 +387,34 @@ fun GlowTrend(
             val figures = days.mapIndexed { i, d ->
                 d.value?.let { m.measure(it.roundToInt().toString(), if (i == days.lastIndex) todayValueText else pastValueText) }
             }
+            val dash = dashEffect()
             onDrawBehind {
-                average?.let { gridLine(yOf(it), Target) }
+                average?.let { dashed(yOf(it), dash) }
+                val picked = touchX?.let { (it / slot).toInt().coerceIn(0, days.size - 1) }
                 days.forEachIndexed { i, d ->
                     val cx = slot * i + slot / 2
                     val today = i == days.lastIndex
                     text(names[i], cx, h + 4.dp.toPx(), align = 0.5f)
                     val v = d.value ?: return@forEachIndexed
                     val y = yOf(v)
+                    // While scrubbing, the other days dim so the picked one stands out, as the bars do.
+                    val dim = if (picked == null || picked == i) 1f else 0.35f
                     drawLine(
-                        Ink.copy(alpha = if (today) 0.9f else 0.45f), Offset(cx, h - 3.dp.toPx()), Offset(cx, y),
+                        Ink.copy(alpha = (if (today) 0.9f else 0.45f) * dim), Offset(cx, h - 3.dp.toPx()), Offset(cx, y),
                         strokeWidth = 2.dp.toPx(), cap = StrokeCap.Round,
                     )
                     if (today) {
-                        drawCircle(Ink.copy(alpha = 0.18f), 11.dp.toPx(), Offset(cx, y))
-                        drawCircle(Ink, 6.dp.toPx(), Offset(cx, y))
+                        drawCircle(Ink.copy(alpha = 0.18f * dim), 11.dp.toPx(), Offset(cx, y))
+                        drawCircle(Ink.copy(alpha = dim), 6.dp.toPx(), Offset(cx, y))
                     } else {
-                        drawCircle(Ink, 4.dp.toPx(), Offset(cx, y))
+                        drawCircle(Ink.copy(alpha = dim), 4.dp.toPx(), Offset(cx, y))
                     }
-                    figures[i]?.let { text(it, cx, y - 20.dp.toPx(), align = 0.5f) }
+                    if (picked == null) figures[i]?.let { text(it, cx, y - 20.dp.toPx(), align = 0.5f) }
+                }
+                if (picked != null) days[picked].value?.let { v ->
+                    val p = Offset(slot * picked + slot / 2, yOf(v))
+                    scrubMarker(p, Ink)
+                    readout(m, describe(picked, v), p.x, p.y)
                 }
             }
         },
@@ -792,8 +832,7 @@ internal fun NormalTrend(
                         nearestReading(values, tx, size.width, inset)?.let { i ->
                             val p = Offset(xOf(i), yOf(values[i]!!))
                             guide(p.x, h)
-                            drawCircle(AppColors.shade.copy(alpha = 0.6f), 8.dp.toPx(), p)
-                            drawCircle(Ink, 5.dp.toPx(), p)
+                            scrubMarker(p, Ink)
                         }
                     }
                 }

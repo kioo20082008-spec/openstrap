@@ -20,7 +20,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import org.openstrap.app.presentation.TodayStatus
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -240,9 +247,13 @@ fun GlowTodayScreen(
     val live = liveHeartRate != null
     // The moment the cards are laid out for, with no moment yet resolved as todayCards does.
     val looksFor = moment ?: if (morning) Moment.Waking else Moment.Midday
+    // One sentence under the date, from the Recovery, strain alert and Energy Today already has; none while the pairing,
+    // the stuck sync, a failed Recovery or a workout under way lead, which say their own.
+    val status = if (pairing != null || ctx.stuck || ctx.recoveryFailure != null || running != null) null
+    else TodayStatus.choose(ctx.recoveryShown.value, ctx.alert, ctx.charge, ctx.endOfDay, isToday)
 
     // The glow holds still while the list scrolls, so scrolling stays as smooth as on other screens.
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalEntryScreen provides "today") {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             // No two cards next to each other look the same (spec 2.4). On two columns, side by side counts too.
             val wide = maxWidth >= GlowLayout.TwoColumnWidth
@@ -255,7 +266,12 @@ fun GlowTodayScreen(
             val slots = varyLooks(applyEdits(todayCards(moment, facts, morning), shownEdits, null, unavailable), looksFor, live, wide, across)
             val panes = todayPanes(slots, across)
             GlowScreenList(contentPadding, list) {
-                add(Pane.Full, GlowBlocks.HEADER) { header() }
+                add(Pane.Full, GlowBlocks.HEADER) {
+                    Column {
+                        header()
+                        status?.let { TodayStatusLine(TodayStatus.text(it)) }
+                    }
+                }
                 // One block per grid row: a Small pair stays side by side, and on a wide screen in one column. Each is
                 // keyed on its cards, so its state stays with them when Edit Today hides or pins one above (audit K5).
                 packGrid(slots.indices.map { slots[it].size to it }).forEach { row ->
@@ -263,7 +279,8 @@ fun GlowTodayScreen(
                         GridRowBlock(row) { i, m ->
                             val slot = slots[i]
                             // Before a strap is paired, everything under the pairing hero waits, dimmed.
-                            val dim = if (pairing != null && slot.card != TodayCard.Hero && slot.card != TodayCard.EditToday) Modifier.alpha(0.45f) else Modifier
+                            val dimmed = pairing != null && slot.card != TodayCard.Hero && slot.card != TodayCard.EditToday
+                            val dim = if (dimmed) Modifier.alpha(0.45f) else Modifier
                             // Where the look differs from the card's own, its edge card is told the side and colour to use.
                             val own = defaultLook(slot.copy(look = null), looksFor, live)
                             val look = slot.lookOr(looksFor, live)
@@ -275,6 +292,8 @@ fun GlowTodayScreen(
                             )
                             CompositionLocalProvider(LocalEdgeOverride provides override) {
                                 Column(m.then(dim)) {
+                                  // Before a strap is paired the dimmed cards take taps and do nothing: the one action is the hero's.
+                                  InertWhile(dimmed) {
                                     when (slot.card) {
                                         TodayCard.Hero -> Hero(
                                             ctx, strap, pairing, heroLightAngle, usualBedtime,
@@ -289,6 +308,7 @@ fun GlowTodayScreen(
                                             onSaveSuggestion, onDismissSuggestion, onOpen, usualSteps, onRetryRecovery,
                                             if (slot.size == CardSize.Small) Modifier.fillMaxSize() else Modifier, onStartSport = onStartSport)
                                     }
+                                  }
                                 }
                             }
                         }
@@ -298,6 +318,28 @@ fun GlowTodayScreen(
                 }
             }
         }
+    }
+}
+
+/** The sentence under Today's date: how the day looks, quietly, in the ink's second tone. */
+@Composable
+private fun TodayStatusLine(text: String) {
+    Text(
+        text, Modifier.fillMaxWidth().padding(start = 10.dp, end = 10.dp, bottom = 6.dp), color = AppColors.ink.copy(alpha = 0.78f),
+        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium), maxLines = 2, overflow = TextOverflow.Ellipsis,
+    )
+}
+
+/**
+ * [content], and while [inert] a layer over it that takes taps and does nothing. Drags pass through to the list, so it
+ * still scrolls over a card that has gone quiet.
+ */
+@Composable
+private fun InertWhile(inert: Boolean, content: @Composable () -> Unit) {
+    if (!inert) return content()
+    Box {
+        content()
+        Box(Modifier.matchParentSize().pointerInput(Unit) { detectTapGestures { } })
     }
 }
 
@@ -510,6 +552,7 @@ private fun DialsToday(
         onEnergy = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Energy) },
         onRecovery = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Recovery) },
         onSleep = { onOpenScore(org.openstrap.app.ui.dashboard.Score.Sleep) },
+        emptyNote = ctx.waiting,
     )
     // The coach, read afresh with every reading: live heart rate, the stress minutes, steps, the battery.
     val (battery, charging) = LocalStrapBattery.current

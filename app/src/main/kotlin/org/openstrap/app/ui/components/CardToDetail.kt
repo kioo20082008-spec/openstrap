@@ -18,6 +18,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
@@ -42,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -227,9 +230,21 @@ fun <S> StackContent(target: S, keys: (S) -> List<String>, modifier: Modifier = 
         val next = CardMotion.settle(holder.taps, to, settled = from == to)
         if (next != holder.taps) holder.taps = next
     }
-    SharedTransitionLayout(modifier) {
+    // Where the last press landed, so a detail that isn't a card growing opens from there.
+    val origin = remember { OpenOrigin() }
+    val press = Modifier.pointerInput(origin) {
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            origin.press(down.position.x, down.position.y, size.width, size.height)
+        }
+    }
+    SharedTransitionLayout(modifier.then(press)) {
         transition.AnimatedContent(
-            transitionSpec = { stackTransform(CardMotion.of(keys(initialState), keys(targetState), holder.taps, animate)) },
+            transitionSpec = {
+                val f = keys(initialState)
+                val t = keys(targetState)
+                stackTransform(CardMotion.of(f, t, holder.taps, animate), origin.forChange(f.size, t.size))
+            },
         ) { state ->
             val page = keys(state)
             // Kept while its parts are the same: a new one on each pass would recompose every card on the page, each of
@@ -246,13 +261,58 @@ fun <S> StackContent(target: S, keys: (S) -> List<String>, modifier: Modifier = 
     }
 }
 
-/** Fades for a change of screen, springs with no bounce; nothing at all when it jumps. */
-private fun stackTransform(motion: StackMotion): ContentTransform {
+/**
+ * Where a detail opens from and goes back to: the last press in the stack, as a share of its size, and the press that
+ * opened each page, so back shrinks to where it came from. Plain state read when a change starts, never composed.
+ */
+internal class OpenOrigin {
+    private var last = TransformOrigin.Center
+    private val opened = HashMap<Int, TransformOrigin>()
+
+    /** A press at ([x], [y]) in a stack [width] by [height] pixels. */
+    fun press(x: Float, y: Float, width: Int, height: Int) {
+        last = OpenOriginMath.origin(x, y, width, height)
+    }
+
+    /**
+     * The origin of the change from a stack [fromSize] deep to one [toSize] deep: the last press when going deeper
+     * (remembered for the way back), the press that opened the page being left when coming back.
+     */
+    fun forChange(fromSize: Int, toSize: Int): TransformOrigin =
+        if (toSize > fromSize) last.also { opened[toSize] = it } else opened[fromSize] ?: last
+}
+
+/** The pure part of [OpenOrigin]: a press as a share of the stack, kept on it. */
+internal object OpenOriginMath {
+    /** The transform origin for a press at ([x], [y]) in [width] by [height]; the middle for an empty stack. */
+    fun origin(x: Float, y: Float, width: Int, height: Int): TransformOrigin =
+        if (width <= 0 || height <= 0) TransformOrigin.Center
+        else TransformOrigin((x / width).coerceIn(0f, 1f), (y / height).coerceIn(0f, 1f))
+
+    /** How small a detail starts (and ends, going back): a little under full size, so it reads as coming from the press. */
+    const val SCALE = 0.92f
+}
+
+/**
+ * Changes of screen: a card that grew into its detail and back crossfades under the shared surface; any other change
+ * fades, and a detail opening also grows a little from where it was pressed and goes back into it ([origin]), on
+ * springs with no bounce. Nothing at all when it jumps.
+ */
+private fun stackTransform(motion: StackMotion, origin: TransformOrigin): ContentTransform {
     if (motion == StackMotion.Jump || motion == StackMotion.Idle) return ContentTransform(EnterTransition.None, ExitTransition.None, sizeTransform = null)
     val stiffness = CardMotion.stiffness(motion)
-    return ContentTransform(
-        fadeIn(spring(Spring.DampingRatioNoBouncy, stiffness)), fadeOut(spring(Spring.DampingRatioNoBouncy, stiffness)), sizeTransform = null,
-    )
+    val fade = spring<Float>(Spring.DampingRatioNoBouncy, stiffness)
+    return when (motion) {
+        // The detail draws over the screen it opens from, growing in from the press.
+        StackMotion.Crossfade -> ContentTransform(
+            fadeIn(fade) + scaleIn(fade, OpenOriginMath.SCALE, origin), fadeOut(fade), targetContentZIndex = 1f, sizeTransform = null,
+        )
+        // Back: the detail, still over the screen, shrinks into the press while the screen under it comes in.
+        StackMotion.CrossfadeBack -> ContentTransform(
+            fadeIn(fade), fadeOut(fade) + scaleOut(fade, OpenOriginMath.SCALE, origin), targetContentZIndex = 0f, sizeTransform = null,
+        )
+        else -> ContentTransform(fadeIn(fade), fadeOut(fade), sizeTransform = null)
+    }
 }
 
 /**

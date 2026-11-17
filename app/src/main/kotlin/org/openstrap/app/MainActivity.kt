@@ -553,7 +553,7 @@ private fun AppRoot(
                     )
                 }
             }
-            if (rail) FloatingNavRail(navItems, tab, selectTab, Modifier.align(Alignment.CenterStart), glass = navGlass)
+            if (rail) FloatingNavRail(navItems, tab, selectTab, Modifier.align(Alignment.CenterStart), glass = navGlass, onPlus = { quickOpen = true })
             AllMetricsHost(nav, shown, workoutsVm, scroll, closePages, onShowCharge = { showCharge = true })
             AddWorkoutHost(nav, container, workoutsVm, rootVm)
             SaveStretchHost(nav, container, workoutsVm, rootVm)

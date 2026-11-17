@@ -459,9 +459,15 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
 private val RingCard = RoundedCornerShape(22.dp)
 private val OnHue = Color(0xFF0A0A0C)
 
-/** One of Today's three figures as a solid card: its name, the number, and a bar of it in the metric's hue. */
+/**
+ * One of Today's three figures as a solid card: its name, the number, a bar of it in the metric's hue, and a word for
+ * the level so the colour never says it alone ([word]); while there's no figure, [empty] says why in its place.
+ */
 @Composable
-internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null) {
+internal fun RingStatCard(
+    label: String, value: Int?, hue: Color, onClick: () -> Unit, modifier: Modifier = Modifier, icon: ImageVector? = null,
+    word: String? = null, empty: String? = null,
+) {
     val shown = rememberSeenCount(value ?: 0)
     val grow = rememberSeenShare(1f, durationMs = 1000, delayMs = 300)
     Column(modifier.bounceClick(onClick = onClick).clip(RoundedCornerShape(20.dp)).background(AppColors.glass).padding(horizontal = 14.dp, vertical = 12.dp)) {
@@ -478,6 +484,14 @@ internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () ->
         Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)).background(hue.copy(alpha = 0.2f))) {
             val filled = (value ?: 0).coerceIn(0, 100) / 100f
             if (filled > 0f) Box(Modifier.fillMaxWidth(filled).fillMaxHeight().growFromStart { grow.value }.clip(RoundedCornerShape(3.dp)).background(hue))
+        }
+        val line = if (value != null) word else empty
+        if (line != null) {
+            Spacer(Modifier.height(6.dp))
+            Text(
+                line, color = if (value != null) AppColors.readable(hue) else Muted, maxLines = 2, overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp, fontWeight = if (value != null) FontWeight.Bold else FontWeight.Normal),
+            )
         }
     }
 }

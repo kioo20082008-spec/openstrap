@@ -171,6 +171,8 @@ internal fun TabsPager(
     seeHabitAge: () -> Unit,
 ) {
     val tab = nav.tab.current
+    // The page's faint mood: the day's Recovery and the hour, one tint under every tab.
+    org.openstrap.app.ui.glow.MoodEffect(shown.recovery?.readiness?.score)
     val pager = rememberPagerState(initialPage = tab) { Tab.entries.size }
     val swiped = remember { java.util.concurrent.atomic.AtomicBoolean(false) }
     LaunchedEffect(tab) {

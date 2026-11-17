@@ -51,4 +51,15 @@
     <string name="breathe_again">Again</string>
     <string name="dials_quick_breathe">Breathe</string>
     <plurals name="day_sleep_naps_count"><item quantity="one">%d nap</item><item quantity="other">%d naps</item></plurals>
+    <!-- The line under Today's date: how the day looks. Short, one sentence. -->
+    <string name="today_status_ready">Your body is ready, push it today</string>
+    <string name="today_status_steady">A steady day, keep it moderate</string>
+    <string name="today_status_rest">Today is a rest day</string>
+    <string name="today_status_strained">Your signals are off your normal, ease off today</string>
+    <string name="today_status_low_energy">Your energy is low, take a short break</string>
+    <string name="today_status_wind_down">Time to wind down, keep tonight calm</string>
+    <!-- A level in a word, beside a ring or bar that shows it in colour: one word. -->
+    <string name="level_great">Great</string>
+    <string name="level_good">Good</string>
+    <string name="level_low">Low</string>
 </resources>

@@ -156,7 +156,7 @@ fun GlowActivityScreen(
     val partialTag = remember { TitleTag(PARTIAL_DAY) { partialInfo = true } }
     val partial = partialTag.takeIf { wear?.partial == true }
     if (partialInfo && wear != null) PartialDaySheet(wear, isToday, onDismiss = { partialInfo = false })
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalEntryScreen provides "activity") {
         GlowScreenList(contentPadding, list) {
             add(Pane.Full, GlowBlocks.HEADER) { header() }
             tabCards(slots) { card, m ->

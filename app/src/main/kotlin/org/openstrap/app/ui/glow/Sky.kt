@@ -7,6 +7,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import kotlinx.coroutines.delay
+import org.openstrap.app.ui.theme.MoodTint
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import org.openstrap.app.ui.theme.AppColors
@@ -39,6 +46,8 @@ fun SkyBackground(tint: SkyTint, modifier: Modifier = Modifier, content: @Compos
         Canvas(Modifier.fillMaxSize()) {
             // Read while drawing, so a theme switch redraws the page without composing anything.
             drawRect(AppColors.page)
+            // The page's mood: recovery and the hour, a tint of a few percent, one more flat rectangle.
+            drawRect(AppColors.mood)
         }
         // Fainter still on the light theme, where any hue reads stronger.
         LiveAura(tint.ringHue, clock, Modifier.fillMaxWidth().fillMaxHeight(0.7f), strength = if (AppColors.light) 0.18f else 0.32f, top = 0.18f)
@@ -49,3 +58,24 @@ fun SkyBackground(tint: SkyTint, modifier: Modifier = Modifier, content: @Compos
 /** Glass: what a card is drawn in over the sky, in the theme's colours. */
 internal val GlassFill: Color get() = AppColors.glass
 internal val GlassEdge: Color get() = AppColors.hairline
+
+/**
+ * Sets the page's mood tint ([AppColors.mood]) from the day's Recovery [score] and the hour, once for the app. The hour
+ * is looked at again every ten minutes (a sleeping coroutine, not an animation), and the tint is written only when it
+ * changes, so nothing composes because of it.
+ */
+@Composable
+fun MoodEffect(score: Int?) {
+    val hour by produceState(java.time.LocalTime.now().hour) {
+        while (true) {
+            delay(HOUR_CHECK_MS)
+            value = java.time.LocalTime.now().hour
+        }
+    }
+    val light = AppColors.light
+    val tint = remember(score, hour, light) { MoodTint.of(score, hour, light) }
+    SideEffect { if (AppColors.mood != tint) AppColors.mood = tint }
+    DisposableEffect(Unit) { onDispose { AppColors.mood = Color.Transparent } }
+}
+
+private const val HOUR_CHECK_MS = 10 * 60_000L

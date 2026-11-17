@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow
 
+import android.os.SystemClock
 import android.provider.Settings
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
@@ -29,6 +30,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.withTimeoutOrNull
+import org.openstrap.app.ui.dashboard.EntryLog
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.exp
@@ -102,17 +105,49 @@ internal fun heartbeat(t: Float, bpm: Float = 64f): Float {
 }
 
 /**
+ * The screen whose heroes play their entrance (rings filling, numbers counting up) once a session ([EntryLog]); null,
+ * the default, plays it each time the piece is first composed. Provided by Today, Recovery, Sleep and Activity.
+ */
+val LocalEntryScreen = staticCompositionLocalOf<String?> { null }
+
+/** What a piece with an entrance needs, fixed when it's first composed: its screen, and whether the entrance plays. */
+private class Entry(val screen: String?, val plays: Boolean)
+
+@Composable
+private fun rememberEntry(): Entry {
+    val screen = LocalEntryScreen.current
+    return remember { Entry(screen, EntryLog.session.plays(screen, SystemClock.uptimeMillis())) }
+}
+
+/**
+ * Waits until the entrance may start: the tab is first seen, a beat passes, the page has settled (not moving, covered
+ * or off screen) and the list isn't scrolling (given up after a moment, so figures never wait out a long scroll).
+ */
+private suspend fun awaitEntry(seen: () -> Boolean, page: () -> Boolean, list: () -> Boolean, delayMs: Long) {
+    snapshotFlow { seen() }.first { it }
+    delay(delayMs)
+    snapshotFlow { page() }.first { !it }
+    withTimeoutOrNull(LIST_WAIT_MS) { snapshotFlow { list() }.first { !it } }
+}
+
+private const val LIST_WAIT_MS = 700L
+
+/**
  * [target] (0 to 1) filling in from empty once the tab is first seen, then easing to later changes. Read its value in a
- * draw or layer block, so only that redraws.
+ * draw or layer block, so only that redraws. Plays once a session for a screen that provides [LocalEntryScreen]: back
+ * on it, the share starts at [target].
  */
 @Composable
 internal fun rememberSeenShare(target: Float, durationMs: Int = 1300, delayMs: Int = 120): Animatable<Float, AnimationVector1D> {
-    val a = remember { Animatable(0f) }
+    val entry = rememberEntry()
+    val a = remember { Animatable(if (entry.plays) 0f else target.coerceIn(0f, 1f)) }
     val seen = LocalTabSeen.current
+    val page by rememberUpdatedState(LocalGlowPagePaused.current)
+    val list by rememberUpdatedState(LocalGlowPaused.current)
     LaunchedEffect(target) {
-        if (a.value == 0f) {
-            snapshotFlow { seen() }.first { it }
-            delay(delayMs.toLong())
+        if (a.value == 0f && target > 0f) {
+            awaitEntry(seen, { page() }, { list() }, delayMs.toLong())
+            EntryLog.session.begin(entry.screen, SystemClock.uptimeMillis())
         }
         a.animateTo(target.coerceIn(0f, 1f), tween(durationMs, easing = FastOutSlowInEasing))
     }
@@ -120,17 +155,21 @@ internal fun rememberSeenShare(target: Float, durationMs: Int = 1300, delayMs: I
 }
 
 /**
- * [target] counted up from zero once the tab is first seen (and eased to any later change). A state, read inside the
- * small composable that shows it, so a count-up recomposes that text only and not the hero round it.
+ * [target] counted up from zero once the tab is first seen (and eased to any later change), once a session for a
+ * screen that provides [LocalEntryScreen]. A state, read inside the small composable that shows it, so a count-up
+ * recomposes that text only and not the hero round it.
  */
 @Composable
 internal fun rememberSeenCount(target: Int, durationMs: Int = 1200): State<Int> {
-    val a = remember { Animatable(0f) }
+    val entry = rememberEntry()
+    val a = remember { Animatable(if (entry.plays) 0f else target.toFloat()) }
     val seen = LocalTabSeen.current
+    val page by rememberUpdatedState(LocalGlowPagePaused.current)
+    val list by rememberUpdatedState(LocalGlowPaused.current)
     LaunchedEffect(target) {
-        if (a.value == 0f) {
-            snapshotFlow { seen() }.first { it }
-            delay(120)
+        if (a.value == 0f && target > 0) {
+            awaitEntry(seen, { page() }, { list() }, 120L)
+            EntryLog.session.begin(entry.screen, SystemClock.uptimeMillis())
         }
         a.animateTo(target.toFloat(), tween(durationMs, easing = FastOutSlowInEasing))
     }

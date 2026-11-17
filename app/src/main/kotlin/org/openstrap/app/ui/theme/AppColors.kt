@@ -60,6 +60,12 @@ class ThemeColors(
 object AppColors {
     var theme: AppTheme by mutableStateOf(AppTheme.Default)
 
+    /**
+     * The faint tint over the page for recovery and the time of day ([MoodTint]); transparent until the root sets it.
+     * Read while drawing the page, so a change redraws it and composes nothing.
+     */
+    var mood: Color by mutableStateOf(Color.Transparent)
+
     val current: ThemeColors get() = of(theme)
 
     val light: Boolean get() = current.light

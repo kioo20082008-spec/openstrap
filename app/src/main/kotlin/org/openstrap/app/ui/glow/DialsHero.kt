@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.openstrap.app.presentation.LevelWord
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.AppPalette
 import org.openstrap.app.ui.theme.NumberFamily
@@ -72,17 +75,20 @@ internal fun DialsHero(
     planTitle: String, planNote: String, planChip: String?, plan: List<PlanItem>,
     onEnergy: () -> Unit, onRecovery: () -> Unit, onSleep: () -> Unit,
     modifier: Modifier = Modifier,
+    /** What a card with no figure says in place of its level word ("After your first night"); null says nothing. */
+    emptyNote: String? = null,
 ) {
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         val energyTitle = stringResource(R.string.glow_today_energy_title)
         Box(Modifier.fillMaxWidth().bounceClick(onClick = onEnergy).padding(top = 12.dp, bottom = 14.dp), contentAlignment = Alignment.TopCenter) {
-            TripleRings(energy, recovery, sleep, word = energyTitle)
+            TripleRings(energy, recovery, sleep, word = if (energy.level == null) emptyNote ?: energyTitle else energyTitle)
         }
         // The rings' three figures as cards, each with its own bar: Energy, Recovery, Sleep.
-        Row(Modifier.riseOnShow(1).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            RingStatCard(energyTitle, energy.level, RingColors.Energy, onEnergy, Modifier.weight(1f), AppIcons.Lightning)
-            RingStatCard(labels.second, recovery, RingColors.Recovery, onRecovery, Modifier.weight(1f), AppIcons.HeartFill)
-            RingStatCard(labels.third, sleep, RingColors.Sleep, onSleep, Modifier.weight(1f), AppIcons.MoonFill)
+        // Each carries a word for its level, so the hue is never the only thing that says it.
+        Row(Modifier.riseOnShow(1).fillMaxWidth().height(IntrinsicSize.Min), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            RingStatCard(energyTitle, energy.level, RingColors.Energy, onEnergy, Modifier.weight(1f).fillMaxHeight(), AppIcons.Lightning, word = energy.word, empty = emptyNote)
+            RingStatCard(labels.second, recovery, RingColors.Recovery, onRecovery, Modifier.weight(1f).fillMaxHeight(), AppIcons.HeartFill, word = LevelWord.of(recovery), empty = emptyNote)
+            RingStatCard(labels.third, sleep, RingColors.Sleep, onSleep, Modifier.weight(1f).fillMaxHeight(), AppIcons.MoonFill, word = LevelWord.of(sleep), empty = emptyNote)
         }
         // One card for what to do with the day, then its list: Energy's bar and the plan's own header said it all again.
         Spacer(Modifier.height(10.dp))

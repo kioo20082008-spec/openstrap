@@ -106,7 +106,7 @@ fun GlowRecoveryScreen(
     val partialTag = remember { TitleTag(PARTIAL_DAY) { partialInfo = true } }
     val partial = partialTag.takeIf { wear?.partial == true }
     val isToday = state.date == java.time.LocalDate.now()
-    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }) {
+    CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalEntryScreen provides "recovery") {
         GlowScreenList(contentPadding, list, focus = showCharge, onFocused = onChargeShown) {
             add(Pane.Full, GlowBlocks.HEADER) { header() }
             tabCards(slots) { card, _ ->
