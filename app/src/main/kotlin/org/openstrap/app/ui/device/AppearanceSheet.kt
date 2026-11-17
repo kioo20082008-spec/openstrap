@@ -31,6 +31,7 @@ import org.openstrap.app.ui.glow.topHairline
 import org.openstrap.app.ui.theme.AppColors
 import org.openstrap.app.ui.theme.AppIcons
 import org.openstrap.app.ui.theme.AppPalette
+import org.openstrap.app.ui.theme.RingsPalette
 
 /** A theme's name, as the You page's row and the picker say it. */
 @Composable
@@ -40,6 +41,7 @@ internal fun themeName(theme: AppTheme): String = stringResource(
         AppTheme.Oled -> R.string.you_theme_oled
         AppTheme.Cream -> R.string.you_theme_cream
         AppTheme.Dusk -> R.string.you_theme_dusk
+        AppTheme.Rings -> R.string.you_theme_rings
     },
 )
 
@@ -95,7 +97,12 @@ private fun ThemeSwatch(theme: AppTheme) {
         val line = 2.dp.toPx()
         drawRoundRect(t.ink, Offset(pad * 2, cardTop + pad), Size(card.width * 0.55f, line), CornerRadius(line / 2))
         drawRoundRect(t.ink.copy(alpha = t.mutedAlpha), Offset(pad * 2, cardTop + pad + line * 2.5f), Size(card.width * 0.4f, line), CornerRadius(line / 2))
-        drawCircle(AppPalette.Coral, 3.dp.toPx(), Offset(size.width / 2, size.height * 0.27f))
+        if (theme == AppTheme.Rings) {
+            val c = Offset(size.width / 2, size.height * 0.27f)
+            listOf(RingsPalette.Energy to 11.dp, RingsPalette.Recovery to 7.dp, RingsPalette.Sleep to 3.dp).forEach { (col, r) ->
+                drawCircle(col, r.toPx(), c, style = Stroke(1.6.dp.toPx()))
+            }
+        } else drawCircle(AppPalette.Coral, 3.dp.toPx(), Offset(size.width / 2, size.height * 0.27f))
         drawRoundRect(edge, cornerRadius = r, style = Stroke(1.dp.toPx()))
     }
 }

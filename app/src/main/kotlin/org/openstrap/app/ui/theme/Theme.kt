@@ -151,13 +151,26 @@ private val AlmaraiFamily = FontFamily(
     Font(R.font.almarai_extrabold, FontWeight.ExtraBold),
 )
 
+/** Rings: Alexandria in every role; its numerals are always bold. */
+private val AlexandriaFamily = FontFamily(
+    Font(R.font.alexandria_regular, FontWeight.Thin), Font(R.font.alexandria_regular, FontWeight.ExtraLight),
+    Font(R.font.alexandria_regular, FontWeight.Light), Font(R.font.alexandria_regular, FontWeight.Normal),
+    Font(R.font.alexandria_medium, FontWeight.Medium), Font(R.font.alexandria_bold, FontWeight.SemiBold),
+    Font(R.font.alexandria_bold, FontWeight.Bold), Font(R.font.alexandria_extrabold, FontWeight.ExtraBold),
+    Font(R.font.alexandria_extrabold, FontWeight.Black),
+)
+private val AlexandriaNumbers = FontFamily(
+    listOf(FontWeight.Thin, FontWeight.ExtraLight, FontWeight.Light, FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold, FontWeight.ExtraBold, FontWeight.Black)
+        .map { Font(R.font.alexandria_extrabold, it) },
+)
+
 private val isArabic: Boolean get() = java.util.Locale.getDefault().language == "ar"
 
 /** Kept under their old names so every caller picks up the new faces. Read on each use, so a language switch takes effect. */
 /** Numbers stay in Inter in every language. */
-val NumberFamily: FontFamily get() = InterFamily
-val FunnelDisplay: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
-val FunnelSans: FontFamily get() = if (isArabic) AlmaraiFamily else InterFamily
+val NumberFamily: FontFamily get() = if (AppColors.rings) AlexandriaNumbers else InterFamily
+val FunnelDisplay: FontFamily get() = if (AppColors.rings) AlexandriaFamily else if (isArabic) AlmaraiFamily else InterFamily
+val FunnelSans: FontFamily get() = if (AppColors.rings) AlexandriaFamily else if (isArabic) AlmaraiFamily else InterFamily
 
 private val Base = Typography()
 

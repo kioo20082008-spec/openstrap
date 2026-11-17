@@ -9,6 +9,8 @@ enum class AppTheme(val key: String) {
     Oled("oled"),
     Cream("cream"),
     Dusk("dusk"),
+    /** Flat dark pages and one coloured ring per metric (the "Rings" design system). */
+    Rings("rings"),
     ;
 
     companion object {
