@@ -1,6 +1,5 @@
 package org.openstrap.app.ui.glow
 
-import android.provider.Settings
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.tween
@@ -17,12 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.snapshotFlow
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,10 +29,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.first
 import org.openstrap.app.data.Recovery
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.TabCopy
@@ -122,27 +114,12 @@ internal fun EnergyFlask(model: FlaskModel, modifier: Modifier = Modifier) {
     LaunchedEffect(model.fill) {
         fill.animateTo(model.fill, tween(1800, 300, CubicBezierEasing(0.16f, 1f, 0.3f, 1f)))
     }
-    val seconds = remember { mutableFloatStateOf(0f) }
-    val context = LocalContext.current
-    val animate = remember(context) { Settings.Global.getFloat(context.contentResolver, Settings.Global.ANIMATOR_DURATION_SCALE, 1f) > 0f }
-    val listPaused by rememberUpdatedState(LocalGlowPaused.current)
-    val pagePaused by rememberUpdatedState(LocalGlowPagePaused.current)
-    val paused = { listPaused() || pagePaused() }
     val liquid = model.level != null
     // Time only runs while the glass is seen and still, as a glow card's core, so the waves pick up where they stopped.
-    if (animate && liquid) LaunchedEffect(Unit) {
-        var last = withFrameNanos { it }
-        while (true) {
-            if (paused()) {
-                snapshotFlow { paused() }.first { !it }
-                last = withFrameNanos { it }
-            }
-            withFrameNanos { now ->
-                seconds.floatValue += (now - last) / 1e9f
-                last = now
-            }
-        }
-    }
+    val seconds = rememberPausableClock(enabled = liquid)
+    // The two waves' paths, refilled each frame instead of built anew.
+    val frontWave = remember { Path() }
+    val backWave = remember { Path() }
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(FLASK_DP.dp), contentAlignment = Alignment.Center) {
             // The warm glow around the glass, drawn past its edge.
@@ -167,7 +144,7 @@ internal fun EnergyFlask(model: FlaskModel, modifier: Modifier = Modifier) {
                 val body = if (light) listOf(Color.White.copy(alpha = 0.55f), AppColors.ink.copy(alpha = 0.05f))
                 else listOf(Color.White.copy(alpha = 0.08f), Color.White.copy(alpha = 0.02f))
                 drawRect(Brush.radialGradient(body, Offset(w * 0.35f, h * 0.30f), w * 0.955f))
-                if (liquid) drawLiquid(fill.value, seconds.floatValue)
+                if (liquid) drawLiquid(fill.value, seconds.value, frontWave, backWave)
                 // The shine, top left, tilted with the glass.
                 val shineTopLeft = Offset(w * 34f / FLASK_DP, h * 26f / FLASK_DP)
                 val shineSize = Size(w * 46f / FLASK_DP, h * 24f / FLASK_DP)
@@ -196,7 +173,7 @@ internal fun EnergyFlask(model: FlaskModel, modifier: Modifier = Modifier) {
 private const val FLASK_DP = 190f
 
 /** The liquid up to [level] (0 to 1) with its two waves and the bubbles, at [t] seconds into the motion. */
-private fun DrawScope.drawLiquid(level: Float, t: Float) {
+private fun DrawScope.drawLiquid(level: Float, t: Float, frontWave: Path, backWave: Path) {
     val w = size.width
     val h = size.height
     val surface = h * (1f - level.coerceIn(0f, 1f))
@@ -206,8 +183,8 @@ private fun DrawScope.drawLiquid(level: Float, t: Float) {
     val amp = 4.dp.toPx()
     val mid = surface - 4.dp.toPx()
     val floor = surface + 3.dp.toPx()
-    drawPath(wave(w, mid, floor, amp, (t / WAVE_FRONT_S) % 1f, +1f), WaveFront)
-    drawPath(wave(w, mid, floor, amp, -(t / WAVE_BACK_S) % 1f, -1f), WaveBack)
+    drawPath(wave(frontWave, w, mid, floor, amp, (t / WAVE_FRONT_S) % 1f, +1f), WaveFront)
+    drawPath(wave(backWave, w, mid, floor, amp, -(t / WAVE_BACK_S) % 1f, -1f), WaveBack)
     // Bubbles rise from near the bottom to just under the surface, fading as they go; never above the liquid.
     val bottom = h - 12.dp.toPx()
     val travel = (bottom - surface - 10.dp.toPx()).coerceAtMost(90.dp.toPx())
@@ -224,9 +201,10 @@ private fun DrawScope.drawLiquid(level: Float, t: Float) {
 
 /**
  * A sine wave across [width] about [mid] with [amp], shifted by [shift] of a wavelength and drawn upright ([sign] 1)
- * or upside down (-1), closed down to [floor].
+ * or upside down (-1), closed down to [floor]. Drawn into [into], which is emptied first.
  */
-private fun wave(width: Float, mid: Float, floor: Float, amp: Float, shift: Float, sign: Float): Path = Path().apply {
+private fun wave(into: Path, width: Float, mid: Float, floor: Float, amp: Float, shift: Float, sign: Float): Path = into.apply {
+    rewind()
     val step = width / 48f
     moveTo(0f, floor)
     var x = 0f

@@ -504,7 +504,7 @@ internal fun PageDots(current: Int, count: Int, position: Float? = null, onSelec
         repeat(count) { i ->
             Box(
                 // A 7 dp dot in a 44 dp box to tap.
-                Modifier.width(36.dp).height(44.dp).pressClickable({ onSelect(i) }, CircleShape),
+                Modifier.width(44.dp).height(44.dp).pressClickable({ onSelect(i) }, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 val lit = if (position != null) (1f - kotlin.math.abs(position - i)).coerceIn(0f, 1f) else if (i == current) 1f else 0f

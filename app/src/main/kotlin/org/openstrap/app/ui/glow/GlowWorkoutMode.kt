@@ -158,7 +158,7 @@ internal fun WorkoutButton(
 ) {
     val swell = if (breathe) rememberPulse(3_200) else null
     Row(
-        modifier.then(if (fill) Modifier.fillMaxWidth() else Modifier).height(height)
+        modifier.then(if (fill) Modifier.fillMaxWidth() else Modifier).heightIn(min = height)
             .then(
                 if (swell == null) Modifier
                 else Modifier.graphicsLayer {
@@ -176,6 +176,7 @@ internal fun WorkoutButton(
                 },
             )
             .clip(RoundedCornerShape(50)).background(background).pressClickable(onClick, RoundedCornerShape(50))
+            .padding(vertical = 6.dp)
             .then(if (fill) Modifier else Modifier.padding(horizontal = 18.dp)),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -183,8 +184,8 @@ internal fun WorkoutButton(
             Icon(icon, null, tint = content, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(10.dp))
         }
-        // Gives way to the icon and ends in an ellipsis rather than spilling over the pill when the label is long.
-        Text(label, if (fill) Modifier.weight(1f, fill = false) else Modifier, color = content, style = ButtonText, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        // Gives way to the icon and wraps to a second line (the pill grows) before it would be cut off with an ellipsis.
+        Text(label, if (fill) Modifier.weight(1f, fill = false) else Modifier, color = content, style = ButtonText, maxLines = 2, overflow = TextOverflow.Ellipsis, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
     }
 }
 

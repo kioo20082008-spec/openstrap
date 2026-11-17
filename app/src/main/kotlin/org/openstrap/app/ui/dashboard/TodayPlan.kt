@@ -141,7 +141,7 @@ fun todayCards(moment: Moment?, facts: TodayFacts, morning: Boolean = true): Lis
     )
 }
 
-/** The card the hero of [moment] already is, so pinning it there would show it twice. */
+/** The card [moment] already shows at the top (Waking: Recovery, in the glass trio under the energy flask), so pinning it there would show it twice. */
 fun heroSubject(moment: Moment?): TodayCard? = when (moment) {
     Moment.Waking -> TodayCard.Recovery
     else -> null

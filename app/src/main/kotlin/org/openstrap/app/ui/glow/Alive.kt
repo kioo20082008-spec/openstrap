@@ -2,13 +2,8 @@ package org.openstrap.app.ui.glow
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -20,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -39,22 +35,37 @@ import kotlin.math.sin
  * Everything here is cheap (graphicsLayer or one canvas) and reads state inside draw/layer blocks only.
  */
 
-/** A value that swings 0..1..0 forever, one full swing every [periodMs]. Read it in a draw or layer block. */
+/**
+ * A value that swings 0..1..0 forever, one full swing every [periodMs] ([delayMs] puts it that far behind). Read it in a
+ * draw or layer block. It runs on the pausable clock ([rememberPausableClock]), so it holds still while the page is off
+ * screen or covered, the list scrolls or the system's animations are off, as the rings do.
+ */
 @Composable
 internal fun rememberPulse(periodMs: Int, delayMs: Int = 0): State<Float> {
-    val t = rememberInfiniteTransition(label = "pulse")
-    return t.animateFloat(
-        0f, 1f,
-        infiniteRepeatable(tween(periodMs / 2, delayMillis = delayMs, easing = FastOutSlowInEasing), RepeatMode.Reverse),
-        label = "pulse",
-    )
+    val clock = rememberPausableClock(wrapS = periodMs / 1000f)
+    return remember(clock, periodMs, delayMs) {
+        val period = periodMs / 1000f
+        val half = period / 2f
+        val behind = (delayMs / 1000f) % period
+        derivedStateOf {
+            // Up over half a period, back down over the next, each leg eased as the old Reverse tween was.
+            val m = (((clock.value - behind) % period + period) % period) / half
+            FastOutSlowInEasing.transform(if (m < 1f) m else 2f - m)
+        }
+    }
 }
 
-/** A value that runs 0..1 and wraps, one lap every [periodMs]. Read it in a draw or layer block. */
+/**
+ * A value that runs 0..1 and wraps, one lap every [periodMs]. Read it in a draw or layer block. Pausable, as
+ * [rememberPulse] is.
+ */
 @Composable
 internal fun rememberLoop(periodMs: Int): State<Float> {
-    val t = rememberInfiniteTransition(label = "loop")
-    return t.animateFloat(0f, 1f, infiniteRepeatable(tween(periodMs, easing = LinearEasing)), label = "loop")
+    val clock = rememberPausableClock(wrapS = periodMs / 1000f)
+    return remember(clock, periodMs) {
+        val period = periodMs / 1000f
+        derivedStateOf { (clock.value / period).coerceIn(0f, 1f) }
+    }
 }
 
 /** [target] counted up from zero on first show (and eased to any later change). */
@@ -62,7 +73,9 @@ internal fun rememberLoop(periodMs: Int): State<Float> {
 internal fun rememberCountUp(target: Int, durationMs: Int = 1100): Int {
     val a = remember { Animatable(0f) }
     LaunchedEffect(target) { a.animateTo(target.toFloat(), tween(durationMs, easing = FastOutSlowInEasing)) }
-    return a.value.toInt()
+    // Whole numbers only: the reader recomposes when the number changes, not on every frame between.
+    val whole = remember(a) { derivedStateOf { a.value.toInt() } }
+    return whole.value
 }
 
 /**
@@ -101,17 +114,18 @@ internal fun Modifier.bounceClick(enabled: Boolean = true, onClick: () -> Unit):
  */
 @Composable
 internal fun AmbientAura(hue: Color, modifier: Modifier = Modifier, strength: Float = 1f) {
-    val a = rememberLoop(26_000)
-    val b = rememberLoop(38_000)
-    val breathe = rememberPulse(7_000)
-    Box(modifier.clipToBounds()) {
+    // One pausable clock for all three blobs, read in steps (the drift takes 26 s and more), in a layer of its own.
+    val clock = rememberPausableClock()
+    val step = remember(clock) { derivedStateOf { (clock.value * AMBIENT_FPS).toInt() } }
+    Box(modifier.clipToBounds().graphicsLayer()) {
         Canvas(Modifier.fillMaxSize()) {
+            val t = step.value / AMBIENT_FPS
             val w = size.width
             val h = size.height
             val r = maxOf(w, h) * 0.62f
-            val k = (0.16f + 0.07f * breathe.value) * strength
-            val ta = a.value * 6.2831855f
-            val tb = b.value * 6.2831855f
+            val k = (0.16f + 0.07f * wave(t, 7f)) * strength
+            val ta = lap(t, 26f) * 6.2831855f
+            val tb = lap(t, 38f) * 6.2831855f
             fun blob(cx: Float, cy: Float, radius: Float, alpha: Float) {
                 drawCircle(
                     Brush.radialGradient(listOf(hue.copy(alpha = alpha), Color.Transparent), Offset(cx, cy), radius),
@@ -124,3 +138,5 @@ internal fun AmbientAura(hue: Color, modifier: Modifier = Modifier, strength: Fl
         }
     }
 }
+
+private const val AMBIENT_FPS = 20f

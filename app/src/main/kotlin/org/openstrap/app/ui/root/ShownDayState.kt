@@ -83,8 +83,11 @@ internal fun rememberShownDay(
     LaunchedEffect(first.remember, preview, data) {
         if (preview == null && data == null) first.remember?.let(rootVm::markFirstScore)
     }
-    return ShownDay(
-        day, recovery, shown.recoveryFailure, healthspan, dayExtras.checkIn, wear,
-        firstScore = first.show || data == DataPreview.FirstScoreShown,
-    )
+    val firstScoreShown = first.show || data == DataPreview.FirstScoreShown
+    // One object while nothing it holds changed: every tab and detail takes it as a parameter, so a new one on each pass
+    // of the app root (the strap chip's clock, a sync step) would recompose them all.
+    val checkIn = dayExtras.checkIn
+    return remember(day, recovery, shown.recoveryFailure, healthspan, checkIn, wear, firstScoreShown) {
+        ShownDay(day, recovery, shown.recoveryFailure, healthspan, checkIn, wear, firstScore = firstScoreShown)
+    }
 }

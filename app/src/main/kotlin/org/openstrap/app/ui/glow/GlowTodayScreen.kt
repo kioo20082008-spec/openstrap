@@ -462,8 +462,8 @@ private fun DialsToday(
     val score = ctx.recoveryShown.value
     val goal = LocalGoals.current.steps
     val steps = ctx.state.steps
-    val n = java.text.NumberFormat.getIntegerInstance()
-    val done = ctx.dayWorkouts.lastOrNull()
+    val n = remember { java.text.NumberFormat.getIntegerInstance() }
+    val done = remember(ctx.workouts, ctx.state.dayStart, ctx.state.dayEnd) { ctx.dayWorkouts.lastOrNull() }
     val zone = when {
         score == null -> 0
         score >= 67 -> 3
@@ -492,7 +492,7 @@ private fun DialsToday(
         if (steps >= goal) add(PlanItem(stringResource(R.string.dials_steps_done), stringResource(R.string.dials_steps_done_note, n.format(steps)), true))
         else add(PlanItem(stringResource(R.string.dials_steps_left, n.format(goal - steps)), stringResource(R.string.dials_steps_left_note, n.format(goal)), false))
         if (bedtime != null) add(PlanItem(
-            stringResource(R.string.dials_bed, bedtime.format(java.time.format.DateTimeFormatter.ofPattern("H:mm"))),
+            stringResource(R.string.dials_bed, bedtime.format(BED_TIME_FORMAT)),
             stringResource(R.string.dials_bed_note), false,
         ))
     }
@@ -528,6 +528,9 @@ private fun DialsToday(
     JournalCard(ctx.now, ctx.zone, ctx.isToday)
     }
 }
+
+/** "7:45", built once: a formatter made on each pass of Today costs more than the line it formats. */
+private val BED_TIME_FORMAT: java.time.format.DateTimeFormatter = java.time.format.DateTimeFormatter.ofPattern("H:mm")
 
 private enum class HeroKind { Pair, Stuck, Waking, NoSleep, Midday, Window, After, Evening, During }
 

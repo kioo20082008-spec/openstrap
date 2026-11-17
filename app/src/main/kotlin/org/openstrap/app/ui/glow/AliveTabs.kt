@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -49,7 +50,16 @@ val LocalTabSeen = staticCompositionLocalOf<() -> Boolean> { { true } }
  * on, so the rings' life costs nothing on the tabs kept ready either side. Read it in a draw or layer block only.
  */
 @Composable
-internal fun rememberLiveClock(): State<Float> {
+internal fun rememberLiveClock(): State<Float> = rememberPausableClock()
+
+/**
+ * The one clock behind every looping motion: seconds that run only while the page is on screen and still
+ * ([LocalGlowPagePaused]), the list isn't scrolling ([LocalGlowPaused]) and the system's animations are on. With [wrapS]
+ * above zero the seconds wrap at it (one lap of a single loop, so floats stay exact however long the app is open).
+ * [enabled] false never starts it. Read it in a draw or layer block only.
+ */
+@Composable
+internal fun rememberPausableClock(enabled: Boolean = true, wrapS: Float = 0f): State<Float> {
     val seconds = remember { mutableFloatStateOf(0f) }
     val context = LocalContext.current
     val animate = remember(context) {
@@ -57,7 +67,7 @@ internal fun rememberLiveClock(): State<Float> {
     }
     val listPaused by rememberUpdatedState(LocalGlowPaused.current)
     val pagePaused by rememberUpdatedState(LocalGlowPagePaused.current)
-    if (animate) LaunchedEffect(Unit) {
+    if (animate && enabled) LaunchedEffect(wrapS) {
         val paused = { listPaused() || pagePaused() }
         var last = withFrameNanos { it }
         while (true) {
@@ -67,7 +77,8 @@ internal fun rememberLiveClock(): State<Float> {
             }
             withFrameNanos { now ->
                 // A long gap (a dropped frame or a resume) moves at most a tenth of a second, so nothing jumps.
-                seconds.floatValue += ((now - last) / 1e9f).coerceAtMost(0.1f)
+                val next = seconds.floatValue + ((now - last) / 1e9f).coerceAtMost(0.1f)
+                seconds.floatValue = if (wrapS > 0f) next % wrapS else next
                 last = now
             }
         }
@@ -108,9 +119,12 @@ internal fun rememberSeenShare(target: Float, durationMs: Int = 1300, delayMs: I
     return a
 }
 
-/** [target] counted up from zero once the tab is first seen (and eased to any later change). */
+/**
+ * [target] counted up from zero once the tab is first seen (and eased to any later change). A state, read inside the
+ * small composable that shows it, so a count-up recomposes that text only and not the hero round it.
+ */
 @Composable
-internal fun rememberSeenCount(target: Int, durationMs: Int = 1200): Int {
+internal fun rememberSeenCount(target: Int, durationMs: Int = 1200): State<Int> {
     val a = remember { Animatable(0f) }
     val seen = LocalTabSeen.current
     LaunchedEffect(target) {
@@ -120,7 +134,7 @@ internal fun rememberSeenCount(target: Int, durationMs: Int = 1200): Int {
         }
         a.animateTo(target.toFloat(), tween(durationMs, easing = FastOutSlowInEasing))
     }
-    return a.value.toInt()
+    return remember(a) { derivedStateOf { a.value.toInt() } }
 }
 
 /**
@@ -167,9 +181,12 @@ private const val RISE_WINDOW_MS = 1400L
  */
 @Composable
 internal fun LiveAura(hue: Color, clock: State<Float>, modifier: Modifier = Modifier, strength: Float = 1f, top: Float = 0.45f) {
-    Box(modifier) {
+    // The wash drifts over 26 s and breathes over 7, so a quarter of the frames show it as smooth as all of them: it reads
+    // the clock in steps of 1/AURA_FPS, and sits in a layer of its own so a redraw of it never redraws what is round it.
+    val step = remember(clock) { derivedStateOf { (clock.value * AURA_FPS).toInt() } }
+    Box(modifier.graphicsLayer()) {
         Canvas(Modifier.fillMaxSize()) {
-            val t = clock.value
+            val t = step.value / AURA_FPS
             val w = size.width
             val h = size.height
             val r = maxOf(w, h) * 0.6f
@@ -188,3 +205,5 @@ internal fun LiveAura(hue: Color, clock: State<Float>, modifier: Modifier = Modi
         }
     }
 }
+
+private const val AURA_FPS = 20f

@@ -17,10 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ import androidx.navigationevent.NavigationEventDispatcherOwner
 import androidx.navigationevent.compose.LocalNavigationEventDispatcherOwner
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.openstrap.app.AppContainer
 import org.openstrap.app.data.Healthspan
@@ -105,8 +108,13 @@ class ShownDay(
 /** The stored histories the charts read. */
 class Histories(val daily: DailyHistory)
 
-/** Live heart rate, whether it's on, whether it can be (the strap connected), and the switch. */
-class LiveHeart(val bpm: Int?, val enabled: Boolean, val canUse: Boolean, val toggle: (Boolean) -> Unit)
+/**
+ * Live heart rate, whether it's on, whether it can be (the strap connected), and the switch. The rate is a State read
+ * where it is drawn, so a tick recomposes only that screen, not the app root and every tab under it.
+ */
+class LiveHeart(private val bpmState: State<Int?>, val enabled: Boolean, val canUse: Boolean, val toggle: (Boolean) -> Unit) {
+    val bpm: Int? get() = bpmState.value
+}
 
 /** Each tab's count of taps asking its lists to scroll to the top. */
 @Stable
@@ -175,6 +183,20 @@ internal fun TabsPager(
         launch { pager.interactionSource.interactions.collect { if (it is DragInteraction.Start) swiped.set(true) } }
         snapshotFlow { pager.settledPage }.collect { nav.settled(it, swiped.get()) }
     }
+    // Only the tab showing is built for the first frame; the others follow one by one once it has settled (nearest first),
+    // so a cold start composes one dashboard, not four. A tab built stays built, so a swipe never builds one mid-gesture.
+    val built = remember { mutableStateListOf(tab) }
+    LaunchedEffect(tab) { if (tab !in built) built.add(tab) }
+    LaunchedEffect(Unit) {
+        withFrameNanos { }
+        delay(WARM_FIRST_MS)
+        for (p in Tab.entries.indices.sortedBy { kotlin.math.abs(it - tab) }) {
+            if (p !in built) {
+                built.add(p)
+                delay(WARM_STEP_MS)
+            }
+        }
+    }
     val currentDetail = nav.stack(nav.current).lastOrNull()
     LaunchedEffect(currentDetail) {
         workoutsVm.open((currentDetail as? Detail.Workout)?.start)
@@ -190,6 +212,10 @@ internal fun TabsPager(
         pager, Modifier.padding(start = if (rail) NavRailWidth else 0.dp).sinkBehind(pageGrow).hazeSource(navGlass),
         userScrollEnabled = !subScreenOpen, key = { it }, beyondViewportPageCount = Tab.entries.size - 1,
     ) { page ->
+        if (page != tab && page !in built) {
+            Box(Modifier.fillMaxSize())
+            return@HorizontalPager
+        }
         val back = if (page == tab) emptyArray() else arrayOf(LocalNavigationEventDispatcherOwner provides idleBack)
         @Suppress("SpreadOperator") // at most one local, once per page
         CompositionLocalProvider(
@@ -236,6 +262,10 @@ internal fun TabsPager(
         }
     }
 }
+
+/** How long after the first frame the other tabs start to be built, and the gap between them. */
+private const val WARM_FIRST_MS = 400L
+private const val WARM_STEP_MS = 250L
 
 /** How far [page] is from sitting fully on screen, in pages: 0 when it fills the screen, 1 and over when it's gone. */
 internal fun pageShift(pager: PagerState, page: Int): Float =
@@ -355,7 +385,7 @@ private fun TabRoot(
             onDismissSuggestion = dismissSuggestion,
             onAllSports = nav::openChoose,
             onAddWorkout = { nav.setAddingOn(day.date) },
-            liveHeartRate = live.bpm, history = histories.daily, wear = shown.wear,
+            history = histories.daily, wear = shown.wear,
         )
     }
 }

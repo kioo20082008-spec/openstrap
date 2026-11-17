@@ -232,7 +232,12 @@ fun <S> StackContent(target: S, keys: (S) -> List<String>, modifier: Modifier = 
             transitionSpec = { stackTransform(CardMotion.of(keys(initialState), keys(targetState), holder.taps, animate)) },
         ) { state ->
             val page = keys(state)
-            val share = if (animate) CardShare(this@SharedTransitionLayout, this, holder, page, motion, bounds) else null
+            // Kept while its parts are the same: a new one on each pass would recompose every card on the page, each of
+            // which reads this local.
+            val sharedScope = this@SharedTransitionLayout
+            val share = if (animate) remember(sharedScope, this, holder, page, motion, bounds) {
+                CardShare(sharedScope, this, holder, page, motion, bounds)
+            } else null
             CompositionLocalProvider(LocalCardShare provides share) {
                 // A detail without the metric template's hero: the card grows into the whole page.
                 Box(Modifier.fillMaxSize().detailSurface(hero = false)) { content(state) }

@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,19 +89,20 @@ private fun animatedShare(target: Float, delayMs: Int = 120): Animatable<Float, 
 
 /* The rings' life: every piece below is drawn inside the ring's canvas from the tab's clock, so nothing recomposes. */
 
-/** Where [share] of a ring [inset] from the edge ends, and the ring's radius. */
-private fun DrawScope.ringPoint(share: Float, stroke: Float, inset: Float): Pair<Offset, Float>? {
+/** Where [share] of a ring [inset] from the edge ends; [Offset.Unspecified] when the ring doesn't fit (no allocation: it runs every frame). */
+private fun DrawScope.ringPoint(share: Float, stroke: Float, inset: Float): Offset {
     val d = size.minDimension - 2 * inset - stroke
-    if (d <= 0f) return null
+    if (d <= 0f) return Offset.Unspecified
     val r = d / 2f
     val a = ((-90f + 360f * share) * PI / 180f).toFloat()
-    return Offset(center.x + r * cos(a), center.y + r * sin(a)) to r
+    return Offset(center.x + r * cos(a), center.y + r * sin(a))
 }
 
 /** A soft halo round the ring's tip, brighter as [glow] (0 to 1) rises, with a small light core on the tip itself. */
 private fun DrawScope.tipGlow(share: Float, color: Color, stroke: Float, inset: Float, glow: Float) {
     if (share <= 0.005f) return
-    val (p, _) = ringPoint(share, stroke, inset) ?: return
+    val p = ringPoint(share, stroke, inset)
+    if (p.isUnspecified) return
     val reach = stroke * (1.15f + 0.45f * glow)
     drawCircle(Brush.radialGradient(listOf(color.copy(alpha = 0.34f + 0.3f * glow), Color.Transparent), p, reach), reach, p)
 }
@@ -108,7 +110,8 @@ private fun DrawScope.tipGlow(share: Float, color: Color, stroke: Float, inset: 
 /** The tip's light core, drawn over the ring. */
 private fun DrawScope.tipCore(share: Float, color: Color, stroke: Float, inset: Float, glow: Float) {
     if (share <= 0.005f) return
-    val (p, _) = ringPoint(share, stroke, inset) ?: return
+    val p = ringPoint(share, stroke, inset)
+    if (p.isUnspecified) return
     drawCircle(lerp(color, Color.White, 0.6f).copy(alpha = 0.35f + 0.45f * glow), stroke * (0.14f + 0.05f * glow), p)
 }
 
@@ -135,7 +138,8 @@ private fun DrawScope.orbit(color: Color, stroke: Float, inset: Float, t: Float,
     val at = lap(t, period)
     val light = lerp(color, Color.White, 0.55f)
     for (k in 0..4) {
-        val (p, _) = ringPoint(at - k * 0.012f, stroke, inset) ?: return
+        val p = ringPoint(at - k * 0.012f, stroke, inset)
+        if (p.isUnspecified) return
         drawCircle(light.copy(alpha = 0.85f * (1f - k / 5f)), stroke * (0.2f - k * 0.025f), p)
     }
 }
@@ -178,11 +182,16 @@ private fun BoxScope.RingMark(icon: ImageVector, top: Dp, size: Dp = 14.dp) {
     Icon(icon, null, tint = Color(0xFF0A0A0C), modifier = Modifier.align(Alignment.TopCenter).padding(top = top - size / 2).size(size))
 }
 
+/**
+ * A figure in the ring's number type. [value] is a lambda read here, so a count-up recomposes this text alone, and not
+ * the hero round it, on each step.
+ */
 @Composable
-private fun RingNumber(value: String, unit: String?, size: TextUnit) {
+private fun RingNumber(value: () -> String, unit: String?, size: TextUnit) {
+    val text = value()
     Text(
         buildAnnotatedString {
-            append(value)
+            append(text)
             if (unit != null) withStyle(SpanStyle(fontSize = size * 0.4f, color = Muted, fontWeight = FontWeight.Bold)) { append(unit) }
         },
         color = AppColors.ink, maxLines = 1,
@@ -206,7 +215,7 @@ internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifi
     Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(250.dp), contentAlignment = Alignment.Center) {
             LiveAura(RingColors.Energy, clock, Modifier.requiredSize(400.dp), strength = 0.9f)
-            Canvas(Modifier.size(250.dp)) {
+            Canvas(Modifier.size(250.dp).graphicsLayer()) {
                 val t = clock.value
                 val w = 20.dp.toPx()
                 val step = w + 5.dp.toPx()
@@ -228,7 +237,7 @@ internal fun TripleRings(energy: FlaskModel, recovery: Int?, sleep: Int?, modifi
             RingMark(AppIcons.HeartFill, 35.dp)
             RingMark(AppIcons.MoonFill, 60.dp)
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                RingNumber(if (level != null) shown.toString() else "–", if (level != null) "%" else null, 40.sp)
+                RingNumber({ if (level != null) shown.value.toString() else "–" }, if (level != null) "%" else null, 40.sp)
                 if (word != null) Text(word, color = AppColors.readable(RingColors.Energy), style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1)
             }
         }
@@ -274,7 +283,7 @@ internal fun RingPulseHero(
                     RingMark(AppIcons.HeartFill, 12.dp, 16.dp)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    RingNumber(shown.toString(), "%", 56.sp)
+                    RingNumber({ shown.value.toString() }, "%", 56.sp)
                     Text(word, color = AppColors.readable(hue), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
                 }
             }
@@ -359,7 +368,7 @@ internal fun RingSkyHero(
             }
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 // The night's score leads when there is one; the time asleep sits under it, or alone without a score.
-                if (score != null) RingNumber(shown.toString(), null, 56.sp)
+                if (score != null) RingNumber({ shown.value.toString() }, null, 56.sp)
                 Text(
                     asleep, color = AppColors.ink, maxLines = 1,
                     style = TextStyle(fontFamily = NumberFamily, fontWeight = FontWeight.ExtraBold, fontSize = if (score != null) 17.sp else 38.sp),
@@ -417,14 +426,14 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
     val shown = rememberSeenCount(steps, durationMs = 1400)
     val clock = rememberLiveClock()
     val hue = RingColors.Steps
-    val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
+    val n = remember { java.text.NumberFormat.getIntegerInstance(java.util.Locale.US) }
     Column(
         Modifier.fillMaxWidth().bounceClick(onClick = onOpen).padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Box(Modifier.size(230.dp), contentAlignment = Alignment.Center) {
             LiveAura(hue, clock, Modifier.requiredSize(390.dp), strength = 0.75f)
-            Canvas(Modifier.size(230.dp)) {
+            Canvas(Modifier.size(230.dp).graphicsLayer()) {
                 val t = clock.value
                 val w = 24.dp.toPx()
                 val g = wave(t, 2.8f)
@@ -437,7 +446,7 @@ internal fun RingPathHero(steps: Int, goal: Int, stepsWord: String, line: String
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 // Sized by the final figure, so the number doesn't jump size while it counts up.
                 val size = n.format(steps).length
-                RingNumber(n.format(shown), null, if (size >= 6) 34.sp else if (size == 5) 40.sp else 50.sp)
+                RingNumber({ n.format(shown.value) }, null, if (size >= 6) 34.sp else if (size == 5) 40.sp else 50.sp)
                 Text(stepsWord, color = Muted, style = MaterialTheme.typography.bodyMedium)
             }
         }
@@ -463,7 +472,7 @@ internal fun RingStatCard(label: String, value: Int?, hue: Color, onClick: () ->
             Text(label, color = Muted, style = MaterialTheme.typography.labelMedium.copy(letterSpacing = 0.sp), maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Spacer(Modifier.height(2.dp))
-        RingNumber(if (value != null) shown.toString() else "–", null, 26.sp)
+        RingNumber({ if (value != null) shown.value.toString() else "–" }, null, 26.sp)
         Spacer(Modifier.height(8.dp))
         Box(Modifier.fillMaxWidth().height(5.dp).clip(RoundedCornerShape(3.dp)).background(hue.copy(alpha = 0.2f))) {
             val filled = (value ?: 0).coerceIn(0, 100) / 100f

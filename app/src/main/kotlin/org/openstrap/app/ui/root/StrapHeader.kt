@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import java.time.LocalDate
@@ -71,7 +72,9 @@ internal fun rememberStrapHeader(facts: StrapFacts, day: DayUiState, preview: St
     } else {
         (android.os.SystemClock.uptimeMillis() - android.os.Process.getStartUptimeMillis()) / MS_PER_S
     }
-    return StrapHeader(view, strapChip(view.paired, view.connection, view.sync, view.lastSeen, now, sinceStart), now)
+    val chip = strapChip(view.paired, view.connection, view.sync, view.lastSeen, now, sinceStart)
+    // One object while the view, the chip and the clock are the same: the pages over the tab take it as a parameter.
+    return remember(view, chip, now) { StrapHeader(view, chip, now) }
 }
 
 /**

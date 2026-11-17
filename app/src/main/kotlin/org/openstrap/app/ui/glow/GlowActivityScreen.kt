@@ -163,7 +163,7 @@ fun GlowActivityScreen(
                 when (card) {
                     ActivityCard.Start -> StartCard(sports, onStartWorkout, onAllSports)
                     ActivityCard.Steps -> LocalGoals.current.steps.let { goal ->
-                        val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
+                        val n = remember { java.text.NumberFormat.getIntegerInstance(java.util.Locale.US) }
                         RingPathHero(
                             state.steps, goal, stringResource(R.string.dials_steps_word),
                             if (state.steps >= goal) stringResource(R.string.dials_steps_done)
@@ -286,8 +286,10 @@ private fun DayFactsList(
     ListPanel(title = stringResource(R.string.glow_activity_today), note = note, tag = tag) {
         val a = r?.activity
         // The latest workout the strap read VO2 max from; the estimate from your profile otherwise.
-        val fromWorkouts = workouts.sortedByDescending { it.workout.start }
-            .firstNotNullOfOrNull { w -> (w.workout.vo2max ?: w.effect?.vo2max?.roundToInt())?.takeIf { it > 0 } }
+        val fromWorkouts = remember(workouts) {
+            workouts.sortedByDescending { it.workout.start }
+                .firstNotNullOfOrNull { w -> (w.workout.vo2max ?: w.effect?.vo2max?.roundToInt())?.takeIf { it > 0 } }
+        }
         val est = r?.vo2max
         ListRow(
             stringResource(R.string.glow_activity_vo2max), MetricColors.heart,
@@ -346,9 +348,12 @@ private fun WorkoutsList(
     val zone = ZoneId.systemDefault()
     fun dayOf(a: WorkoutAnalysis) = Instant.ofEpochSecond(a.workout.start).atZone(zone).toLocalDate()
     // Newest first within the day too, as under every day before it.
-    val today = workouts.filter { dayOf(it) == date }.sortedByDescending { it.workout.start }
-    val before = workouts.filter { dayOf(it) < date }.sortedByDescending { it.workout.start }
-    val shown = today + before.take((LISTED_WORKOUTS - today.size).coerceAtLeast(0))
+    // Worked out once per list of workouts and day: the list grows with every workout you've done.
+    val (today, shown) = remember(workouts, date) {
+        val today = workouts.filter { dayOf(it) == date }.sortedByDescending { it.workout.start }
+        val before = workouts.filter { dayOf(it) < date }.sortedByDescending { it.workout.start }
+        today to (today + before.take((LISTED_WORKOUTS - today.size).coerceAtLeast(0)))
+    }
     // From every workout (newest first), so a row glows the same here and in All workouts.
     val usual = remember(workouts) { Workouts.usualLoad(workouts.map { it.workout.trainingLoad }) }
     val note = if (today.isNotEmpty()) pluralStringResource(R.plurals.glow_activity_this_day, today.size, today.size) else null

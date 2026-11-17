@@ -355,7 +355,9 @@ private fun AppRoot(
     val day = previewed.day
     val strapFacts by rootVm.strap.collectAsStateWithLifecycle()
     val connected = strapFacts.connection is ConnectionState.Connected
-    val live by rootVm.liveHeartRate.collectAsStateWithLifecycle()
+    // The live heart rate ticks about every second while it is on. Its State is passed down and read where it is drawn,
+    // so only those screens recompose, not the app root and every tab under it.
+    val liveState = rootVm.liveHeartRate.collectAsStateWithLifecycle()
     var breatheOpen by remember { mutableStateOf(false) }
     val liveEnabled by rootVm.liveEnabled.collectAsStateWithLifecycle()
     val workoutState by container.workout.state.collectAsStateWithLifecycle()
@@ -370,7 +372,9 @@ private fun AppRoot(
     val histories = remember(container) {
         Histories { m, from, to -> container.health.daily(m, from, to) }
     }
-    val liveHeart = LiveHeart(live, liveEnabled, connected) { container.strap.setLiveHeartRate(it) }
+    val liveHeart = remember(liveState, liveEnabled, connected, container) {
+        LiveHeart(liveState, liveEnabled, connected) { container.strap.setLiveHeartRate(it) }
+    }
     val pairedKnown = strapFacts.pairedKnown && preview != StrapPreview.NotPaired
     val scan by deviceVm.scan.collectAsStateWithLifecycle()
     val pairing = rememberPairingStage(strapFacts.pairedKnown, scan.scanning, scan.found.isNotEmpty(), strapFacts.connection, dataPreview)
@@ -400,6 +404,26 @@ private fun AppRoot(
         if (nav.pages.isEmpty()) growFrom = tapped
         nav.openPage(p)
     }
+    // What the tabs are handed, kept as one object while nothing in it changed: a new one on each pass of the app root
+    // would recompose every tab, whose parameters they are.
+    val staleAfter = preview?.staleAfter ?: STALE_AFTER_S
+    val syncHalted = syncStopped(pairedKnown, strap.view.connection, strap.view.sync)
+    val todayStrap = remember(pairedKnown, pairing, syncHalted, strap.view.record, connected, staleAfter) {
+        TodayStrap(
+            paired = pairedKnown, pairing = pairing, stopped = syncHalted, record = strap.view.record,
+            canSync = connected, staleAfter = staleAfter,
+        )
+    }
+    val liveHero = remember(liveGlance, onGlanceAction) { LiveHeroHooks({ liveGlance.value }, onGlanceAction, { liveHeroShown = it }) }
+    val todayHooks = remember(todayStrap, liveHero, today.layout, today.usualBedtime, running, container) {
+        TodayHooks(
+            todayStrap, liveHero, today.layout, today.usualBedtime, running,
+            onOpenRunning = { container.workout.minimized.value = false },
+        )
+    }
+    val headerHooks = remember(day, today.clockDate, today.moment, today.layout, today.usualBedtime, today.lastWorkout, running, strap.chip, dayVm, rootVm, openPage) {
+        HeaderHooks(day, today, running, strap.chip, dayVm, rootVm, openPage)
+    }
     NavRequestsEffect(
         navRequests, nav,
         NavRequestHooks(
@@ -422,10 +446,11 @@ private fun AppRoot(
         saved?.let { s -> rootVm.saveSportSettings(plan.sportType, s) }
         nav.workoutStarted()
     }
-    val pageHooks = PageHooks(
-        container, dayVm, deviceVm, firmwareVm, workoutsVm, rootVm,
-        rememberHealthConnectActions(rootVm, deviceVm), rememberBackupActions(deviceVm),
-    )
+    val hcActions = rememberHealthConnectActions(rootVm, deviceVm)
+    val backupActions = rememberBackupActions(deviceVm)
+    val pageHooks = remember(container, dayVm, deviceVm, firmwareVm, workoutsVm, rootVm, hcActions, backupActions) {
+        PageHooks(container, dayVm, deviceVm, firmwareVm, workoutsVm, rootVm, hcActions, backupActions)
+    }
     // Back closes what's open first (those screens handle it, registered later so they win). From a tab's root it goes
     // to the tab before, then to Today. On Today looking at a past day, back first returns to today. Only Today's back
     // leaves the app.
@@ -458,7 +483,7 @@ private fun AppRoot(
     ) {
       Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         if (hinge != null) {
-            TabletopTop(hinge, container, running?.takeIf { !workoutMinimized }, day, live, liveEnabled, strapFacts.connection)
+            TabletopTop(hinge, container, running?.takeIf { !workoutMinimized }, day, liveState.value, liveEnabled, strapFacts.connection)
         }
         // Below the fold the status bar is far away, so the pages don't make room for it.
         BoxWithConstraints(
@@ -475,7 +500,7 @@ private fun AppRoot(
             val showBar = !rail && !barHidden && !(detailOpen && maxWidth < SideBySideWidth)
             val selectTab: (Int) -> Unit = { t -> tapTab(t, nav, firmwareVm, scroll) }
             var quickOpen by remember { mutableStateOf(false) }
-            if (breatheOpen) org.openstrap.app.ui.glow.BreatheScreen(live, liveEnabled, { container.strap.setLiveHeartRate(it) }) { breatheOpen = false }
+            if (breatheOpen) org.openstrap.app.ui.glow.BreatheScreen(liveState.value, liveEnabled, { container.strap.setLiveHeartRate(it) }) { breatheOpen = false }
             val quickScope = androidx.compose.runtime.rememberCoroutineScope()
             // Composed only while the sheet is open, so it is the last back handler added and Back closes the sheet
             // before anything under it (the tabs' details and pages).
@@ -510,19 +535,10 @@ private fun AppRoot(
                 CompositionLocalProvider(LocalHideTabBar provides { barHidden = it }) {
                     GoalsSheetHost(nav, rootVm)
                     TabsPager(
-                        nav, shown, histories,
-                        TodayHooks(
-                            TodayStrap(
-                                paired = pairedKnown, pairing = pairing,
-                                stopped = syncStopped(pairedKnown, strap.view.connection, strap.view.sync), record = strap.view.record,
-                                canSync = connected, staleAfter = preview?.staleAfter ?: STALE_AFTER_S,
-                            ),
-                            LiveHeroHooks({ liveGlance.value }, onGlanceAction, { liveHeroShown = it }),
-                            today.layout, today.usualBedtime, running, onOpenRunning = { container.workout.minimized.value = false },
-                        ),
+                        nav, shown, histories, todayHooks,
                         container, dayVm, workoutsVm, rootVm, liveHeart, padding, rail, pageGrow, navGlass, idleBack, scroll,
                         showCharge, onChargeConsume = { showCharge = false },
-                        header = HeaderHooks(day, today, running, strap.chip, dayVm, rootVm, openPage),
+                        header = headerHooks,
                         detail = { t, d ->
                             DetailHost(
                                 t, d, nav, shown, histories, container, dayVm, workoutsVm, liveHeart, profile, padding,
@@ -541,12 +557,17 @@ private fun AppRoot(
             AllMetricsHost(nav, shown, workoutsVm, scroll, closePages, onShowCharge = { showCharge = true })
             AddWorkoutHost(nav, container, workoutsVm, rootVm)
             SaveStretchHost(nav, container, workoutsVm, rootVm)
+            val workoutHooks = remember(
+                liveState, strapFacts.connection, gates.startPlan, gates.requestLocation, showBar, hinge != null, folds.book,
+            ) {
+                WorkoutLayerHooks(
+                    liveState, strapFacts.connection, gates.startPlan, gates.requestLocation,
+                    capsuleBottom = if (showBar) CapsuleOverBar else CapsuleNoBar, tabletop = hinge != null, bookHinge = folds.book,
+                )
+            }
             WorkoutLayer(
                 container, nav, workoutState, workoutMinimized, workoutsVm, rootVm,
-                WorkoutLayerHooks(
-                    live, strapFacts.connection, gates.startPlan, gates.requestLocation,
-                    capsuleBottom = if (showBar) CapsuleOverBar else CapsuleNoBar, tabletop = hinge != null, bookHinge = folds.book,
-                ),
+                workoutHooks,
                 glass = navGlass, glance = { liveGlance.value }, onGlanceAction = onGlanceAction,
                 capsuleHidden = liveHeroShown && nav.atTodayRoot,
             )

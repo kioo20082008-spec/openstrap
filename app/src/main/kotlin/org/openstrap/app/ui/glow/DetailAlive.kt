@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -187,18 +188,30 @@ private val NumberText = Regex("""(\d{1,3}(?:,\d{3})+|\d+)(?:\.(\d+))?""")
 internal fun detailCountUp(value: String, durationMs: Int = 1100): String {
     val p = remember { Animatable(0f) }
     LaunchedEffect(Unit) { p.animateTo(1f, tween(durationMs, easing = FastOutSlowInEasing)) }
-    val at = p.value
-    if (at >= 1f) return value
-    val m = NumberText.matchEntire(value) ?: return value
-    val whole = m.groupValues[1]
-    val decimals = m.groupValues[2].length
-    val target = (whole.replace(",", "") + if (decimals > 0) "." + m.groupValues[2] else "").toDoubleOrNull() ?: return value
-    val f = java.text.NumberFormat.getNumberInstance(java.util.Locale.US).apply {
-        isGroupingUsed = whole.contains(',')
-        minimumFractionDigits = decimals
-        maximumFractionDigits = decimals
+    // Worked out once a value, not on every frame of the count; and the text is a derived state, so the reader recomposes
+    // only when the shown text itself changes.
+    val counter = remember(value) {
+        val m = NumberText.matchEntire(value)
+        val whole = m?.groupValues?.get(1)
+        val decimals = m?.groupValues?.get(2)?.length ?: 0
+        val target = if (m == null) null else (whole!!.replace(",", "") + if (decimals > 0) "." + m.groupValues[2] else "").toDoubleOrNull()
+        if (target == null) null else {
+            val f = java.text.NumberFormat.getNumberInstance(java.util.Locale.US).apply {
+                isGroupingUsed = whole!!.contains(',')
+                minimumFractionDigits = decimals
+                maximumFractionDigits = decimals
+            }
+            target to f
+        }
     }
-    return f.format(target * at)
+    if (counter == null) return value
+    val shown = remember(value, counter) {
+        derivedStateOf {
+            val at = p.value
+            if (at >= 1f) value else counter.second.format(counter.first * at)
+        }
+    }
+    return shown.value
 }
 
 /**

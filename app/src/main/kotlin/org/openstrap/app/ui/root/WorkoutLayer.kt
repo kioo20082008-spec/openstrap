@@ -78,7 +78,7 @@ private const val MS_PER_S = 1000
 
 /** The live workout, the Choose and Ready screens, and the folds that split them. */
 internal class WorkoutLayerHooks(
-    val live: Int?,
+    private val liveState: State<Int?>,
     val connection: ConnectionState,
     /** Starts a plan once Bluetooth (and location, for GPS) may be used, then closes Ready and Choose. */
     val startPlan: (WorkoutPlan, SportSettings?) -> Unit,
@@ -86,7 +86,10 @@ internal class WorkoutLayerHooks(
     val capsuleBottom: Dp,
     val tabletop: Boolean,
     val bookHinge: FoldingFeature?,
-)
+) {
+    /** The live heart rate, read where a screen draws it, so a tick recomposes that screen and not the whole layer. */
+    val live: Int? get() = liveState.value
+}
 
 /** What a tap on the workout at a glance does, on the floating bar and on the Today hero. */
 internal fun glanceAction(session: WorkoutSession): (GlanceAction) -> Unit = { a ->
