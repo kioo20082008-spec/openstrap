@@ -665,9 +665,22 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         StrapSnapshot(prefs[address] != null && prefs[authKey] != null, prefs[strapBattery], prefs[strapCharging] == true, prefs[syncDone])
     }
 
-    /** The connected strap's battery and charging, written when either changes. */
-    suspend fun setStrapBattery(percent: Int, charging: Boolean) {
+    private val strapChargedAt = longPreferencesKey(SettingsKeys.STRAP_CHARGED_AT)
+    private val strapChargedPercent = androidx.datastore.preferences.core.intPreferencesKey(SettingsKeys.STRAP_CHARGED_PERCENT)
+
+    /** When the strap was last charged, as far as the app saw: null before it has seen one. */
+    val lastCharge: Flow<LastCharge?> = read { prefs -> prefs[strapChargedAt]?.let { LastCharge(it, prefs[strapChargedPercent]) } }
+
+    /**
+     * The connected strap's battery and charging, written when either changes. A reading while charging, or one that
+     * jumped up from the last ([ChargeLog.charged]), is also a charge: it sets [lastCharge] to [nowSeconds].
+     */
+    suspend fun setStrapBattery(percent: Int, charging: Boolean, nowSeconds: Long = System.currentTimeMillis() / 1000) {
         store.edit {
+            if (ChargeLog.charged(it[strapBattery], percent, charging)) {
+                it[strapChargedAt] = nowSeconds
+                it[strapChargedPercent] = percent
+            }
             it[strapBattery] = percent
             it[strapCharging] = charging
         }
@@ -811,7 +824,7 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
             setOf(
                 DEVICE_ADDRESS, DEVICE_AUTH_KEY, DEVICE_NAME,
                 COMPANION_ASSOCIATION_ID, COMPANION_DECLINED, HELD_DISCONNECTED,
-                STRAP_BATTERY, STRAP_CHARGING, STRAP_LAST_SYNC_DONE,
+                STRAP_BATTERY, STRAP_CHARGING, STRAP_LAST_SYNC_DONE, STRAP_CHARGED_AT, STRAP_CHARGED_PERCENT,
                 ZEPP_APP_TOKEN, ZEPP_USER_ID, ZEPP_API_BASE, ZEPP_CHINA, ZEPP_LOGIN_TOKEN, ZEPP_APP_TOKEN_AT, ZEPP_APP_TTL,
             )
         }
@@ -893,6 +906,8 @@ object SettingsKeys {
     const val STRAP_BATTERY = "strap_battery"
     const val STRAP_CHARGING = "strap_charging"
     const val STRAP_LAST_SYNC_DONE = "strap_last_sync_done"
+    const val STRAP_CHARGED_AT = "strap_charged_at"
+    const val STRAP_CHARGED_PERCENT = "strap_charged_percent"
     const val BACKUP_FOLDER = "backup_folder"
     const val BACKUP_FOLDER_NAME = "backup_folder_name"
     const val BACKUP_LAST_DONE = "backup_last_done"

@@ -9,6 +9,9 @@
     <string name="you_strap_state_key_rejected">رفض السترب المفتاح</string>
     <string name="you_strap_state_cant_connect">تعذّر الاتصال</string>
     <string name="you_strap_state_not_paired">غير مربوط</string>
+    <string name="you_strap_last_charged">آخر شحن ⁨%1$s⁩</string>
+    <string name="you_strap_last_charged_at">آخر شحن ⁨%1$s⁩ عند ⁨%2$d⁩%%</string>
+    <string name="you_strap_last_charged_none">آخر شحن: ما انسجّل بعد، يظهر بعد أول شحن</string>
     <string name="you_strap_state_last_seen">آخر ظهور ⁨%1$s⁩</string>
     <string name="you_strap_state_not_connected">غير متصل</string>
     <string name="you_strap_disconnect_title">قطع اتصال السترب؟</string>

@@ -18,6 +18,9 @@
     <string name="you_strap_state_cant_connect">Can\'t connect</string>
     <string name="you_strap_state_not_paired">Not paired</string>
     <!-- The time is how long ago, in lower case, "18 min ago". -->
+    <string name="you_strap_last_charged">Last charged <xliff:g id="ago" example="3 days ago">%1$s</xliff:g></string>
+    <string name="you_strap_last_charged_at">Last charged <xliff:g id="ago" example="3 days ago">%1$s</xliff:g>, at <xliff:g id="percent" example="98">%2$d</xliff:g>%%</string>
+    <string name="you_strap_last_charged_none">Last charge: not seen yet, it shows after the next one</string>
     <string name="you_strap_state_last_seen">Last seen <xliff:g id="ago" example="18 min ago">%1$s</xliff:g></string>
     <string name="you_strap_state_not_connected">Not connected</string>
 

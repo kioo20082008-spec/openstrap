@@ -68,6 +68,10 @@ class DeviceViewModel(
     val paired: StateFlow<PairedDevice?> =
         settings.pairedDevice.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
+    /** When the strap was last charged, as far as the app saw. */
+    val lastCharge: StateFlow<org.openstrap.app.data.settings.LastCharge?> =
+        settings.lastCharge.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     val profile: StateFlow<org.openstrap.app.data.settings.UserProfile> =
         settings.profile.stateIn(viewModelScope, SharingStarted.Eagerly, org.openstrap.app.data.settings.UserProfile())
 

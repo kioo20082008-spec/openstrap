@@ -145,6 +145,7 @@ fun DeviceScreen(
     val paired by vm.paired.collectAsStateWithLifecycle()
     val connection by vm.connection.collectAsStateWithLifecycle()
     val sync by vm.sync.collectAsStateWithLifecycle()
+    val lastCharge by vm.lastCharge.collectAsStateWithLifecycle()
     val scan by vm.scan.collectAsStateWithLifecycle()
     val info by vm.info.collectAsStateWithLifecycle()
     val calls by vm.buzzOnCalls.collectAsStateWithLifecycle()
@@ -198,7 +199,7 @@ fun DeviceScreen(
             item { PairPanel(vm, scan, onRequestBluetooth) }
             return@ScreenList
         }
-        item { StrapHero(device.name, preview?.connection ?: connection, preview?.sync ?: sync, preview?.lastSeen ?: lastSeen) }
+        item { StrapHero(device.name, preview?.connection ?: connection, preview?.sync ?: sync, preview?.lastSeen ?: lastSeen, lastCharge) }
         val failed = connection as? ConnectionState.Failed
         if (failed?.keyRejected == true) item { KeyRejectedPanel(failed.reason, onPairAgain = vm::forget) }
         else item {
@@ -353,7 +354,10 @@ private fun KeepConnectedRow(vm: DeviceViewModel, keepConnected: KeepConnected, 
 
 /** The strap in a glow card: its name, the state line, a drawing of it with its light, and the battery. */
 @Composable
-internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncState, lastSeen: Long?) {
+internal fun StrapHero(
+    name: String, connection: ConnectionState, sync: SyncState, lastSeen: Long?,
+    lastCharge: org.openstrap.app.data.settings.LastCharge? = null,
+) {
     val connected = connection as? ConnectionState.Connected
     val battery = connected?.batteryPercent
     val led = when {
@@ -384,6 +388,16 @@ internal fun StrapHero(name: String, connection: ConnectionState, sync: SyncStat
                     }
                     RingsBar(battery / 100f, AppColors.readable(if (battery <= 15) MetricColors.warn else StrapLight))
                 }
+                // When it was last charged, kept by the app from the battery readings it has seen.
+                val chargedAgo = lastCharge?.let { agoText((now - it.atSeconds).coerceAtLeast(0)) }
+                Text(
+                    when {
+                        lastCharge == null || chargedAgo == null -> stringResource(R.string.you_strap_last_charged_none)
+                        lastCharge.percent != null -> stringResource(R.string.you_strap_last_charged_at, chargedAgo, lastCharge.percent)
+                        else -> stringResource(R.string.you_strap_last_charged, chargedAgo)
+                    },
+                    color = AppColors.muted, style = GlowType.secondary,
+                )
             }
             Spacer(Modifier.width(12.dp))
             StrapDrawing(

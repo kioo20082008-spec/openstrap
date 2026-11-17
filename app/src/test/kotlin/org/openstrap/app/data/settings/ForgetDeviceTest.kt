@@ -57,7 +57,7 @@ class ForgetDeviceTest {
         val strap = setOf(
             "device_address", "device_auth_key", "device_name",
             "companion_association_id", "companion_declined", "held_disconnected",
-            "strap_battery", "strap_charging", "strap_last_sync_done",
+            "strap_battery", "strap_charging", "strap_last_sync_done", "strap_charged_at", "strap_charged_percent",
             "zepp_app_token", "zepp_user_id", "zepp_api_base", "zepp_china", "zepp_login_token", "zepp_app_token_at", "zepp_app_ttl",
             "last_sync_gdsp_1", "last_sync_gdsp_16",
         )
