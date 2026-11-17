@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -28,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
@@ -62,10 +61,10 @@ fun InfoSheet(
     PageSheet(onDismiss) {
         // One block, so the sheet's gap between blocks leaves this one's own spacing alone.
         Column {
-            Text(info.name, color = AppColors.ink.copy(alpha = 0.5f), style = GlowType.secondary)
+            Text(info.name, color = AppColors.ink, style = PageTitleStyle.copy(fontSize = 22.sp, lineHeight = 28.sp))
             Text(
-                info.meaning, color = AppColors.ink, modifier = Modifier.padding(top = 6.dp),
-                style = GlowType.sentence,
+                info.meaning, color = AppColors.ink.copy(alpha = 0.86f), modifier = Modifier.padding(top = 8.dp),
+                style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp),
             )
             // Some numbers have no scale to place them on (naps, breathing disturbances, whose only words are apnea bands).
             if (info.scale.isNotEmpty()) Scale(info.scale, color, here, Modifier.padding(top = 22.dp))
@@ -74,7 +73,7 @@ fun InfoSheet(
                 modifier = Modifier.padding(top = if (info.scale.isEmpty()) 16.dp else 10.dp),
             )
             Column(
-                Modifier.padding(top = 24.dp).fillMaxWidth().background(AppColors.inset, GlowLayout.CardShape).padding(horizontal = 18.dp),
+                Modifier.padding(top = 24.dp).fillMaxWidth().background(AppColors.glass, RingDetailShape).padding(horizontal = 18.dp),
             ) {
                 val folds = rows ?: listOf(
                     stringResource(R.string.glow_info_how) to info.how,
@@ -104,13 +103,13 @@ private fun Scale(labels: List<String>, color: Color, here: Int?, modifier: Modi
                 val on = i == here
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Box(
+                        // Flat: the bar you're in in the full hue, the rest at the ring's track.
                         Modifier.fillMaxWidth().height(10.dp)
-                            .let { if (on) it.shadow(10.dp, CircleShape, ambientColor = color, spotColor = color) else it }
-                            .background(if (on) color else color.copy(alpha = 0.18f + 0.12f * i / (labels.size - 1).coerceAtLeast(1)), CircleShape),
+                            .background(if (on) color else color.copy(alpha = 0.2f), CircleShape),
                     )
                     Text(
                         label, color = if (on) AppColors.ink else AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                        style = style.copy(fontWeight = if (on) FontWeight.Medium else FontWeight.Normal),
+                        style = style.copy(fontWeight = if (on) FontWeight.Bold else FontWeight.Normal),
                     )
                 }
             }
@@ -125,7 +124,7 @@ private fun Scale(labels: List<String>, color: Color, here: Int?, modifier: Modi
 private fun fitWords(labels: List<String>, roles: List<TextStyle>, width: Int, measurer: TextMeasurer): TextStyle {
     val words = labels.flatMap { it.split(' ') }.filter { it.isNotEmpty() }
     if (words.isEmpty() || width <= 0) return roles.first()
-    fun widest(s: TextStyle) = words.maxOf { measurer.measure(it, s.copy(fontWeight = FontWeight.Medium), softWrap = false, maxLines = 1).size.width }
+    fun widest(s: TextStyle) = words.maxOf { measurer.measure(it, s.copy(fontWeight = FontWeight.Bold), softWrap = false, maxLines = 1).size.width }
     return roles.firstOrNull { widest(it) <= width } ?: roles.last()
 }
 
@@ -137,13 +136,13 @@ private fun Fold(title: String, text: String, divider: Boolean = true) {
     val clickLabel = stringResource(if (open) R.string.glow_info_fold else R.string.glow_info_open)
     Column(
         Modifier.fillMaxWidth()
-            .topHairline(divider, RowHairline),
+            .topHairline(divider, AppColors.hairline),
     ) {
         Row(
-            Modifier.fillMaxWidth().clickable(onClickLabel = clickLabel) { open = !open }.padding(vertical = 16.dp),
+            Modifier.fillMaxWidth().detailPress(onClickLabel = clickLabel, scale = 0.98f) { open = !open }.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(title, color = AppColors.ink, style = GlowType.body, modifier = Modifier.weight(1f))
+            Text(title, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
             Spacer(Modifier.size(12.dp))
             Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = 0.6f), modifier = Modifier.size(16.dp).rotate(turn))
         }

@@ -2,6 +2,7 @@ package org.openstrap.app.ui.glow
 
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -212,8 +213,9 @@ fun AllMetricsSheet(
     onOpen: (IndexTarget) -> Unit,
 ) {
     PageSheet(onDismiss, stringResource(R.string.glow_metrics_all_metrics), dayName(date), side = 16.dp) {
-        groups.forEach { group ->
-            ListPanel(title = group.title) {
+        groups.forEachIndexed { gi, group ->
+            // The groups cascade up into the sheet.
+            ListPanel(Modifier.enterRise(gi), title = group.title) {
                 group.rows.forEachIndexed { i, r ->
                     ListRow(r.name, r.color, r.value, r.status, onClick = { onOpen(r.target) }, divider = i > 0, icon = r.target.rowIcon())
                 }

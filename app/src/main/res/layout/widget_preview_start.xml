@@ -63,7 +63,7 @@
         android:layout_height="wrap_content"
         android:text="Your usual"
         android:textSize="13sp"
-        android:textColor="#B8FFFFFF"
+        android:textColor="#FFA7A7B0"
         android:maxLines="1"
         android:includeFontPadding="true" />
 </LinearLayout>

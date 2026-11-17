@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow.live
 
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.Arrangement
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.layout.Column
@@ -24,6 +25,8 @@ import org.openstrap.app.data.WorkoutRecorder
 import org.openstrap.app.device.ConnectionState
 import org.openstrap.app.device.WorkoutState
 import org.openstrap.app.ui.glow.HeroValue
+import org.openstrap.app.ui.glow.beating
+import org.openstrap.app.ui.glow.rememberBeatPhase
 import org.openstrap.app.ui.glow.draw.DotSize
 import org.openstrap.app.ui.glow.GlowCard
 import org.openstrap.app.ui.glow.draw.GlowMotion
@@ -94,7 +97,7 @@ internal fun LiveGameScreen(
         if (split) EffortBar(effort) else GlowCard(style, Modifier.fillMaxWidth()) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(verticalAlignment = androidx.compose.ui.Alignment.Bottom) {
-                    if (bpm != null) HeroValue("$bpm", stringResource(R.string.workout_live_unit_bpm), dot = DotSize.Detail)
+                    if (bpm != null) HeroValue("$bpm", stringResource(R.string.workout_live_unit_bpm), Modifier.beating(rememberBeatPhase(bpm), 0.035f), dot = DotSize.Detail)
                     else Text(WorkoutCopy.noHeartRate(r.paused, connected), color = AppColors.ink, style = GlowType.sentence)
                     Spacer(Modifier.weight(1f))
                     WorkoutRecorder.liveZone(bpm, r.maxHeartRate, heartZones)?.let { z ->
@@ -128,8 +131,8 @@ private fun PeriodRow(r: WorkoutState.Recording, periods: Structure.Periods, pha
         else -> stringResource(R.string.workout_live_game_full_time) to workoutClock(active())
     }
     Row(Modifier.fillMaxWidth()) {
-        Text(title, color = AppColors.ink, style = GlowType.pageTitle, modifier = Modifier.weight(1f))
-        Text(clock, color = AppColors.ink, style = GlowType.pageTitle.copy(fontFeatureSettings = "tnum"))
+        Text(title, color = AppColors.ink, style = GlowType.pageTitle.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), modifier = Modifier.weight(1f))
+        Text(clock, color = AppColors.ink, style = org.openstrap.app.ui.workout.ringFigure(24.sp))
     }
 }
 

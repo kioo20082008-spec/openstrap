@@ -6,7 +6,7 @@ package org.openstrap.app.presentation
  */
 object WorkoutColors {
     /** Zone 1, easy: the cool blue of light sleep. */
-    const val ZONE_1 = 0xFF8FA8FF.toInt()
+    const val ZONE_1 = 0xFFB3A8FF.toInt()
 
     /** Zone 2, aerobic. Also the rest green between sets and intervals. */
     const val ZONE_2 = 0xFF3DDC97.toInt()

@@ -1,6 +1,10 @@
 package org.openstrap.app.ui.alarms
 
 import androidx.activity.compose.BackHandler
+import org.openstrap.app.ui.device.RingsHeader
+import org.openstrap.app.ui.device.RingsPanel
+import org.openstrap.app.ui.device.pressSink
+import org.openstrap.app.ui.device.riseIn
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import org.openstrap.app.ui.glow.topHairline
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import org.openstrap.app.R
 import org.openstrap.app.i18n.Strings
@@ -38,10 +44,8 @@ import org.openstrap.app.ui.glow.PageChip
 import org.openstrap.app.ui.glow.PageConfirm
 import org.openstrap.app.ui.glow.PageSheet
 import org.openstrap.app.ui.glow.PageTextButton
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageMenuRow
 import org.openstrap.app.ui.glow.PageNote
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.theme.MetricColors
 import org.openstrap.protocol.services.Alarm
@@ -149,10 +153,10 @@ fun AlarmsScreen(
         )
     }
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_alarms_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_alarms_title), onBack) }
         state.error?.let { msg -> item { ErrorPanel(msg, state.busy, vm::refresh) } }
         if (state.loading) {
-            item { PagePanel { PageNote(stringResource(R.string.you_alarms_reading)) } }
+            item { RingsPanel { PageNote(stringResource(R.string.you_alarms_reading)) } }
             return@ScreenList
         }
         item {
@@ -168,10 +172,10 @@ fun AlarmsScreen(
 fun HealthAlertsScreen(vm: AlarmsViewModel, state: AlarmsUiState, contentPadding: PaddingValues, onBack: () -> Unit) {
     BackHandler(onBack = onBack)
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_health_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_health_title), onBack) }
         state.error?.let { msg -> item { ErrorPanel(msg, state.busy, vm::refresh) } }
         if (state.loading) {
-            item { PagePanel { PageNote(stringResource(R.string.you_alarms_reading)) } }
+            item { RingsPanel { PageNote(stringResource(R.string.you_alarms_reading)) } }
             return@ScreenList
         }
         state.health?.let { item { HeartAlertsPanel(state, vm) } }
@@ -180,7 +184,7 @@ fun HealthAlertsScreen(vm: AlarmsViewModel, state: AlarmsUiState, contentPadding
 
 @Composable
 private fun ErrorPanel(message: String, busy: Boolean, onRetry: () -> Unit) {
-    PagePanel {
+    RingsPanel {
         PageNote(message, color = MetricColors.warn)
         PageButton(stringResource(R.string.you_alarms_try_again), onRetry, Modifier.fillMaxWidth(), enabled = !busy)
     }
@@ -194,25 +198,31 @@ private fun AlarmsPanel(
     onAdd: () -> Unit,
     onDeleteAll: () -> Unit,
 ) {
-    PagePanel(
+    RingsPanel(
         title = stringResource(R.string.you_alarms_on_strap),
         note = state.caps?.let { stringResource(R.string.you_alarms_count, state.alarms.size, it.maxCount) },
     ) {
         if (state.alarms.isEmpty()) PageNote(stringResource(R.string.you_alarms_none))
-        state.alarms.forEach { a ->
-            Row(Modifier.fillMaxWidth().clickable(enabled = !state.busy) { onEdit(a) }.padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        // List rows with a hairline between them; the time bold, the days under it.
+        if (state.alarms.isNotEmpty()) Column { state.alarms.forEachIndexed { i, a ->
+            Row(
+                Modifier.fillMaxWidth().riseIn().pressSink(!state.busy, 0.98f).clickable(enabled = !state.busy) { onEdit(a) }
+                    .topHairline(i > 0, AppColors.ink.copy(alpha = 0.08f))
+                    .padding(vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Column(Modifier.weight(1f)) {
                     val ink = if (a.enabled) AppColors.ink else AppColors.ink.copy(alpha = 0.45f)
                     val (digits, marker) = dotClock(a.hour, a.minute)
                     Row(verticalAlignment = Alignment.Bottom) {
-                        org.openstrap.app.ui.glow.DotMatrixText(digits, dot = org.openstrap.app.ui.glow.draw.DotSize.Edge, color = ink)
-                        marker?.let { Text(it, style = GlowType.secondary, color = ink, modifier = Modifier.padding(start = 6.dp)) }
+                        Text(digits, style = org.openstrap.app.ui.device.RingsType.figure(30.sp), color = ink, maxLines = 1)
+                        marker?.let { Text(it, style = GlowType.secondary, color = ink, modifier = Modifier.padding(start = 6.dp, bottom = 4.dp)) }
                     }
-                    Text(daysLabel(a.days), style = GlowType.secondary, color = AppColors.ink.copy(alpha = 0.6f), modifier = Modifier.padding(top = 6.dp))
+                    Text(daysLabel(a.days), style = GlowType.secondary, color = AppColors.muted, modifier = Modifier.padding(top = 2.dp))
                 }
                 org.openstrap.app.ui.glow.GlowSwitch(a.enabled, { onToggle(a, it) }, enabled = !state.busy)
             }
-        }
+        } }
         if (state.canAdd) {
             PageButton(stringResource(R.string.you_alarms_add), onAdd, Modifier.fillMaxWidth(), enabled = !state.busy, primary = true)
         }
@@ -234,7 +244,7 @@ private fun HeartAlertsPanel(state: AlarmsUiState, vm: AlarmsViewModel) {
     val off: (Int) -> Boolean = { it == 0 }
     // A health alert's value in its menu: off, or the limit by [limit] ("Above 150", "Below 90%").
     fun alertLabel(v: Int, limit: Int) = if (v == 0) Strings.app.get(R.string.you_value_off) else Strings.app.format(limit, v)
-    PagePanel(title = stringResource(R.string.you_health_panel)) {
+    RingsPanel(title = stringResource(R.string.you_health_panel)) {
         // Rows with a menu each, in place of 21 chips; the measuring note only when it turns the heart rate alerts off.
         Column {
             var first = true

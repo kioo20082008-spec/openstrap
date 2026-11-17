@@ -1,5 +1,10 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.workout.RingCardShape
+import org.openstrap.app.ui.workout.RingBar
+import org.openstrap.app.ui.workout.RingInk
+import org.openstrap.app.ui.workout.ringFigure
+import androidx.compose.ui.unit.sp
 import org.openstrap.app.R
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.ui.res.stringResource
@@ -94,9 +99,10 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
     val shape = RoundedCornerShape(50)
     val quiet = glance.tint == GlanceTint.Mind
     Box(
-        // Mind and body is quieter: 56 dp and no glow.
-        modifier.fillMaxWidth().height(if (quiet) 56.dp else 64.dp).then(if (quiet) Modifier else Modifier.shadow(24.dp, shape, ambientColor = color, spotColor = color))
-            .clip(shape).background(Raised).border(BorderStroke(1.5.dp, color), shape).pressClickable(onClick, shape),
+        // Mind and body is quieter: 56 dp. Flat in the rings design: a solid raised pill, no glow and no edge; the
+        // glance's colour is in the dot, the pause button and the goal's bar.
+        modifier.fillMaxWidth().height(if (quiet) 56.dp else 64.dp)
+            .clip(shape).background(AppColors.raised).pressClickable(onClick, shape),
     ) {
         Row(Modifier.fillMaxSize().padding(start = 18.dp, end = 10.dp), verticalAlignment = Alignment.CenterVertically) {
             PulseDot(color, glance.bpm, 12.dp)
@@ -117,7 +123,7 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        AppIcons.PauseFill, stringResource(R.string.glow_workout_capsule_pause), tint = Color.Black,
+                        AppIcons.PauseFill, stringResource(R.string.glow_workout_capsule_pause), tint = RingInk,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -132,7 +138,7 @@ fun WorkoutCapsule(glance: LiveGlance, onClick: () -> Unit, onAction: (GlanceAct
         // A goal fills along the bottom edge, inside the bar's curve.
         glance.progress?.let { p ->
             Canvas(Modifier.align(Alignment.BottomCenter).fillMaxWidth().height(3.dp).padding(horizontal = 28.dp)) {
-                drawRect(AppColors.ink.copy(alpha = 0.12f))
+                drawRect(color.copy(alpha = 0.2f))
                 drawRect(color, size = size.copy(width = size.width * p.fraction))
             }
         }
@@ -162,7 +168,7 @@ private fun BarPill(label: String, primary: Boolean, icon: androidx.compose.ui.g
 
 /**
  * The Today hero while a workout records and its live screen is tucked away (workouts spec 2.10, board HomeLiveRun):
- * a glow card in the glance's colour lit from below; the sport and the total time; the glance's figure in the card's
+ * a solid card (the rings design) with the glance's colour in its dot and bar; the sport and the total time; the glance's figure in the card's
  * one dotted number; the goal's bar with the goal and what's left under it; three figures; then the buttons: Pause (or
  * the glance's second action) as a dark round button and its action as the white one, "Open run" while it runs.
  * Tapping the card elsewhere opens the live screen.
@@ -170,22 +176,21 @@ private fun BarPill(label: String, primary: Boolean, icon: androidx.compose.ui.g
 @Composable
 internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen: () -> Unit, onAction: (GlanceAction) -> Unit, modifier: Modifier) {
     val color = glanceColor(glance)
-    val style = heroStyle(color, LightAngle.Below).let { s -> glance.bpm?.let { s.copy(motion = GlowMotion.Heartbeat(it)) } ?: s }
-    GlowCard(style, modifier, onClick = onOpen) {
+    Box(modifier.clip(RingCardShape).background(AppColors.glass).pressClickable(onOpen, RingCardShape).padding(GlowLayout.CardInset)) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Canvas(Modifier.size(8.dp)) { drawCircle(color) }
                 Spacer(Modifier.width(8.dp))
                 Text(Workouts.sportName(sportType), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
-                Text(clock, color = AppColors.ink, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
+                Text(clock, color = AppColors.ink, style = ringFigure(20.sp), maxLines = 1)
             }
             Spacer(Modifier.height(18.dp))
-            if (glance.figure != null) HeroValue(glance.figure, glance.unit.orEmpty(), gap = 10.dp, unitStyle = GlowType.sentence)
+            if (glance.figure != null) HeroValue(glance.figure, glance.unit.orEmpty(), gap = 10.dp, unitStyle = GlowType.body)
             else Row(verticalAlignment = Alignment.Bottom) {
                 WaitingDash(Modifier.padding(vertical = 12.dp))
                 glance.unit?.let {
                     Spacer(Modifier.width(10.dp))
-                    Text(it, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.sentence)
+                    Text(it, color = AppColors.muted, style = GlowType.body)
                 }
             }
             if (glance.line1.isNotEmpty() && glance.tint in setOf(GlanceTint.Paused, GlanceTint.Asking)) {
@@ -195,9 +200,7 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
             }
             glance.progress?.let { p ->
                 Spacer(Modifier.height(16.dp))
-                Box(Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(50)).background(AppColors.well())) {
-                    Box(Modifier.fillMaxWidth(p.fraction).height(6.dp).clip(RoundedCornerShape(50)).background(AppColors.ink))
-                }
+                RingBar(p.fraction, color)
             }
             if (glance.goal != null || glance.toGo != null) {
                 Spacer(Modifier.height(8.dp))
@@ -211,7 +214,7 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                 Row(Modifier.fillMaxWidth()) {
                     glance.figures.forEach { (value, label) ->
                         Column(Modifier.weight(1f)) {
-                            if (value != null) Text(value, color = AppColors.ink, style = GlowType.sentence.copy(fontFeatureSettings = "tnum"), maxLines = 1)
+                            if (value != null) Text(value, color = AppColors.ink, style = ringFigure(22.sp), maxLines = 1)
                             else WaitingDash(Modifier.padding(vertical = 8.dp))
                             Text(label, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
                         }
@@ -220,7 +223,7 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
             }
             glance.next?.let { next ->
                 Spacer(Modifier.height(16.dp))
-                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(AppColors.well()).padding(14.dp)) {
+                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(AppColors.control).padding(14.dp)) {
                     Text(
                         stringResource(R.string.glow_workout_capsule_next), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                         style = GlowType.secondary,
@@ -236,7 +239,7 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
                     val label = glance.secondLabel.takeIf { a == glance.second }
                     Box(
                         Modifier.height(52.dp).then(if (label == null) Modifier.size(52.dp) else Modifier).clip(RoundedCornerShape(50))
-                            .background(AppColors.well(0.45f)).pressClickable({ onAction(a) }, RoundedCornerShape(50))
+                            .background(AppColors.control).pressClickable({ onAction(a) }, RoundedCornerShape(50))
                             .padding(horizontal = if (label == null) 0.dp else 18.dp),
                         contentAlignment = Alignment.Center,
                     ) {
@@ -259,16 +262,17 @@ internal fun LiveHero(glance: LiveGlance, sportType: Int, clock: String, onOpen:
 /** A dot in [color] that beats at [bpm]; still without one. */
 @Composable
 fun PulseDot(color: Color, bpm: Int?, size: Dp) {
-    val beat = if (bpm != null) {
-        val period = (60_000 / bpm).coerceIn(250, 2000)
-        rememberInfiniteTransition(label = "beat").animateFloat(
-            1f, 1f,
-            infiniteRepeatable(keyframes { durationMillis = period; 1.5f at period * 15 / 100; 1f at period * 40 / 100 }, RepeatMode.Restart),
-            label = "dot",
-        )
-    } else null
-    // Read while drawing, so the beat doesn't compose the dot again every frame.
-    Canvas(Modifier.size(size).graphicsLayer { val s = beat?.value ?: 1f; scaleX = s; scaleY = s }) { drawCircle(color) }
+    // At the strap's own bpm, lub-dub, with a ring rippling out of it on each beat; read while drawing, so the beat
+    // never composes the dot again.
+    val phase = rememberBeatPhase(bpm)
+    Canvas(Modifier.size(size)) {
+        val r = this.size.minDimension / 2f
+        val p = phase.value
+        if (bpm != null && p > 0f) {
+            drawCircle(color.copy(alpha = 0.45f * (1f - p)), radius = r * (1f + 1.6f * p), style = androidx.compose.ui.graphics.drawscope.Stroke(r * 0.35f))
+        }
+        drawCircle(color, radius = r * (1f + 0.4f * lubDub(p)))
+    }
 }
 
 /**

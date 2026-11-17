@@ -131,10 +131,14 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
                 Canvas(Modifier.size(300.dp)) {
                     val r = size.minDimension / 2
                     val share = if (running) left / (minutes * 60f) else 1f
-                    drawArc(AppColors.ink.copy(alpha = 0.15f), 0f, 360f, false, style = Stroke(4.dp.toPx()))
-                    drawArc(AppPalette.Coral, -90f, 360f * share, false, style = Stroke(4.dp.toPx(), cap = StrokeCap.Round))
-                    drawCircle(Brush.radialGradient(listOf(Color(0xFFFFB3A8), AppPalette.Coral, Color(0xFFD9483A))), r * 0.82f * scale.value)
-                    drawCircle(AppPalette.Coral.copy(alpha = 0.18f), r * 0.82f * (scale.value + 0.12f))
+                    // One thick ring, round capped from the top over its track (the rings design), and a flat ball.
+                    val w = 18.dp.toPx()
+                    val tl = androidx.compose.ui.geometry.Offset(w / 2, w / 2)
+                    val arc = androidx.compose.ui.geometry.Size(size.width - w, size.height - w)
+                    drawArc(AppPalette.Coral.copy(alpha = 0.2f), 0f, 360f, false, tl, arc, style = Stroke(w))
+                    if (share > 0f) drawArc(AppPalette.Coral, -90f, 360f * share, false, tl, arc, style = Stroke(w, cap = StrokeCap.Round))
+                    drawCircle(AppPalette.Coral, r * 0.72f * scale.value)
+                    drawCircle(AppPalette.Coral.copy(alpha = 0.18f), r * 0.72f * (scale.value + 0.12f))
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
@@ -181,8 +185,8 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
             ) {
                 Text(
                     stringResource(if (running) R.string.breathe_stop else if (done) R.string.breathe_again else R.string.breathe_start),
-                    // Cream on coral in every theme; on the control surface while it runs, the theme's ink.
-                    color = if (running) AppColors.ink else AppPalette.Cream, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
+                    // Dark ink on coral, the rings design's main button; on the control surface while it runs, the theme's ink.
+                    color = if (running) AppColors.ink else Color(0xFF0A0A0C), style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.ExtraBold),
                 )
             }
         }

@@ -55,6 +55,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -94,8 +96,8 @@ internal val PausedColor = Color(WorkoutColors.PAUSED_GREY)
 /** The Control surface (spec 2.2): round buttons, chips, pills, tiles and fields on the workout pages. */
 internal val Raised: Color get() = AppColors.control
 
-/** A button's label: Body (spec 2.3), a step heavier so it reads as the thing to press. */
-private val ButtonText = GlowType.body.copy(fontWeight = FontWeight.SemiBold)
+/** A button's label: Body, bold, so it reads as the thing to press (the rings design's main button). */
+private val ButtonText get() = GlowType.body.copy(fontWeight = FontWeight.Bold)
 
 /** Body in Medium, for pills, chips and short live lines. */
 internal val MediumBody = GlowType.body.copy(fontWeight = FontWeight.Medium)
@@ -141,15 +143,39 @@ internal fun activeSecondsState(r: WorkoutState.Recording): androidx.compose.run
     }
 }
 
-/** A full-width pill button, 56 dp like Start and Done (spec 6.3). */
+/**
+ * A full-width pill button, 56 dp like Start and Done (spec 6.3): flat, no glow, as the rings design has its buttons.
+ * Without [fill] it is as wide as its label, for a button at the end of a row.
+ */
 @Composable
 internal fun WorkoutButton(
     label: String, background: Color, content: Color, onClick: () -> Unit,
     modifier: Modifier = Modifier, icon: androidx.compose.ui.graphics.vector.ImageVector? = null, height: Dp = 56.dp,
+    fill: Boolean = true,
+    /** The page's one Start: it breathes gently, a slow swell with a soft light of its colour round it. */
+    breathe: Boolean = false,
 ) {
+    val swell = if (breathe) rememberPulse(3_200) else null
     Row(
-        modifier.fillMaxWidth().height(height).shadow(28.dp, RoundedCornerShape(50), ambientColor = background, spotColor = background)
-            .clip(RoundedCornerShape(50)).background(background).pressClickable(onClick, RoundedCornerShape(50)),
+        modifier.then(if (fill) Modifier.fillMaxWidth() else Modifier).height(height)
+            .then(
+                if (swell == null) Modifier
+                else Modifier.graphicsLayer {
+                    val k = 1f + 0.018f * swell.value
+                    scaleX = k
+                    scaleY = k
+                }.drawBehind {
+                    val g = 7.dp.toPx() * swell.value
+                    val r = size.height / 2f + g
+                    drawRoundRect(
+                        background.copy(alpha = 0.22f * swell.value), Offset(-g, -g),
+                        androidx.compose.ui.geometry.Size(size.width + 2 * g, size.height + 2 * g),
+                        androidx.compose.ui.geometry.CornerRadius(r, r),
+                    )
+                },
+            )
+            .clip(RoundedCornerShape(50)).background(background).pressClickable(onClick, RoundedCornerShape(50))
+            .then(if (fill) Modifier else Modifier.padding(horizontal = 18.dp)),
         horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) {
@@ -161,7 +187,8 @@ internal fun WorkoutButton(
 }
 
 /**
- * A workout screen: the theme's stage (black on Navy), with the workout's colour glowing softly from the top, scrolling if it must but filling
+ * A workout screen: the theme's flat page (the rings design: no glow, no gradient; [glow] is kept for the callers but
+ * no longer lit), scrolling if it must but filling
  * the height so the controls sit at the bottom. [pinned] (Start, Done) stays on the bottom edge while the rest
  * scrolls under it, behind the pinned buttons' fade ([pinnedFade], spec 6.3), and the content ends clear of it.
  */
@@ -171,20 +198,15 @@ internal fun WorkoutPage(
     pinned: (@Composable ColumnScope.() -> Unit)? = null,
     /** Painted over the whole screen in place of the top glow (HIIT's phase light). */
     backdrop: Brush? = null,
+    /** A live screen's zone colour, washing slowly behind the page ([LiveZoneWash]) where there's no [backdrop]. */
+    aura: Color? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    BoxWithConstraints(Modifier.fillMaxSize().background(AppColors.stage)) {
-        val width = constraints.maxWidth.toFloat()
+    BoxWithConstraints(Modifier.fillMaxSize().background(AppColors.page)) {
         val density = LocalDensity.current
         var pinnedHeight by remember { mutableStateOf(0.dp) }
-        // No wider than the box is tall: on a wide screen (unfolded) a wider glow would be cut off in a straight line.
-        val glowHeight = 420.dp
-        val radius = minOf(width * 0.9f, with(density) { glowHeight.toPx() })
-        if (backdrop != null) Box(Modifier.fillMaxSize().background(backdrop)) else Box(
-            Modifier.fillMaxWidth().height(glowHeight).background(
-                Brush.radialGradient(listOf(glow.copy(alpha = 0.22f), Color.Transparent), center = Offset(width / 2f, 0f), radius = radius),
-            ),
-        )
+        if (backdrop != null) Box(Modifier.fillMaxSize().background(backdrop))
+        else if (aura != null) LiveZoneWash(aura, Modifier.fillMaxSize())
         // On a wide screen the page keeps to one centred column (spec 2.4 Unfolded); the glow stays the screen's.
         val side = GlowLayout.pageSide(maxWidth, LocalPageColumn.current, GlowLayout.Gutter)
         // The content ends [PinnedFade.Ramp] above the pinned buttons (their box already counts the bottom padding),

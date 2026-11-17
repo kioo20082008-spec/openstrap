@@ -1,5 +1,6 @@
 package org.openstrap.app.ui.glow
 
+import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -207,7 +208,7 @@ internal fun GamePlanCard(type: Int, periods: Structure.Periods?, onChange: (Str
 /** Ready's switch rows under the plan card, on a plain panel. */
 @Composable
 internal fun ReadyRows(content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxWidth().clip(GlowLayout.CardShape).background(ListSurface).padding(horizontal = 18.dp), content = content)
+    Column(Modifier.fillMaxWidth().clip(org.openstrap.app.ui.workout.RingCardShape).background(AppColors.glass).padding(horizontal = 18.dp), content = content)
 }
 
 /** Work and rest along the rounds, each as wide as its time: work in heart red, rest in sleep blue. */

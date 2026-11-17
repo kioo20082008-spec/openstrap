@@ -166,7 +166,7 @@ fun GlowActivityScreen(
                     ActivityCard.Start -> StartCard(sports, onStartWorkout, onAllSports)
                     ActivityCard.Steps -> LocalGoals.current.steps.let { goal ->
                         val n = java.text.NumberFormat.getIntegerInstance(java.util.Locale.US)
-                        PathHero(
+                        RingPathHero(
                             state.steps, goal, stringResource(R.string.dials_steps_word),
                             if (state.steps >= goal) stringResource(R.string.dials_steps_done)
                             else stringResource(R.string.dials_path_left, n.format(goal - state.steps)),
@@ -525,20 +525,11 @@ private fun EffortLight(icon: androidx.compose.ui.graphics.vector.ImageVector, e
         Modifier
             .size(EffortTile)
             .clip(EffortShape)
-            .background(EffortSurface)
-            .drawBehind {
-                val centre = Offset(size.width / 2, size.height * 0.6f)
-                drawRect(
-                    Brush.radialGradient(
-                        0f to MetricColors.heart.copy(alpha = 0.7f * effort.coerceIn(0f, 1f)), 1f to Color.Transparent,
-                        center = centre, radius = size.minDimension * 0.56f,
-                    ),
-                )
-            }
-            .border(1.dp, AppColors.ink.copy(alpha = 0.06f), EffortShape),
+            // The rings design: no glow; how hard it was is how much of the hue the flat tile takes.
+            .background(RingColors.Energy.copy(alpha = 0.15f + 0.25f * effort.coerceIn(0f, 1f))),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, null, tint = AppColors.ink.copy(alpha = 0.85f), modifier = Modifier.size(RowIcon))
+        Icon(icon, null, tint = AppColors.readable(RingColors.Energy), modifier = Modifier.size(RowIcon))
     }
 }
 

@@ -40,9 +40,7 @@ import org.openstrap.app.ui.glow.GlowType
 import org.openstrap.app.ui.glow.PageButton
 import org.openstrap.app.ui.glow.PageConfirm
 import org.openstrap.app.ui.glow.PageNumberField
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageNote
-import org.openstrap.app.ui.glow.PagePanel
 import org.openstrap.app.ui.glow.PageRow
 import org.openstrap.app.ui.glow.PageSwitchRow
 import java.time.LocalDate
@@ -156,9 +154,9 @@ fun ProfileScreen(profile: UserProfile, contentPadding: PaddingValues, onSave: (
         val side = GlowLayout.pageSide(maxWidth, LocalPageColumn.current, GlowLayout.Gutter)
         // The list ends clear of Save and the fade behind it (ScreenList adds its own 24 dp).
         ScreenList(PaddingValues(bottom = PinnedFade.listClearance(bottom + 12.dp + SaveHeight, listEnd = 24.dp)), gutter = GlowLayout.Gutter) {
-            item { PageHeader(stringResource(R.string.you_profile_title), back) }
+            item { RingsHeader(stringResource(R.string.you_profile_title), back) }
             item {
-                PagePanel {
+                RingsPanel {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         PageNote(stringResource(R.string.you_profile_note))
                         PageNumberField(
@@ -169,14 +167,14 @@ fun ProfileScreen(profile: UserProfile, contentPadding: PaddingValues, onSave: (
                         // again clears it.
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             PageNote(stringResource(R.string.you_profile_sex_note))
-                            org.openstrap.app.ui.glow.GlowSegments(
+                            RingsSegments(
                                 listOf(stringResource(R.string.you_profile_sex_female), stringResource(R.string.you_profile_sex_male)),
                                 if (sex in 0..1) sex else -1, { i -> sex = if (sex == i) 2 else i },
                             )
                         }
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             PageNote(stringResource(R.string.you_profile_units))
-                            org.openstrap.app.ui.glow.GlowSegments(
+                            RingsSegments(
                                 listOf(
                                     stringResource(R.string.you_profile_units_metric), stringResource(R.string.you_profile_units_imperial),
                                 ),
@@ -212,18 +210,18 @@ fun ProfileScreen(profile: UserProfile, contentPadding: PaddingValues, onSave: (
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             PageNote(stringResource(R.string.you_profile_activity_note))
                             // Tapping the chosen level again clears it.
-                            org.openstrap.app.ui.glow.GlowSegments((1..5).map { "$it" }, activity, { i -> activity = if (activity == i) -1 else i })
+                            RingsSegments((1..5).map { "$it" }, activity, { i -> activity = if (activity == i) -1 else i })
                             PageNote(
                                 if (activity in 0..4) org.openstrap.app.data.Vo2max.ACTIVITY_LEVELS[activity]
                                 else stringResource(R.string.you_profile_activity_pick),
                             )
                         }
-                        PageSwitchRow(
+                        RingsSwitchRow(
                             stringResource(R.string.you_profile_beta_blockers), null, betaBlocker, { betaBlocker = it }, divider = false,
                         )
-                        PageSwitchRow(stringResource(R.string.you_profile_pregnant), null, pregnant, { pregnant = it }, divider = false)
+                        RingsSwitchRow(stringResource(R.string.you_profile_pregnant), null, pregnant, { pregnant = it }, divider = false)
                         // Your max is set on the Heart rate zones page, with the zones that follow it.
-                        PageRow(
+                        RingsRow(
                             org.openstrap.app.ui.workout.HeartZonesCopy.MAX_ROW, org.openstrap.app.ui.workout.HeartZonesCopy.profileLine(profile.maxHeartRate),
                             onClick = onHeartZones, below = true, divider = false,
                         )

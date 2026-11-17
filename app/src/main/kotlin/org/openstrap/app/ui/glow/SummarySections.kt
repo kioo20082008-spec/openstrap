@@ -10,7 +10,6 @@ import org.openstrap.app.presentation.Ranges
 import org.openstrap.app.presentation.Units
 import org.openstrap.app.presentation.Pace
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -44,6 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -64,7 +64,6 @@ import org.openstrap.app.ui.workout.RoundLine
 import org.openstrap.app.ui.workout.ZONE_COLORS
 import org.openstrap.app.ui.workout.ZONE_NAMES
 import org.openstrap.app.ui.workout.familyColor
-import org.openstrap.app.ui.glow.draw.EdgeKind
 import org.openstrap.app.ui.glow.draw.Edge
 import org.openstrap.app.ui.dashboard.LocalHeartZones
 
@@ -271,7 +270,7 @@ internal fun FamilySection(
 @Composable
 private fun RouteCard(summary: PhoneSummary) {
     if (!Route.mappable(summary.route)) return
-    EdgeCard(MetricColors.steps, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         val climb = Route.climb(summary.route)?.let { stringResource(R.string.glow_summary_climb, Math.round(it)) }
         EdgeTitle(stringResource(R.string.glow_summary_route), climb)
         RouteMap(summary, Modifier.padding(top = 12.dp))
@@ -281,11 +280,8 @@ private fun RouteCard(summary: PhoneSummary) {
 /** A quiet card with its [title] and one [sentence] under it: Rest after the sets, Recovery after the rounds. */
 @Composable
 private fun SentenceCard(title: String, sentence: String) {
-    QuietPanel {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            GlowHeader(title)
-            Text(sentence, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
-        }
+    DetailCard(title = title) {
+        Text(sentence, color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.body)
     }
 }
 
@@ -297,7 +293,7 @@ private fun SentenceCard(title: String, sentence: String) {
 private fun SetsCard(groups: List<ExerciseSets>, maxHr: Int) {
     val heartZones = LocalHeartZones.current
     val shares = remember(groups) { FamilySummary.peakShares(groups.flatMap { g -> g.sets.map { it.peak } }) }
-    EdgeCard(familyColor(Workouts.Family.Strength), Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         EdgeTitle(stringResource(R.string.glow_summary_sets_title), stringResource(R.string.glow_summary_peak_heart_rate))
         var i = 0
         groups.forEachIndexed { gi, g ->
@@ -348,7 +344,7 @@ private fun RoundsCard(lines: List<RoundLine>, title: String, maxHr: Int) {
     val labelled = lines.size <= LabelledRounds
     val gap = if (labelled) 6.dp else 3.dp
     val shape = RoundedCornerShape(5.dp)
-    EdgeCard(familyColor(Workouts.Family.Intervals), Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         EdgeTitle(title, stringResource(R.string.glow_summary_peak_then_rest))
         Row(Modifier.fillMaxWidth().height(84.dp).padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.Bottom) {
             lines.forEachIndexed { i, r ->
@@ -398,7 +394,7 @@ private fun RepTimesCard(times: List<Long>) {
     val gap = if (labelled) 6.dp else 3.dp
     val shape = RoundedCornerShape(5.dp)
     val color = familyColor(Workouts.Family.Intervals)
-    EdgeCard(color, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         EdgeTitle(stringResource(R.string.glow_summary_each_rep), stringResource(R.string.glow_summary_rep_times_time))
         Row(Modifier.fillMaxWidth().height(RoundColumnHeight + 14.dp).padding(top = 14.dp), horizontalArrangement = Arrangement.spacedBy(gap), verticalAlignment = Alignment.Bottom) {
             times.forEachIndexed { i, t ->
@@ -433,7 +429,7 @@ private val RoundColumnHeight = 52.dp
 private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
     val color = familyColor(Workouts.Family.Games)
     val shares = remember(periods) { FamilySummary.peakShares(periods.map { it.averageBpm }) }
-    EdgeCard(color, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         EdgeTitle(
             stringResource(
                 when (of) {
@@ -461,7 +457,7 @@ private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
                         }
                     }
                     p.averageBpm?.let {
-                        Text("$it", color = AppColors.ink, style = GlowType.rowValue, maxLines = 1, modifier = Modifier.padding(start = 12.dp))
+                        Text("$it", color = AppColors.ink, style = ringFigure(20.sp), maxLines = 1, modifier = Modifier.padding(start = 12.dp))
                         Text(
                             stringResource(R.string.glow_summary_period_avg), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
                             style = GlowType.secondary, maxLines = 1,
@@ -482,7 +478,7 @@ private fun PeriodsCard(periods: List<PeriodLine>, of: Int, read: String?) {
 internal fun ZoneStripPanel(zones: ZoneSeconds, focus: Int? = null, onFocus: ((Int?) -> Unit)? = null) {
     val minutes = remember(zones) { FamilySummary.zoneMinutes(zones) }
     val total = zones.sum().coerceAtLeast(1)
-    QuietPanel {
+    DetailCard(spacing = 14.dp) {
         GlowHeader(
             stringResource(R.string.glow_summary_time_in_zones),
             if (onFocus != null) stringResource(R.string.glow_zones_tap) else FamilySummary.mostlyZone(zones),
@@ -498,7 +494,7 @@ internal fun ZoneStripPanel(zones: ZoneSeconds, focus: Int? = null, onFocus: ((I
                     Row(
                         Modifier.fillMaxWidth().height(44.dp).clip(RoundedCornerShape(12.dp))
                             .background(if (on) ZONE_COLORS[z].copy(alpha = 0.14f) else Color.Transparent)
-                            .let { m -> if (onFocus != null) m.clickable { onFocus(if (on) null else z) } else m }
+                            .let { m -> if (onFocus != null) m.detailPress(scale = 0.98f) { onFocus(if (on) null else z) } else m }
                             .padding(horizontal = 8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -534,7 +530,7 @@ private fun ZonesEdgeCard(zones: ZoneSeconds) {
     val minutes = remember(zones) { FamilySummary.zoneMinutes(zones) }
     val most = zones.indices.maxByOrNull { zones[it] } ?: 0
     CompositionLocalProvider(LocalEdgeOverride provides EdgeOverride(edge = Edge.Right)) {
-        EdgeCard(ZONE_COLORS[most], Modifier.fillMaxWidth()) {
+        DetailCard {
             EdgeTitle(stringResource(R.string.glow_summary_time_in_zones), FamilySummary.mostlyZone(zones))
             ZoneBar(
                 zones, ZONE_COLORS, Modifier.padding(top = 10.dp, bottom = 6.dp), height = 12.dp, gap = 3.dp, corner = 4.dp, ends = 4.dp,
@@ -567,11 +563,11 @@ private fun IndoorHeartCard(readings: List<Pair<Long, Int>>, target: Pair<String
     val line = chart && readings.size >= 10
     if (!line && target == null) return false
     val values = remember(readings) { FamilySummary.heartLine(readings, HeartPoints, window = 3) }
-    QuietPanel {
+    DetailCard(spacing = 14.dp) {
         if (line) Column {
             val range = Ranges.of("${readings.minOf { it.second }}", "${readings.maxOf { it.second }}")
             GlowHeader(stringResource(R.string.glow_summary_heart_rate), range)
-            PlainLine(values, MetricColors.heart, 64.dp, Modifier.padding(top = 8.dp), dots = LineDots.Highest)
+            PlainLine(values, MetricColors.heart, 64.dp, Modifier.padding(top = 8.dp).detailReveal(), dots = LineDots.Highest)
         }
         target?.let { (text, reached) ->
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -611,22 +607,22 @@ private const val HeartPoints = 60
 private fun HeartLineCard(readings: List<Pair<Long, Int>>, color: Color, settled: Pair<Int, Int>? = null, chart: Boolean = true) {
     if (readings.size < 10 || (!chart && settled == null)) return
     val values = remember(readings) { FamilySummary.heartLine(readings, HeartPoints, window = 9) }
-    EdgeCard(color, Modifier.fillMaxWidth(), kind = EdgeKind.Earlier) {
+    DetailCard {
         val drop = settled?.let { FamilySummary.settledDrop(it.first, it.second) }
         val range = Ranges.of("${readings.minOf { it.second }}", "${readings.maxOf { it.second }}")
         val down = drop?.let { stringResource(R.string.glow_summary_heart_down, it) }
         EdgeTitle(stringResource(R.string.glow_summary_heart_rate), down ?: range)
-        if (chart) PlainLine(values, color, 74.dp, Modifier.padding(top = 14.dp), dots = LineDots.Ends)
+        if (chart) PlainLine(values, color, 74.dp, Modifier.padding(top = 14.dp).detailReveal(), dots = LineDots.Ends)
         if (settled != null) Row(Modifier.fillMaxWidth().padding(top = 8.dp)) {
             Column(Modifier.weight(1f)) {
-                Text("${settled.first}", color = AppColors.ink, style = GlowType.rowValue)
+                Text("${settled.first}", color = AppColors.ink, style = ringFigure(20.sp))
                 Text(
                     stringResource(R.string.glow_summary_at_start),
                     color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
                 )
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("${settled.second}", color = AppColors.ink, style = GlowType.rowValue)
+                Text("${settled.second}", color = AppColors.ink, style = ringFigure(20.sp))
                 Text(
                     stringResource(R.string.glow_summary_at_end),
                     color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
@@ -654,7 +650,7 @@ internal fun WeekDaysPanel(weekStarts: List<Long>, note: String? = null, day: Lo
     val days = remember(weekStarts, day) { FamilySummary.weekDays(weekStarts, day, firstDay) }
     val today = LocalDate.now()
     val thisWeek = days.any { it.first == today }
-    QuietPanel {
+    DetailCard(spacing = 14.dp) {
         GlowHeader(stringResource(if (thisWeek) R.string.glow_summary_this_week else R.string.glow_summary_that_week))
         WeekDots(
             days.map { (d, on) -> d.dayOfWeek.getDisplayName(TextStyle.NARROW, Locale.getDefault()) to on }, color,

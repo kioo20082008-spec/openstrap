@@ -51,7 +51,12 @@ fun <S> PushContent(target: S, depth: (S) -> Int, modifier: Modifier = Modifier,
 fun Modifier.pressClickable(onClick: () -> Unit, shape: androidx.compose.ui.graphics.Shape? = null, scale: Float = 0.97f): Modifier = composed {
     val interaction = remember { MutableInteractionSource() }
     val pressed by interaction.collectIsPressedAsState()
-    val s by animateFloatAsState(if (pressed) scale else 1f, tween(Motion.QUICK, easing = Motion.easing), label = "press")
+    // A spring, so the card presses in and settles back with a small give rather than a flat ease (the alive kit's bounce).
+    val s by animateFloatAsState(
+        if (pressed) scale else 1f,
+        androidx.compose.animation.core.spring(dampingRatio = 0.55f, stiffness = 650f),
+        label = "press",
+    )
     graphicsLayer {
         scaleX = s; scaleY = s
         if (shape != null) { this.shape = shape; clip = true }

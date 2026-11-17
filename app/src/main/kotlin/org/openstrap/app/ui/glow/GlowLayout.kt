@@ -44,7 +44,7 @@ object GlowLayout {
     val Gutter = 20.dp
 
     /** Every card's corner, on every tier: glow, edge, list, strip and page panels. */
-    val CardCorner = 28.dp
+    val CardCorner = 22.dp
     val CardShape = RoundedCornerShape(CardCorner)
     /** A sheet's top corners match the cards'. */
     val SheetShape = RoundedCornerShape(topStart = CardCorner, topEnd = CardCorner)
@@ -63,7 +63,7 @@ object GlowLayout {
     /** The 1 dp hairline round a glow or edge card, and a chart's grid: white at 8% (spec 2.2, 2.7). */
     const val HairlineAlpha = 0.08f
     /** A list panel's border and the divider between its rows: white at 6%. */
-    const val DividerAlpha = 0.06f
+    const val DividerAlpha = 0.09f
 
     /** Title row to the hero number. */
     val TitleGap = 14.dp
@@ -224,20 +224,28 @@ fun GlowScreenList(
         androidx.compose.runtime.LaunchedEffect(focus, target) {
             if (focus && target != null) { state.animateScrollToItem(target); onFocused() }
         }
-        androidx.compose.runtime.CompositionLocalProvider(LocalPageColumn provides Dp.Unspecified) { ScreenList(contentPadding, state, gutter = gutter) {
-            if (!wide) blocks.forEachIndexed { i, block -> item(keys[i]) { block.content() } }
+        // The tab's cards cascade in the first time it shows; one scrolled to later just shows ([riseOnShow]).
+        val gate = androidx.compose.runtime.remember { RiseGate() }
+        androidx.compose.runtime.CompositionLocalProvider(LocalPageColumn provides Dp.Unspecified) { ScreenList(contentPadding, state, gutter = gutter, opaque = false) {
+            if (!wide) blocks.forEachIndexed { i, block -> item(keys[i]) { Rising(i, gate) { block.content() } } }
             else sections(blocks.indices.toList()) { blocks[it].pane }.forEach { section ->
                 val left = section.filter { blocks[it].pane == Pane.Left }
                 val right = section.filter { blocks[it].pane == Pane.Right }
                 // A full block, or a run with nothing on one side, takes the whole width rather than leave a hole.
-                if (left.isEmpty() || right.isEmpty()) section.forEach { i -> item(keys[i]) { blocks[i].content() } }
+                if (left.isEmpty() || right.isEmpty()) section.forEach { i -> item(keys[i]) { Rising(i, gate) { blocks[i].content() } } }
                 // Two columns are one item, keyed on every block in them.
                 else item(section.joinToString("|") { keys[it] }) {
-                    BalancedColumns(left.map { blocks[it].content }, right.map { blocks[it].content })
+                    Rising(section.first(), gate) { BalancedColumns(left.map { blocks[it].content }, right.map { blocks[it].content }) }
                 }
             }
         } }
     }
+}
+
+/** One dashboard block rising into place, [index] steps into the cascade (one child, as the block was). */
+@Composable
+private fun Rising(index: Int, gate: RiseGate, content: @Composable () -> Unit) {
+    androidx.compose.foundation.layout.Box(Modifier.riseOnShow(index, gate), propagateMinConstraints = true) { content() }
 }
 
 /**
@@ -337,12 +345,12 @@ internal const val ROW_CARET_ALPHA = 0.3f
 @Composable
 internal fun CardTitle(title: String, modifier: Modifier = Modifier) {
     if (!LocalCardOpens.current) {
-        Text(title, modifier, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(title, modifier, color = AppColors.ink, style = RingType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
         return
     }
     Layout(
         content = {
-            Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(title, color = AppColors.ink, style = RingType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
             TapCaret(CARD_CARET_ALPHA)
         },
         modifier = modifier,
@@ -471,7 +479,10 @@ internal fun NoteText(text: String) =
  */
 @Composable
 internal fun StateMarker(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier, color = AppColors.readable(MetricColors.warn), style = GlowType.caption, maxLines = 1)
+    Text(
+        text, modifier.clip(PillShape).background(MetricColors.warn.copy(alpha = 0.2f)).padding(horizontal = 10.dp, vertical = 3.dp),
+        color = AppColors.readable(MetricColors.warn), style = GlowType.caption, maxLines = 1,
+    )
 }
 
 /**
@@ -494,13 +505,14 @@ internal fun TitleMark(marker: String?, tag: TitleTag?, modifier: Modifier = Mod
  */
 @Composable
 internal fun OutlineTag(text: String, modifier: Modifier = Modifier, onClick: (() -> Unit)? = null) {
-    val shape = RoundedCornerShape(50)
+    val shape = PillShape
     val about = stringResource(R.string.glow_tag_about, text.lowercase())
+    // The rings design: a status word is a filled pill, never an outline.
     Text(
         text,
-        modifier.clip(shape).border(1.dp, AppColors.ink.copy(alpha = 0.22f), shape)
+        modifier.clip(shape).background(AppColors.raised)
             .let { if (onClick != null) it.clickable(onClickLabel = about, onClick = onClick) else it }
-            .padding(horizontal = 8.dp, vertical = 2.dp),
-        color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption, maxLines = 1,
+            .padding(horizontal = 10.dp, vertical = 3.dp),
+        color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1,
     )
 }

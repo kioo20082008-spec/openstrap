@@ -154,7 +154,7 @@ private fun NightHero(state: DayUiState, firstNights: Boolean, onRestore: (org.o
         val zone = java.time.ZoneId.systemDefault()
         val totals = state.sleepBreakdown?.let { stageTotals(it.byStage) }.orEmpty()
         val longest = totals.maxOfOrNull { it.second }?.coerceAtLeast(1L) ?: 1L
-        SkyHero(
+        RingSkyHero(
             hours = asleep / 3600, minutes = asleep % 3600 / 60,
             units = stringResource(R.string.dials_unit_h) to stringResource(R.string.dials_unit_m),
             line = listOfNotNull(session.score?.let { "$it · ${TabCopy.sleepScoreLine(it)}" }, TabCopy.woke(session.wakeCount)).joinToString(" · "),
@@ -163,7 +163,7 @@ private fun NightHero(state: DayUiState, firstNights: Boolean, onRestore: (org.o
             stages = totals.map { (stage, seconds) ->
                 StageLine(org.openstrap.app.presentation.SLEEP_NAMES[stage].orEmpty(), seconds / longest.toFloat(), org.openstrap.app.presentation.Units.duration(seconds), stageColor(stage))
             },
-            onOpen = onOpen,
+            onOpen = onOpen, score = session.score,
         )
         return
     }

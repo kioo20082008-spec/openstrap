@@ -28,12 +28,9 @@ import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.PageSwitchRow
 import org.openstrap.app.ui.glow.PageButton
-import org.openstrap.app.ui.glow.PageHeader
 import org.openstrap.app.ui.glow.PageNote
 import org.openstrap.app.ui.glow.PageRow
 import org.openstrap.app.ui.glow.PanelLabelInset
-import org.openstrap.app.ui.glow.SectionLabel
-import org.openstrap.app.ui.glow.PageRows
 import org.openstrap.app.ui.theme.AppIcons
 
 /**
@@ -58,29 +55,29 @@ fun HealthConnectPage(
 ) {
     BackHandler(onBack = onBack)
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
-        item { PageHeader(stringResource(R.string.you_hc_title), onBack) }
+        item { RingsHeader(stringResource(R.string.you_hc_title), onBack) }
         if (availability == HcAvailability.INSTALLABLE) item { InstallPanel(onInstall) }
         item {
-            PageRows {
+            RingsRows {
                 val now = System.currentTimeMillis() / 1000
                 val line = healthConnectLine(auto, now, java.time.ZoneId.systemDefault(), availability = availability)
-                PageSwitchRow(stringResource(R.string.you_hc_auto), line, auto.on, onAuto, divider = false, icon = AppIcons.Refresh04)
+                RingsSwitchRow(stringResource(R.string.you_hc_auto), line, auto.on, onAuto, divider = false, icon = AppIcons.Refresh04)
             }
         }
-        item { SectionLabel(stringResource(R.string.you_hc_any_time), Modifier.padding(top = 4.dp), PanelLabelInset) }
+        item { RingsSection(stringResource(R.string.you_hc_any_time), Modifier.padding(top = 4.dp), PanelLabelInset) }
         item {
-            PageRows {
-                PageRow(
+            RingsRows {
+                RingsRow(
                     stringResource(R.string.you_hc_copy_now), stringResource(R.string.you_hc_copy_now_note), onClick = onCopyNow,
                     below = true,
                     divider = false, icon = AppIcons.Heartbeat,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_action_restore), stringResource(R.string.you_hc_restore_note), onClick = onRestore,
                     below = true,
                     icon = AppIcons.ArrowCounterClockwise,
                 )
-                PageRow(
+                RingsRow(
                     stringResource(R.string.you_hc_open), stringResource(R.string.you_hc_open_note), onClick = onOpen, below = true,
                     icon = AppIcons.SlidersHorizontal,
                 )

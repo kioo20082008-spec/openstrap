@@ -26,7 +26,7 @@ jobs:
       - name: Install Android SDK packages
         run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.2" "build-tools;36.0.0" > /dev/null
       - name: Build debug APK
-        run: ./gradlew :app:assembleDebug -PappVersion=3.0.${{ github.run_number }}
+        run: ./gradlew :app:assembleDebug -PappVersion=3.0.${{ github.run_number }} ${{ github.ref == 'refs/heads/design/rings-draft' && '-PdemoApp' || '' }}
       - uses: actions/upload-artifact@v7
         with:
           name: openstrap-redesign-debug
@@ -43,3 +43,15 @@ jobs:
           gh release create "v$VERSION" "openstrap-$VERSION.apk" --target "$GITHUB_SHA" \
             --title "OpenStrap $VERSION" --notes-file RELEASE_NOTES.md \
             || gh release upload "v$VERSION" "openstrap-$VERSION.apk" --clobber
+      # The rings draft: a separate app (org.openstrap.app.demo) with sample data, as a pre-release the real app's
+      # updater skips.
+      - name: Publish the draft as a pre-release
+        if: github.ref == 'refs/heads/design/rings-draft'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: 3.0.${{ github.run_number }}
+        run: |
+          cp app/build/outputs/apk/debug/app-debug.apk "rings-draft-$VERSION.apk"
+          gh release create "draft-$VERSION" "rings-draft-$VERSION.apk" --target "$GITHUB_SHA" --prerelease \
+            --title "Rings draft $VERSION" --notes "Draft app with sample data. Installs beside OpenStrap." \
+            || gh release upload "draft-$VERSION" "rings-draft-$VERSION.apk" --clobber
