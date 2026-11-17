@@ -74,7 +74,7 @@ internal fun DialsHero(
     Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         // Room above the glass for its glow, inside the ripple's corners.
         Box(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).clickable(onClick = onEnergy).padding(top = 24.dp, bottom = 12.dp), contentAlignment = Alignment.TopCenter) {
-            if (AppColors.rings) RingsHero(energy.level, recovery, sleep) else EnergyFlask(energy)
+            EnergyFlask(energy)
         }
         Text(
             buildAnnotatedString {

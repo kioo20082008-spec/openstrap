@@ -62,9 +62,6 @@ object AppColors {
 
     val current: ThemeColors get() = of(theme)
 
-    /** The Rings look: flat pages, bold Alexandria numerals, one ring per metric. */
-    val rings: Boolean get() = theme == AppTheme.Rings
-
     val light: Boolean get() = current.light
     val ink: Color get() = current.ink
     /** Ink for a secondary line: 55% (50% on OLED black). */
@@ -102,7 +99,6 @@ object AppColors {
         AppTheme.Oled -> Oled
         AppTheme.Cream -> Cream
         AppTheme.Dusk -> Dusk
-        AppTheme.Rings -> Rings
     }
 
     /**
@@ -203,37 +199,4 @@ object AppColors {
         nav = Color(0xFF281C2C).copy(alpha = 0.9f), sheet = Color(0xFF140E19).copy(alpha = 0.78f),
         scrim = Color.Black.copy(alpha = 0.45f), ring = Color(0xFFF6EBDD).copy(alpha = 0.28f),
     )
-
-    /**
-     * Rings: flat near-black pages, solid cards with no edge, no glow or grain; white ink, and the metric rings do the
-     * colouring ([RingsPalette]).
-     */
-    private val Rings = ThemeColors(
-        light = false,
-        skyTop = RingsPalette.Page, skyMid = RingsPalette.Page, skyLow = RingsPalette.Page,
-        glow = 0f, grain = 0f,
-        page = RingsPalette.Page, stage = RingsPalette.Page,
-        ink = Color.White, mutedAlpha = 0.62f, onInk = RingsPalette.Page,
-        glass = RingsPalette.Card, hairline = Color.Transparent, list = RingsPalette.Card,
-        control = RingsPalette.Control, raised = RingsPalette.Divider,
-        nav = RingsPalette.Card.copy(alpha = 0.96f), sheet = RingsPalette.Card.copy(alpha = 0.98f),
-        scrim = Color.Black.copy(alpha = 0.6f), ring = RingsPalette.Outline,
-    )
-}
-
-/** The Rings design's colours: one per metric, each with its track (the same colour at about 20%). */
-object RingsPalette {
-    val Page = Color(0xFF0A0A0C)
-    val Card = Color(0xFF17171B)
-    val Control = Color(0xFF222228)
-    val Divider = Color(0xFF2B2B31)
-    val Outline = Color(0xFF3A3A42)
-    val Energy = Color(0xFFFF5C39)
-    val Recovery = Color(0xFFC8FF3D)
-    val Sleep = Color(0xFF8B7BFF)
-    val Steps = Color(0xFF3DD6FF)
-    val EnergyTrack = Color(0xFF3B1A15)
-    val RecoveryTrack = Color(0xFF303B16)
-    val SleepTrack = Color(0xFF24213D)
-    val StepsTrack = Color(0xFF14333D)
 }

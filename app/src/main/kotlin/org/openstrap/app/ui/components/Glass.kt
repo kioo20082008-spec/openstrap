@@ -55,9 +55,8 @@ val GlassEdge: BorderStroke get() = glassEdges.getValue(AppColors.theme)
 private val glassEdges = AppTheme.entries.associateWith { theme ->
     val t = AppColors.of(theme)
     BorderStroke(
-        if (t.hairline.alpha == 0f) 0.dp else 1.dp,
-        if (t.hairline.alpha == 0f) Brush.verticalGradient(0f to Color.Transparent, 1f to Color.Transparent)
-        else if (t.light) Brush.verticalGradient(0f to Color.White, 0.5f to t.ink.copy(alpha = 0.05f), 1f to t.ink.copy(alpha = 0.14f))
+        1.dp,
+        if (t.light) Brush.verticalGradient(0f to Color.White, 0.5f to t.ink.copy(alpha = 0.05f), 1f to t.ink.copy(alpha = 0.14f))
         else Brush.verticalGradient(0f to t.ink.copy(alpha = 0.2f), 0.5f to t.ink.copy(alpha = 0.05f), 1f to Color.Black.copy(alpha = 0.4f)),
     )
 }
