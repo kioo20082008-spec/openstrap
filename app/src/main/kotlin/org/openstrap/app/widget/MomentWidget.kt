@@ -106,7 +106,7 @@ private fun MomentContent(m: MomentWidgetModel) {
     // While a workout records, the recording is the news and the live screen shows the strap: no status line.
     GlowWidget(
         m.light.style(m.mood), open, BITMAP_EXTRA, showStatus = m.recording == null,
-        hue = if (m.mood == GlowMood.Day) RingWidget.Energy else RingWidget.Sleep,
+        hue = if (m.mood == org.openstrap.app.ui.glow.draw.GlowMood.Day) RingWidget.Energy else RingWidget.Sleep,
     ) { f ->
         when (f.bucket) {
             WidgetSizes.Small -> SmallContent(m, f)
