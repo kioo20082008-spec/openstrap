@@ -365,7 +365,7 @@ private val StoryStatStyle get() = androidx.compose.ui.text.TextStyle(
     textDirection = androidx.compose.ui.text.style.TextDirection.ContentOrLtr, fontFamily = NumberFamily,
     fontWeight = FontWeight.ExtraBold, fontSize = 30.sp, lineHeight = 36.sp,
 )
-private val StoryTitleStyle get() = StoryTitleStyle.copy(fontWeight = FontWeight.ExtraBold)
+private val StoryTitleStyle get() = GlowType.storyTitle.copy(fontWeight = FontWeight.ExtraBold)
 
 /**
  * A card's one big figure, [value] bold in [color] with [unit] after it on its baseline in muted grey, shrunk to
