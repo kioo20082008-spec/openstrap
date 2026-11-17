@@ -58,6 +58,9 @@ android {
         // `-PdevApp` builds a debug app that also installs beside it (org.openstrap.app.dev), named with its version,
         // to try a branch on a phone with its own data while the release stays as it is.
         debug {
+            // The build the phone follows is this one, so it isn't debuggable: a debuggable app is compiled by ART with
+            // fewer optimisations and runs visibly slower (Compose most of all).
+            isDebuggable = false
             // en-XA (accented and longer, so text still in Kotlin or text that clips stands out) and ar-XB (right to
             // left) can be picked as the phone's language on a debug build (docs/audits/2026-11-04-i18n-plan.md).
             isPseudoLocalesEnabled = true
