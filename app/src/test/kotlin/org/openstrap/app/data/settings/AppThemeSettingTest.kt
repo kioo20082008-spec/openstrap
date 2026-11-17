@@ -19,7 +19,7 @@ class AppThemeSettingTest {
 
     @Test fun `each theme's key reads back as that theme`() {
         for (theme in AppTheme.entries) assertEquals(theme, AppTheme.fromKey(theme.key))
-        assertEquals(listOf("navy", "oled", "cream", "dusk", "rings"), AppTheme.entries.map { it.key })
+        assertEquals(listOf("navy", "oled", "cream", "dusk"), AppTheme.entries.map { it.key })
     }
 
     @Test fun `nothing stored, or a key this version doesn't know, is Navy`() {
