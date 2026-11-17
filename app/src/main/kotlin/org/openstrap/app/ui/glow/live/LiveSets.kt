@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
@@ -76,6 +79,7 @@ import org.openstrap.app.ui.glow.MinusPlus
 import org.openstrap.app.ui.glow.RoundIcon
 import org.openstrap.app.ui.glow.WorkoutButton
 import org.openstrap.app.ui.glow.activeSecondsState
+import org.openstrap.app.ui.glow.detailPress
 import org.openstrap.app.ui.glow.draw.heroStyle
 import org.openstrap.app.ui.glow.workoutClock
 import org.openstrap.app.ui.glow.dotClock
@@ -163,7 +167,7 @@ internal fun LiveStrengthScreen(
                 { haptics.perform(HapticEvent.SetDone); onSetDone() }, icon = AppIcons.Tick02, height = tall,
             )
             else -> Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                if (r.resting) Box(Modifier.width(108.dp)) {
+                if (r.resting) Box(Modifier.weight(0.55f)) {
                     WorkoutButton(stringResource(R.string.workout_live_sets_add_30_s), Raised, AppColors.ink, onExtendRest, height = tall)
                 }
                 Box(Modifier.weight(1f)) {
@@ -198,7 +202,10 @@ private fun SetCard(r: WorkoutState.Recording, number: Int, seconds: () -> Long,
     GlowCard(style, Modifier.fillMaxWidth()) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(WorkoutCopy.setOf(number, r.workout.setsTarget), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f))
+                Text(
+                    WorkoutCopy.setOf(number, r.workout.setsTarget), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+                )
                 ExercisePill(r.exercise, onName)
             }
             Column(Modifier.fillMaxWidth().padding(top = 34.dp, bottom = 26.dp), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -236,7 +243,7 @@ private fun CompactCard(
     EdgeCard(color, Modifier.fillMaxWidth()) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+                Text(title, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 ExercisePill(r.exercise, onName)
             }
             if (clock != null) DotClock(clock, DotSize.Detail)
@@ -251,7 +258,7 @@ private fun ReadyCard(r: WorkoutState.Recording, number: Int, color: Color, onNa
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(if (number == 1) R.string.workout_live_sets_ready_first else R.string.workout_live_sets_rest_over),
-                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
             )
             ExercisePill(r.exercise, onName)
         }
@@ -277,7 +284,7 @@ private fun RestCard(r: WorkoutState.Recording, left: () -> Long, done: Int, bpm
         Row {
             Text(
                 stringResource(R.string.workout_live_sets_rest_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
-                modifier = Modifier.weight(1f),
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
             )
             Text(
                 stringResource(R.string.workout_live_sets_after, WorkoutCopy.setOf(done, r.workout.setsTarget).lowercase()),
@@ -412,12 +419,14 @@ private fun HeartLine(bpm: Int?, maxHr: Int, paused: Boolean) {
 @Composable
 private fun ExercisePill(name: String?, onClick: () -> Unit) {
     val shape = RoundedCornerShape(50)
-    Text(
-        name ?: stringResource(R.string.workout_live_sets_name_it), color = AppColors.ink, style = MediumBody, maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-        modifier = Modifier.clip(shape).background(AppColors.well(0.35f)).pressClickable(onClick, shape)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
-    )
+    // The pill is about 36 dp, in a 44 dp box to tap, and never wider than most of the card.
+    Box(Modifier.widthIn(max = 180.dp).heightIn(min = 44.dp).detailPress(role = Role.Button, onClick = onClick), contentAlignment = Alignment.Center) {
+        Text(
+            name ?: stringResource(R.string.workout_live_sets_name_it), color = AppColors.ink, style = MediumBody, maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.clip(shape).background(AppColors.well(0.35f)).padding(horizontal = 14.dp, vertical = 8.dp),
+        )
+    }
 }
 
 /** The sets done, newest first: "Set 2" and "10 × 60 kg, 0:51, peak 148". */
@@ -526,7 +535,7 @@ private fun ExerciseSheet(current: String?, used: List<String>, onPick: (String?
             keyboardActions = KeyboardActions(onDone = { if (typed.isNotBlank()) onPick(typed) }),
             decorationBox = { field ->
                 Row(
-                    Modifier.fillMaxWidth().height(48.dp).clip(CircleShape).background(Raised).padding(horizontal = 16.dp),
+                    Modifier.fillMaxWidth().heightIn(min = 48.dp).clip(RoundedCornerShape(24.dp)).background(Raised).padding(start = 16.dp, end = 4.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(Modifier.weight(1f)) {
@@ -536,10 +545,11 @@ private fun ExerciseSheet(current: String?, used: List<String>, onPick: (String?
                         )
                         field()
                     }
-                    if (typed.isNotBlank()) Icon(
-                        AppIcons.Tick02, stringResource(R.string.workout_live_exercise_use), tint = AppColors.ink,
-                        modifier = Modifier.size(28.dp).clip(CircleShape).pressClickable({ onPick(typed) }, CircleShape).padding(4.dp),
-                    )
+                    // A 44 dp box to tap round the 20 dp tick.
+                    if (typed.isNotBlank()) Box(
+                        Modifier.size(44.dp).pressClickable({ onPick(typed) }, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) { Icon(AppIcons.Tick02, stringResource(R.string.workout_live_exercise_use), tint = AppColors.ink, modifier = Modifier.size(20.dp)) }
                 }
             },
         )

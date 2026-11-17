@@ -167,57 +167,21 @@ private fun NightHero(state: DayUiState, firstNights: Boolean, onRestore: (org.o
         )
         return
     }
+    // No night to show: the card says why (and Restore for a night the user deleted).
     GlowCard(SleepGlow, Modifier.fillMaxWidth().gridSize(CardSize.Wide), onClick = onOpen) {
         Column {
-            GlowHeader(stringResource(R.string.glow_sleep_last_night), trailing = session?.let { TabCopy.nightTimes(it.start, it.end) })
-            if (session == null) {
-                // Nothing said until the night has loaded, so a cold start doesn't open on "No sleep recorded".
-                val deleted = state.deletedSleep
-                if (state.loaded) HeroSentence(
-                    if (firstNights) TabCopy.FIRST_NIGHT_SLEEP else TabCopy.noNight(state.naps.isNotEmpty(), isToday, deleted = deleted != null),
-                )
-                if (state.loaded && deleted != null) {
-                    Spacer(Modifier.height(20.dp))
-                    PageButton(
-                        stringResource(R.string.glow_sleep_restore), { onRestore(deleted.strap) },
-                        icon = org.openstrap.app.ui.theme.AppIcons.ArrowCounterClockwise,
-                    )
-                }
-                return@Column
-            }
-            val asleep = state.asleepSeconds ?: (session.end - session.start)
-            val others = SleepHistory.weekOthers(state.nights.mapNotNull { n -> n.session?.let { n.date to it } }.toMap(), state.date)
-            HeroSentence(TabCopy.night(asleep, others))
-            Spacer(Modifier.height(16.dp))
-            val score = session.score
-            HeroNumber(
-                score?.toString(),
-                listOfNotNull(
-                    TabCopy.sleepScoreLine(score),
-                    TabCopy.woke(session.wakeCount),
-                ),
+            GlowHeader(stringResource(R.string.glow_sleep_last_night))
+            // Nothing said until the night has loaded, so a cold start doesn't open on "No sleep recorded".
+            val deleted = state.deletedSleep
+            if (state.loaded) HeroSentence(
+                if (firstNights) TabCopy.FIRST_NIGHT_SLEEP else TabCopy.noNight(state.naps.isNotEmpty(), isToday, deleted = deleted != null),
             )
-            if (state.sleepStages.isNotEmpty()) {
-                Spacer(Modifier.height(18.dp))
-                GlowSleepStages(state.sleepStages, 96.dp)
-            }
-            state.sleepBreakdown?.let { b ->
-                // Stage totals as text, never dots (spec 2.3): a stage under a minute leaves its segment and legend out.
-                val totals = stageTotals(b.byStage)
-                if (totals.isNotEmpty()) {
-                    Spacer(Modifier.height(16.dp))
-                    // The stage bar: sized by [StageBarLook] as a widget's bar is ([stageBarSegments] lays that one out in
-                    // whole pixels the way this bar's Row does), its legend the stage's total by a square mark, "Deep 2 h 51".
-                    SegmentBar(
-                        totals.map { (stage, seconds) -> Segment(seconds.toFloat(), stageColor(stage)) },
-                        height = StageBarLook.HEIGHT_DP.dp, gap = StageBarLook.GAP_DP.dp, corner = StageBarLook.CORNER_DP.dp,
-                    )
-                    Spacer(Modifier.height(10.dp))
-                    Legend(
-                        totals.map { (stage, seconds) -> TabCopy.stageTotal(stage, seconds) to stageColor(stage) },
-                        swatch = RoundedCornerShape(2.dp), layout = LegendLayout.Flow,
-                    )
-                }
+            if (state.loaded && deleted != null) {
+                Spacer(Modifier.height(20.dp))
+                PageButton(
+                    stringResource(R.string.glow_sleep_restore), { onRestore(deleted.strap) },
+                    icon = org.openstrap.app.ui.theme.AppIcons.ArrowCounterClockwise,
+                )
             }
         }
     }
@@ -271,7 +235,8 @@ internal val SleepRowColors: List<Color> = DayViewModel.SLEEP_STAGE_ROWS.let { r
 @Composable
 private fun VitalsList(state: DayUiState, firstNights: Boolean, onOpen: (Metric) -> Unit) {
     ListPanel(title = stringResource(R.string.glow_sleep_vitals_title), note = stringResource(R.string.glow_sleep_vitals_note)) {
-        nightVitals(state, firstNights).forEachIndexed { i, v ->
+        // One row a metric: the lowest and the average heart rate open the same detail, so only the lowest is listed.
+        nightVitals(state, firstNights).distinctBy { it.metric }.forEachIndexed { i, v ->
             ListRow(
                 v.label, v.color, v.value, v.status,
                 offNormal = v.direction != null && v.direction != 0, onClick = { onOpen(v.metric) }, divider = i > 0,

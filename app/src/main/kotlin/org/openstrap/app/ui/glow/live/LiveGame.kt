@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -131,8 +132,11 @@ private fun PeriodRow(r: WorkoutState.Recording, periods: Structure.Periods, pha
         else -> stringResource(R.string.workout_live_game_full_time) to workoutClock(active())
     }
     Row(Modifier.fillMaxWidth()) {
-        Text(title, color = AppColors.ink, style = GlowType.pageTitle.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold), modifier = Modifier.weight(1f))
-        Text(clock, color = AppColors.ink, style = org.openstrap.app.ui.workout.ringFigure(24.sp))
+        Text(
+            title, color = AppColors.ink, style = org.openstrap.app.ui.glow.PageTitleStyle, maxLines = 2,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+        )
+        Text(clock, Modifier.padding(start = 12.dp), color = AppColors.ink, style = org.openstrap.app.ui.workout.ringFigure(20.sp))
     }
 }
 

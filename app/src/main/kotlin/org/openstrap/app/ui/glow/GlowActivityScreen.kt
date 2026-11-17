@@ -123,9 +123,9 @@ fun GlowActivityScreen(
     onSaveSuggestion: () -> Unit = {},
     onDismissSuggestion: () -> Unit = {},
     onAddWorkout: () -> Unit = {},
-    /** The live heart rate, when the live switch is on; lights Heart rate from the right. */
+    /** Not shown on this tab any more (the heart rate card is on Today); kept so the tab's callers don't change. */
     liveHeartRate: Int? = null,
-    /** Per-day history, for your resting range behind the heart rate line; null leaves the band out. */
+    /** Not used on this tab any more; kept so the tab's callers don't change. */
     history: org.openstrap.app.ui.dashboard.DailyHistory? = null,
     /** Opens a detail over the tab: the Activity details behind the Small pair, Load and the Today list. */
     onOpen: (org.openstrap.app.ui.dashboard.Detail) -> Unit = {},
@@ -149,9 +149,7 @@ fun GlowActivityScreen(
     val stored = activity.heartPointsOn(state.date)
     val heartPoints = state.pai?.total ?: stored[state.date]?.total
     val r = recovery?.takeIf { it.date == state.date }
-    val live = liveHeartRate?.takeIf { isToday }
-    val slots = activityCards(ActivityFacts(isToday = isToday, suggestion = suggestion != null, live = live != null))
-    val restingRange = rememberNormal(Metric.RestingHr, state.date, history)
+    val slots = activityCards(ActivityFacts(isToday = isToday, suggestion = suggestion != null))
     // A partial day lowers the steps and the day's totals: those two cards carry the tag (spec 4.3).
     var partialInfo by rememberSaveable { mutableStateOf(false) }
     // Built once, so the cards given it can skip (audit K11).
@@ -186,7 +184,6 @@ fun GlowActivityScreen(
                         onClick = { open(Score.HeartPoints) },
                     )
                     ActivityCard.Load -> DayLoadCard(r) { open(Score.Load) }
-                    ActivityCard.HeartRate -> HeartCard(state, live, { onOpenMetric(Metric.HeartRate) }, restingRange = restingRange)
                     ActivityCard.Facts -> DayFactsList(state, r, workouts, isToday, onEditProfile, open, partial)
                     ActivityCard.Workouts -> WorkoutsList(
                         state.date, workouts, suggestion?.takeIf { isToday }, onOpenWorkout, onAllWorkouts, onAddWorkout,
@@ -242,79 +239,6 @@ private val StartTileGap = 8.dp
 /** How many sports by use a wide Start card offers before the everyday ones pad it. */
 private const val MORE_BY_USE = 8
 
-
-/* ----------------------------------------------- Steps ---------------------------------------------- */
-
-/**
- * Steps as a level glow (spec 2.1 Levels, 2.6, 5.3): the light rises from below to the share of the goal walked, the
- * dark core above it, like Charge. The title with the goal as its note, the day's steps hour by hour in the dark, then
- * the number at the foot in the light with how far toward the goal and, once there is one, against your [usual] by now
- * (compare by pace). Tapping an hour puts its steps in the number; tapping it again, or another card, puts the day
- * back. Opens the Steps detail.
- */
-@Composable
-private fun StepsGlow(state: DayUiState, usual: List<Float>?, tag: TitleTag?, onClick: () -> Unit) {
-    val goal = LocalGoals.current.steps
-    val share = if (goal > 0) state.steps / goal.toFloat() else 0f
-    val isToday = state.date == LocalDate.now()
-    val now = java.time.LocalTime.now()
-    val pace = ActivityCopy.paceOf(state.steps, usual, isToday, now.hour, now.minute)
-    var hour by remember(state.date, state.hourlySteps) { mutableStateOf<Int?>(null) }
-    GlowCard(GlowStyle.level(MetricColors.steps, share), Modifier.fillMaxWidth().gridSize(CardSize.Wide), onClick = onClick) {
-        Column {
-            GlowHeader(
-                stringResource(R.string.glow_activity_steps), trailing = stringResource(R.string.glow_activity_goal, Units.count(goal)),
-                tag = tag,
-            )
-            Spacer(Modifier.height(GlowLayout.TitleGap))
-            HourPills(state.hourlySteps, hour) { hour = it }
-            Spacer(Modifier.height(16.dp))
-            // A picked hour takes the number's place; one dotted number either way (spec 2.3). A level glow isn't the
-            // screen's hero, so its number is the second glow's size, as on the Charge battery.
-            val h = hour
-            val picked = h?.let { state.hourlySteps.getOrNull(it) }
-            HeroFigure(
-                Units.count(if (h != null && picked != null) Math.round(picked) else state.steps, Units.DOT_LOCALE),
-                if (h != null && picked != null) ActivityCopy.hourLabel(h) else ActivityCopy.activityLine(state.steps, goal, pace, isToday),
-                big = true, dot = DotSize.Second, labelLines = 2,
-            )
-        }
-    }
-}
-
-/**
- * Hourly pill bars (chart kit, spec 2.7): the day's steps as 24 pills, one an hour, as high as the hour's share of the
- * busiest, white at 45% with the latest hour with steps at full. Hours with none, and those still to come, aren't
- * drawn, only the hairline baseline under the bars. Tapping an hour picks it ([onPick]) and lights it in place of the
- * latest; tapping it again lets it go. The hours under it in Caption.
- */
-@Composable
-private fun HourPills(hourly: List<Float>, picked: Int?, onPick: (Int?) -> Unit) {
-    Column {
-        Canvas(
-            Modifier.fillMaxWidth().height(HourPillsHeight).pointerInput(hourly, picked) {
-                detectTapGestures { o ->
-                    if (hourly.isEmpty()) return@detectTapGestures
-                    val h = (o.x / (size.width.toFloat() / hourly.size)).toInt().coerceIn(0, hourly.lastIndex)
-                    // A tap, not a scrub: no tick (spec 3.6).
-                    onPick(if (h == picked) null else h)
-                }
-            },
-        ) {
-            // The shared pill bars ([hourPills]), as a widget's chart draws them.
-            hourPills(hourly, picked, size.width, size.height, density)?.let { drawHourPills(it) }
-        }
-        Ltr {
-            Row(Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                listOf("00", "06", "12", "18", "24").forEach {
-                    Text(it, color = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), style = GlowType.caption)
-                }
-            }
-        }
-    }
-}
-
-private val HourPillsHeight = 56.dp
 
 /* ------------------------------------------------ Load ---------------------------------------------- */
 

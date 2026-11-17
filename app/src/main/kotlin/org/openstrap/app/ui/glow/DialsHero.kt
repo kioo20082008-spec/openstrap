@@ -212,7 +212,7 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
                     if (action != null) {
                         Spacer(Modifier.height(10.dp))
                         Box(
-                            Modifier.heightIn(min = 44.dp).clip(CircleShape).background(tone).clickable(onClick = action.second).padding(horizontal = 18.dp),
+                            Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(tone).clickable(onClick = action.second).padding(horizontal = 18.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(

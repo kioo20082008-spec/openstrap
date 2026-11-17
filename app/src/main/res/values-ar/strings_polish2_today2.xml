@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="journal_hint_short">اضغط على ما حدث اليوم.</string>
+    <string name="journal_learning_short">سجّلت ⁨%1$d⁩ يوماً. تظهر النتائج بعد ⁨%2$d⁩ أيام لكل حالة.</string>
+</resources>

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -75,9 +76,9 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
         Modifier.fillMaxWidth().padding(top = 10.dp).ringCard()
             .padding(horizontal = 18.dp, vertical = 16.dp),
     ) {
-        Text(stringResource(R.string.journal_title), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+        Text(stringResource(R.string.journal_title), color = AppColors.ink, style = RingType.cardTitle)
         Spacer(Modifier.height(4.dp))
-        Text(stringResource(R.string.journal_hint), color = AppColors.muted, style = MaterialTheme.typography.bodyMedium)
+        Text(stringResource(R.string.journal_hint_short), color = AppColors.muted, style = GlowType.secondary)
         Spacer(Modifier.height(12.dp))
         Journal.Tag.entries.chunked(CHIPS_A_ROW).forEach { row ->
             Row(Modifier.fillMaxWidth().padding(bottom = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -90,15 +91,15 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
             if (result.loggedDays > 0) {
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    stringResource(R.string.journal_learning, result.loggedDays, Insights.MIN_DAYS),
-                    color = AppColors.muted, style = MaterialTheme.typography.bodySmall,
+                    stringResource(R.string.journal_learning_short, result.loggedDays, Insights.MIN_DAYS),
+                    color = AppColors.muted, style = GlowType.secondary,
                 )
             }
         } else {
             Spacer(Modifier.height(6.dp))
             RingDivider()
             Spacer(Modifier.height(12.dp))
-            Text(stringResource(R.string.journal_found), color = AppColors.ink, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+            Text(stringResource(R.string.journal_found), color = AppColors.ink, style = RingType.cardTitle)
             result.findings.forEach { f ->
                 Spacer(Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.Top) {
@@ -106,12 +107,12 @@ internal fun JournalCard(now: Long, zone: ZoneId, isToday: Boolean) {
                     Spacer(Modifier.width(10.dp))
                     Text(
                         stringResource(R.string.journal_finding, tagName(f.tag), effect(f), f.withDays, f.withoutDays),
-                        color = AppColors.ink, style = MaterialTheme.typography.bodyMedium,
+                        color = AppColors.ink, style = GlowType.body,
                     )
                 }
             }
             Spacer(Modifier.height(10.dp))
-            Text(stringResource(R.string.journal_caveat), color = AppColors.muted, style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.journal_caveat), color = AppColors.muted, style = GlowType.secondary)
         }
     }
 }
@@ -121,7 +122,7 @@ private fun Chip(text: String, on: Boolean, modifier: Modifier, onClick: () -> U
     // The rings design's choice: the chosen pill filled with the ink, the rest on the raised surface.
     Box(
         modifier.clip(PillShape).background(if (on) AppColors.ink else AppColors.raised)
-            .clickable(onClick = onClick).padding(horizontal = 12.dp, vertical = 9.dp),
+            .clickable(onClick = onClick).heightIn(min = 44.dp).padding(horizontal = 12.dp, vertical = 9.dp),
         contentAlignment = Alignment.Center,
     ) {
         Text(

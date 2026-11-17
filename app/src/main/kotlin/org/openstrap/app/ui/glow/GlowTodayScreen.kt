@@ -202,7 +202,6 @@ fun GlowTodayScreen(
 ) {
     val list = rememberLazyListState()
     var editing by rememberSaveable { mutableStateOf(false) }
-    if (editing) EditTodaySheet(edits, onSave = { onEditsChange(it); editing = false }, onDismiss = { editing = false })
     var partialInfo by rememberSaveable { mutableStateOf(false) }
     // Built once, so the cards given it can skip (audit K11).
     val partialTag = remember { TitleTag(PARTIAL_DAY) { partialInfo = true } }
@@ -236,6 +235,7 @@ fun GlowTodayScreen(
     )
     // Before the first estimate Habit Age never shows on Today, pinned or not.
     val unavailable = if (healthspan?.result == null) setOf(TodayCard.HabitAge) else emptySet()
+    if (editing) EditTodaySheet(edits, onSave = { onEditsChange(it); editing = false }, onDismiss = { editing = false }, unavailable = unavailable)
     val morning = LocalTime.now().hour < 12
     val live = liveHeartRate != null
     // The moment the cards are laid out for, with no moment yet resolved as todayCards does.
@@ -248,9 +248,11 @@ fun GlowTodayScreen(
             val wide = maxWidth >= GlowLayout.TwoColumnWidth
             // On columns too narrow for Smalls (the Fold's inner screen) a Small pair spans both (spec 2.4 Unfolded).
             val across = GlowLayout.smallsAcross(maxWidth)
-            // Recovery's wide card only repeats the hero's Recovery figure (which opens the same detail): out unless you pinned it.
+            // Recovery's wide card only repeats the Recovery ring above (which opens the same detail): out unless you pinned
+            // it, and Edit Today's Recovery switch is that pin. No moment is given to [applyEdits]: the hero is the flask at
+            // every moment, so a pinned Recovery card is never "the hero's subject" to drop.
             val shownEdits = if (TodayCard.Recovery in edits.pinned) edits else edits.copy(hidden = edits.hidden + TodayCard.Recovery)
-            val slots = varyLooks(applyEdits(todayCards(moment, facts, morning), shownEdits, moment, unavailable), looksFor, live, wide, across)
+            val slots = varyLooks(applyEdits(todayCards(moment, facts, morning), shownEdits, null, unavailable), looksFor, live, wide, across)
             val panes = todayPanes(slots, across)
             GlowScreenList(contentPadding, list) {
                 add(Pane.Full, GlowBlocks.HEADER) { header() }
@@ -279,7 +281,6 @@ fun GlowTodayScreen(
                                             running, onOpenRunning, liveHero, onStartSport, onOtherSport, onPair, onSyncNow,
                                             onOpenRecovery, onOpenWorkout, onRetryRecovery,
                                             onOpenScore = { onOpen(org.openstrap.app.ui.dashboard.Detail.OfScore(it)) },
-                                            energyHidden = slots.none { it.card == TodayCard.Charge },
                                             usualSteps = usualSteps,
                                         )
                                         TodayCard.EditToday -> EditTodayButton({ editing = true })
@@ -333,9 +334,6 @@ private data class TodayContext(
     /** Today's Recovery is the first real score (E4). */
     val firstScore: Boolean,
 ) {
-    /** The evening and night hero shows the day's steps in dots ([EveningHero]), so the Steps card needn't. */
-    val stepsInHero: Boolean get() = (moment == Moment.Evening || moment == Moment.Night) && !stuck
-
     /** "Up to 09:40" for a card whose [newest] reading is stale while syncing has stopped ([upToMarker]). */
     fun upTo(newest: Long?): String? = upToMarker(newest, now, stopped, isToday, zone, staleAfter)
 
@@ -412,8 +410,6 @@ private fun Hero(
      * heroes, as the Charge battery on Recovery does.
      */
     onOpenScore: (org.openstrap.app.ui.dashboard.Score) -> Unit,
-    /** The Energy card is hidden in Edit Today, so the evening hero says Energy itself. */
-    energyHidden: Boolean = false,
     /** Your usual steps by each hour, for the coach's pace. */
     usualSteps: List<Float>? = null,
 ) {
@@ -536,211 +532,13 @@ private fun DialsToday(
 private enum class HeroKind { Pair, Stuck, Waking, NoSleep, Midday, Window, After, Evening, During }
 
 /**
- * Waking up: how you slept and what Recovery says, the score in dots with its word, and Charge at waking as text
- * beside it (one dotted number a card, spec 2.3). Recovery's one teal, lit from the lower left (spec 4.2). Without
- * OpenStrap's own score the strap's stands in, labelled as its estimate.
+ * Today's Recovery failed to work out: the failure hero, with its Try again. (Every other moment's hero is the Energy
+ * flask and plan, [DialsToday].)
  */
 @Composable
 private fun WakingHero(ctx: TodayContext, lightAngle: Float?, onOpen: () -> Unit, onRetry: () -> Unit, modifier: Modifier) {
-    ctx.recoveryFailure?.let {
-        return RecoveryFailedHero(it, heroStyle(MetricColors.readiness, lightAngle), onOpen, onRetry, modifier, gap = 24.dp)
-    }
-    val score = ctx.score
-    val shown = ctx.recoveryShown
-    val before = ctx.rec?.readinessTrend?.dropLast(1)?.lastOrNull()?.second
-    val atWake = ctx.rec?.charge?.takeIf { it.anchored }?.atWake?.toInt()
-    GlowCard(heroStyle(MetricColors.readiness, lightAngle), modifier, onClick = onOpen) {
-        Column {
-            GlowHeader(
-                stringResource(R.string.glow_today_recovery_title), trailing = score?.let { TabCopy.vsYesterday(it, before) },
-                tag = if (ctx.firstScore && score != null) TitleTag(FIRST_SCORE) else null,
-            )
-            if (ctx.state.loaded) HeroSentence(TodayCopy.waking(ctx.state.asleepSeconds, score, ctx.alert, ctx.noScore, ctx.firstNights, ctx.isToday, deleted = ctx.state.deletedSleep != null))
-            // A hero leaves out a figure it doesn't have rather than show a lone dash; the sentence says why.
-            if (shown.value == null && atWake == null) return@Column
-            Spacer(Modifier.height(24.dp))
-            HeroNumber(
-                shown.value?.toString(),
-                listOfNotNull(
-                    shown.value?.let { shown.word ?: ctx.waiting },
-                    atWake?.let { stringResource(R.string.glow_today_energy_at_waking, it) },
-                ),
-            )
-        }
-    }
-}
-
-/**
- * Midday: Charge as a light level, what the day took and what's left: Charge now in dots, recharged and drained as text
- * beside it. With [noSleep] it leads the morning too, saying no sleep was recorded (spec 4.3).
- */
-@Composable
-private fun ChargeHero(ctx: TodayContext, onOpen: () -> Unit, onRetry: () -> Unit, modifier: Modifier, noSleep: Boolean = false) {
-    val c = ctx.rec?.charge
-    val now = ctx.charge
-    var info by rememberSaveable { mutableStateOf(false) }
-    // Charge is lit to its level from below (spec 2.5), so the moment's angle gives way here.
-    GlowCard(GlowStyle.Ember.copy(lightLevel = (now ?: 0) / 100f), modifier, onClick = onOpen) {
-        Column {
-            val start = c?.takeIf { it.anchored }?.atWake?.toInt()
-            GlowHeader(
-                stringResource(R.string.glow_today_energy_title),
-                trailing = start?.let {
-                    stringResource(if (c.strapOffOvernight) R.string.glow_today_energy_at_start else R.string.glow_today_energy_waking, it)
-                },
-                marker = ctx.upTo(ctx.newest), tag = ctx.partial,
-            )
-            // Charge is worked out with Recovery, so when that fails it says so rather than waiting for a first night.
-            val failed = ctx.recoveryFailure != null
-            HeroSentence(
-                when {
-                    failed -> CHARGE_FAILED
-                    noSleep -> if (ctx.state.deletedSleep != null) TodayCopy.deletedNight(ctx.isToday) else TodayCopy.NO_SLEEP
-                    else -> TodayCopy.charge(
-                        now, c?.let { TabCopy.drainedAmount(it.drainedExercise + it.drainedStress + it.drainedLiving).toInt() },
-                        c?.anchored == true, LocalTime.now().hour,
-                    )
-                },
-            )
-            if (failed) {
-                Spacer(Modifier.height(24.dp))
-                PageButton(TRY_AGAIN, onRetry, primary = true, size = ButtonSize.Hero)
-                return@Column
-            }
-            // The caveat marker: tapping it opens Charge's info sheet, which explains the estimated start. One caveat a
-            // card (spec 7.1): a Partial day tag, or the no sleep sentence, already says the day is short of wear.
-            if (c?.strapOffOvernight == true && !noSleep && ctx.partial == null) Text(
-                stringResource(R.string.glow_today_strap_off),
-                color = AppColors.ink.copy(alpha = 0.7f), style = GlowType.secondary,
-                modifier = Modifier.padding(top = 8.dp)
-                    .clickable(onClickLabel = stringResource(R.string.glow_today_about_energy)) { info = true },
-            )
-            // No lone dash in a hero: before the first night the sentence says Charge starts after it.
-            if (now == null) return@Column
-            Spacer(Modifier.height(24.dp))
-            HeroNumber(
-                now.toString(),
-                if (c != null && c.anchored) listOf(
-                    stringResource(R.string.glow_today_recharged, c.recharged.toInt()),
-                    // After "Drained" the amount needs no minus.
-                    stringResource(
-                        R.string.glow_today_drained, TabCopy.drainedAmount(c.drainedExercise + c.drainedStress + c.drainedLiving),
-                    ),
-                ) else listOf(stringResource(R.string.glow_today_now)),
-            )
-        }
-    }
-    if (info) InfoSheet(
-        org.openstrap.app.ui.dashboard.InfoCopy.of(org.openstrap.app.ui.dashboard.Score.Energy), MetricColors.charge,
-        now?.let(org.openstrap.app.ui.dashboard.InfoCopy::chargeBar), now?.let { org.openstrap.app.ui.dashboard.InfoCopy.HERE },
-        onDismiss = { info = false }, notes = org.openstrap.app.ui.dashboard.InfoCopy.chargeNotes(c),
-    )
-}
-
-/**
- * Your usual workout time: whether you're ready for effort, and a way to start the sport you usually do now. Heart red
- * from the upper right with the rim raised (spec 4.2); Recovery is a note on the title row, not the hero's colour.
- */
-@Composable
-private fun WindowHero(ctx: TodayContext, lightAngle: Float?, onStart: (Int) -> Unit, onOther: () -> Unit, modifier: Modifier) {
-    val sport = ctx.usualSport
-    val noun = sportNoun(sport)
-    GlowCard(heroStyle(MetricColors.heart, lightAngle, rim = WINDOW_RIM), modifier) {
-        Column {
-            GlowHeader(
-                TodayCopy.windowTitle(ctx.score), trailing = ctx.score?.let { stringResource(R.string.glow_today_recovery_score, it) },
-            )
-            HeroSentence(TodayCopy.window(sport, ctx.charge))
-            Spacer(Modifier.height(28.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                PageButton(
-                    stringResource(R.string.glow_today_start_sport, noun ?: Workouts.sportName(sport).lowercase()), { onStart(sport) },
-                    Modifier.weight(1f),
-                    primary = true, icon = AppIcons.PlayFill, size = ButtonSize.Hero,
-                )
-                PageButton(stringResource(R.string.glow_today_other_sport), onOther, size = ButtonSize.Hero, onCard = true)
-            }
-        }
-    }
-}
-
-/**
- * After a workout: how long since, and the heart coming down, drawn from the readings since it ended. The heart rate
- * now in dots, the end and resting rates as text beside it. Calm light from below, the rim at 80% (spec 4.2).
- */
-@Composable
-private fun AfterHero(ctx: TodayContext, lightAngle: Float?, onOpenWorkout: (Long) -> Unit, modifier: Modifier) {
-    val w = ctx.lastWorkout ?: return
-    val since = ctx.state.heartRate.filter { it.x >= w.end }
-    val nowHr = ctx.live ?: since.lastOrNull()?.y?.toInt()
-    val noun = sportNoun(w.workout.sportType) ?: stringResource(R.string.glow_today_workout_noun)
-    GlowCard(heroStyle(MetricColors.heart, lightAngle, rim = AFTER_RIM), modifier, onClick = { onOpenWorkout(w.workout.start) }) {
-        Column {
-            GlowHeader(stringResource(R.string.glow_today_since_your, noun), trailing = Units.duration(ctx.now - w.end))
-            HeroSentence(TodayCopy.after(nowHr, ctx.state.restingHeartRate))
-            // The drop since the end, from the readings the strap has sent. A live curve needs live readings kept
-            // through the calm down (step 7).
-            if (since.size >= 2) {
-                // About 40 points over whatever time has passed, and never narrower than the strap's usual gap between
-                // readings (it keeps one every few minutes outside a workout): a slot with no reading between two that
-                // have one breaks the line into lone dots.
-                val gaps = since.zipWithNext { a, b -> (b.x - a.x).toInt() }.filter { it > 0 }
-                val typical = Stats.upperMiddle(gaps)?.toLong() ?: 0L
-                // Half as wide again, so a reading a little late still lands in its own slot.
-                val step = maxOf(60L, (ctx.now - w.end) / 40, typical * 3 / 2)
-                val values = remember(since, w.end, step) { bucket(since, w.end..ctx.now, step) }
-                Spacer(Modifier.height(14.dp))
-                // The line drops into your resting range, a dim band, once it's known.
-                GlowLineChart(values, height = 64.dp, showAverage = false, band = ctx.restingRange?.let { it.low..it.high })
-            }
-            Spacer(Modifier.height(18.dp))
-            // No readings around the end give no end heart rate: leave it out rather than show a dash.
-            val end = w.endHeartRate
-            val resting = ctx.state.restingHeartRate
-            val then = when {
-                end != null && resting != null -> stringResource(R.string.glow_today_after_end_resting, end, resting)
-                end != null -> stringResource(R.string.glow_today_after_end, end)
-                resting != null -> stringResource(R.string.glow_today_after_resting, resting)
-                else -> null
-            }
-            HeroNumber(nowHr?.toString(), listOfNotNull(nowHr?.let { stringResource(R.string.glow_today_bpm_now) }, then))
-        }
-    }
-}
-
-/**
- * Evening and night: the day in a sentence (Load in it), the steps in dots, Energy left under them only when
- * [energyHidden] (its card, normally right under the hero, is hidden in Edit Today), and how
- * long until your usual bedtime. Evening violet from the lower right in the evening, Sleep blue from below at night
- * (spec 4.2), each in its mood.
- */
-@Composable
-private fun EveningHero(ctx: TodayContext, lightAngle: Float?, bedtime: LocalTime?, energyHidden: Boolean, onOpen: () -> Unit, modifier: Modifier) {
-    val goals = LocalGoals.current
-    val sports = ctx.dayWorkouts.map { it.workout.sportType }
-    val night = ctx.moment == Moment.Night
-    val style = heroStyle(if (night) MetricColors.sleepDeep else MetricColors.evening, lightAngle)
-    // The evening's violet is lit lighter so it reads as violet, not as a second night (spec 4.2).
-    GlowCard(if (night) style else style.copy(bodyLightness = EVENING_BODY), modifier, onClick = onOpen) {
-        Column {
-            GlowHeader(
-                stringResource(R.string.glow_today_title), trailing = TodayCopy.bedtimeIn(LocalTime.now(), bedtime),
-                marker = ctx.upTo(ctx.newest), tag = ctx.partial,
-            )
-            // The count is in dots below, so the sentence says the steps against the goal instead.
-            HeroSentence(TodayCopy.evening(sports, ctx.state.steps, goals.steps, ctx.loadStatus, stepCount = false))
-            Spacer(Modifier.height(24.dp))
-            HeroNumber(Units.count(ctx.state.steps, Units.DOT_LOCALE), listOf(stringResource(R.string.glow_today_steps)))
-            // Load is said in the sentence, and Energy has its own card right under the hero. Only with that card
-            // hidden in Edit Today does Energy come back here, last and full width, never a lone dash.
-            val energy = ctx.charge?.takeIf { energyHidden }
-            if (energy != null) Text(
-                stringResource(R.string.glow_today_energy_left, energy), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                style = GlowType.secondary,
-                maxLines = 1, modifier = Modifier.padding(top = 10.dp),
-            )
-        }
-    }
+    val failure = ctx.recoveryFailure ?: return
+    RecoveryFailedHero(failure, heroStyle(MetricColors.readiness, lightAngle), onOpen, onRetry, modifier, gap = 24.dp)
 }
 
 /**
@@ -916,30 +714,11 @@ private fun TodayRow(
             upTo = if (ctx.live == null) ctx.upTo(s.heartRate.lastOrNull()?.x) else null,
         )
         // Steps come in the same records as the rest of the day, so the day's newest reading is how far they go.
-        // In the evening and at night the hero has the day's steps in dots, so the card leads with its sentence.
         TodayCard.Activity -> ActivityCard(
             s, { onOpenMetric(Metric.Steps) }, usual = usualSteps, upTo = ctx.upTo(ctx.newest), tag = ctx.partial,
-            count = !ctx.stepsInHero,
         )
         TodayCard.Recovery -> RecoveryEarlierCard(ctx.recoveryShown, { openScore(org.openstrap.app.ui.dashboard.Score.Recovery) }, failure = ctx.recoveryFailure, onRetry = onRetryRecovery)
-        TodayCard.Charge -> {
-            val c = ctx.rec?.charge
-            // What the day drained, gross, as the hero, Recovery's Drained Small and the Charge detail say it.
-            val drained = c?.let { it.drainedExercise + it.drainedStress + it.drainedLiving }
-            val status = when {
-                // Worked out with Recovery: when that failed, say so here too. The card opens Recovery and its Try again.
-                ctx.charge == null -> if (ctx.recoveryFailure != null) CHARGE_FAILED else ctx.waiting
-                ctx.endOfDay -> stringResource(R.string.glow_today_charge_fills_back)
-                drained != null && drained >= 1f -> stringResource(R.string.glow_today_drained, TabCopy.drainedAmount(drained))
-                else -> stringResource(R.string.glow_today_charge_steady)
-            }
-            // The day's Charge so far beside the number, in the evening too, as on every other Charge card.
-            val soFar = c?.takeIf { it.anchored && ctx.isToday }?.let { chargeSoFar(it.points, s.dayStart..s.dayEnd, ctx.now) }
-            ChargeWideCard(
-                ctx.charge, status, slot.secondGlow, { openScore(org.openstrap.app.ui.dashboard.Score.Energy) }, soFar = soFar,
-                upTo = ctx.upTo(ctx.newest), tag = ctx.partial,
-            )
-        }
+        // Energy is the hero (the flask), so it has no card of its own; Recover is drawn with Load.
         // After a workout, what it did as a Small pair: Load toward your usual (from below) and time to recover.
         TodayCard.LoadToday -> if (slot.size == CardSize.Small) SmallCard(
             MetricColors.load, stringResource(R.string.glow_today_load), ctx.rec?.load?.let { Math.round(it).toString() }, null,
@@ -974,14 +753,6 @@ private fun TodayRow(
         // Habit Age's home is the foot of Recovery; Today shows the same card when there's a new estimate, or pinned.
         TodayCard.HabitAge -> HabitAgeEdgeCard(healthspan, onOpenHealthspan, onOpenProfile)
         TodayCard.StartWorkout -> StartWorkoutStrip(ctx.usualSport, onStartSport)
-        TodayCard.Hero, TodayCard.EditToday -> Unit
+        TodayCard.Hero, TodayCard.EditToday, TodayCard.Charge -> Unit
     }
-}
-
-/* ---------------------------------------------- Helpers --------------------------------------------- */
-
-/** The day's Charge in quarter hours across [day], up to [now]; the quarters still to come are null. */
-internal fun chargeSoFar(points: List<Recovery.ChargePoint>, day: LongRange, now: Long): List<Float?> {
-    val step = 15 * 60L
-    return org.openstrap.app.data.Summaries.evenly(points.filter { it.t <= now }, day, step, { it.t }, { it.value })
 }

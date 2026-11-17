@@ -159,7 +159,7 @@ internal fun ReadyWhere(
                 },
             ) {
                 val other = StartCopy.otherPlace(sides, indoor)
-                IconPill(other, onSwitch, icon = placeIcon(sides, !indoor), height = 36.dp, description = other)
+                IconPill(other, onSwitch, icon = placeIcon(sides, !indoor), height = 44.dp, description = other)
             }
             rows++
         } else if (outdoor && !locationOn) {
@@ -310,7 +310,7 @@ private fun ReadyPlanCard(
         var choosing by rememberSaveable { mutableStateOf(false) }
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             IconPill(
-                shown.name, { onTyping(false); choosing = true }, icon = shown.icon, tint = TypingLime, caret = true, height = 40.dp,
+                shown.name, { onTyping(false); choosing = true }, icon = shown.icon, tint = TypingLime, caret = true, height = 44.dp,
                 description = stringResource(R.string.glow_ready_plan_description, shown.name, StartCopy.planHint(family)),
             )
         }
@@ -387,9 +387,9 @@ internal fun <T> Presets(presets: List<Pair<T, String>>, on: T?, onPick: (T) -> 
         presets.forEach { (v, label) ->
             val chosen = v == on
             Box(
-                Modifier.weight(1f).heightIn(min = 44.dp).clip(CircleShape)
-                    .then(if (chosen) Modifier.background(AppColors.ink) else Modifier.border(1.dp, AppColors.ink.copy(alpha = 0.15f), CircleShape))
-                    .pressClickable({ onPick(v) }, CircleShape).semantics { role = Role.Button; selected = chosen },
+                Modifier.weight(1f).heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp))
+                    .then(if (chosen) Modifier.background(AppColors.ink) else Modifier.border(1.dp, AppColors.ink.copy(alpha = 0.15f), RoundedCornerShape(22.dp)))
+                    .pressClickable({ onPick(v) }, RoundedCornerShape(22.dp)).semantics { role = Role.Button; selected = chosen },
                 contentAlignment = Alignment.Center,
             ) {
                 Text(

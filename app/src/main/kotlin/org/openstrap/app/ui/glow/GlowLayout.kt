@@ -325,14 +325,25 @@ internal val CaretSize = 14.dp
 
 /**
  * (i) on a card (spec 2.5): a 32 dp round button at 10% white with a 16 dp icon at 72%, at the right of the title
- * row. The same on every card that has an explanation; it opens that card's info sheet.
+ * row, in a 44 dp box so it is easy to hit. The same on every card that has an explanation; it opens that card's info sheet.
  */
 @Composable
-internal fun InfoButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) = RoundIconButton(
-    AppIcons.Info, label, onClick, modifier, size = InfoButtonSize, iconSize = 16.dp,
-    tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-)
+internal fun InfoButton(label: String, onClick: () -> Unit, modifier: Modifier = Modifier) =
+    androidx.compose.foundation.layout.Box(
+        modifier.size(InfoButtonTouch)
+            .detailPress(onClickLabel = label, role = androidx.compose.ui.semantics.Role.Button, scale = 0.9f, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        androidx.compose.foundation.layout.Box(
+            Modifier.size(InfoButtonSize).clip(androidx.compose.foundation.shape.CircleShape).background(AppColors.ink.copy(alpha = 0.10f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(AppIcons.Info, label, Modifier.size(16.dp), tint = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA))
+        }
+    }
 
+/** The box an (i) sits in: the least a thumb should have to hit. */
+internal val InfoButtonTouch = 44.dp
 internal val InfoButtonSize = 32.dp
 /** A card's caret, right after its title. */
 internal const val CARD_CARET_ALPHA = 0.5f

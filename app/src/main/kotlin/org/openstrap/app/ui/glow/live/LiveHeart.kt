@@ -3,6 +3,7 @@ package org.openstrap.app.ui.glow.live
 import androidx.compose.foundation.Canvas
 import org.openstrap.app.ui.theme.AppColors
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -330,18 +331,20 @@ internal fun liveHeartStyle(color: Color, bpm: Int?, zone: Int?, paused: Boolean
 /** The time in the [zone] you're in on the left of the heart card's foot, and the target's progress on the right. */
 @Composable
 internal fun HeartNotes(r: WorkoutState.Recording, zone: Int?, zoneSeconds: ZoneSeconds, active: () -> Long, kcal: Float?) {
-    Row {
-        zone?.let { PageNote(WorkoutCopy.zoneTime(zoneSeconds[it])) }
-        Spacer(Modifier.weight(1f))
-        when (val t = WorkoutTarget.parse(r.workout.target)) {
-            is WorkoutTarget.Zones -> PageNote(
-                if (t.low == t.high) stringResource(R.string.workout_live_target_zone, t.low + 1)
-                else stringResource(R.string.workout_live_target_zones, t.low + 1, t.high + 1),
-            )
-            is WorkoutTarget.Time -> TimeTargetNote(active, t.seconds)
-            is WorkoutTarget.Kcal -> PageNote(WorkoutCopy.kcalProgress(kcal, t))
-            is WorkoutTarget.Distance -> PageNote(WorkoutCopy.distanceProgress(r.workout.distanceMeters, t))
-            null -> Unit
+    // Each note in half the row, so a long Arabic line wraps inside its half instead of squeezing the other.
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Box(Modifier.weight(1f)) { zone?.let { PageNote(WorkoutCopy.zoneTime(zoneSeconds[it])) } }
+        Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+            when (val t = WorkoutTarget.parse(r.workout.target)) {
+                is WorkoutTarget.Zones -> PageNote(
+                    if (t.low == t.high) stringResource(R.string.workout_live_target_zone, t.low + 1)
+                    else stringResource(R.string.workout_live_target_zones, t.low + 1, t.high + 1),
+                )
+                is WorkoutTarget.Time -> TimeTargetNote(active, t.seconds)
+                is WorkoutTarget.Kcal -> PageNote(WorkoutCopy.kcalProgress(kcal, t))
+                is WorkoutTarget.Distance -> PageNote(WorkoutCopy.distanceProgress(r.workout.distanceMeters, t))
+                null -> Unit
+            }
         }
     }
 }

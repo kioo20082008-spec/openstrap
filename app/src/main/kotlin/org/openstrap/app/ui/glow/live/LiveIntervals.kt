@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -159,7 +160,7 @@ internal fun LiveIntervalsScreen(
                 // Folded, +10 s sits beside the seconds: the half has no room for a row of its own.
                 action = {
                     val more = stringResource(R.string.workout_live_add_10_s)
-                    WorkoutButton(more, OverGlow, AppColors.ink, onAddRest, Modifier.width(120.dp), height = 44.dp)
+                    WorkoutButton(more, OverGlow, AppColors.ink, onAddRest, height = 44.dp, fill = false)
                 },
             )
             Phase.WarmUp -> PhaseFigure(
@@ -183,7 +184,7 @@ internal fun LiveIntervalsScreen(
             // A pill as high as the heart rate strip and, like it, no wider than its words need.
             is Phase.Rest -> if (!compact) WorkoutButton(
                 stringResource(R.string.workout_live_add_10_s), OverGlow, AppColors.ink, onAddRest,
-                Modifier.align(Alignment.CenterHorizontally).width(140.dp), height = 52.dp,
+                Modifier.align(Alignment.CenterHorizontally), height = 52.dp, fill = false,
             )
             is Phase.Work -> if (m.everyMinute) WorkoutButton(
                 stringResource(R.string.workout_live_done_button), AppColors.ink, AppColors.onInk, onSkip, icon = AppIcons.Tick02, height = tall,
@@ -217,7 +218,10 @@ private fun SkipButton(label: String, done: Boolean, onSkip: () -> Unit) {
                 Icon(if (done) AppIcons.Tick02 else AppIcons.SkipFill, label, tint = AppColors.ink, modifier = Modifier.size(20.dp))
             }
         }
-        Text(label, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        Text(
+            label, Modifier.widthIn(max = 96.dp), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 2,
+            textAlign = TextAlign.Center, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -307,7 +311,10 @@ private fun RoundPeaks(rounds: List<AppWorkoutRound>, total: Int) {
     val shown = peaks.filterNotNull().joinToString(", ")
     val described = stringResource(R.string.workout_live_peaks_description, shown)
     EdgeCard(WorkRed, Modifier.fillMaxWidth()) {
-        Text(stringResource(R.string.workout_live_peaks_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+        Text(
+            stringResource(R.string.workout_live_peaks_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
         Spacer(Modifier.height(12.dp))
         PeakBars(
             peaks, { MetricColors.heart },
@@ -340,7 +347,8 @@ internal fun RepCard(r: WorkoutState.Recording, route: List<Route.Point>, readin
                     Phase.WarmUp -> stringResource(R.string.workout_live_warm_up)
                     Phase.Done -> stringResource(R.string.workout_live_all_reps_done, m.rounds)
                 },
-                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
             val pace = if (m.phase is Phase.Work) org.openstrap.app.presentation.Pace.clock(Route.currentPace(route)) else null
             if (pace != null) Text(

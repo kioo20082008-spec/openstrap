@@ -477,6 +477,9 @@ private fun AppRoot(
             var quickOpen by remember { mutableStateOf(false) }
             if (breatheOpen) org.openstrap.app.ui.glow.BreatheScreen(live, liveEnabled, { container.strap.setLiveHeartRate(it) }) { breatheOpen = false }
             val quickScope = androidx.compose.runtime.rememberCoroutineScope()
+            // Composed only while the sheet is open, so it is the last back handler added and Back closes the sheet
+            // before anything under it (the tabs' details and pages).
+            if (quickOpen) BackHandler { quickOpen = false }
             if (quickOpen) org.openstrap.app.ui.glow.QuickSheet(
                 androidx.compose.ui.res.stringResource(R.string.dials_quick_title),
                 listOf(

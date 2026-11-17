@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="journal_hint_short">Tap what happened today.</string>
+    <string name="journal_learning_short">%1$d days logged. Results show after %2$d days each way.</string>
+</resources>

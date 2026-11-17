@@ -198,20 +198,20 @@ class FrameRulesTest {
 
     @Test fun `unfolded, the tabs' rows of Smalls span both columns and stay varied`() {
         val bools = listOf(false, true)
-        for (today in bools) for (suggestion in bools) for (live in bools) {
-            assertSmallsAcross(activityCards(ActivityFacts(today, suggestion, live)), "activity")
+        for (today in bools) for (suggestion in bools) {
+            assertSmallsAcross(activityCards(ActivityFacts(today, suggestion)), "activity")
         }
-        for (habit in bools) assertSmallsAcross(recoveryCards(RecoveryFacts(habitAge = habit)), "recovery")
+        assertSmallsAcross(recoveryCards(RecoveryFacts()), "recovery")
         for (breathing in bools) for (naps in bools) assertSmallsAcross(sleepCards(SleepFacts(breathing, naps)), "sleep")
-        // Activity: Active minutes and Heart points two across on their own row. Heart rate isn't beside them but
-        // in its column under it, beside Load, so the columns are still there to balance.
+        // Activity: Active minutes and Heart points two across on their own row. The facts aren't beside them but
+        // in their column under it, beside Load, so the columns are still there to balance.
         val act = activityCards()
         val panes = tabPanes(act, smallsAcross = true)
         fun pane(c: ActivityCard) = panes[act.indexOfFirst { it.card == c }]
         assertEquals(Pane.Full, pane(ActivityCard.ActiveMinutes))
         assertEquals(Pane.Full, pane(ActivityCard.HeartPoints))
         assertEquals(Pane.Left, pane(ActivityCard.Load))
-        assertEquals(Pane.Right, pane(ActivityCard.HeartRate))
+        assertEquals(Pane.Right, pane(ActivityCard.Facts))
         // With room in each column (a tablet) the pair keeps its column as before.
         assertEquals(act.map { it.pane }, tabPanes(act, smallsAcross = false))
     }

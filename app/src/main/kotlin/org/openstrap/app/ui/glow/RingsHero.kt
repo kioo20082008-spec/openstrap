@@ -388,7 +388,7 @@ internal fun RingSkyHero(
                     Row(Modifier.fillMaxWidth().padding(vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(10.dp).clip(CircleShape).background(s.color))
                         Spacer(Modifier.width(10.dp))
-                        Text(s.name, Modifier.width(68.dp), color = AppColors.ink, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(s.name, Modifier.widthIn(min = 68.dp, max = 104.dp), color = AppColors.ink, style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                         Box(Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)).background(AppColors.ink.copy(alpha = 0.1f))) {
                             Box(
                                 Modifier.fillMaxWidth(s.share.coerceIn(0.02f, 1f)).fillMaxHeight()

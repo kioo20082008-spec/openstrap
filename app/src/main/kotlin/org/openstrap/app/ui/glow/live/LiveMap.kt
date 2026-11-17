@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -100,12 +103,12 @@ internal fun LiveMapScreen(
                 Spacer(Modifier.weight(1f))
                 val acc = route.lastOrNull()?.accuracy
                 Row(
-                    Modifier.height(32.dp).clip(RoundedCornerShape(50)).background(OverMap).padding(horizontal = 12.dp),
+                    Modifier.widthIn(max = 160.dp).height(32.dp).clip(RoundedCornerShape(50)).background(OverMap).padding(horizontal = 12.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(Modifier.size(6.dp).clip(CircleShape).background(if (acc != null && acc <= Route.MAX_ACCURACY_M) TrendGood else TrendBad))
                     Spacer(Modifier.width(6.dp))
-                    Text(WorkoutCopy.gpsPill(acc), color = AppColors.ink, style = GlowType.secondary, maxLines = 1)
+                    Text(WorkoutCopy.gpsPill(acc), Modifier.weight(1f, fill = false), color = AppColors.ink, style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
             // On its side the map is short, so the buttons hang under the GPS pill instead of rising into it.
@@ -162,12 +165,15 @@ private fun LastSplit(route: List<Route.Point>, readings: List<Pair<Long, Int>>,
     val now = nowTicking()
     val (line, ago) = WorkoutCopy.lastSplit(splits, readings, route.firstOrNull()?.t, now) ?: return
     Row(
-        Modifier.fillMaxWidth().height(44.dp).clip(RoundedCornerShape(14.dp)).background(Raised).padding(horizontal = 14.dp),
+        Modifier.fillMaxWidth().heightIn(min = 44.dp).clip(RoundedCornerShape(14.dp)).background(Raised).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(8.dp).clip(CircleShape).background(MetricColors.steps))
         Spacer(Modifier.width(10.dp))
-        Text(line, color = AppColors.ink, style = GlowType.body.copy(fontFeatureSettings = "tnum"), maxLines = 1, modifier = Modifier.weight(1f))
-        Text(ago, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        Text(
+            line, color = AppColors.ink, style = GlowType.body.copy(fontFeatureSettings = "tnum"), maxLines = 1, overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f),
+        )
+        Text(ago, Modifier.padding(start = 8.dp), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
     }
 }

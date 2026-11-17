@@ -153,7 +153,7 @@ fun HabitAgeEdgeCard(state: Healthspan.Outcome?, onClick: (() -> Unit)?, onOpenP
         r?.let {
             Text(
                 TabCopy.habitAgeUpdated(dateOf(it.asOf)), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                style = GlowType.secondary, maxLines = 1,
+                style = GlowType.secondary, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             )
         }
         val line = r?.let { TabCopy.habitAgeLine(it.estimate, state.lastWeek, it.low, it.high) }

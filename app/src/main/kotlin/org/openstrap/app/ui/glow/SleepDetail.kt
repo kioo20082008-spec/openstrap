@@ -256,7 +256,6 @@ internal fun SleepScoreDetail(
                     item { DetailSentence(it) }
                 }
             }
-            item { SleepRelated(Score.Sleep, state, r, onOpen) }
         }
     }
 
@@ -355,12 +354,12 @@ private fun UndoHost(message: String?, contentPadding: PaddingValues, onUndo: ()
             }
             Row(
                 Modifier.align(Alignment.BottomCenter).padding(bottom = contentPadding.calculateBottomPadding() + 16.dp, start = 16.dp, end = 16.dp)
-                    .fillMaxWidth().heightIn(min = 56.dp).background(SnackbarSurface, CircleShape).padding(start = 22.dp, end = 8.dp),
+                    .fillMaxWidth().heightIn(min = 56.dp).background(SnackbarSurface, RoundedCornerShape(28.dp)).padding(start = 22.dp, end = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(message, color = AppColors.onInk, style = GlowType.body, maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
                 Row(
-                    Modifier.heightIn(min = 44.dp).clip(CircleShape).background(AppColors.onInk).pressClickable(onUndo, CircleShape)
+                    Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(AppColors.onInk).pressClickable(onUndo, RoundedCornerShape(22.dp))
                         .semantics { role = Role.Button }.padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
@@ -408,7 +407,7 @@ private fun StageBars(b: Summaries.SleepBreakdown, modifier: Modifier = Modifier
         order.forEach { st ->
             val secs = b.byStage[st] ?: 0L
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, maxLines = 1, modifier = Modifier.width(64.dp))
+                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.widthIn(min = 64.dp, max = 96.dp))
                 FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f).detailReveal(delayMs = 300, fromStart = true), height = 10.dp)
                 Text(
                     Units.duration(secs), color = AppColors.ink, style = GlowType.secondary, maxLines = 1,
@@ -494,7 +493,6 @@ internal fun RegularityDetail(
             }
         }
         item { DetailSentence(SleepCopy.regularity(reg)) }
-        item { SleepRelated(Score.Regularity, state, r, onOpen) }
     }
 
     if (info) InfoSheet(
@@ -594,7 +592,6 @@ internal fun NapsDetail(
                     }
                 }
             }
-            item { SleepRelated(Score.Naps, state, r, onOpen) }
         }
     }
 

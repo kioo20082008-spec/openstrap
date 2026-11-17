@@ -33,6 +33,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.material3.Icon
 import androidx.compose.ui.input.pointer.pointerInput
 import org.openstrap.app.ui.glow.GlowType
@@ -58,6 +61,12 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.animation.animateContentSize
+
+/**
+ * A tab cell's shape in the plain bar and the rail: rounded, not a full circle, so the label under the icon in a narrow
+ * rail cell isn't cut by the curve.
+ */
+private val NavCellShape = RoundedCornerShape(18.dp)
 
 /** One destination in [FloatingNavBar]; [tint] colours its capsule while it's the tab showing (none, plain glass, on Today). */
 data class NavItem(val label: String, val icon: ImageVector, val selectedIcon: ImageVector = icon, val tint: Color? = null)
@@ -99,12 +108,12 @@ fun FloatingNavBar(
                     (cell + gap) * selected, tween(Motion.SWIFT, easing = Motion.easing), label = "nav pill",
                 )
                 Box(
-                    Modifier.offset(x = x).width(cell).fillMaxHeight().clip(CircleShape)
+                    Modifier.offset(x = x).width(cell).fillMaxHeight().clip(NavCellShape)
                         .background(AppColors.ink),
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
                     items.forEachIndexed { i, item ->
-                        NavCell(item, i == selected, modifier = Modifier.clip(CircleShape).clickable { onSelect(i) }
+                        NavCell(item, i == selected, modifier = Modifier.clip(NavCellShape).clickable { onSelect(i) }
                             .weight(1f)
                             .padding(vertical = 8.dp), onTint = AppColors.onInk)
                     }
@@ -137,14 +146,14 @@ fun FloatingNavRail(
                     (cell + gap) * selected, tween(Motion.SWIFT, easing = Motion.easing), label = "nav pill",
                 )
                 Box(
-                    Modifier.offset(y = y).height(cell).fillMaxWidth().clip(CircleShape)
+                    Modifier.offset(y = y).height(cell).fillMaxWidth().clip(NavCellShape)
                         .background(AppColors.ink),
                 )
                 Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(gap)) {
                     items.forEachIndexed { i, item ->
                         NavCell(
                             item, i == selected,
-                            modifier = Modifier.clip(CircleShape).clickable { onSelect(i) }.weight(1f).fillMaxWidth(),
+                            modifier = Modifier.clip(NavCellShape).clickable { onSelect(i) }.weight(1f).fillMaxWidth(),
                             verticalArrangement = Arrangement.Center, onTint = AppColors.onInk,
                         )
                     }
@@ -239,6 +248,7 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
         contentAlignment = Alignment.Center,
     ) {
         // Where each tab's cell sits in the bar (window pixels), so the chosen pill can glide from one to the next.
+        val quickTitle = androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.dials_quick_title)
         val cells = remember { androidx.compose.runtime.mutableStateMapOf<Int, androidx.compose.ui.geometry.Rect>() }
         var origin by remember { androidx.compose.runtime.mutableStateOf(Offset.Zero) }
         val pill = rememberGlidingPill(cells[selected]?.translate(-origin))
@@ -265,7 +275,8 @@ private fun DialsNavBar(items: List<NavItem>, selected: Int, onSelect: (Int) -> 
             items.forEachIndexed { i, item ->
                 if (i == half) Box(
                     Modifier.size(50.dp).clip(CircleShape).background(PlusHue)
-                        .clickable(onClickLabel = androidx.compose.ui.res.stringResource(org.openstrap.app.R.string.dials_quick_title), onClick = onPlus),
+                        .semantics { contentDescription = quickTitle }
+                        .clickable(onClickLabel = quickTitle, onClick = onPlus),
                     contentAlignment = Alignment.Center,
                 ) {
                     androidx.compose.foundation.Canvas(Modifier.size(22.dp)) {

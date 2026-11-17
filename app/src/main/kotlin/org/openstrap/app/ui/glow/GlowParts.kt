@@ -8,6 +8,8 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
@@ -17,6 +19,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.TextStyle
@@ -83,22 +86,31 @@ fun GlowSwitch(checked: Boolean, onCheckedChange: (Boolean) -> Unit, modifier: M
         label = "glow switch knob colour",
     )
     val knob by animateDpAsState(if (checked) 26.dp else 0.dp, spring(dampingRatio = 0.6f, stiffness = 500f), label = "glow switch knob")
+    // The pill is 34 dp tall inside a 44 dp box that takes the tap, so the switch is easy to hit.
+    val source = remember { MutableInteractionSource() }
     Box(
         modifier
-            .size(60.dp, 34.dp)
+            .size(60.dp, 44.dp)
             .alpha(if (enabled) 1f else 0.4f)
-            // Clipped so the press ripple stays inside the pill.
-            .clip(CircleShape)
-            .background(track)
-            .toggleable(checked, enabled = enabled, interactionSource = null, indication = ripple(color = Color.Gray), role = Role.Switch, onValueChange = onCheckedChange)
-            .padding(3.dp),
+            .toggleable(checked, enabled = enabled, interactionSource = source, indication = null, role = Role.Switch, onValueChange = onCheckedChange),
+        contentAlignment = Alignment.Center,
     ) {
         Box(
             Modifier
-                .offset(x = knob)
-                .size(28.dp)
-                .background(knobColor, CircleShape),
-        )
+                .size(60.dp, 34.dp)
+                // Clipped so the press ripple stays inside the pill.
+                .clip(CircleShape)
+                .background(track)
+                .indication(source, ripple(color = Color.Gray))
+                .padding(3.dp),
+        ) {
+            Box(
+                Modifier
+                    .offset(x = knob)
+                    .size(28.dp)
+                    .background(knobColor, CircleShape),
+            )
+        }
     }
 }
 

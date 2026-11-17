@@ -46,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
@@ -254,7 +255,7 @@ private fun RepPage(
                 org.openstrap.app.ui.workout.StartCopy.structureName(structure),
                 org.openstrap.app.ui.workout.StartCopy.restText(structure.rest),
             ),
-            color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1,
+            color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
         )
         val underWay = structure.meters?.let { meters -> m.metersLeft?.let { 1f - it / meters } }
         RoundBar(m, structure.seconds, underWay)
@@ -266,7 +267,7 @@ private fun RepPage(
                     org.openstrap.app.data.Phase.WarmUp -> stringResource(R.string.workout_live_warm_up)
                     org.openstrap.app.data.Phase.Done -> stringResource(R.string.workout_live_all_reps_done, m.rounds)
                 },
-                color = AppColors.ink, style = MediumBody, maxLines = 1, modifier = Modifier.weight(1f),
+                color = AppColors.ink, style = MediumBody, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
             )
             val next = when (m.phase) {
                 is org.openstrap.app.data.Phase.Work ->
@@ -276,7 +277,10 @@ private fun RepPage(
                 org.openstrap.app.data.Phase.WarmUp -> stringResource(R.string.workout_live_reps_after, m.rounds)
                 org.openstrap.app.data.Phase.Done -> ""
             }
-            Text(next, color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary, maxLines = 1)
+            Text(
+                next, Modifier.padding(start = 8.dp), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
         }
         Column(
             Modifier.fillMaxWidth().then(if (shortLandscape(compact)) Modifier else Modifier.weight(1f)),
@@ -368,7 +372,7 @@ private fun PaceCard(pace: Double?, averagePace: () -> Double?, splits: List<Rou
         Row(Modifier.fillMaxWidth()) {
             Text(
                 stringResource(if (speed) R.string.workout_live_speed_title else R.string.workout_live_pace_title), color = AppColors.ink,
-                style = GlowType.cardTitle, maxLines = 1, modifier = Modifier.weight(1f),
+                style = GlowType.cardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
             )
             AveragePace(averagePace, speed)
         }

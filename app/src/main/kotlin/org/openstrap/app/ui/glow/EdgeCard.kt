@@ -1,7 +1,6 @@
 package org.openstrap.app.ui.glow
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -14,7 +13,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -22,20 +20,15 @@ import kotlin.math.exp
 import org.openstrap.app.ui.components.LocalCardNumbers
 import org.openstrap.app.ui.components.cardOpening
 import org.openstrap.app.ui.components.pressClickable
-import org.openstrap.app.ui.glow.draw.brush
-import org.openstrap.app.ui.glow.draw.drawEdge
-import org.openstrap.app.ui.glow.draw.edgeLevel
-import org.openstrap.app.ui.glow.draw.edgePaint
 import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.glow.draw.edgeLight
 import org.openstrap.app.ui.glow.draw.Edge
 
 /*
- * The middle tier of the glow language: a near-black card with a soft glow coming in from one edge in the metric's
- * colour. Which edge, and how strong, carries the meaning (see [edgeLight]). No bright line on the border, only a
- * plain hairline, the same on every card: off your normal shows in the stronger glow and the coloured value and
- * status. Static: the edge only changes when the data does.
+ * The middle tier of the cards: in the rings design a flat, solid card ([FlatSurface]) with no light, border or glow.
+ * The metric's colour shows in the bar a Progress or Level card carries and in the card's own chart. The edge-light
+ * parameters ([status], [kind]'s edge, [LocalEdgeOverride]'s edge) stay so every caller and the widgets' shared
+ * specs keep their API, but nothing is drawn from them.
  */
 
 /** The neutral edge light, hsl 220 10% 55%: a cool soft white for cards that speak for no one metric. */
@@ -54,10 +47,8 @@ val LocalEdgeOverride = staticCompositionLocalOf { EdgeOverride() }
 private val EdgeShape = GlowLayout.CardShape
 
 /**
- * A card in the edge light tier, lit in [color] from the edge [edgeLight] picks for [status] and [kind], unless
- * [LocalEdgeOverride] says otherwise. For a [EdgeKind.Progress] card, [progress] (0..1) fills the bar under [content].
- * For a [EdgeKind.Level] card it's how far across the light fills.
- * The screen's [LocalGlowMood] softens the light; the hairline always stays.
+ * A flat card for [color]'s metric. For a [EdgeKind.Progress] or [EdgeKind.Level] card, [progress] (0..1) fills the
+ * metric-coloured bar under [content].
  */
 @Composable
 fun EdgeCard(
@@ -70,31 +61,19 @@ fun EdgeCard(
     contentPadding: PaddingValues = GlowLayout.CardPadding,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val override = LocalEdgeOverride.current
-    // A level always fills from the left, so only its colour can be overridden.
-    val light = edgeLight(status, kind).let { l -> override.edge?.takeIf { kind != EdgeKind.Level }?.let { l.copy(edge = it) } ?: l }
-    val level = edgeLevel(progress?.takeIf { kind == EdgeKind.Level })
-    val tint = override.color ?: color
-    val mood = LocalGlowMood.current
+    // Only the override's colour is used: a card told to speak for no one metric draws its bar in the neutral.
+    val tint = LocalEdgeOverride.current.color ?: color
     // Tapped, the card grows into what it opens (spec 3.5).
     val opening = cardOpening(onClick, EdgeShape)
     Column(
         modifier
             .then(opening?.modifier ?: Modifier)
             .let { if (onClick != null) it.pressClickable(opening?.onClick ?: onClick, EdgeShape) else it }
-            .let {
-                if (override.plain || FlatCards) it.clip(EdgeShape).background(FlatSurface, EdgeShape)
-                else it.drawWithCache {
-                    // The shared edge light ([edgePaint]), as a widget's background draws it.
-                    val paint = edgePaint(light, tint, level, mood, size.width, size.height, density)
-                    val glow = paint.glow.brush()
-                    onDrawBehind { drawEdge(paint, glow) }
-                }
-            }
+            .clip(EdgeShape).background(FlatSurface, EdgeShape)
             .padding(contentPadding),
     ) {
         CompositionLocalProvider(LocalCardNumbers provides opening?.numbers, LocalCardOpens provides (onClick != null)) { content() }
-        if (light.progressBar && progress != null) {
+        if ((kind == EdgeKind.Progress || kind == EdgeKind.Level) && progress != null) {
             Spacer(Modifier.weight(1f, fill = false).padding(top = 12.dp))
             FillBar(progress, tint)
         }

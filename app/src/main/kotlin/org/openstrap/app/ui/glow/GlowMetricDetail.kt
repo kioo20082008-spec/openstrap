@@ -302,12 +302,12 @@ internal fun DetailFigures(
                 verticalArrangement = Arrangement.spacedBy(gap),
             ) {
                 when {
-                    value != null -> Text(value, color = AppColors.ink, style = valueStyle.copy(fontWeight = FontWeight.ExtraBold), maxLines = 1)
+                    value != null -> Text(value, color = AppColors.ink, style = valueStyle.copy(fontWeight = FontWeight.ExtraBold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     missing != null -> Text(missing, color = AppColors.ink.copy(alpha = 0.3f), style = valueStyle, maxLines = 1)
                     // As tall as a Row value line, so a missing figure keeps its label level with the others.
                     else -> WaitingDash(Modifier.padding(vertical = 10.5.dp))
                 }
-                Text(label, color = AppColors.muted, style = RingLabel, maxLines = 1)
+                Text(label, color = AppColors.muted, style = RingLabel, maxLines = 2, overflow = TextOverflow.Ellipsis)
             }
         }
     }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -121,10 +122,12 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
         ) {
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(stringResource(R.string.breathe_title), Modifier.weight(1f), color = AppColors.ink, style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold))
-                Text(
-                    stringResource(R.string.breathe_close), Modifier.clip(CircleShape).clickable(onClick = onClose).padding(10.dp),
-                    color = Muted, style = MaterialTheme.typography.titleMedium,
-                )
+                Box(
+                    Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).clickable(onClick = onClose).padding(horizontal = 12.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(stringResource(R.string.breathe_close), color = Muted, style = MaterialTheme.typography.titleMedium)
+                }
             }
             Spacer(Modifier.weight(1f))
             Box(Modifier.size(300.dp), contentAlignment = Alignment.Center) {
@@ -168,12 +171,16 @@ fun BreatheScreen(liveBpm: Int?, liveWasOn: Boolean, setLive: (Boolean) -> Unit,
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Lengths.forEach { m ->
                         val on = m == minutes
-                        Text(
-                            stringResource(R.string.breathe_minutes, m),
-                            Modifier.clip(CircleShape).background(if (on) AppColors.ink else AppColors.control)
-                                .clickable { minutes = m }.padding(horizontal = 18.dp, vertical = 10.dp),
-                            color = if (on) AppColors.onInk else AppColors.ink, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                        )
+                        Box(
+                            Modifier.heightIn(min = 44.dp).clip(RoundedCornerShape(22.dp)).background(if (on) AppColors.ink else AppColors.control)
+                                .clickable { minutes = m }.padding(horizontal = 18.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                stringResource(R.string.breathe_minutes, m),
+                                color = if (on) AppColors.onInk else AppColors.ink, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                            )
+                        }
                     }
                 }
                 Spacer(Modifier.height(16.dp))

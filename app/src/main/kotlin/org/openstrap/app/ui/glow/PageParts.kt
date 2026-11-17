@@ -134,7 +134,7 @@ fun RoundIconButton(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 38.dp,
+    size: Dp = 44.dp,
     surface: Color = AppColors.ink.copy(alpha = 0.10f),
     iconSize: Dp = size * ROUND_ICON_SHARE,
     tint: Color = AppColors.ink,
@@ -439,7 +439,8 @@ fun PageSwitchRow(
         Modifier.fillMaxWidth()
             .toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onChange)
             .topHairline(divider, Hairline)
-            .padding(vertical = GlowLayout.RowPadding),
+            // The switch's box is 44 dp (10 more than its pill), so the row keeps its height.
+            .padding(vertical = GlowLayout.RowPadding - 5.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (icon != null) RowIcon(icon)
@@ -482,17 +483,26 @@ fun PageButton(
     size: ButtonSize = ButtonSize.Page,
     onCard: Boolean = false,
 ) {
+    // A small button (Row) keeps its 32 dp pill but takes 44 dp to tap: the touch box is taller, the pill inset in it.
+    val touch = if (size == ButtonSize.Row) 44.dp else size.height
+    val inset = (touch - size.height) / 2
+    val shape = RoundedCornerShape(size.height / 2)
+    val fill = when {
+        primary -> AppColors.ink
+        onCard -> AppColors.ink.copy(alpha = 0.10f)
+        else -> AppColors.control
+    }
     Row(
         // Dimmed before the pill is drawn, so a disabled button fades whole, pill and label (user, 2026-11-03).
-        modifier.heightIn(min = size.height).alpha(if (enabled) 1f else 0.4f).clip(RoundedCornerShape(size.height / 2))
+        modifier.heightIn(min = touch).alpha(if (enabled) 1f else 0.4f)
             .let {
-                when {
-                    primary -> it.background(AppColors.ink)
-                    onCard -> it.background(AppColors.ink.copy(alpha = 0.10f))
-                    else -> it.background(AppColors.control)
+                if (inset > 0.dp) {
+                    (if (enabled) it.detailPress(role = Role.Button, scale = 0.96f, onClick = onClick) else it)
+                        .padding(vertical = inset).clip(shape).background(fill)
+                } else {
+                    it.clip(shape).background(fill).let { v -> if (enabled) v.pressClickable(onClick, shape) else v }
                 }
             }
-            .let { if (enabled) it.pressClickable(onClick, RoundedCornerShape(size.height / 2)) else it }
             .semantics { role = Role.Button }
             .padding(horizontal = size.padding),
         horizontalArrangement = Arrangement.Center,
@@ -528,7 +538,7 @@ fun PageTextButton(
             .alpha(if (enabled) 1f else 0.4f)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center,
-    ) { Text(text, color = AppColors.readable(color), style = GlowType.body, maxLines = 1) }
+    ) { Text(text, color = AppColors.readable(color), style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis) }
 }
 
 /**
@@ -664,7 +674,7 @@ fun PageConfirm(
 
 /**
  * A chip (spec 2.4, fully round): a hairline and 72% text, or white with black text when [selected]. A [filled] chip
- * sits on the Control surface instead of the hairline, for a lone chip like Live. Secondary type, at least 40 dp tall.
+ * sits on the Control surface instead of the hairline, for a lone chip like Live. Secondary type, a 40 dp pill in a 44 dp box to tap.
  * A [description] is what TalkBack reads in place of a [text] too short to say it, like a day's letter.
  */
 @Composable
@@ -678,16 +688,18 @@ fun PageChip(
     filled: Boolean = false,
     description: String? = null,
 ) {
+    // The pill is 40 dp, in a 44 dp box to tap.
     Box(
-        modifier.heightIn(min = 40.dp)
+        modifier.heightIn(min = 44.dp)
             .detailPress(enabled = enabled, role = role, scale = 0.93f, onClick = onClick)
-            .clip(CircleShape)
-            .background(if (selected) AppColors.ink else if (filled) AppColors.control else AppColors.glass)
             .alpha(if (enabled) 1f else 0.4f)
             .semantics {
                 this.selected = selected
                 description?.let { contentDescription = it }
             }
+            .padding(vertical = 2.dp)
+            .clip(CircleShape)
+            .background(if (selected) AppColors.ink else if (filled) AppColors.control else AppColors.glass)
             .padding(horizontal = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -722,14 +734,17 @@ internal fun IconPill(
     description: String? = null,
     style: TextStyle = GlowType.body,
 ) {
+    // A pill that taps is at least 44 dp to hit: a shorter one is inset in a 44 dp box.
+    val touch = if (onClick != null) maxOf(height, 44.dp) else height
+    val inset = (touch - height) / 2
     Row(
-        modifier.height(height).clip(CircleShape).background(surface)
-            .let { if (hairline) it.border(1.dp, RowHairline, CircleShape) else it }
-            .let { if (onClick != null) it.pressClickable(onClick, CircleShape) else it }
+        modifier.height(touch)
+            .let { if (onClick != null) it.detailPress(role = Role.Button, scale = 0.96f, onClick = onClick) else it }
             .semantics {
-                if (onClick != null) role = Role.Button
                 if (description != null) contentDescription = description
             }
+            .padding(vertical = inset).clip(CircleShape).background(surface)
+            .let { if (hairline) it.border(1.dp, RowHairline, CircleShape) else it }
             .padding(start = if (icon != null || dot != null) 12.dp else 16.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),

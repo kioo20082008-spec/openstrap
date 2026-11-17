@@ -67,6 +67,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -156,7 +157,8 @@ internal fun LiveFrame(
                 if (quiet) {
                     Text(
                         title ?: Workouts.sportName(r.workout.sportType), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                        style = GlowType.cardTitle, textAlign = TextAlign.Center, maxLines = 1, modifier = Modifier.weight(1f),
+                        style = GlowType.cardTitle, textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
                     )
                     // The minimise button's width again, so the name sits in the middle of the screen.
                     Spacer(Modifier.width(44.dp))
@@ -388,7 +390,11 @@ private fun Labelled(label: String, show: Boolean, button: @Composable () -> Uni
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         // Every button sits in Pause's height, so the row's buttons stay centred on one line and the labels on another.
         Box(Modifier.height(88.dp), contentAlignment = Alignment.Center) { button() }
-        if (show) Text(label, color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 1)
+        // Up to two centred lines, so a long Arabic label stays under its own button and never runs into its neighbour's.
+        if (show) Text(
+            label, Modifier.widthIn(max = 96.dp), color = AppColors.ink.copy(alpha = 0.6f), style = GlowType.secondary, maxLines = 2,
+            textAlign = TextAlign.Center, overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -411,6 +417,8 @@ internal fun LapButton(onLap: () -> Unit, label: Boolean = false, skip: Boolean 
 private fun HoldPill(label: String, modifier: Modifier, onEnd: () -> Unit, height: androidx.compose.ui.unit.Dp = 64.dp) {
     val progress = remember { Animatable(0f) }
     val haptics = rememberHaptics()
+    // Read when the hold completes, so a new handler is the one that ends it.
+    val end by androidx.compose.runtime.rememberUpdatedState(onEnd)
     val described = stringResource(R.string.workout_live_hold_to_end_description)
     val shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
     Row(
@@ -422,7 +430,7 @@ private fun HoldPill(label: String, modifier: Modifier, onEnd: () -> Unit, heigh
                         val hold = launch {
                             progress.animateTo(1f, tween(HOLD_MS, easing = LinearEasing))
                             haptics.perform(HapticEvent.WorkoutEnd)
-                            onEnd()
+                            end()
                         }
                         tryAwaitRelease()
                         if (progress.value < 1f) {
@@ -437,7 +445,7 @@ private fun HoldPill(label: String, modifier: Modifier, onEnd: () -> Unit, heigh
     ) {
         Canvas(Modifier.size(10.dp)) { drawCircle(EndRed) }
         Spacer(Modifier.width(10.dp))
-        Text(label, color = AppColors.ink, style = GlowType.body, maxLines = 1)
+        Text(label, Modifier.weight(1f, fill = false), color = AppColors.ink, style = GlowType.body, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -495,7 +503,8 @@ internal fun PageDots(current: Int, count: Int, position: Float? = null, onSelec
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
         repeat(count) { i ->
             Box(
-                Modifier.size(28.dp).clip(CircleShape).pressClickable({ onSelect(i) }, CircleShape),
+                // A 7 dp dot in a 44 dp box to tap.
+                Modifier.width(36.dp).height(44.dp).pressClickable({ onSelect(i) }, CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 val lit = if (position != null) (1f - kotlin.math.abs(position - i)).coerceIn(0f, 1f) else if (i == current) 1f else 0f
@@ -546,11 +555,10 @@ internal fun StoppedPrompt(r: WorkoutState.Recording, at: Long, onEnd: () -> Uni
         PageNote(
             stringResource(if (r.inCar) R.string.workout_live_stopped_car_note else R.string.workout_live_stopped_note, clock(at), sport),
         )
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-            Box(Modifier.weight(1f)) {
-                WorkoutButton(stringResource(R.string.workout_live_stopped_end_at, clock(at)), AppColors.ink, AppColors.onInk, onEnd)
-            }
-            Box(Modifier.weight(1f)) { WorkoutButton(stringResource(R.string.workout_live_keep_going), Raised, AppColors.ink, onKeep) }
+        // One under the other, so "End at 07:45" keeps all its words.
+        Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            WorkoutButton(stringResource(R.string.workout_live_stopped_end_at, clock(at)), AppColors.ink, AppColors.onInk, onEnd)
+            WorkoutButton(stringResource(R.string.workout_live_keep_going), Raised, AppColors.ink, onKeep)
         }
     }
 }
@@ -560,6 +568,8 @@ internal fun StoppedPrompt(r: WorkoutState.Recording, at: Long, onEnd: () -> Uni
 internal fun HoldToEnd(onEnd: () -> Unit) {
     val progress = remember { Animatable(0f) }
     val haptics = rememberHaptics()
+    // Read when the hold completes, so a new handler is the one that ends it.
+    val end by androidx.compose.runtime.rememberUpdatedState(onEnd)
     Box(contentAlignment = Alignment.Center) {
         FlatButton(
             Raised, 64.dp,
@@ -569,7 +579,7 @@ internal fun HoldToEnd(onEnd: () -> Unit) {
                         val hold = launch {
                             progress.animateTo(1f, tween(HOLD_MS, easing = LinearEasing))
                             haptics.perform(HapticEvent.WorkoutEnd)
-                            onEnd()
+                            end()
                         }
                         tryAwaitRelease()
                         if (progress.value < 1f) {
@@ -628,7 +638,7 @@ internal fun LitHeartPill(bpm: Int?, maxHr: Int?, color: Color, paused: Boolean,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (bpm == null) {
-            Text(WorkoutCopy.noHeartRate(paused), color = Color.Black, style = MediumBody)
+            Text(WorkoutCopy.noHeartRate(paused), color = Color.Black, style = MediumBody, maxLines = 1, overflow = TextOverflow.Ellipsis)
             return@Row
         }
         org.openstrap.app.ui.glow.PulseDot(Color.Black, bpm, 8.dp)
@@ -639,7 +649,7 @@ internal fun LitHeartPill(bpm: Int?, maxHr: Int?, color: Color, paused: Boolean,
         if (maxHr == null) return@Row
         Spacer(Modifier.weight(1f))
         WorkoutRecorder.liveZone(bpm, maxHr, heartZones)?.let { z ->
-            Text(WorkoutCopy.zoneLine(z), color = Color.Black, style = MediumBody, maxLines = 1)
+            Text(WorkoutCopy.zoneLine(z), color = Color.Black, style = MediumBody, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }

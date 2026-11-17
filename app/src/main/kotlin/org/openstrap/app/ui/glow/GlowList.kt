@@ -125,7 +125,10 @@ private fun ListNote(note: String, onNote: (() -> Unit)?) {
             .heightIn(min = 44.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(note, color = AppColors.ink, style = GlowType.secondary, maxLines = 1)
+        Text(
+            note, Modifier.weight(1f, fill = false), color = AppColors.ink, style = GlowType.secondary, maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+        )
         Spacer(Modifier.width(6.dp))
         TapCaret(CARD_CARET_ALPHA)
     }

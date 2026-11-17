@@ -41,26 +41,24 @@ private fun <C> small(card: C, h: Hue, e: Edge, pane: Pane) = TabSlot(card, Card
 
 /* ---------------------------------------------- Recovery -------------------------------------------- */
 
-enum class RecoveryCard { Hero, Drivers, BodySignals, HabitAge }
+enum class RecoveryCard { Hero, Drivers, BodySignals }
 
 /**
- * What changes the Recovery tab. Only [habitAge] adds or removes a card; [learning] and [hasRecovery] change what
- * the cards say, never which cards there are, so the screen keeps its shape from the first night on.
+ * What changes the Recovery tab: nothing adds or removes a card. [learning] and [hasRecovery] change what the cards say,
+ * never which cards there are, so the screen keeps its shape from the first night on.
  */
-data class RecoveryFacts(val habitAge: Boolean = true, val learning: Boolean = false, val hasRecovery: Boolean = true)
+data class RecoveryFacts(val learning: Boolean = false, val hasRecovery: Boolean = true)
 
 /**
- * Recovery (spec 5.1): the score glows, what drove it as a list, then Body signals. Habit Age is about earlier (last
- * week), lit from the left, always last. Charge moved to Today, where the day's level is read.
+ * Recovery (spec 5.1): the score glows, what drove it as a list, then Body signals. Habit Age is on Today and in All
+ * metrics, and Charge moved to Today, so the tab stays three cards short.
  *
- * Wide: the hero spans both columns; What drove it and Habit Age on the left, Body signals on the right.
+ * Wide: the hero spans both columns; What drove it on the left, Body signals on the right.
  */
-fun recoveryCards(facts: RecoveryFacts = RecoveryFacts()): List<TabSlot<RecoveryCard>> = listOfNotNull(
+fun recoveryCards(facts: RecoveryFacts = RecoveryFacts()): List<TabSlot<RecoveryCard>> = listOf(
     TabSlot(RecoveryCard.Hero, glow(Hue.Recovery), Pane.Full),
     TabSlot(RecoveryCard.Drivers, ListLook, Pane.Left),
-    // Lit from the right, so it doesn't read as a second What drove it now Charge no longer sits between them.
     TabSlot(RecoveryCard.BodySignals, edge(Hue.Heart, Edge.Right), Pane.Right),
-    TabSlot(RecoveryCard.HabitAge, edge(Hue.HabitAge, Edge.Left), Pane.Left).takeIf { facts.habitAge },
 )
 
 /* ----------------------------------------------- Sleep ---------------------------------------------- */
@@ -93,32 +91,30 @@ fun sleepCards(facts: SleepFacts = SleepFacts()): List<TabSlot<SleepCard>> {
 
 /* --------------------------------------------- Activity --------------------------------------------- */
 
-enum class ActivityCard { Start, Steps, ActiveMinutes, HeartPoints, Load, HeartRate, Facts, Workouts }
+enum class ActivityCard { Start, Steps, ActiveMinutes, HeartPoints, Load, Facts, Workouts }
 
 /**
- * What changes the Activity tab: the Start a workout card is [isToday] only, and heart rate is lit from the right while it's
- * [live]. A [suggestion] to save is a row in the workouts list, not a card of its own.
+ * What changes the Activity tab: the Start a workout card is [isToday] only. A [suggestion] to save is a row in the
+ * workouts list, not a card of its own.
  */
-data class ActivityFacts(val isToday: Boolean = true, val suggestion: Boolean = false, val live: Boolean = false)
+data class ActivityFacts(val isToday: Boolean = true, val suggestion: Boolean = false)
 
 /**
- * Activity (spec 5.3): a Wide card to start a sport (today only, unlit with a light moving round its border), steps glowing,
- * active minutes (from below) and Heart points (from above) as a Small pair, Load filling across toward your usual,
- * the day's facts as a list, the day's heart rate (from the right while live, else from below like any usual value),
- * then the workouts list, unlit like the facts. Heart rate sits between the two lists, so they never touch and
- * neither needs a light that says nothing.
+ * Activity (spec 5.3): steps glowing, a Wide card to start a sport (today only), active minutes (from below) and Heart
+ * points (from above) as a Small pair, Load filling across toward your usual, the day's facts lit from the right, then
+ * the workouts list. The day's heart rate chart is on Today and in All metrics, so it isn't repeated here.
  *
- * Wide: the Start a workout card and steps span both columns; the Small pair and Load on the left, the facts, heart
- * rate and workouts on the right.
+ * Wide: steps and the Start a workout card span both columns; the Small pair and Load on the left, the facts and
+ * workouts on the right.
  */
 fun activityCards(facts: ActivityFacts = ActivityFacts()): List<TabSlot<ActivityCard>> = listOfNotNull(
-    // Plain, not a list: an unlit card whose border carries the moving light.
     TabSlot(ActivityCard.Steps, glow(Hue.Steps), Pane.Full),
+    // Plain, not a list: an unlit card whose border carries the moving light.
     TabSlot(ActivityCard.Start, CardLook(Tier.Plain, Hue.Heart), Pane.Full).takeIf { facts.isToday },
     small(ActivityCard.ActiveMinutes, Hue.Steps, Edge.Bottom, Pane.Left),
     small(ActivityCard.HeartPoints, Hue.Heart, Edge.Top, Pane.Left),
     TabSlot(ActivityCard.Load, CardLook(Tier.Level, Hue.Load, Edge.Left), Pane.Left),
-    TabSlot(ActivityCard.Facts, ListLook, Pane.Right),
-    TabSlot(ActivityCard.HeartRate, edge(Hue.Heart, if (facts.live) Edge.Right else Edge.Bottom), Pane.Right),
+    // Lit from the right so it never reads as the workouts list under it.
+    TabSlot(ActivityCard.Facts, edge(Hue.Neutral, Edge.Right), Pane.Right),
     TabSlot(ActivityCard.Workouts, ListLook, Pane.Right),
 )

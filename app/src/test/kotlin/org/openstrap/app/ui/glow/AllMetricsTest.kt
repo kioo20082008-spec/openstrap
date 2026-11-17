@@ -76,7 +76,8 @@ class AllMetricsTest {
     @Test fun `rows whose home is a tab go to it, the rest open their detail`() {
         val targets = metricIndex(empty, null, null, emptyList()).flatMap { it.rows }.associate { it.name to it.target }
         assertEquals(IndexTarget.Home(HomeTab.Recovery), targets["Recovery"])
-        assertEquals(IndexTarget.Home(HomeTab.Recovery, charge = true), targets["Energy"])
+        // Energy has no card on the Recovery tab any more (it lives on Today), so its row opens its own detail.
+        assertEquals(IndexTarget.Open(Detail.OfScore(org.openstrap.app.ui.dashboard.Score.Energy)), targets["Energy"])
         assertEquals(IndexTarget.Home(HomeTab.Sleep), targets["Sleep"])
         assertEquals(IndexTarget.Open(Detail.Healthspan), targets["Habit Age"])
         assertEquals(IndexTarget.Open(Detail.AllWorkouts), targets["Workouts"])

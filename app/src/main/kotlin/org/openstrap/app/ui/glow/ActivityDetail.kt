@@ -204,7 +204,6 @@ private fun HeartPointsDetail(ctx: ActivityDetailContext) {
             }
             ActivityCopy.heartPointsMonth(totals)?.let { item { DetailSentence(it) } }
         }
-        item { ActivityRelated(Score.HeartPoints, ctx, total) }
     }
     if (info) InfoSheet(InfoCopy.of(Score.HeartPoints), color, null, null, onDismiss = { info = false })
 }
@@ -287,7 +286,6 @@ private fun ActiveMinutesDetail(ctx: ActivityDetailContext) {
         } else if (a != null && day != null) {
             item { DetailSentence(ActivityCopy.activeDay(day, ctx.isToday)) }
         }
-        item { ActivityRelated(Score.ActiveMinutes, ctx, null) }
     }
     if (info) InfoSheet(
         InfoCopy.of(Score.ActiveMinutes), color, null, null, onDismiss = { info = false },
@@ -399,7 +397,6 @@ private fun LoadDetail(ctx: ActivityDetailContext) {
                 }
             }
         }
-        item { ActivityRelated(Score.Load, ctx, null) }
     }
     if (info) InfoSheet(
         InfoCopy.of(Score.Load), color, r?.let { ActivityCopy.loadBar(it.load, usual) },
@@ -470,7 +467,6 @@ private fun Vo2Detail(ctx: ActivityDetailContext) {
                 }
             }
         }
-        item { ActivityRelated(Score.Vo2Max, ctx, null) }
     }
     if (info) InfoSheet(
         InfoCopy.of(Score.Vo2Max), color, null, band?.let { stringResource(R.string.glow_activity_vo2max_you_are_here, it) },
@@ -534,7 +530,6 @@ private fun RecoverDetail(ctx: ActivityDetailContext) {
                 }
             }
         }
-        item { ActivityRelated(Score.Recover, ctx, null) }
     }
     if (info) InfoSheet(InfoCopy.of(Score.Recover), color, null, null, onDismiss = { info = false })
 }
@@ -669,12 +664,6 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
             if (summary != null && summary.days > 0) {
                 CaloriesCopy.rangeSentence(summary)?.let { item { DetailSentence(it) } }
             }
-        }
-        // On Day the list of sources sits right above, so Related takes the neutral edge (spec 2.5).
-        item {
-            androidx.compose.runtime.CompositionLocalProvider(
-                LocalEdgeOverride provides if (range == Range.Day && e != null) EdgeOverride(edge = Edge.Bottom) else EdgeOverride(),
-            ) { ActivityRelated(Score.Calories, ctx, null) }
         }
     }
     if (info) InfoSheet(InfoCopy.of(Score.Calories), color, null, null, onDismiss = { info = false }, notes = InfoCopy.caloriesNotes(e))
@@ -870,48 +859,11 @@ private fun DistanceDetail(ctx: ActivityDetailContext) {
         ranges = listOf(Range.Day), range = Range.Day, onRange = {},
     ) {
         if (km != null && ctx.state.steps > 0) item { DetailSentence(ActivityCopy.distance(ctx.state.steps, ctx.isToday)) }
-        item { ActivityRelated(Score.Distance, ctx, null) }
     }
     if (info) InfoSheet(InfoCopy.of(Score.Distance), color, null, null, onDismiss = { info = false })
 }
 
 /* ---------------------------------------------- Related --------------------------------------------- */
-
-/**
- * The rows under an Activity detail: the tab's other numbers about moving (steps, active minutes, Heart points and
- * Load) without the one showing, each with the day's value, opening its detail. [heartPoints] is the 7-day total when
- * the detail has it loaded.
- */
-@Composable
-private fun ActivityRelated(current: Score, ctx: ActivityDetailContext, heartPoints: Int?) {
-    val a = ctx.r?.activity
-    val goal = org.openstrap.app.ui.dashboard.LocalGoals.current.steps
-    val points = heartPoints ?: ctx.state.pai?.total?.let(Math::round)
-    ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_metrics_related)) {
-        var first = true
-        fun divider() = !first.also { first = false }
-        ListRow(
-            Metric.Steps.title, MetricColors.steps, ctx.state.steps.takeIf { it > 0 }?.let { Units.count(it) },
-            ActivityCopy.goalShare(ctx.state.steps, goal), onClick = { ctx.onOpen(Detail.OfMetric(Metric.Steps)) }, divider = divider(),
-            icon = Metric.Steps.rowIcon(),
-        )
-        if (current != Score.ActiveMinutes) ListRow(
-            Score.ActiveMinutes.title, MetricColors.steps, a?.weekEquivalent?.toString(),
-            a?.let { TabCopy.activeMinutes(it.weekEquivalent, Activity.MVPA_WEEKLY_TARGET) } ?: NO_VALUE,
-            onClick = { ctx.onOpen(Detail.OfScore(Score.ActiveMinutes)) }, divider = divider(), icon = Score.ActiveMinutes.rowIcon(),
-        )
-        if (current != Score.HeartPoints) ListRow(
-            Score.HeartPoints.title, MetricColors.heart, points?.toString(),
-            points?.let { TabCopy.heartPoints(it, ActivityCopy.HEART_POINTS_TARGET) } ?: AFTER_NEXT_SYNC,
-            onClick = { ctx.onOpen(Detail.OfScore(Score.HeartPoints)) }, divider = divider(), icon = Score.HeartPoints.rowIcon(),
-        )
-        if (current != Score.Load) ListRow(
-            Score.Load.title, MetricColors.load, ctx.r?.load?.let(Math::round)?.toString(),
-            ctx.r?.let { TabCopy.loadUsual(it.chronicLoad) } ?: NO_VALUE,
-            onClick = { ctx.onOpen(Detail.OfScore(Score.Load)) }, divider = divider(), icon = Score.Load.rowIcon(),
-        )
-    }
-}
 
 /* ----------------------------------------------- Week ----------------------------------------------- */
 

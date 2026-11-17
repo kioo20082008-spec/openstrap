@@ -81,7 +81,7 @@ internal fun Modifier.gridSize(size: CardSize): Modifier = GlowGrid.height(size)
 internal fun HeroSentence(text: String, modifier: Modifier = Modifier) =
     Text(text, color = AppColors.ink, style = GlowType.sentence, modifier = modifier.padding(top = 14.dp))
 
-/** A number on the hero: dot-matrix digits, or the dim dash while there's none, with a [label] under it. */
+/** A number on the hero: bold digits, or the dim dash while there's none, with a [label] under it. */
 @Composable
 internal fun HeroFigure(
     value: String?, label: String, big: Boolean = false, horizontal: Alignment.Horizontal = Alignment.Start,
@@ -183,21 +183,24 @@ internal fun CheckInStrip(feeling: Int?, onCheckIn: (Int?) -> Unit, modifier: Mo
     }
 
 /**
- * Start a workout (spec 4.2): unlit, with a heart-red light travelling round its border ([movingBorder]), the title
- * with your usual sport under it ("Outdoor run, your usual") and a white play button. One thing to do, so the whole
- * strip is the button and has no caret; it opens Ready with that sport.
+ * Start a workout (spec 4.2): a flat strip with the title, your usual sport under it ("Outdoor run, your usual") and
+ * Energy's round play button. One thing to do, so the whole strip is the button and has no caret; it opens Ready with
+ * that sport.
  */
 @Composable
 internal fun StartWorkoutStrip(sport: Int, onStart: (Int) -> Unit, modifier: Modifier = Modifier) {
     val name = Workouts.sportName(sport)
     // A strip that does one thing is a button: its title is plain text, with no caret (spec 2.5, Tappable says so).
-    TodayStrip(MetricColors.heart, EdgeKind.Value, modifier.movingBorder(MetricColors.heart), onClick = { onStart(sport) }) {
+    TodayStrip(MetricColors.heart, EdgeKind.Value, modifier, onClick = { onStart(sport) }) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(stringResource(R.string.glow_today_start_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
+                Text(
+                    stringResource(R.string.glow_today_start_title), color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 Text(
                     stringResource(R.string.glow_today_start_usual, name), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA),
-                    style = GlowType.secondary, maxLines = 1,
+                    style = GlowType.secondary, maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
             Spacer(Modifier.width(12.dp))
@@ -444,44 +447,6 @@ internal fun RecoveryFailed(failure: RecoveryFailure, onRetry: () -> Unit) {
 
 /** How dim a value kept from before is, beside a failure. */
 internal const val FAILED_ALPHA = 0.45f
-
-/**
- * Charge as a wide card: the screen's second glow, a level whose light fills across from the left to the value, the
- * Charge battery of Recovery on its side (spec 2.1). Where that would sit next to another glow it steps down to a level
- * edge card whose light fills across to the value, only as high as its content. [status] says what's happening to it. [soFar] is the day's
- * Charge so far (evenly spaced, nulls still to come), drawn beside the number on the level card (ghost line, chart
- * kit). TODO(step 6): the ghost of your usual Charge by this time needs past days' Charge hour by hour. The engine
- * simulates Charge only for the day shown (with a week's lead-in to settle it); past days would each need that whole
- * simulation re-run, and nothing keeps its results, so only today's line shows.
- */
-@Composable
-internal fun ChargeWideCard(
-    now: Int?, status: String, secondGlow: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier, soFar: List<Float?>? = null,
-    upTo: String? = null, tag: TitleTag? = null,
-) {
-    val m = modifier.fillMaxWidth().gridSize(CardSize.Wide)
-    if (secondGlow) {
-        GlowCard(GlowStyle.Ember.copy(lightLevel = (now ?: 0) / 100f, lightAngle = LightAngle.Left, second = true), m, onClick = onClick) {
-            Column {
-                GlowHeader(stringResource(R.string.glow_today_energy_title), marker = upTo, tag = tag)
-                if (soFar == null || soFar.count { it != null } < 2) EdgeValue(now?.toString(), null, status, AppColors.ink.copy(alpha = 0.8f), dot = DotSize.Second)
-                else Row(verticalAlignment = Alignment.Bottom) {
-                    Column(Modifier.weight(1f)) { EdgeValue(now?.toString(), null, status, AppColors.ink.copy(alpha = 0.8f), dot = DotSize.Second) }
-                    Spacer(Modifier.width(14.dp))
-                    GhostLine(soFar, AppColors.ink, 100f, Modifier.weight(1f), height = 52.dp)
-                }
-            }
-        }
-    } else EdgeCard(MetricColors.charge, modifier.fillMaxWidth(), kind = EdgeKind.Level, progress = (now ?: 0) / 100f, onClick = onClick) {
-        EdgeTitle(stringResource(R.string.glow_today_energy_title), null, marker = upTo, tag = tag)
-        if (soFar == null || soFar.count { it != null } < 2) EdgeValue(now?.toString(), null, status)
-        else Row(verticalAlignment = Alignment.Bottom) {
-            Column(Modifier.weight(1f)) { EdgeValue(now?.toString(), null, status) }
-            Spacer(Modifier.width(14.dp))
-            GhostLine(soFar, MetricColors.charge, 100f, Modifier.weight(1f), height = 52.dp)
-        }
-    }
-}
 
 /** The workout just done, after it: how long it was, the average heart rate and the zone it mostly sat in. Lit from the left, about earlier. */
 @Composable

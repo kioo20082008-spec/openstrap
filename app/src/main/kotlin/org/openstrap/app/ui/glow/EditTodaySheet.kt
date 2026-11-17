@@ -25,20 +25,28 @@ import org.openstrap.app.ui.dashboard.TodayEdits
  * a fold and process death ([TodayEditsSaver]).
  */
 @Composable
-internal fun EditTodaySheet(edits: TodayEdits, onSave: (TodayEdits) -> Unit, onDismiss: () -> Unit) {
+internal fun EditTodaySheet(
+    edits: TodayEdits, onSave: (TodayEdits) -> Unit, onDismiss: () -> Unit,
+    /** Cards Today can't show yet (Habit Age before its first estimate): left out, a switch for them would do nothing. */
+    unavailable: Set<TodayCard> = emptySet(),
+) {
     var e by rememberSaveable(stateSaver = TodayEditsSaver) { mutableStateOf(edits) }
     PageSheet(onDismiss, stringResource(R.string.glow_today_edit), note = stringResource(R.string.glow_today_edit_note)) {
         PageRows {
-            TodayCard.entries.filter { it.editable }.forEachIndexed { i, card ->
-                val shown = card !in e.hidden
+            TodayCard.entries.filter { it.editable && it !in unavailable }.forEachIndexed { i, card ->
+                // Recovery's wide card only repeats the Recovery ring above it, so Today shows it only when it's pinned:
+                // its switch is the pin (no Pin chip), and says what Today really does.
+                val pinOnly = card == TodayCard.Recovery
+                val shown = if (pinOnly) card in e.pinned else card !in e.hidden
                 PageRow(card.label, divider = i > 0) {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        if (card.pinnable) {
+                        if (card.pinnable && !pinOnly) {
                             val pinned = card in e.pinned
                             val pin = stringResource(if (pinned) R.string.glow_today_edit_pinned else R.string.glow_today_edit_pin)
                             PageChip(pin, pinned, { e = e.togglePin(card) }, enabled = e.canPin(card))
                         }
-                        GlowSwitch(shown, { e = e.toggleHidden(card) })
+                        if (pinOnly) GlowSwitch(shown, { e = e.togglePin(card) }, enabled = e.canPin(card))
+                        else GlowSwitch(shown, { e = e.toggleHidden(card) })
                     }
                 }
             }

@@ -24,15 +24,15 @@ class TabPlansTest {
 
     @Test fun `recovery is varied in every state`() {
         var checked = 0
-        for (habit in bools) for (learning in bools) for (has in bools) for (wide in bools) {
-            val f = RecoveryFacts(habitAge = habit, learning = learning, hasRecovery = has)
+        for (learning in bools) for (has in bools) for (wide in bools) {
+            val f = RecoveryFacts(learning = learning, hasRecovery = has)
             val slots = recoveryCards(f)
             assertVaried(slots, wide, "$f wide=$wide")
-            // The same cards whether learning or not, and with or without a Recovery yet: only Habit Age comes and goes.
-            assertEquals(recoveryCards(RecoveryFacts(habitAge = habit)).map { it.card }, slots.map { it.card })
+            // The same cards whether learning or not, and with or without a Recovery yet.
+            assertEquals(recoveryCards().map { it.card }, slots.map { it.card })
             checked++
         }
-        assertEquals(16, checked)
+        assertEquals(8, checked)
     }
 
     @Test fun `sleep is varied in every state`() {
@@ -47,12 +47,12 @@ class TabPlansTest {
 
     @Test fun `activity is varied in every state`() {
         var checked = 0
-        for (today in bools) for (suggestion in bools) for (live in bools) for (wide in bools) {
-            val f = ActivityFacts(isToday = today, suggestion = suggestion, live = live)
+        for (today in bools) for (suggestion in bools) for (wide in bools) {
+            val f = ActivityFacts(isToday = today, suggestion = suggestion)
             assertVaried(activityCards(f), wide, "$f wide=$wide")
             checked++
         }
-        assertEquals(16, checked)
+        assertEquals(8, checked)
     }
 
     @Test fun `each tab leads with one glow`() {
@@ -71,8 +71,6 @@ class TabPlansTest {
     @Test fun `edges follow what each card means`() {
         fun <C> look(slots: List<TabSlot<C>>, card: C) = slots.first { it.card == card }.look
         val rec = recoveryCards()
-        assertEquals(CardLook(Tier.Edge, Hue.HabitAge, Edge.Left), look(rec, RecoveryCard.HabitAge))
-        assertEquals(RecoveryCard.HabitAge, rec.last().card)
         assertEquals(CardLook(Tier.Edge, Hue.Heart, Edge.Right), look(rec, RecoveryCard.BodySignals)) // apart from What drove it
         val sleep = sleepCards(SleepFacts(naps = true))
         assertEquals(Edge.Top, look(sleep, SleepCard.Regularity).edge)
@@ -81,15 +79,15 @@ class TabPlansTest {
         val act = activityCards()
         assertEquals(CardLook(Tier.Level, Hue.Load, Edge.Left), look(act, ActivityCard.Load))
         assertEquals(CardLook(Tier.List, Hue.Neutral), look(act, ActivityCard.Workouts))
-        assertEquals(Edge.Bottom, look(act, ActivityCard.HeartRate).edge)
-        assertEquals(Edge.Right, look(activityCards(ActivityFacts(live = true)), ActivityCard.HeartRate).edge)
+        // Lit from the right, so the facts never read as the workouts list under them.
+        assertEquals(Edge.Right, look(act, ActivityCard.Facts).edge)
     }
 
     @Test fun `sizes are back where the mock tags them`() {
         fun <C> sizes(slots: List<TabSlot<C>>) = slots.associate { it.card to it.size }
         val rec = recoveryCards()
-        // Charge moved to Today: the Recovery tab is the score, what drove it, body signals and Habit Age.
-        assertEquals(listOf(RecoveryCard.Hero, RecoveryCard.Drivers, RecoveryCard.BodySignals, RecoveryCard.HabitAge), rec.map { it.card })
+        // Charge and Habit Age are on Today: the Recovery tab is the score, what drove it and body signals.
+        assertEquals(listOf(RecoveryCard.Hero, RecoveryCard.Drivers, RecoveryCard.BodySignals), rec.map { it.card })
         // Breathing disturbances and naps pair up only together; alone, either is a Wide.
         assertEquals(CardSize.Small, sizes(sleepCards(SleepFacts(breathing = true, naps = true)))[SleepCard.Breathing])
         assertEquals(CardSize.Small, sizes(sleepCards(SleepFacts(breathing = true, naps = true)))[SleepCard.Naps])
@@ -99,7 +97,7 @@ class TabPlansTest {
         assertEquals(CardSize.Small, act[ActivityCard.ActiveMinutes])
         assertEquals(CardSize.Small, act[ActivityCard.HeartPoints])
         assertEquals(
-            listOf(ActivityCard.Load, ActivityCard.Facts, ActivityCard.HeartRate),
+            listOf(ActivityCard.Load, ActivityCard.Facts, ActivityCard.Workouts),
             activityCards().map { it.card }.dropWhile { it != ActivityCard.Load }.take(3),
         )
     }

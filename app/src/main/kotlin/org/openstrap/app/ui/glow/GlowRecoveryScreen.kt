@@ -55,8 +55,7 @@ import org.openstrap.app.ui.glow.draw.DotSize
 
 /*
  * The Recovery tab (spec 5.1): "can I push today, and why". The score glows with the last 7 days beside it, what
- * drove it as contributor bars, then Charge as a Tall battery with Recharged and Drained as Smalls, the body signals
- * and Habit Age ([recoveryCards]). How the score is
+ * drove it as contributor bars, then the body signals ([recoveryCards]). How the score is
  * worked out, the strap's own score and why it might be off are in the Recovery info sheet, behind the hero's (i).
  * The hero, the contributors and the Charge battery open their details on this tab's stack.
  */
@@ -76,7 +75,7 @@ fun GlowRecoveryScreen(
     onOpenScore: (Score) -> Unit = {},
     /** The strap's own Recovery for the day, for the info sheet. */
     strapScore: Int? = null,
-    /** The weekly Habit Age estimate, or why it's withheld; null leaves the card out. */
+    /** Not shown here any more (Habit Age is on Today and in All metrics); kept so the tab's callers don't change. */
     healthspan: Healthspan.Outcome? = null,
     onOpenHealthspan: () -> Unit = {},
     /** Opens the profile, for Habit Age's reminder to add a birth year or sex. */
@@ -100,7 +99,7 @@ fun GlowRecoveryScreen(
     val learning = r?.readiness?.calibrating == true
     val firstNights = r != null && !r.charge.anchored
     val waiting = if (firstNights) AFTER_FIRST_NIGHT else NO_READING
-    val slots = recoveryCards(RecoveryFacts(habitAge = healthspan != null, learning = learning, hasRecovery = r != null))
+    val slots = recoveryCards(RecoveryFacts(learning = learning, hasRecovery = r != null))
     var info by rememberSaveable { mutableStateOf(false) }
     var partialInfo by rememberSaveable { mutableStateOf(false) }
     // Built once, so the cards given it can skip (audit K11).
@@ -124,7 +123,6 @@ fun GlowRecoveryScreen(
                         )
                     RecoveryCard.Drivers -> DriversList(r?.readiness, onAll = { onOpenScore(Score.Recovery) })
                     RecoveryCard.BodySignals -> SignalsList(signals, waiting, onOpenMetric)
-                    RecoveryCard.HabitAge -> HabitAgeEdgeCard(healthspan, onOpenHealthspan, onOpenProfile)
                 }
             }
         }
