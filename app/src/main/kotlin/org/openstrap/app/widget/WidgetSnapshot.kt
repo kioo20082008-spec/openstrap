@@ -153,13 +153,13 @@ class WidgetSnapshot(
             usualBedtime = bedtime,
             steps = goal?.takeIf { WidgetKind.Steps in kinds }?.let { StepsRead(it, day) },
             start = if (WidgetKind.Start in kinds) start() else null,
-            recovery = profile?.takeIf { WidgetKind.Recovery in kinds }?.let { recovery(today, rec, it) },
-            sleep = span?.takeIf { WidgetKind.Sleep in kinds }?.let { s ->
+            recovery = profile?.takeIf { WidgetKind.Recovery in kinds || WidgetKind.Summary in kinds }?.let { recovery(today, rec, it) },
+            sleep = span?.takeIf { WidgetKind.Sleep in kinds || WidgetKind.Summary in kinds }?.let { s ->
                 catching { sleep(s.getOrThrow(), today, zone, rec?.sleepScores.orEmpty()) }.onFailure { logUnread("sleep for $today", it) }
             },
             momentWidget = if (WidgetKind.Moment in kinds) catching { momentWidget(reads) } else null,
             // Today's Recovery is read once for every widget that shows it: Energy is its Charge.
-            energy = profile?.takeIf { WidgetKind.Energy in kinds }
+            energy = profile?.takeIf { WidgetKind.Energy in kinds || WidgetKind.Summary in kinds }
                 ?.let { EnergyRead(rec?.takeIf { it.date == today }?.charge, rec?.usualBedtime) },
         )
     }
@@ -352,8 +352,8 @@ class WidgetSnapshot(
         private val MOOD_KINDS = setOf(WidgetKind.Steps, WidgetKind.Start, WidgetKind.Recovery, WidgetKind.Energy, WidgetKind.Moment)
 
         /** The widgets that read the nights, those that read Recovery (Energy is its Charge) and those that read today's steps. */
-        private val NIGHT_KINDS = setOf(WidgetKind.Sleep, WidgetKind.Moment)
-        private val RECOVERY_KINDS = setOf(WidgetKind.Recovery, WidgetKind.Energy, WidgetKind.Moment)
+        private val NIGHT_KINDS = setOf(WidgetKind.Sleep, WidgetKind.Moment, WidgetKind.Summary)
+        private val RECOVERY_KINDS = setOf(WidgetKind.Recovery, WidgetKind.Energy, WidgetKind.Moment, WidgetKind.Summary)
         private val STEP_KINDS = setOf(WidgetKind.Steps, WidgetKind.Moment)
 
         /** Nights the Sleep tab reads for the week's other nights, as Today's sleep (`ui.dashboard.SLEEP_NIGHTS`). */

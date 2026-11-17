@@ -229,12 +229,12 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
 private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
     Row(
         modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(6.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         days.forEach { d ->
             val show = stringResource(R.string.glow_metrics_show_day, d.label)
             Column(
-                Modifier.width(40.dp).clip(RoundedCornerShape(16.dp))
+                Modifier.weight(1f).clip(RoundedCornerShape(16.dp))
                     .background(if (d.selected) AppColors.ink else Color.Transparent)
                     .detailPress(onClickLabel = show, role = Role.Button, scale = 0.92f) { onDay(d.date) }
                     .padding(vertical = 8.dp),
@@ -243,7 +243,7 @@ private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (Loc
             ) {
                 Text(
                     d.label, color = if (d.selected) AppColors.onInk else AppColors.muted, maxLines = 1,
-                    style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal),
+                    style = GlowType.secondary.copy(fontWeight = if (d.selected) FontWeight.Bold else FontWeight.Normal, fontSize = 12.sp, lineHeight = 18.sp),
                 )
                 if (d.selected && d.hasData) DetailSelectedDot(color)
                 else Box(Modifier.size(5.dp).background(if (d.hasData) color else Color.Transparent, CircleShape))

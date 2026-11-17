@@ -54,7 +54,22 @@ internal object RingWidget {
 
     /** The ring's stroke as a share of its diameter (the mockup's 13 in 100) and its track's alpha. */
     const val STROKE = 0.13f
-    const val TRACK_ALPHA = 0.20f
+    const val TRACK_ALPHA = 0.30f
+
+    /** Stands for the day's summary, which wears no one metric's hue. */
+    val SummaryHue = Color(0xFFFFB067)
+
+    /**
+     * The card's colours for [hue]: a deep shade of the metric's own colour at the top start, deeper at the bottom end,
+     * so each widget wears its metric (Energy red, Recovery green, Sleep violet, Steps blue) rather than black.
+     */
+    fun card(hue: Color): Pair<Color, Color> = when (hue) {
+        Recovery -> Color(0xFF4B6D10) to Color(0xFF1B2A06)
+        Sleep -> Color(0xFF4C3FAE) to Color(0xFF1A1542)
+        Steps -> Color(0xFF106B86) to Color(0xFF082A34)
+        SummaryHue -> Color(0xFF45306F) to Color(0xFF3F1C1A)
+        else -> Color(0xFF99361B) to Color(0xFF3D140C)
+    }
 
     /** The title's sizes, largest first, and the word under it. */
     val TITLE_SIZES = listOf(15f, 13f, 12f)
@@ -83,7 +98,9 @@ internal fun ColumnScope.RingContent(
     lines: List<RingLine> = emptyList(),
     belowHeight: Float = 0f,
     below: (@Composable () -> Unit)? = null,
+    ringImage: (@Composable (Float) -> Unit)? = null,
 ) {
+    val ring: @Composable (Float) -> Unit = { d -> if (ringImage != null) ringImage(d) else RingImage(share, hue, number, icon, d, f.density, description) }
     val small = f.bucket == WidgetSizes.Small
     val top = TopRow.of(title, if (small) null else note, f.status, f.contentWidth, f.fontScale, withWords = !small, titleSizes = RingWidget.TITLE_SIZES)
     TopRowView(title, if (small) null else note, top, f, above = 0f)
@@ -94,8 +111,8 @@ internal fun ColumnScope.RingContent(
         Spacer(GlanceModifier.defaultWeight())
         Row(GlanceModifier.fillMaxWidth(), verticalAlignment = Alignment.Bottom) {
             // The ring at the far end: the left in Arabic, as the mockups place it.
-            if (WidgetRtl) { RingImage(share, hue, number, icon, d, f.density, description); Spacer(GlanceModifier.defaultWeight()) }
-            else { Spacer(GlanceModifier.defaultWeight()); RingImage(share, hue, number, icon, d, f.density, description) }
+            if (WidgetRtl) { ring(d); Spacer(GlanceModifier.defaultWeight()) }
+            else { Spacer(GlanceModifier.defaultWeight()); ring(d) }
         }
         return
     }
@@ -116,13 +133,13 @@ internal fun ColumnScope.RingContent(
             }
         }
         if (WidgetRtl) {
-            RingImage(share, hue, number, icon, d, f.density, description)
+            ring(d)
             Spacer(GlanceModifier.width(RingWidget.RING_GAP_DP.dp))
             text()
         } else {
             text()
             Spacer(GlanceModifier.width(RingWidget.RING_GAP_DP.dp))
-            RingImage(share, hue, number, icon, d, f.density, description)
+            ring(d)
         }
     }
     if (below != null) {
@@ -213,11 +230,43 @@ internal fun ringBitmap(context: Context, share: Float, hue: Color, number: Stri
 }
 
 /** The rings theme's flat card [w] by [h] dp with [corner] dp corners at [density]. */
-internal fun flatBackground(w: Float, h: Float, corner: Float, density: Float): Bitmap {
+internal fun flatBackground(w: Float, h: Float, corner: Float, density: Float, hue: Color = RingWidget.Energy): Bitmap {
     val pw = w * density
     val ph = h * density
     val r = corner * density
+    val (from, to) = RingWidget.card(hue)
     return renderToBitmap(pw, ph) { c ->
-        c.drawRoundRect(0f, 0f, pw, ph, r, r, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = RingWidget.Page.toArgb() })
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.shader = android.graphics.LinearGradient(0f, 0f, pw, ph, from.toArgb(), to.toArgb(), android.graphics.Shader.TileMode.CLAMP)
+        c.drawRoundRect(0f, 0f, pw, ph, r, r, paint)
+        // A soft light of the hue in the top corner, so the card isn't a flat fill.
+        val light = Paint(Paint.ANTI_ALIAS_FLAG)
+        light.shader = android.graphics.RadialGradient(
+            pw * 0.8f, 0f, pw * 0.9f, hue.copy(alpha = 0.28f).toArgb(), hue.copy(alpha = 0f).toArgb(), android.graphics.Shader.TileMode.CLAMP,
+        )
+        c.drawRoundRect(0f, 0f, pw, ph, r, r, light)
+    }
+}
+
+/** The day's three rings nested, Energy outside, then Recovery, then Sleep, [d] dp across at [density]: tracks at 30%, round arcs. */
+internal fun nestedRingsBitmap(shares: List<Float>, hues: List<Color>, d: Float, density: Float): Bitmap {
+    val s = d * density
+    val stroke = s * 0.105f
+    val gap = s * 0.035f
+    return renderToBitmap(s, s) { c ->
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE; strokeWidth = stroke }
+        hues.forEachIndexed { i, hue ->
+            val inset = stroke / 2 + i * (stroke + gap)
+            val rect = RectF(inset, inset, s - inset, s - inset)
+            paint.strokeCap = Paint.Cap.BUTT
+            paint.color = hue.copy(alpha = RingWidget.TRACK_ALPHA).toArgb()
+            c.drawArc(rect, 0f, 360f, false, paint)
+            val sweep = 360f * shares.getOrElse(i) { 0f }.coerceIn(0f, 1f)
+            if (sweep > 0f) {
+                paint.strokeCap = Paint.Cap.ROUND
+                paint.color = hue.toArgb()
+                c.drawArc(rect, -90f, sweep, false, paint)
+            }
+        }
     }
 }

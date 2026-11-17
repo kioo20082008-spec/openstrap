@@ -280,7 +280,7 @@ internal fun EdgeWidget(
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
 ) = CardWidget(
     open, bitmapExtra, sidePadding, showStatus,
-    { w, h, corner, density -> flatBackground(w, h, corner, density) }, content,
+    { w, h, corner, density -> flatBackground(w, h, corner, density, ink) }, content,
 )
 
 /**
@@ -288,8 +288,10 @@ internal fun EdgeWidget(
  * and no longer drawn.
  */
 @Composable
-internal fun GlowWidget(style: GlowStyle, open: Intent, bitmapExtra: Double, showStatus: Boolean = true, content: @Composable ColumnScope.(WidgetFrame) -> Unit) =
-    CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { w, h, corner, density -> flatBackground(w, h, corner, density) }, content)
+internal fun GlowWidget(
+    style: GlowStyle, open: Intent, bitmapExtra: Double, showStatus: Boolean = true, hue: Color = RingWidget.Energy,
+    content: @Composable ColumnScope.(WidgetFrame) -> Unit,
+) = CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { w, h, corner, density -> flatBackground(w, h, corner, density, hue) }, content)
 
 /**
  * A widget card with [background] (dp width, dp height, dp corner, px per dp) behind: what [EdgeWidget] and [GlowWidget]

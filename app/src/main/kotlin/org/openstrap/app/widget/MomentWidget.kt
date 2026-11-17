@@ -104,7 +104,10 @@ private fun MomentContent(m: MomentWidgetModel) {
     val context = LocalContext.current
     val open = if (m.opensLive) openLiveWorkout(context) else openToday(context)
     // While a workout records, the recording is the news and the live screen shows the strap: no status line.
-    GlowWidget(m.light.style(m.mood), open, BITMAP_EXTRA, showStatus = m.recording == null) { f ->
+    GlowWidget(
+        m.light.style(m.mood), open, BITMAP_EXTRA, showStatus = m.recording == null,
+        hue = if (m.mood == GlowMood.Day) RingWidget.Energy else RingWidget.Sleep,
+    ) { f ->
         when (f.bucket) {
             WidgetSizes.Small -> SmallContent(m, f)
             WidgetSizes.Wide -> WideContent(m, MomentLayout.wide(m, f.contentWidth, f.contentHeight, f.fontScale, f.status), f)

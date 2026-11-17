@@ -180,7 +180,7 @@ private fun DaySwitcher(
     ) {
         Peek(peekDay(date.minusDays(1)))
         Column(
-            Modifier.padding(horizontal = 16.dp).widthIn(max = 200.dp).clip(CircleShape)
+            Modifier.padding(horizontal = 12.dp).widthIn(max = 240.dp).clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
                 .clickable(onClickLabel = stringResource(R.string.day_header_pick_day), onClick = onPick)
                 .padding(horizontal = 10.dp, vertical = 4.dp)
                 .semantics { contentDescription = description },

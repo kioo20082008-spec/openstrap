@@ -216,9 +216,19 @@ private val AppTypography get() = Typography(
 fun OpenStrapTheme(content: @Composable () -> Unit) {
     val colors = AppColors.current
     val scheme = remember(colors) { schemeOf(colors) }
-    MaterialTheme(
-        colorScheme = scheme,
-        typography = AppTypography,
-        content = content,
-    )
+    // The Alexandria face runs wide, so every size is drawn a little smaller than its sp.
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val scaled = remember(density.density, density.fontScale) {
+        androidx.compose.ui.unit.Density(density.density, density.fontScale * TEXT_SCALE)
+    }
+    androidx.compose.runtime.CompositionLocalProvider(androidx.compose.ui.platform.LocalDensity provides scaled) {
+        MaterialTheme(
+            colorScheme = scheme,
+            typography = AppTypography,
+            content = content,
+        )
+    }
 }
+
+/** How much smaller than its sp the app's text is drawn. */
+private const val TEXT_SCALE = 0.86f
