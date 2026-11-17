@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_title">المساعد الذكي</string>
+    <string name="ai_row_no_key">أضف مفتاح DeepSeek</string>
+    <string name="ai_settings_intro">استخدم مفتاح DeepSeek الخاص بك. عندما تطلب التحليل يرسل OpenStrap ملخصاً لبياناتك الأخيرة إلى DeepSeek ويعرض لك تحليله واقتراحاته. لا يُرسل شيء من تلقاء نفسه.</string>
+    <string name="ai_section_key">مفتاح DeepSeek</string>
+    <string name="ai_key_hint">الصق مفتاحك هنا</string>
+    <string name="ai_key_save">حفظ المفتاح</string>
+    <string name="ai_key_saved">محفوظ على هذا الجوال ومشفّر: ⁨%1$s⁩</string>
+    <string name="ai_key_none">لا يوجد مفتاح محفوظ بعد</string>
+    <string name="ai_key_test">جرّب المفتاح</string>
+    <string name="ai_key_testing">جاري تجربة المفتاح</string>
+    <string name="ai_key_works">المفتاح يعمل.</string>
+    <string name="ai_key_delete">احذف المفتاح</string>
+    <string name="ai_key_invalid">هذا لا يشبه مفتاح DeepSeek. المفتاح يبدأ بـ ⁨%1$s⁩ ولا فيه مسافات.</string>
+    <string name="ai_key_save_failed">تعذّر حفظ المفتاح على هذا الجوال.</string>
+    <string name="ai_switch_title">تفعيل المساعد</string>
+    <string name="ai_switch_note">لا يعمل التحليل إلا عندما تضغط على حلّل الحين.</string>
+    <string name="ai_switch_needs_key">احفظ المفتاح أولاً.</string>
+    <string name="ai_open_analysis">افتح التحليل</string>
+    <string name="ai_open_analysis_note">آخر نتيجة، أو تحليل جديد</string>
+    <string name="ai_consent_title">ماذا يُرسل، وإلى أين</string>
+    <string name="ai_consent_where">عندما تضغط حلّل الحين يرسل OpenStrap البيانات التالية إلى ⁨%1$s⁩ بمفتاحك أنت. لا يُرسل شيء قبل ذلك، ولا شيء في الخلفية.</string>
+    <string name="ai_consent_days">ملخص لكل يوم من آخر 30 يوماً: مدة النوم ودرجته، والتعافي، وHRV، ونبض الراحة، والحمل والإجهاد، والخطوات (بعد حذف الخطوات الكاذبة)، والطاقة.</string>
+    <string name="ai_consent_nights">آخر 14 ليلة بالتفصيل: وقت النوم والاستيقاظ، ومراحل النوم، ومرات الاستيقاظ.</string>
+    <string name="ai_consent_workouts">آخر 14 تمريناً: نوع الرياضة، والمدة، ومتوسط النبض وأعلاه، والحمل، وهبوط النبض بعد التمرين.</string>
+    <string name="ai_consent_extra">متوسطاتك، وحاجتك من النوم، وأهدافك اليومية، وخطة اليوم، وتوقع بسيط، وعمرك وجنسك إن أدخلتهما.</string>
+    <string name="ai_consent_never">لا يُرسل أبداً: اسمك، أو بريدك، أو موقعك ومساراتك، أو معرّف السوار وعنوانه، أو قراءات النبض الخام.</string>
+    <string name="ai_consent_third">DeepSeek شركة مستقلة لها شروطها وسياسة خصوصيتها، وهي التي تحاسبك على مفتاحك. الجواب إرشاد عام للعافية من أرقامك، وليس نصيحة طبية.</string>
+    <string name="ai_consent_key">يبقى مفتاحك على هذا الجوال مشفّراً بمخزن مفاتيح الجهاز. لا يدخل في النسخ الاحتياطي، ويبقى عند نسيان السوار.</string>
+    <string name="ai_analysis_title">التحليل</string>
+    <string name="ai_analyse_now">حلّل الحين</string>
+    <string name="ai_analysing">جاري تحليل بياناتك</string>
+    <string name="ai_updated">آخر تحديث ⁨%1$s⁩</string>
+    <string name="ai_updated_earlier">من يوم سابق، ⁨%1$s⁩. اضغط حلّل الحين للحصول على تحليل جديد.</string>
+    <string name="ai_basis">من ⁨%1$s⁩ و⁨%2$s⁩ و⁨%3$s⁩</string>
+    <string name="ai_section_summary">الخلاصة</string>
+    <string name="ai_section_patterns">الأنماط</string>
+    <string name="ai_section_do">اسوي إيش</string>
+    <string name="ai_section_adjust">أعدّل إيش</string>
+    <string name="ai_section_outlook">الأيام الثلاثة إلى السبعة القادمة</string>
+    <string name="ai_not_medical">إرشاد عام للعافية من أرقامك، وليس نصيحة طبية. إذا أقلقك شيء راجع الطبيب.</string>
+    <string name="ai_partial">وصل الجواب ناقصاً، لذلك بعض الأقسام غير موجودة.</string>
+    <string name="ai_plain">لم يصل الجواب بالشكل المتوقع، لذلك يُعرض كما كُتب.</string>
+    <string name="ai_empty_title">لا يوجد تحليل بعد</string>
+    <string name="ai_empty_body">اضغط حلّل الحين لتحصل على تحليل لآخر 30 يوماً وما تفعله بعدها.</string>
+    <string name="ai_state_no_key_title">أضف مفتاح DeepSeek</string>
+    <string name="ai_state_no_key_body">المساعد يعمل بمفتاح DeepSeek الخاص بك. أضفه من إعدادات المساعد.</string>
+    <string name="ai_state_off_title">المساعد متوقف</string>
+    <string name="ai_state_off_body">لا يُرسل شيء وهو متوقف. فعّله من إعدادات المساعد.</string>
+    <string name="ai_open_settings">إعدادات المساعد</string>
+    <string name="ai_fail_offline">تعذّر الوصول إلى DeepSeek. تأكد من الاتصال وحاول مرة أخرى.</string>
+    <string name="ai_fail_bad_key">DeepSeek لا يقبل هذا المفتاح (خطأ 401). تحقق منه أو بدّله من إعدادات المساعد.</string>
+    <string name="ai_fail_no_balance">حساب DeepSeek لا يوجد فيه رصيد (خطأ 402). اشحنه من موقع DeepSeek.</string>
+    <string name="ai_fail_rate_limit">طلبات كثيرة (خطأ 429). انتظر دقيقة وحاول مرة أخرى.</string>
+    <string name="ai_fail_timeout">لم يرد DeepSeek خلال 60 ثانية. حاول مرة أخرى.</string>
+    <string name="ai_fail_malformed">وصل جواب فارغ أو غير مقروء. حاول مرة أخرى.</string>
+    <string name="ai_fail_server">DeepSeek مشغول أو متوقف الآن. حاول لاحقاً.</string>
+    <string name="ai_fail_rejected">رفض DeepSeek الطلب (خطأ ⁨%1$d⁩).</string>
+    <string name="ai_fail_no_data">لا توجد بيانات كافية بعد: يحتاج المساعد إلى 3 أيام على الأقل فيها نوم أو خطوات.</string>
+    <string name="ai_fail_unknown">حدث خطأ. حاول مرة أخرى.</string>
+    <string name="ai_coach_link">التحليل الذكي لآخر 30 يوماً</string>
+    <plurals name="ai_basis_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم واحد</item><item quantity="two">يومين</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ يوماً</item><item quantity="other">⁨%1$d⁩ يوم</item></plurals>
+    <plurals name="ai_basis_nights"><item quantity="zero">⁨%1$d⁩ ليلة</item><item quantity="one">ليلة واحدة</item><item quantity="two">ليلتين</item><item quantity="few">⁨%1$d⁩ ليالٍ</item><item quantity="many">⁨%1$d⁩ ليلة</item><item quantity="other">⁨%1$d⁩ ليلة</item></plurals>
+    <plurals name="ai_basis_workouts"><item quantity="zero">⁨%1$d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">تمرينين</item><item quantity="few">⁨%1$d⁩ تمارين</item><item quantity="many">⁨%1$d⁩ تمريناً</item><item quantity="other">⁨%1$d⁩ تمرين</item></plurals>
+</resources>

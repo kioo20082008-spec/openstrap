@@ -633,6 +633,29 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         store.edit { it[appThemeKey] = theme.key }
     }
 
+    private val aiOn = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.AI_ENABLED)
+    private val aiKey = stringPreferencesKey(SettingsKeys.AI_KEY)
+
+    /**
+     * The smart assistant's switch, off until the user turns it on. Not strap data ([forgetDevice] keeps it) and not in
+     * the settings backup: it belongs to this phone, with the key.
+     */
+    val aiEnabled: Flow<Boolean> = read { it[aiOn] == true }
+
+    suspend fun setAiEnabled(on: Boolean) {
+        store.edit { it[aiOn] = on }
+    }
+
+    /**
+     * The user's own DeepSeek key as sealed by [org.openstrap.app.data.ai.AiVault] (never the key itself), null before
+     * one is saved. Kept when the strap is forgotten and left out of the settings backup.
+     */
+    val aiKeySealed: Flow<String?> = read { it[aiKey] }
+
+    suspend fun setAiKeySealed(sealed: String?) {
+        store.edit { if (sealed == null) it.remove(aiKey) else it[aiKey] = sealed }
+    }
+
     private val quietOn = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.QUIET_HOURS)
     private val quietFrom = androidx.datastore.preferences.core.intPreferencesKey(SettingsKeys.QUIET_FROM_MINUTES)
     private val quietTo = androidx.datastore.preferences.core.intPreferencesKey(SettingsKeys.QUIET_TO_MINUTES)
@@ -919,6 +942,8 @@ object SettingsKeys {
     const val UPDATE_INSTALLING_TAG = "update_installing_tag"
     const val UPDATE_SEEN_TAG = "update_seen_tag"
     const val APP_THEME = "app_theme"
+    const val AI_ENABLED = "ai_enabled"
+    const val AI_KEY = "ai_key_sealed"
 
     /** Before a type, the keys of [SettingsStore.lastSync]. */
     const val LAST_SYNC_PREFIX = "last_sync_"

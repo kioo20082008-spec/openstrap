@@ -14,6 +14,7 @@ import org.openstrap.app.ui.alarms.PhoneAlertsViewModel
 import org.openstrap.app.ui.dashboard.DayViewModel
 import org.openstrap.app.ui.dashboard.JournalViewModel
 import org.openstrap.app.ui.dashboard.WeeklyReportViewModel
+import org.openstrap.app.ui.device.AiViewModel
 import org.openstrap.app.ui.device.DeviceViewModel
 import org.openstrap.app.ui.firmware.FirmwareViewModel
 import org.openstrap.app.ui.workout.WorkoutsViewModel
@@ -35,6 +36,11 @@ internal object ViewModelFactories {
                 liveTickMs = LIVE_TICK_MS,
             )
         }
+    }
+
+    /** The smart assistant's settings page and Analysis screen, one view model for both. */
+    fun ai(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
+        initializer { AiViewModel(c.ai) }
     }
 
     /** The week report, worked out when its page opens. */

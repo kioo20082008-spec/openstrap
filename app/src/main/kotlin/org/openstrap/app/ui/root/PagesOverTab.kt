@@ -41,6 +41,7 @@ import org.openstrap.app.AppContainer
 import org.openstrap.app.PendingAction
 import org.openstrap.app.data.HeartZones
 import org.openstrap.app.data.Recovery
+import org.openstrap.app.data.ai.AiKeyState
 import org.openstrap.app.data.SampleData
 import org.openstrap.app.data.settings.UserProfile
 import org.openstrap.app.data.sleepNeed
@@ -58,6 +59,9 @@ import org.openstrap.app.ui.components.OledSurfaces
 import org.openstrap.app.ui.components.PushContent
 import org.openstrap.app.ui.components.SidePaneWidth
 import org.openstrap.app.ui.dashboard.StrapView
+import org.openstrap.app.ui.device.AiAnalysisPage
+import org.openstrap.app.ui.device.AiSettingsPage
+import org.openstrap.app.ui.device.AiViewModel
 import org.openstrap.app.ui.device.BackupPage
 import org.openstrap.app.ui.device.DeletedSleepPage
 import org.openstrap.app.ui.device.DeviceScreen
@@ -246,6 +250,22 @@ private fun DataPage(
             val log by container.strap.log.collectAsStateWithLifecycle()
             DiagnosticsScreen(log, padding, onBack = close)
         }
+        Page.AiSettings, Page.AiAnalysis -> {
+            // One view model for both pages, so an analysis running or just made is still there after a hop to the settings.
+            val ai: AiViewModel = viewModel(key = "ai", factory = ViewModelFactories.ai(container))
+            val state by ai.state.collectAsStateWithLifecycle()
+            if (shown == Page.AiSettings) {
+                AiSettingsPage(
+                    state, padding, onSaveKey = ai::saveKey, onClearSaveError = ai::clearSaveError, onTest = ai::test,
+                    onDelete = ai::deleteKey, onEnabled = ai::setEnabled, onOpenAnalysis = { open(Page.AiAnalysis) }, onBack = close,
+                )
+            } else {
+                AiAnalysisPage(
+                    state, padding, onAnalyse = ai::analyse, onCancel = ai::cancel,
+                    onOpenSettings = { open(Page.AiSettings) }, onBack = close,
+                )
+            }
+        }
         else -> Unit
     }
 }
@@ -284,6 +304,7 @@ private fun YouPageHost(
     val updateWaiting by hooks.rootVm.updateWaiting.collectAsStateWithLifecycle()
     val deletedSleep by hooks.dayVm.deletedSleep.collectAsStateWithLifecycle()
     val youMaxHr by hooks.workoutsVm.maxHeartRate.collectAsStateWithLifecycle()
+    val aiState by container.ai.keys.state.collectAsStateWithLifecycle(initialValue = AiKeyState(enabled = false, hasKey = false, masked = ""))
     // Permissions can be taken back in Health Connect while away: the row says so on return.
     LifecycleResumeEffect(Unit) {
         deviceVm.checkAutoHealthConnect()
@@ -309,6 +330,8 @@ private fun YouPageHost(
         updateWaiting = updateWaiting,
         onUpdates = { open(Page.Updates) },
         onDiagnostics = { open(Page.Diagnostics) },
+        aiState = aiState,
+        onAi = { open(Page.AiSettings) },
         onSampleData = if (SampleData.AVAILABLE) ({ deviceVm.loadSampleData() }) else null,
         onBack = onBack,
         selected = selected?.row,

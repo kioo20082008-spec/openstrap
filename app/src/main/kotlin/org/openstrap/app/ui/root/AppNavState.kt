@@ -59,6 +59,8 @@ enum class Page(
     HealthAlerts(PageRowKeys.HEALTH_ALERTS),
     Firmware(PageRowKeys.FIRMWARE),
     ZeppAccount(PageRowKeys.ZEPP_ACCOUNT),
+    AiSettings(PageRowKeys.AI),
+    AiAnalysis,
 }
 
 /** Keeps the open pages across process death, as their names ("Strap,Alarms"). */

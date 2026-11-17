@@ -231,5 +231,7 @@ internal fun CoachCard(tips: List<org.openstrap.app.presentation.Coach.Tip>, liv
             }
             Spacer(Modifier.height(12.dp))
         }
+        RingDivider()
+        CoachAiLink()
     }
 }

@@ -48,6 +48,17 @@ class SettingsBackupTest {
         assertEquals(settings, SettingsBackup.fromJson(json))
     }
 
+    @Test fun `the smart assistant's key and switch never go in`() {
+        val ai = mapOf("ai_enabled" to true, "ai_key_sealed" to "c2VhbGVkLWtleQ==")
+        val json = SettingsBackup.toJson(settings + ai)
+        assertFalse("ai_key_sealed" in json)
+        assertFalse("ai_enabled" in json)
+        assertFalse(SettingsBackup.carries("ai_key_sealed"))
+        assertEquals(settings, SettingsBackup.fromJson(json))
+        val hostile = JSONObject().put("version", 1).put("settings", JSONObject().put("ai_key_sealed", "x").put("ai_enabled", true)).toString()
+        assertEquals(emptyMap<String, Any>(), SettingsBackup.fromJson(hostile))
+    }
+
     @Test fun `a newer or damaged file restores what it can`() {
         val json = JSONObject().put("version", 9).put("settings", JSONObject()
             .put("goal_steps", 12_000)
@@ -81,6 +92,8 @@ class SettingsBackupTest {
             "goal_moment_week", "recap_week", "rewards_started", "history_badges_waiting", "habit_age_seen", "habit_age_seen_day",
             "update_checked_at", "update_notified_tag", "update_installing_tag", "update_seen_tag",
             "personal_calibration",
+            // The smart assistant's switch and its sealed DeepSeek key belong to this phone, never to a backup.
+            "ai_enabled", "ai_key_sealed",
         )
         val keys = org.openstrap.app.data.settings.SettingsKeys::class.java.declaredFields
             .filter { java.lang.reflect.Modifier.isStatic(it.modifiers) && it.type == String::class.java && !it.name.endsWith("_PREFIX") }

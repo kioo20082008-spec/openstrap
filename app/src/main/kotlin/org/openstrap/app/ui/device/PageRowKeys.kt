@@ -20,4 +20,5 @@ internal object PageRowKeys {
     const val HEALTH_ALERTS = "Health alerts"
     const val FIRMWARE = "Firmware"
     const val ZEPP_ACCOUNT = "Zepp account"
+    const val AI = "Smart assistant"
 }

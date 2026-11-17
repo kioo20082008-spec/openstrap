@@ -65,6 +65,15 @@ class ForgetDeviceTest {
         assertEquals(strap - setOf("last_sync_gdsp_1", "last_sync_gdsp_16"), SettingsStore.STRAP_KEYS)
     }
 
+    @Test fun `forgetting the strap keeps the smart assistant's key and switch`() = runTest {
+        settings.setAiKeySealed("c2VhbGVk")
+        settings.setAiEnabled(true)
+        settings.forgetDevice()
+        assertEquals("c2VhbGVk", settings.aiKeySealed.first())
+        assertEquals(true, settings.aiEnabled.first())
+        assertEquals(false, SettingsKeys.AI_KEY in SettingsStore.STRAP_KEYS || SettingsKeys.AI_ENABLED in SettingsStore.STRAP_KEYS)
+    }
+
     @Test fun `a write to another setting doesn't re-emit a flow`() = runTest {
         val seen = Collections.synchronizedList(mutableListOf<Goals>())
         val job = scope.launch { settings.goals.collect { seen += it } }

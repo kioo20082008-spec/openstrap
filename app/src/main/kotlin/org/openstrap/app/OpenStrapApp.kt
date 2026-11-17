@@ -75,6 +75,13 @@ class AppContainer(val app: Application) {
     /** The workouts, analysed, for the lists, pages and summaries. */
     val workouts: org.openstrap.app.data.WorkoutRepository =
         org.openstrap.app.data.RoomWorkoutRepository(database.healthDao(), settings.profile, maxHeartRates, settings.heartZones)
+    /** The smart assistant: the user's own DeepSeek key, and an analysis made only when asked for. */
+    val ai = org.openstrap.app.data.ai.AiAssistant(
+        org.openstrap.app.data.ai.AiKeyStore(settings, org.openstrap.app.data.ai.KeystoreVault()),
+        org.openstrap.app.data.ai.AiClient(),
+        org.openstrap.app.data.ai.AiInputSource(health, workouts, settings.profile, settings.goals),
+        org.openstrap.app.data.ai.AiResultStore(java.io.File(app.filesDir, "ai_analysis.json")),
+    )
 
     init {
         // The Recovery cache follows the data from here on.

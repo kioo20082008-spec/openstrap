@@ -477,6 +477,7 @@ private fun AppRoot(
     CompositionLocalProvider(
         LocalGoals provides goals, LocalHeartZones provides heartZones, LocalGlassHost provides glassHost,
         org.openstrap.app.ui.glow.LocalOpenBreathe provides { breatheOpen = true },
+        org.openstrap.app.ui.glow.LocalOpenAnalysis provides { openPage(Page.AiAnalysis) },
         org.openstrap.app.ui.glow.LocalJournal provides journalUi,
         org.openstrap.app.ui.glow.LocalStrapBattery provides ((strapFacts.connection as? org.openstrap.app.device.ConnectionState.Connected)?.let { it.batteryPercent to it.charging } ?: (null to false)),
         LocalGrowOrigin provides growOrigin,

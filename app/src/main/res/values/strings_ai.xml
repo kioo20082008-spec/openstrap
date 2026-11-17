@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ai_title">Smart assistant</string>
+    <string name="ai_row_no_key">Add your DeepSeek key</string>
+    <string name="ai_settings_intro">Bring your own DeepSeek key. When you ask, OpenStrap sends a summary of your recent data to DeepSeek and shows you its analysis and suggestions. Nothing is sent by itself.</string>
+    <string name="ai_section_key">Your DeepSeek key</string>
+    <string name="ai_key_hint">Paste your key here</string>
+    <string name="ai_key_save">Save key</string>
+    <string name="ai_key_saved">Saved on this phone, encrypted: %1$s</string>
+    <string name="ai_key_none">No key saved yet</string>
+    <string name="ai_key_test">Test key</string>
+    <string name="ai_key_testing">Testing the key</string>
+    <string name="ai_key_works">The key works.</string>
+    <string name="ai_key_delete">Delete key</string>
+    <string name="ai_key_invalid">That doesn\'t look like a DeepSeek key. It starts with %1$s and has no spaces.</string>
+    <string name="ai_key_save_failed">Couldn\'t save the key on this phone.</string>
+    <string name="ai_switch_title">Use the assistant</string>
+    <string name="ai_switch_note">Analysis runs only when you tap Analyse now.</string>
+    <string name="ai_switch_needs_key">Save a key first.</string>
+    <string name="ai_open_analysis">Open the analysis</string>
+    <string name="ai_open_analysis_note">Your last result, or a new one</string>
+    <string name="ai_consent_title">What is sent, and where</string>
+    <string name="ai_consent_where">When you tap Analyse now, OpenStrap sends the data below to %1$s, with your own key. Nothing is sent before that, and nothing in the background.</string>
+    <string name="ai_consent_days">A summary of each of the last 30 days: sleep time and score, Recovery, HRV, resting heart rate, load and strain, steps (false steps removed) and Energy.</string>
+    <string name="ai_consent_nights">The last 14 nights in detail: bed and wake times, sleep stages, wake-ups.</string>
+    <string name="ai_consent_workouts">The last 14 workouts: sport, duration, average and highest heart rate, load, and how far the heart rate dropped after.</string>
+    <string name="ai_consent_extra">Your averages, sleep need, daily targets, today\'s plan, a simple forecast, and your age and sex if you entered them.</string>
+    <string name="ai_consent_never">Never sent: your name, email, location or routes, the strap\'s ID or address, or raw heart rate readings.</string>
+    <string name="ai_consent_third">DeepSeek is a separate company with its own terms and privacy policy, and it bills your key. The answer is general wellness guidance from your own numbers, not medical advice.</string>
+    <string name="ai_consent_key">Your key stays on this phone, encrypted with the phone\'s key store. It is not in backups and it stays when you forget the strap.</string>
+    <string name="ai_analysis_title">Analysis</string>
+    <string name="ai_analyse_now">Analyse now</string>
+    <string name="ai_analysing">Analysing your data</string>
+    <string name="ai_updated">Updated %1$s</string>
+    <string name="ai_updated_earlier">From an earlier day, %1$s. Tap Analyse now for a fresh one.</string>
+    <string name="ai_basis">From %1$s, %2$s and %3$s</string>
+    <string name="ai_section_summary">Summary</string>
+    <string name="ai_section_patterns">Patterns</string>
+    <string name="ai_section_do">What to do</string>
+    <string name="ai_section_adjust">What to adjust</string>
+    <string name="ai_section_outlook">Next 3 to 7 days</string>
+    <string name="ai_not_medical">General wellness guidance from your own numbers, not medical advice. If something worries you, see a doctor.</string>
+    <string name="ai_partial">The answer came back incomplete, so some parts are missing.</string>
+    <string name="ai_plain">The answer wasn\'t in the expected form, so it is shown as written.</string>
+    <string name="ai_empty_title">No analysis yet</string>
+    <string name="ai_empty_body">Tap Analyse now for an analysis of your last 30 days and what to do next.</string>
+    <string name="ai_state_no_key_title">Add your DeepSeek key</string>
+    <string name="ai_state_no_key_body">The assistant works with your own DeepSeek key. Add it in the assistant\'s settings.</string>
+    <string name="ai_state_off_title">The assistant is off</string>
+    <string name="ai_state_off_body">Nothing is sent while it is off. Turn it on in the assistant\'s settings.</string>
+    <string name="ai_open_settings">Assistant settings</string>
+    <string name="ai_fail_offline">Couldn\'t reach DeepSeek. Check your connection and try again.</string>
+    <string name="ai_fail_bad_key">DeepSeek doesn\'t accept this key (error 401). Check it or replace it in the assistant\'s settings.</string>
+    <string name="ai_fail_no_balance">The DeepSeek account has no balance (error 402). Top it up on DeepSeek\'s site.</string>
+    <string name="ai_fail_rate_limit">Too many requests (error 429). Wait a minute and try again.</string>
+    <string name="ai_fail_timeout">DeepSeek didn\'t answer within 60 seconds. Try again.</string>
+    <string name="ai_fail_malformed">The answer came back empty or unreadable. Try again.</string>
+    <string name="ai_fail_server">DeepSeek is busy or down right now. Try again later.</string>
+    <string name="ai_fail_rejected">DeepSeek refused the request (error %1$d).</string>
+    <string name="ai_fail_no_data">Not enough data yet: the assistant needs at least 3 days with sleep or steps.</string>
+    <string name="ai_fail_unknown">Something went wrong. Try again.</string>
+    <string name="ai_coach_link">Smart analysis of your last 30 days</string>
+    <plurals name="ai_basis_days"><item quantity="one">%1$d day</item><item quantity="other">%1$d days</item></plurals>
+    <plurals name="ai_basis_nights"><item quantity="one">%1$d night</item><item quantity="other">%1$d nights</item></plurals>
+    <plurals name="ai_basis_workouts"><item quantity="one">%1$d workout</item><item quantity="other">%1$d workouts</item></plurals>
+</resources>

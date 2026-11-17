@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.openstrap.app.BuildConfig
 import org.openstrap.app.R
+import org.openstrap.app.data.ai.AiKeyState
 import org.openstrap.app.data.settings.AppTheme
 import org.openstrap.app.data.settings.BackupState
 import org.openstrap.app.data.settings.Goals
@@ -31,6 +32,7 @@ import org.openstrap.app.data.settings.HealthConnectAuto
 import org.openstrap.app.data.settings.UserProfile
 import org.openstrap.app.health.HcAvailability
 import org.openstrap.app.i18n.Strings
+import org.openstrap.app.presentation.AiCopy
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.Units
 import java.util.concurrent.TimeUnit.MINUTES
@@ -149,6 +151,9 @@ fun YouPage(
     /** The colour theme, picked in place on the Appearance card; a pick applies at once. */
     appTheme: AppTheme = AppTheme.Default,
     onAppTheme: (AppTheme) -> Unit = {},
+    /** The smart assistant's key and switch, said on its row; the row opens its settings page. */
+    aiState: AiKeyState = AiKeyState(enabled = false, hasKey = false, masked = ""),
+    onAi: () -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
     // The rings theme (T-You): sections named over flat cards of rows with a hairline between them, and the theme
@@ -201,6 +206,14 @@ fun YouPage(
         }
         item { RingsSection(stringResource(R.string.you_row_appearance)) }
         item { AppearanceCard(appTheme, onAppTheme) }
+        item {
+            RingsRows {
+                RingsRow(
+                    stringResource(R.string.ai_title), AiCopy.rowSummary(aiState), onClick = onAi, below = true, divider = false,
+                    selected = selected == PageRowKeys.AI,
+                )
+            }
+        }
         item { RingsSection(stringResource(R.string.you_section_help)) }
         item {
             RingsRows {
