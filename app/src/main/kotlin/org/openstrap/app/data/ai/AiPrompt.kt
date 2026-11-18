@@ -92,14 +92,15 @@ object AiPrompt {
     )
 
     /** The answer's shape, as the model should write it: every key with an empty value of its type. */
-    private fun example(): String = JSONObject().apply {
-        put(AiAnswer.DEEP, JSONArray().put(JSONObject().put("title", "").put("text", "").put("evidence", JSONArray())))
-        put(AiAnswer.SUMMARY, "")
-        put(AiAnswer.PATTERNS, JSONArray())
-        put(AiAnswer.DO_THIS, JSONArray())
-        put(AiAnswer.ADJUST, JSONArray())
-        put(AiAnswer.OUTLOOK, "")
-    }.toString()
+    // Written out as text: org.json's JSONObject does not keep the order of its keys, and the deep part must come first.
+    private fun example(): String = listOf(
+        "\"${AiAnswer.DEEP}\":[{\"title\":\"\",\"text\":\"\",\"evidence\":[]}]",
+        "\"${AiAnswer.SUMMARY}\":\"\"",
+        "\"${AiAnswer.PATTERNS}\":[]",
+        "\"${AiAnswer.DO_THIS}\":[]",
+        "\"${AiAnswer.ADJUST}\":[]",
+        "\"${AiAnswer.OUTLOOK}\":\"\"",
+    ).joinToString(",", "{", "}")
 
     val system: String by lazy {
         buildString {
