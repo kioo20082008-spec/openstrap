@@ -635,6 +635,7 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
 
     private val aiOn = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.AI_ENABLED)
     private val aiKey = stringPreferencesKey(SettingsKeys.AI_KEY)
+    private val aiDeep = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.AI_DEEPER)
 
     /**
      * The smart assistant's switch, off until the user turns it on. Not strap data ([forgetDevice] keeps it) and not in
@@ -644,6 +645,16 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
 
     suspend fun setAiEnabled(on: Boolean) {
         store.edit { it[aiOn] = on }
+    }
+
+    /**
+     * The smart assistant's "deeper thinking": the analysis asks DeepSeek's reasoning model, which is slower and
+     * costs more. Off until the user turns it on; belongs to this phone like the switch, so it is not in the backup.
+     */
+    val aiDeeper: Flow<Boolean> = read { it[aiDeep] == true }
+
+    suspend fun setAiDeeper(on: Boolean) {
+        store.edit { it[aiDeep] = on }
     }
 
     /**
@@ -944,6 +955,7 @@ object SettingsKeys {
     const val APP_THEME = "app_theme"
     const val AI_ENABLED = "ai_enabled"
     const val AI_KEY = "ai_key_sealed"
+    const val AI_DEEPER = "ai_deeper"
 
     /** Before a type, the keys of [SettingsStore.lastSync]. */
     const val LAST_SYNC_PREFIX = "last_sync_"

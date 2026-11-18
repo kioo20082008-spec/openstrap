@@ -25,12 +25,13 @@
     <string name="ai_consent_nights">آخر 14 ليلة بالتفصيل: وقت النوم والاستيقاظ، ومراحل النوم، ومرات الاستيقاظ.</string>
     <string name="ai_consent_workouts">آخر 14 تمريناً: نوع الرياضة، والمدة، ومتوسط النبض وأعلاه، والحمل، وهبوط النبض بعد التمرين.</string>
     <string name="ai_consent_extra">متوسطاتك، وحاجتك من النوم، وأهدافك اليومية، وخطة اليوم، وتوقع بسيط، وعمرك وجنسك إن أدخلتهما.</string>
+    <string name="ai_consent_insights">مقارنات يحسبها التطبيق من الأرقام نفسها: هذا الأسبوع مع الأسبوع الماضي ومتوسط 30 يوماً، وعلاقة النوم ووقته والحمل والخطوات بالتعافي وHRV، وأنماط أيام الأسبوع، وأفضل أيامك وأسوؤها، والسلاسل المتتالية، ودين النوم، وأثر كل تمرين على صباح اليوم التالي.</string>
     <string name="ai_consent_never">لا يُرسل أبداً: اسمك، أو بريدك، أو موقعك ومساراتك، أو معرّف السوار وعنوانه، أو قراءات النبض الخام.</string>
     <string name="ai_consent_third">DeepSeek شركة مستقلة لها شروطها وسياسة خصوصيتها، وهي التي تحاسبك على مفتاحك. الجواب إرشاد عام للعافية من أرقامك، وليس نصيحة طبية.</string>
     <string name="ai_consent_key">يبقى مفتاحك على هذا الجوال مشفّراً بمخزن مفاتيح الجهاز. لا يدخل في النسخ الاحتياطي، ويبقى عند نسيان السوار.</string>
     <string name="ai_analysis_title">التحليل</string>
     <string name="ai_analyse_now">حلّل الحين</string>
-    <string name="ai_analysing">جاري تحليل بياناتك</string>
+    <string name="ai_analysing">يحلل بياناتك…</string>
     <string name="ai_updated">آخر تحديث ⁨%1$s⁩</string>
     <string name="ai_updated_earlier">من يوم سابق، ⁨%1$s⁩. اضغط حلّل الحين للحصول على تحليل جديد.</string>
     <string name="ai_basis">من ⁨%1$s⁩ و⁨%2$s⁩ و⁨%3$s⁩</string>
@@ -53,7 +54,7 @@
     <string name="ai_fail_bad_key">DeepSeek لا يقبل هذا المفتاح (خطأ 401). تحقق منه أو بدّله من إعدادات المساعد.</string>
     <string name="ai_fail_no_balance">حساب DeepSeek لا يوجد فيه رصيد (خطأ 402). اشحنه من موقع DeepSeek.</string>
     <string name="ai_fail_rate_limit">طلبات كثيرة (خطأ 429). انتظر دقيقة وحاول مرة أخرى.</string>
-    <string name="ai_fail_timeout">لم يرد DeepSeek خلال 60 ثانية. حاول مرة أخرى.</string>
+    <string name="ai_fail_timeout">لم يرد DeepSeek في الوقت المناسب. التحليل طويل، حاول مرة أخرى أو أطفئ التفكير الأعمق.</string>
     <string name="ai_fail_malformed">وصل جواب فارغ أو غير مقروء. حاول مرة أخرى.</string>
     <string name="ai_fail_server">DeepSeek مشغول أو متوقف الآن. حاول لاحقاً.</string>
     <string name="ai_fail_rejected">رفض DeepSeek الطلب (خطأ ⁨%1$d⁩).</string>
@@ -63,4 +64,13 @@
     <plurals name="ai_basis_days"><item quantity="zero">⁨%1$d⁩ أيام</item><item quantity="one">يوم واحد</item><item quantity="two">يومين</item><item quantity="few">⁨%1$d⁩ أيام</item><item quantity="many">⁨%1$d⁩ يوماً</item><item quantity="other">⁨%1$d⁩ يوم</item></plurals>
     <plurals name="ai_basis_nights"><item quantity="zero">⁨%1$d⁩ ليلة</item><item quantity="one">ليلة واحدة</item><item quantity="two">ليلتين</item><item quantity="few">⁨%1$d⁩ ليالٍ</item><item quantity="many">⁨%1$d⁩ ليلة</item><item quantity="other">⁨%1$d⁩ ليلة</item></plurals>
     <plurals name="ai_basis_workouts"><item quantity="zero">⁨%1$d⁩ تمارين</item><item quantity="one">تمرين واحد</item><item quantity="two">تمرينين</item><item quantity="few">⁨%1$d⁩ تمارين</item><item quantity="many">⁨%1$d⁩ تمريناً</item><item quantity="other">⁨%1$d⁩ تمرين</item></plurals>
+    <string name="ai_analysing_note">التحليل مفصّل، فقد يأخذ دقيقة أو دقيقتين.</string>
+    <string name="ai_analysing_deep">التفكير الأعمق شغّال، فقد يأخذ حتى أربع دقائق.</string>
+    <string name="ai_deeper_title">تفكير أعمق</string>
+    <string name="ai_deeper_note">يستخدم نموذج التفكير من DeepSeek: تحليل أبطأ وأدق (حتى 4 دقائق) ويستهلك رصيداً أكثر من حسابك.</string>
+    <string name="ai_deep_title">التحليل المفصّل</string>
+    <string name="ai_deep_toggle">إظهار التحليل المفصّل أو إخفاؤه</string>
+    <string name="ai_deep_toggle_section">إظهار هذا القسم أو إخفاؤه</string>
+    <string name="ai_deep_untitled">تفاصيل</string>
+    <plurals name="ai_deep_count"><item quantity="zero">⁨%1$d⁩ قسم</item><item quantity="one">قسم واحد</item><item quantity="two">قسمان</item><item quantity="few">⁨%1$d⁩ أقسام</item><item quantity="many">⁨%1$d⁩ قسماً</item><item quantity="other">⁨%1$d⁩ قسم</item></plurals>
 </resources>

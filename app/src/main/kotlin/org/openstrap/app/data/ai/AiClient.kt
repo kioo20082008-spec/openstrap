@@ -37,7 +37,7 @@ enum class AiFailure {
     /** 429: too many requests, try again in a while. */
     RateLimit,
 
-    /** No answer within 60 seconds. */
+    /** No answer in time: 150 seconds, or 240 for the deeper thinking. */
     Timeout,
 
     /** An answer that has nothing in it to show. */
@@ -114,7 +114,7 @@ class UrlConnectionHttp : AiHttp {
         }
     }
 
-    /** The body as text, at most [MAX_REPLY_BYTES]: a reply is a few KB of JSON, so more is not one. */
+    /** The body as text, at most [MAX_REPLY_BYTES]: a reply is some tens of KB of JSON (more with the reasoning), so more is not one. */
     private fun readCapped(stream: InputStream): String = stream.use {
         val out = java.io.ByteArrayOutputStream()
         val buffer = ByteArray(BUFFER)
@@ -129,22 +129,33 @@ class UrlConnectionHttp : AiHttp {
     private companion object {
         const val CONNECT_MS = 15_000
         const val BUFFER = 8 * 1024
-        const val MAX_REPLY_BYTES = 256 * 1024
+        const val MAX_REPLY_BYTES = 1024 * 1024
         val OK_RANGE = 200..299
     }
 }
 
 /**
  * The DeepSeek calls, OpenAI-compatible: [analyse] posts the payload to `/chat/completions` (model deepseek-chat, JSON
- * answer, temperature 0.3, 60 seconds), [check] asks the account endpoint whether the key works without spending a
- * token. Every outcome is an [AiResult]: no exception leaves, and neither the key nor what was sent is ever logged or
+ * answer, temperature 0.3, 150 seconds; or, for the deeper thinking, deepseek-reasoner with 240 seconds and no JSON
+ * mode, which that model may refuse: the answer is read tolerantly anyway, and a refusal is retried once on the chat
+ * model), [check] asks the account endpoint whether the key works without spending a token. Every outcome is an [AiResult]: no exception leaves, and neither the key nor what was sent is ever logged or
  * kept in an error.
  */
 class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base: String = BASE) {
-    /** Sends [payload] (an [AiPayload] JSON) with [key] and gives the reply's text, to be read by [AiAnswer.parse]. */
-    suspend fun analyse(key: String, payload: String): AiResult<String> {
-        val body = requestBody(AiPrompt.system, AiPrompt.userMessage(payload)).toString()
-        return when (val r = send(base + CHAT, key, body)) {
+    /**
+     * Sends [payload] (an [AiPayload] JSON) with [key] and gives the reply's text, to be read by [AiAnswer.parse]. With
+     * [deeper] the reasoning model is asked, and if DeepSeek refuses that request (a 4xx) it is asked again on the chat model.
+     */
+    suspend fun analyse(key: String, payload: String, deeper: Boolean = false): AiResult<String> {
+        val user = AiPrompt.userMessage(payload)
+        val first = ask(key, user, deeper)
+        if (deeper && first is AiResult.Failed && first.failure == AiFailure.Rejected) return ask(key, user, false)
+        return first
+    }
+
+    private suspend fun ask(key: String, user: String, deeper: Boolean): AiResult<String> {
+        val body = requestBody(AiPrompt.system, user, deeper).toString()
+        return when (val r = send(base + CHAT, key, body, if (deeper) DEEP_TIMEOUT_MS else TIMEOUT_MS)) {
             is AiResult.Failed -> r
             is AiResult.Ok -> content(r.value)?.let { AiResult.Ok(it) } ?: AiResult.Failed(AiFailure.Malformed)
         }
@@ -155,7 +166,7 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
      * that endpoint (404, 403, 405) is asked for a one-token answer instead.
      */
     suspend fun check(key: String): AiResult<Unit> {
-        when (val r = send(base + BALANCE, key, null)) {
+        when (val r = send(base + BALANCE, key, null, CHECK_TIMEOUT_MS)) {
             is AiResult.Ok -> return if (available(r.value)) AiResult.Ok(Unit) else AiResult.Failed(AiFailure.NoBalance, CODE_PAYMENT)
             is AiResult.Failed -> if (r.code == null || r.code !in FALLBACK_CODES) return r
         }
@@ -165,7 +176,7 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
             put("max_tokens", 1)
             put("stream", false)
         }.toString()
-        return when (val r = send(base + CHAT, key, tiny)) {
+        return when (val r = send(base + CHAT, key, tiny, CHECK_TIMEOUT_MS)) {
             is AiResult.Ok -> AiResult.Ok(Unit)
             is AiResult.Failed -> r
         }
@@ -173,8 +184,8 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
 
     // A call that fails any other way is an outcome, not a crash; only cancellation passes through.
     @Suppress("TooGenericExceptionCaught")
-    private suspend fun send(url: String, key: String, body: String?): AiResult<String> = try {
-        val reply = withTimeout(TIMEOUT_MS.toLong()) { http.call(url, key, body, TIMEOUT_MS) }
+    private suspend fun send(url: String, key: String, body: String?, timeoutMs: Int): AiResult<String> = try {
+        val reply = withTimeout(timeoutMs.toLong()) { http.call(url, key, body, timeoutMs) }
         if (reply.code in OK_RANGE) AiResult.Ok(reply.body) else AiResult.Failed(failureOf(reply.code), reply.code)
     } catch (e: TimeoutCancellationException) {
         AiResult.Failed(AiFailure.Timeout)
@@ -195,9 +206,19 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
         const val CHAT = "/chat/completions"
         const val BALANCE = "/user/balance"
         const val MODEL = "deepseek-chat"
+
+        /** The reasoning model the "deeper thinking" setting asks for. */
+        const val MODEL_DEEP = "deepseek-reasoner"
         const val TEMPERATURE = 0.3
-        const val TIMEOUT_MS = 60_000
-        const val MAX_TOKENS = 2_500
+
+        /** How long an analysis may take on the chat model, on the reasoning model, and a key check. */
+        const val TIMEOUT_MS = 150_000
+        const val DEEP_TIMEOUT_MS = 240_000
+        const val CHECK_TIMEOUT_MS = 60_000
+
+        /** The longest answer asked for: the chat model's limit is 8192 tokens; the reasoning model's count includes its reasoning. */
+        const val MAX_TOKENS = 8_000
+        const val MAX_TOKENS_DEEP = 16_000
         private const val CODE_PAYMENT = 402
         private val OK_RANGE = 200..299
         private val FALLBACK_CODES = setOf(403, 404, 405)
@@ -213,18 +234,23 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
             else -> AiFailure.Unknown
         }
 
-        /** The request body: model, the two messages, a JSON answer, temperature 0.3 and a ceiling on the answer's length. */
-        fun requestBody(system: String, user: String): JSONObject = JSONObject().apply {
-            put("model", MODEL)
+        /**
+         * The request body: model, the two messages, a JSON answer, temperature 0.3 and a ceiling on the answer's length.
+         * For the [deeper] model there is no JSON mode and no temperature (it takes neither), and the ceiling is higher.
+         */
+        fun requestBody(system: String, user: String, deeper: Boolean = false): JSONObject = JSONObject().apply {
+            put("model", if (deeper) MODEL_DEEP else MODEL)
             put(
                 "messages",
                 JSONArray()
                     .put(JSONObject().put("role", "system").put("content", system))
                     .put(JSONObject().put("role", "user").put("content", user)),
             )
-            put("response_format", JSONObject().put("type", "json_object"))
-            put("temperature", TEMPERATURE)
-            put("max_tokens", MAX_TOKENS)
+            if (!deeper) {
+                put("response_format", JSONObject().put("type", "json_object"))
+                put("temperature", TEMPERATURE)
+            }
+            put("max_tokens", if (deeper) MAX_TOKENS_DEEP else MAX_TOKENS)
             put("stream", false)
         }
 

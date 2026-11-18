@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import org.openstrap.app.data.settings.SettingsStore
 
 /** What the settings page needs to know about the key: whether there is one, how it is shown, and the switch. */
-data class AiKeyState(val enabled: Boolean, val hasKey: Boolean, val masked: String) {
+data class AiKeyState(val enabled: Boolean, val hasKey: Boolean, val masked: String, val deeper: Boolean = false) {
     /** The assistant can be asked: switched on and a key saved. */
     val ready: Boolean get() = enabled && hasKey
 }
@@ -20,13 +20,16 @@ data class AiKeyState(val enabled: Boolean, val hasKey: Boolean, val masked: Str
  */
 class AiKeyStore(private val settings: SettingsStore, private val vault: AiVault) {
     /** The key as the page shows it: masked, never whole. A sealed text the vault can't open counts as no key. */
-    val state: Flow<AiKeyState> = combine(settings.aiEnabled, settings.aiKeySealed) { on, sealed ->
+    val state: Flow<AiKeyState> = combine(settings.aiEnabled, settings.aiKeySealed, settings.aiDeeper) { on, sealed, deeper ->
         val key = sealed?.let(vault::open)
-        AiKeyState(on, key != null, AiKey.mask(key))
+        AiKeyState(on, key != null, AiKey.mask(key), deeper)
     }.flowOn(Dispatchers.Default)
 
     /** Whether the assistant is switched on. */
     val enabled: Flow<Boolean> = settings.aiEnabled
+
+    /** Whether the analysis asks the slower, deeper reasoning model. */
+    val deeper: Flow<Boolean> = settings.aiDeeper
 
     /** Seals and saves [raw] (as [AiKey.clean] reads it); false when it isn't a usable key. */
     suspend fun save(raw: String?): Boolean {
@@ -46,6 +49,10 @@ class AiKeyStore(private val settings: SettingsStore, private val vault: AiVault
 
     suspend fun setEnabled(on: Boolean) {
         settings.setAiEnabled(on)
+    }
+
+    suspend fun setDeeper(on: Boolean) {
+        settings.setAiDeeper(on)
     }
 
     /** True while a key is saved: for turning the switch on only with one. */

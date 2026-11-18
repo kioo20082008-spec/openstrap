@@ -257,7 +257,7 @@ private fun DataPage(
             if (shown == Page.AiSettings) {
                 AiSettingsPage(
                     state, padding, onSaveKey = ai::saveKey, onClearSaveError = ai::clearSaveError, onTest = ai::test,
-                    onDelete = ai::deleteKey, onEnabled = ai::setEnabled, onOpenAnalysis = { open(Page.AiAnalysis) }, onBack = close,
+                    onDelete = ai::deleteKey, onEnabled = ai::setEnabled, onDeeper = ai::setDeeper, onOpenAnalysis = { open(Page.AiAnalysis) }, onBack = close,
                 )
             } else {
                 AiAnalysisPage(

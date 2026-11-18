@@ -142,4 +142,92 @@ class AiAnswerTest {
         assertEquals("0123456789 abc", AiAnswer.digits("٠١٢٣٤٥٦٧٨٩ abc"))
         assertEquals("0123456789", AiAnswer.digits("۰۱۲۳۴۵۶۷۸۹"))
     }
+
+    // ---- the detailed analysis (deep)
+
+    private val deepPart = "\"deep\":" + """[{"title":"النوم","text":"نمت هذا الأسبوع 6 ساعات و50 دقيقة، أقل من الأسبوع الماضي.","evidence":["6 ساعات و50 دقيقة","7 ساعات و20 دقيقة قبلها"]},{"title":"التعافي","text":"التعافي ثابت تقريباً.","evidence":["62 مقابل 61"]}]"""
+    private val withDeep = """{$deepPart,"summary":"نومك أقل من حاجتك","patterns":["النوم 6 ساعات"],"doThis":["نم مبكراً"],"adjust":["خفف التمرين"],"outlook":"التعافي سيتحسن"}"""
+
+    @Test fun `a deep part is read with its sections, texts and evidence beside the five parts`() {
+        val a = AiAnswer.parse(withDeep)!!
+        assertEquals(2, a.deep.size)
+        assertEquals("النوم", a.deep[0].title)
+        assertEquals("نمت هذا الأسبوع 6 ساعات و50 دقيقة، أقل من الأسبوع الماضي.", a.deep[0].text)
+        assertEquals(listOf("6 ساعات و50 دقيقة", "7 ساعات و20 دقيقة قبلها"), a.deep[0].evidence)
+        assertEquals("نومك أقل من حاجتك", a.summary)
+        assertEquals(listOf("نم مبكراً"), a.doThis)
+        assertFalse(a.partial)
+        assertTrue(a.structured)
+    }
+
+    @Test fun `an answer with no deep is the same as before, not partial`() {
+        val a = AiAnswer.parse(whole)!!
+        assertTrue(a.deep.isEmpty())
+        assertFalse(a.partial)
+    }
+
+    @Test fun `a malformed deep is dropped and the rest still shows`() {
+        for (bad in listOf("\"deep\":\"نص\"", "\"deep\":42", "\"deep\":null", "\"deep\":[1,2,null]", "\"deep\":[{}]", "\"deep\":[{\"title\":\"فقط عنوان\"}]", "\"deep\":{}")) {
+            val a = AiAnswer.parse("""{$bad,"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+            assertTrue(bad, a.deep.isEmpty())
+            assertEquals(bad, "س", a.summary)
+            assertFalse(bad, a.partial)
+            assertNull(bad, a.plain)
+        }
+    }
+
+    @Test fun `deep sections may be bare strings, an object of title to text, or use other names`() {
+        val strings = AiAnswer.parse("""{"deep":["فقرة أولى","فقرة ثانية"],"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+        assertEquals(listOf("فقرة أولى", "فقرة ثانية"), strings.deep.map { it.text })
+        assertEquals(listOf("", ""), strings.deep.map { it.title })
+        val mapped = AiAnswer.parse("""{"deep":{"النوم":"نص النوم","التعافي":{"text":"نص التعافي","evidence":["62"]}},"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+        assertEquals(listOf("النوم", "التعافي"), mapped.deep.map { it.title })
+        assertEquals(listOf("62"), mapped.deep[1].evidence)
+        val named = AiAnswer.parse("""{"detailed":[{"name":"الحمل","analysis":"نص","numbers":"رقم أ\nرقم ب"}],"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+        assertEquals("الحمل", named.deep.single().title)
+        assertEquals("نص", named.deep.single().text)
+        assertEquals(listOf("رقم أ", "رقم ب"), named.deep.single().evidence)
+    }
+
+    @Test fun `deep digits are Western, and sections, text and evidence are capped`() {
+        val many = (1..12).joinToString(",") { """{"title":"قسم $it","text":"${"ا".repeat(4_000)}","evidence":[${(1..12).joinToString(",") { e -> "\"${"ب".repeat(300)}$e\"" }}]}""" }
+        val a = AiAnswer.parse("""{"deep":[$many,{"title":"٢٠٢٦","text":"نمت ٦ ساعات"}],"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+        assertEquals(AiAnswer.MAX_SECTIONS, a.deep.size)
+        assertTrue(a.deep.all { it.text.length == AiAnswer.MAX_SECTION_CHARS })
+        assertTrue(a.deep.all { it.evidence.size == AiAnswer.MAX_EVIDENCE && it.evidence.all { e -> e.length == AiAnswer.MAX_EVIDENCE_CHARS } })
+        val digits = AiAnswer.parse("""{"deep":[{"title":"٢٠٢٦","text":"نمت ٦ ساعات"}],"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م"}""")!!
+        assertEquals("2026", digits.deep.single().title)
+        assertEquals("نمت 6 ساعات", digits.deep.single().text)
+    }
+
+    @Test fun `an answer cut off inside the deep part is closed, keeps what was written, and is partial`() {
+        val a = AiAnswer.parse("""{"deep":[{"title":"النوم","text":"نص كامل","evidence":["رقم"]},{"title":"التعافي","text":"نص مقطو""")!!
+        assertEquals(2, a.deep.size)
+        assertEquals("نص كامل", a.deep[0].text)
+        assertTrue(a.deep[1].text.startsWith("نص مقطو"))
+        assertTrue(a.partial)
+        assertNull(a.plain)
+        assertTrue(a.summary.isEmpty())
+    }
+
+    @Test fun `a deep part alone is an answer, JSON with neither is plain text`() {
+        val a = AiAnswer.parse("""{"deep":[{"title":"ن","text":"نص"}]}""")!!
+        assertNull(a.plain)
+        assertEquals(1, a.deep.size)
+        assertTrue(a.partial)
+        assertNotNull(AiAnswer.parse("""{"deep":[{}],"hello":"world"}""")!!.plain)
+    }
+
+    @Test fun `the deep part survives the cache, and an older cached answer without it still loads`() {
+        val a = AiAnswer.parse(withDeep)!!
+        assertEquals(a, AiAnswer.fromJson(a.toJson()))
+        val old = """{"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م","partial":false}"""
+        val read = AiAnswer.fromJson(old)!!
+        assertEquals("س", read.summary)
+        assertTrue(read.deep.isEmpty())
+        assertEquals(AiAnswer("س", listOf("ن"), listOf("ع"), listOf("ت"), "م"), read)
+        // A cached deep that is damaged loses only itself.
+        val damaged = """{"summary":"س","patterns":["ن"],"doThis":["ع"],"adjust":["ت"],"outlook":"م","deep":"not a list"}"""
+        assertTrue(AiAnswer.fromJson(damaged)!!.deep.isEmpty())
+    }
 }

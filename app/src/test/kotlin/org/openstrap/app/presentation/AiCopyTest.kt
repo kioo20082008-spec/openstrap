@@ -24,7 +24,7 @@ class AiCopyTest {
         assertTrue(AiCopy.failure(AiFailure.BadKey).contains("401"))
         assertTrue(AiCopy.failure(AiFailure.NoBalance).contains("402"))
         assertTrue(AiCopy.failure(AiFailure.RateLimit).contains("429"))
-        assertTrue(AiCopy.failure(AiFailure.Timeout).contains("60"))
+        assertTrue(AiCopy.failure(AiFailure.Timeout).contains("deeper thinking"))
         assertTrue(AiCopy.failure(AiFailure.Rejected, 422).contains("422"))
         assertEquals(AiCopy.failure(AiFailure.Unknown), AiCopy.failure(AiFailure.Rejected, null))
     }
@@ -60,5 +60,16 @@ class AiCopyTest {
 
     @Test fun `the consent text names where the data goes`() {
         assertTrue(AiCopy.consentWhere().contains("api.deepseek.com"))
+    }
+
+    @Test fun `numbers in Arabic text are isolated so they read left to right`() {
+        val lri = "\u2066"
+        val pdi = "\u2069"
+        assertEquals("نمت ${lri}6$pdi ساعات", AiCopy.isolateNumbers("نمت 6 ساعات"))
+        assertEquals("${lri}-12$pdi نقطة، و${lri}45%$pdi، و${lri}7:30$pdi", AiCopy.isolateNumbers("-12 نقطة، و45%، و7:30"))
+        assertEquals("${lri}12,345$pdi خطوة و${lri}1.5$pdi.", AiCopy.isolateNumbers("12,345 خطوة و1.5."))
+        // A range is one run, and a digit stuck to an Arabic prefix letter is isolated too.
+        assertEquals("من ${lri}6-7$pdi ساعات، ب${lri}8$pdi", AiCopy.isolateNumbers("من 6-7 ساعات، ب8"))
+        assertEquals("نص بلا رقم", AiCopy.isolateNumbers("نص بلا رقم"))
     }
 }

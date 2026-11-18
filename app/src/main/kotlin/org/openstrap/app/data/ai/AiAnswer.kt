@@ -4,10 +4,15 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 
+/** One section of the detailed analysis: a [title], its [text] and the [evidence], the short figures it rests on. */
+data class AiDeepSection(val title: String = "", val text: String = "", val evidence: List<String> = emptyList())
+
 /**
  * The assistant's answer as the app shows it: a [summary], the [patterns] it saw, what to do in the coming days
- * ([doThis]), what to change ([adjust]) and the [outlook] for the next 3 to 7 days. [plain] is the model's own text when
- * it didn't come back as the JSON asked for, shown as it is; [partial] says some of the five parts were missing or cut off.
+ * ([doThis]), what to change ([adjust]) and the [outlook] for the next 3 to 7 days, and under them the [deep], the
+ * detailed analysis those were drawn from (empty for an answer made before it existed, or when it didn't come back).
+ * [plain] is the model's own text when it didn't come back as the JSON asked for, shown as it is; [partial] says some of
+ * the five parts were missing or cut off.
  */
 data class AiAnswer(
     val summary: String = "",
@@ -17,6 +22,7 @@ data class AiAnswer(
     val outlook: String = "",
     val plain: String? = null,
     val partial: Boolean = false,
+    val deep: List<AiDeepSection> = emptyList(),
 ) {
     /** The answer has structure to show (not only [plain] text). */
     val structured: Boolean get() = plain == null
@@ -30,6 +36,7 @@ data class AiAnswer(
         put(OUTLOOK, outlook)
         if (plain != null) put(PLAIN, plain)
         put(PARTIAL, partial)
+        if (deep.isNotEmpty()) put(DEEP, JSONArray().apply { deep.forEach { put(sectionJson(it)) } })
     }.toString()
 
     companion object {
@@ -38,6 +45,7 @@ data class AiAnswer(
         const val DO_THIS = "doThis"
         const val ADJUST = "adjust"
         const val OUTLOOK = "outlook"
+        const val DEEP = "deep"
         private const val PLAIN = "plain"
         private const val PARTIAL = "partial"
 
@@ -47,12 +55,23 @@ data class AiAnswer(
         private val DO_NAMES = listOf(DO_THIS, "do_this", "dothis", "do", "actions", "todo")
         private val ADJUST_NAMES = listOf(ADJUST, "adjustments", "changes", "tweaks")
         private val OUTLOOK_NAMES = listOf(OUTLOOK, "forecast", "outlook_next_days", "expectation")
+        private val DEEP_NAMES = listOf(DEEP, "detailed", "detail", "sections", "detailed_analysis", "analysis")
+        private val TITLE_NAMES = listOf("title", "name", "heading", "section", "topic")
+        private val TEXT_NAMES = listOf("text", "body", "analysis", "content", "details", "description")
+        private val EVIDENCE_NAMES = listOf("evidence", "numbers", "data", "facts", "figures")
 
         /** Most items in a list and most characters in an item or a paragraph that the app keeps. */
         const val MAX_ITEMS = 8
         const val MAX_ITEM_CHARS = 500
         const val MAX_PARAGRAPH_CHARS = 1_200
         const val MAX_PLAIN_CHARS = 4_000
+
+        /** The detailed analysis: most sections, most characters in a title, a section's text and an evidence item, and most evidence items. */
+        const val MAX_SECTIONS = 8
+        const val MAX_TITLE_CHARS = 80
+        const val MAX_SECTION_CHARS = 2_500
+        const val MAX_EVIDENCE = 8
+        const val MAX_EVIDENCE_CHARS = 140
 
         private val fence = Regex("```[A-Za-z]*[ \\t]*\\r?\\n?(.*?)```", RegexOption.DOT_MATCHES_ALL)
         private val openFence = Regex("^```[A-Za-z]*[ \\t]*\\r?\\n?")
@@ -73,10 +92,12 @@ data class AiAnswer(
             val doThis = items(obj, DO_NAMES)
             val adjust = items(obj, ADJUST_NAMES)
             val outlook = paragraph(obj, OUTLOOK_NAMES)
+            val deep = deepSections(obj)
             val missing = listOf(summary.isEmpty(), patterns.isEmpty(), doThis.isEmpty(), adjust.isEmpty(), outlook.isEmpty()).count { it }
-            // JSON with none of the five parts is not an answer in our shape: show what the model wrote.
-            if (missing == PARTS) return plainOnly(text)
-            return AiAnswer(summary, patterns, doThis, adjust, outlook, plain = null, partial = repaired || missing > 0)
+            // JSON with none of the five parts (and no detailed analysis) is not an answer in our shape: show what the model wrote.
+            if (missing == PARTS && deep.isEmpty()) return plainOnly(text)
+            // A missing or unreadable `deep` doesn't make the answer partial: the five parts are the answer, `deep` is more.
+            return AiAnswer(summary, patterns, doThis, adjust, outlook, plain = null, partial = repaired || missing > 0, deep = deep)
         }
 
         private const val PARTS = 5
@@ -86,9 +107,72 @@ data class AiAnswer(
             val o = JSONObject(text)
             val plain = o.optString(PLAIN, "").takeIf { it.isNotBlank() }
             val list = { key: String -> o.optJSONArray(key)?.let { a -> (0 until a.length()).map { a.optString(it) } }.orEmpty() }
-            AiAnswer(o.optString(SUMMARY, ""), list(PATTERNS), list(DO_THIS), list(ADJUST), o.optString(OUTLOOK, ""), plain, o.optBoolean(PARTIAL, false))
+            AiAnswer(
+                o.optString(SUMMARY, ""), list(PATTERNS), list(DO_THIS), list(ADJUST), o.optString(OUTLOOK, ""), plain, o.optBoolean(PARTIAL, false),
+                deepSections(o),
+            )
         } catch (e: JSONException) {
             null
+        }
+
+        private fun sectionJson(s: AiDeepSection): JSONObject =
+            JSONObject().put("title", s.title).put("text", s.text).put("evidence", JSONArray(s.evidence))
+
+        /**
+         * The detailed analysis in [obj], as far as it reads: a list of sections (objects with a title, a text and
+         * evidence, or bare strings), or an object of title to text. Anything else, or nothing, is no sections.
+         */
+        private fun deepSections(obj: JSONObject): List<AiDeepSection> {
+            val v = DEEP_NAMES.firstNotNullOfOrNull { n -> obj.opt(n)?.takeIf { it != JSONObject.NULL && (it is JSONArray || it is JSONObject) } }
+                ?: return emptyList()
+            val raw: List<Any?> = when (v) {
+                is JSONArray -> (0 until v.length()).map { v.opt(it) }
+                is JSONObject -> v.keys().asSequence().map { k ->
+                    val value = v.opt(k)
+                    // A title mapped to a text, or to an object that holds the text and its evidence.
+                    (value as? JSONObject ?: JSONObject().put("text", value)).put("title", k)
+                }.toList()
+                else -> emptyList()
+            }
+            return raw.mapNotNull { section(it) }.take(MAX_SECTIONS)
+        }
+
+        private fun section(v: Any?): AiDeepSection? {
+            val s = when (v) {
+                is String -> AiDeepSection(text = clean(v).take(MAX_SECTION_CHARS).trim())
+                is JSONObject -> {
+                    val title = clean(firstText(v, TITLE_NAMES)).take(MAX_TITLE_CHARS).trim()
+                    val text = clean(firstText(v, TEXT_NAMES)).take(MAX_SECTION_CHARS).trim()
+                    AiDeepSection(title, text, evidence(v))
+                }
+                else -> return null
+            }
+            return s.takeIf { it.text.isNotEmpty() || it.evidence.isNotEmpty() }
+        }
+
+        /** The first of [names] in [o] that holds text, as text (a list of strings is joined). */
+        private fun firstText(o: JSONObject, names: List<String>): String {
+            for (n in names) {
+                val v = o.opt(n)
+                val t = when (v) {
+                    is String -> v
+                    is JSONArray -> (0 until v.length()).mapNotNull { itemText(v.opt(it)) }.joinToString(" ")
+                    is Number, is Boolean -> v.toString()
+                    else -> ""
+                }
+                if (t.isNotBlank()) return t
+            }
+            return ""
+        }
+
+        private fun evidence(o: JSONObject): List<String> {
+            val v = EVIDENCE_NAMES.firstNotNullOfOrNull { n -> o.opt(n)?.takeIf { it != JSONObject.NULL } } ?: return emptyList()
+            val raw = when (v) {
+                is JSONArray -> (0 until v.length()).mapNotNull { itemText(v.opt(it)) }
+                is String -> v.lines()
+                else -> listOfNotNull(itemText(v))
+            }
+            return raw.map { clean(it).replace(bullet, "").take(MAX_EVIDENCE_CHARS).trim() }.filter { it.isNotEmpty() }.take(MAX_EVIDENCE)
         }
 
         private fun plainOnly(text: String): AiAnswer =

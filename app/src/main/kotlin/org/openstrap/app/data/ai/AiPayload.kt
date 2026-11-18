@@ -8,16 +8,21 @@ import kotlin.math.roundToInt
 
 /**
  * Builds the compact JSON the smart assistant sends, from an [AiInput]: the last 30 days of summaries, the last 14
- * nights and workouts in detail, the baselines, the targets, and the simple forecast ([AiForecast]). Pure.
+ * nights and workouts in detail, the baselines, the targets, the simple forecast ([AiForecast]) and the cross-checks the
+ * app worked out itself ([AiInsights]). Pure.
  *
  * What it never holds: a name, an email, a location, a device id or address, or a raw heart rate stream. [AiInput] has
  * no field for them, and the one free text in it (a sport's name) is cut down to letters, digits and spaces. The size is
  * held to [MAX_BYTES]: when the full payload is bigger, the oldest days and the least recent nights and workouts go
- * first, the baselines, targets and forecast stay.
+ * first; the baselines, targets, forecast and insights stay (the insights are worked out from the whole history, once,
+ * before anything is cut).
  */
 object AiPayload {
     /** The most bytes the JSON may take. */
-    const val MAX_BYTES = 12_000
+    const val MAX_BYTES = 16_000
+
+    /** The payload's shape: 2 added the `insights`. */
+    const val VERSION = 2
 
     const val DAYS = 30
     const val NIGHTS = 14
@@ -27,7 +32,7 @@ object AiPayload {
     private const val SPORT_CHARS = 24
 
     /** Every key that may appear anywhere in the JSON, so a test (and a reader) can see nothing else is sent. */
-    val KEYS: Set<String> = setOf(
+    val KEYS: Set<String> = AiInsights.KEYS + setOf(
         "v", "today", "weekday", "user", "targets", "now", "load_model", "baselines", "forecast", "days", "nights", "workouts",
         "age", "sex", "sleep_need_min", "usual_bed", "usual_wake",
         "steps", "sleep_min", "active_hours", "kcal", "workouts_week",
@@ -56,9 +61,10 @@ object AiPayload {
         val days = input.days.sortedBy { it.date }.takeLast(DAYS)
         val nights = input.nights.sortedBy { it.date }.takeLast(NIGHTS)
         val workouts = input.workouts.sortedBy { it.date }.takeLast(WORKOUTS)
+        val insights = AiInsights.toJson(AiInsights.of(input))
         var last: Built? = null
         for ((d, n, w) in STEPS) {
-            val json = write(input, days.takeLast(d), nights.takeLast(n), workouts.takeLast(w))
+            val json = write(input, insights, days.takeLast(d), nights.takeLast(n), workouts.takeLast(w))
             val built = Built(json, json.toByteArray(Charsets.UTF_8).size, minOf(d, days.size), minOf(n, nights.size), minOf(w, workouts.size), false)
             last = built
             if (built.bytes <= MAX_BYTES) {
@@ -66,13 +72,13 @@ object AiPayload {
             }
         }
         // Even three days over the cap (nothing but absurd input does that): send the targets and the forecast alone.
-        val json = write(input, emptyList(), emptyList(), emptyList())
+        val json = write(input, insights, emptyList(), emptyList(), emptyList())
         return checkNotNull(last).copy(json = json, bytes = json.toByteArray(Charsets.UTF_8).size, days = 0, nights = 0, workouts = 0, trimmed = true)
     }
 
-    private fun write(input: AiInput, days: List<AiDay>, nights: List<AiNight>, workouts: List<AiWorkout>): String {
+    private fun write(input: AiInput, insights: JSONObject, days: List<AiDay>, nights: List<AiNight>, workouts: List<AiWorkout>): String {
         val root = JSONObject()
-        root.put("v", 1)
+        root.put("v", VERSION)
         root.put("today", input.date.toString())
         root.put("weekday", input.date.dayOfWeek.value)
         root.put("user", JSONObject().apply {
@@ -109,6 +115,7 @@ object AiPayload {
         }
         root.put("baselines", baselines(input.days.sortedBy { it.date }.takeLast(DAYS)))
         root.put("forecast", forecast(AiForecast.of(input)))
+        root.put("insights", insights)
         root.put("days", JSONArray().apply {
             days.forEach { d ->
                 put(JSONObject().apply {

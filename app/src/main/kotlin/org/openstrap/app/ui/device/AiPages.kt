@@ -1,6 +1,17 @@
 package org.openstrap.app.ui.device
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.key
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,6 +47,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import org.openstrap.app.R
 import org.openstrap.app.data.ai.AiCached
+import org.openstrap.app.data.ai.AiDeepSection
 import org.openstrap.app.presentation.AiCopy
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
@@ -63,6 +75,7 @@ fun AiSettingsPage(
     onTest: () -> Unit,
     onDelete: () -> Unit,
     onEnabled: (Boolean) -> Unit,
+    onDeeper: (Boolean) -> Unit,
     onOpenAnalysis: () -> Unit,
     onBack: () -> Unit,
 ) {
@@ -129,7 +142,12 @@ fun AiSettingsPage(
                 RingsSwitchRow(
                     stringResource(R.string.ai_switch_title),
                     stringResource(if (key.hasKey) R.string.ai_switch_note else R.string.ai_switch_needs_key),
-                    key.enabled && key.hasKey, onEnabled, divider = false, enabled = key.hasKey, icon = AppIcons.Brain,
+                    key.enabled && key.hasKey, onEnabled, enabled = key.hasKey, icon = AppIcons.Brain,
+                )
+                RingsSwitchRow(
+                    stringResource(R.string.ai_deeper_title),
+                    stringResource(if (key.hasKey) R.string.ai_deeper_note else R.string.ai_switch_needs_key),
+                    key.deeper && key.hasKey, onDeeper, divider = false, enabled = key.hasKey, icon = AppIcons.Hourglass,
                 )
                 RingsRow(
                     stringResource(R.string.ai_open_analysis), stringResource(R.string.ai_open_analysis_note), onClick = onOpenAnalysis,
@@ -146,6 +164,7 @@ fun AiSettingsPage(
                     stringResource(R.string.ai_consent_nights),
                     stringResource(R.string.ai_consent_workouts),
                     stringResource(R.string.ai_consent_extra),
+                    stringResource(R.string.ai_consent_insights),
                     stringResource(R.string.ai_consent_never),
                     stringResource(R.string.ai_consent_third),
                     stringResource(R.string.ai_consent_key),
@@ -239,7 +258,12 @@ fun AiAnalysisPage(
                 )
                 if (state.running) {
                     Spacer(Modifier.height(12.dp))
-                    Text(stringResource(R.string.ai_analysing), color = AppColors.muted, style = GlowType.secondary)
+                    Text(stringResource(R.string.ai_analysing), color = AppColors.ink, style = GlowType.body)
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        stringResource(if (state.key.deeper) R.string.ai_analysing_deep else R.string.ai_analysing_note),
+                        color = AppColors.muted, style = GlowType.secondary,
+                    )
                     Spacer(Modifier.height(8.dp))
                     PageProgress()
                 }
@@ -298,8 +322,74 @@ private fun androidx.compose.foundation.lazy.LazyListScope.analysisCards(c: AiCa
             Text(a.outlook, color = AppColors.ink, style = GlowType.body)
         }
     }
+    if (a.deep.isNotEmpty()) item { DeepAnalysis(a.deep) }
     if (a.partial) item { PageNote(stringResource(R.string.ai_partial)) }
 }
+
+/** The detailed analysis: one header, closed to begin with; opened, a card per section. */
+@Composable
+private fun DeepAnalysis(sections: List<AiDeepSection>) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    val label = stringResource(R.string.ai_deep_toggle)
+    RingsCard(Modifier.animateContentSize()) {
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(8.dp)).clickable(onClickLabel = label, role = Role.Button) { open = !open },
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.ai_deep_title), color = AppColors.ink, style = RingsType.cardTitle)
+                Text(
+                    pluralStringResource(R.plurals.ai_deep_count, sections.size, sections.size),
+                    color = AppColors.muted, style = GlowType.secondary,
+                )
+            }
+            Icon(AppIcons.CaretDown, null, Modifier.size(20.dp).rotate(if (open) 180f else 0f), tint = AppColors.muted)
+        }
+        if (open) sections.forEachIndexed { i, section -> key(i) { DeepCard(section) } }
+    }
+}
+
+/** One section of the detailed analysis: its title and the start of its text, and, opened, all of it with its evidence as chips. */
+@Composable
+private fun DeepCard(section: AiDeepSection) {
+    var open by rememberSaveable { mutableStateOf(false) }
+    val shape = RoundedCornerShape(14.dp)
+    val label = stringResource(R.string.ai_deep_toggle_section)
+    Column(
+        Modifier.fillMaxWidth().clip(shape).background(AppColors.ink.copy(alpha = 0.06f), shape).animateContentSize()
+            .clickable(onClickLabel = label, role = Role.Button) { open = !open }.padding(14.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                section.title.ifBlank { stringResource(R.string.ai_deep_untitled) }, Modifier.weight(1f), color = AppColors.ink,
+                style = GlowType.body.copy(fontWeight = FontWeight.Bold),
+            )
+            Icon(AppIcons.CaretDown, null, Modifier.size(18.dp).rotate(if (open) 180f else 0f), tint = AppColors.muted)
+        }
+        if (section.text.isNotEmpty()) Text(
+            AiCopy.isolateNumbers(section.text), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body,
+            maxLines = if (open) Int.MAX_VALUE else COLLAPSED_LINES, overflow = TextOverflow.Ellipsis,
+        )
+        if (open && section.evidence.isNotEmpty()) EvidenceChips(section.evidence)
+    }
+}
+
+/** The figures a section rests on, as small chips; the numbers inside are isolated so they read left to right in Arabic. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun EvidenceChips(items: List<String>) {
+    FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        items.forEach { item ->
+            Text(
+                AiCopy.isolateNumbers(item), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.secondary,
+                modifier = Modifier.clip(CircleShape).background(AppColors.ink.copy(alpha = 0.08f), CircleShape).padding(horizontal = 10.dp, vertical = 4.dp),
+            )
+        }
+    }
+}
+
+private const val COLLAPSED_LINES = 2
 
 /** A card of short points, each with a dot in the card's [hue]. */
 @Composable

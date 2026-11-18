@@ -93,7 +93,7 @@ class SettingsBackupTest {
             "update_checked_at", "update_notified_tag", "update_installing_tag", "update_seen_tag",
             "personal_calibration",
             // The smart assistant's switch and its sealed DeepSeek key belong to this phone, never to a backup.
-            "ai_enabled", "ai_key_sealed",
+            "ai_enabled", "ai_key_sealed", "ai_deeper",
         )
         val keys = org.openstrap.app.data.settings.SettingsKeys::class.java.declaredFields
             .filter { java.lang.reflect.Modifier.isStatic(it.modifiers) && it.type == String::class.java && !it.name.endsWith("_PREFIX") }

@@ -42,7 +42,7 @@ class AiPayloadTest {
 
     @Test fun `the fields the assistant needs are there`() {
         val j = json()
-        assertEquals(1, j.getInt("v"))
+        assertEquals(2, j.getInt("v"))
         assertEquals("2026-11-17", j.getString("today"))
         assertEquals(480, j.getJSONObject("user").getInt("sleep_need_min"))
         assertEquals(10_000, j.getJSONObject("targets").getInt("steps"))
@@ -60,6 +60,20 @@ class AiPayloadTest {
         for (k in listOf("bed", "wake", "asleep", "deep", "rem", "light", "awake", "wakeups", "hrv", "score")) assertTrue(k, night.has(k))
         val w = j.getJSONArray("workouts").getJSONObject(0)
         for (k in listOf("sport", "min", "avg_hr", "max_hr", "load", "hr_drop_1m")) assertTrue(k, w.has(k))
+    }
+
+    @Test fun `the insights are in, worked out by the app from the whole history`() {
+        val j = json()
+        val insights = j.getJSONObject("insights")
+        for (k in listOf("periods", "links", "weekday", "best_days", "worst_days", "streaks", "debt", "workout_next_day")) assertTrue(k, insights.has(k))
+        val sleep = insights.getJSONObject("periods").getJSONObject("sleep")
+        assertEquals(7, sleep.getInt("n"))
+        assertTrue(sleep.has("d_prev") && sleep.has("dir"))
+        // Worked out before anything is cut: its 7 days are all there though the history sent is cut short.
+        val big = AiPayload.build(aiInput(bedtime = "z".repeat(900)))
+        assertTrue(big.trimmed)
+        assertTrue(big.days < 30)
+        assertEquals(7, JSONObject(big.json).getJSONObject("insights").getJSONObject("periods").getJSONObject("sleep").getInt("n"))
     }
 
     @Test fun `no personal data and no raw streams can be in it`() {
@@ -81,8 +95,8 @@ class AiPayloadTest {
         assertTrue(AiPayload.cleanText("x".repeat(100)).length <= 24)
     }
 
-    @Test fun `it stays under 12 kB, dropping the oldest history first when the nights are long`() {
-        val big = AiPayload.build(aiInput(bedtime = "z".repeat(450)))
+    @Test fun `it stays under the cap, dropping the oldest history first when the nights are long, and keeps the insights`() {
+        val big = AiPayload.build(aiInput(bedtime = "z".repeat(900)))
         assertTrue("${big.bytes} bytes", big.bytes <= AiPayload.MAX_BYTES)
         assertEquals(big.json.toByteArray().size, big.bytes)
         assertTrue(big.trimmed)
@@ -90,11 +104,22 @@ class AiPayloadTest {
         // The baselines, targets and the forecast stay when history goes.
         val j = JSONObject(big.json)
         assertTrue(j.has("baselines") && j.has("targets") && j.has("forecast"))
+        val insights = j.getJSONObject("insights")
+        assertTrue(insights.has("periods") && insights.has("links") && insights.has("workout_next_day"))
     }
 
-    @Test fun `a normal payload is well under the cap`() {
+    @Test fun `even the shortest history keeps the insights`() {
+        val tiny = AiPayload.build(aiInput(bedtime = "z".repeat(5_000)))
+        assertTrue(tiny.bytes <= AiPayload.MAX_BYTES)
+        assertTrue(JSONObject(tiny.json).has("insights"))
+    }
+
+    @Test fun `a normal payload, insights and all, is under the cap and keeps the full history`() {
         val built = AiPayload.build(aiInput())
         assertTrue("${built.bytes} bytes", built.bytes < AiPayload.MAX_BYTES)
+        assertFalse(built.trimmed)
+        val insights = JSONObject(built.json).getJSONObject("insights").toString().toByteArray().size
+        assertTrue("insights take $insights bytes", insights < 6_000)
     }
 
     @Test fun `missing values are left out, not sent as null`() {
@@ -129,7 +154,25 @@ class AiPayloadTest {
         val body = AiClient.requestBody(AiPrompt.system, AiPrompt.userMessage(payload))
         val user = body.getJSONArray("messages").getJSONObject(1).getString("content")
         assertTrue(user.endsWith(payload))
-        for (k in listOf(AiAnswer.SUMMARY, AiAnswer.PATTERNS, AiAnswer.DO_THIS, AiAnswer.ADJUST, AiAnswer.OUTLOOK)) assertTrue(k, AiPrompt.system.contains(k))
+        for (k in listOf(AiAnswer.DEEP, AiAnswer.SUMMARY, AiAnswer.PATTERNS, AiAnswer.DO_THIS, AiAnswer.ADJUST, AiAnswer.OUTLOOK)) assertTrue(k, AiPrompt.system.contains(k))
         assertNotNull(AiPrompt.system)
+    }
+
+    @Test fun `the prompt explains the insights it is sent, and asks for the deep part first`() {
+        val p = AiPrompt.system
+        for (k in listOf("insights", "periods", "links", "weekday", "best_days", "streaks", "workout_next_day", "load_next_rec", "insufficient")) assertTrue(k, p.contains(k))
+        assertTrue(p.indexOf("\"deep\"") in 0 until p.indexOf("\"summary\""))
+    }
+
+    @Test fun `the deeper thinking asks the reasoning model, without a JSON mode or a temperature`() {
+        val deep = AiClient.requestBody("s", "u", deeper = true)
+        assertEquals("deepseek-reasoner", deep.getString("model"))
+        assertFalse(deep.has("response_format"))
+        assertFalse(deep.has("temperature"))
+        assertEquals(AiClient.MAX_TOKENS_DEEP, deep.getInt("max_tokens"))
+        val plain = AiClient.requestBody("s", "u")
+        assertEquals("deepseek-chat", plain.getString("model"))
+        assertEquals(AiClient.MAX_TOKENS, plain.getInt("max_tokens"))
+        assertTrue(AiClient.MAX_TOKENS <= 8_192)
     }
 }

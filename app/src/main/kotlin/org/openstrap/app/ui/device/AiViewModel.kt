@@ -92,6 +92,11 @@ class AiViewModel(private val ai: AiAssistant) : ViewModel() {
         }
     }
 
+    /** Turns the deeper thinking (the reasoning model) on or off. */
+    fun setDeeper(on: Boolean) {
+        viewModelScope.launch { catching { ai.keys.setDeeper(on) } }
+    }
+
     fun setEnabled(on: Boolean) {
         viewModelScope.launch { catching { ai.keys.setEnabled(on) } }
         if (!on) cancel()

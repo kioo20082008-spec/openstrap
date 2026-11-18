@@ -25,12 +25,13 @@
     <string name="ai_consent_nights">The last 14 nights in detail: bed and wake times, sleep stages, wake-ups.</string>
     <string name="ai_consent_workouts">The last 14 workouts: sport, duration, average and highest heart rate, load, and how far the heart rate dropped after.</string>
     <string name="ai_consent_extra">Your averages, sleep need, daily targets, today\'s plan, a simple forecast, and your age and sex if you entered them.</string>
+    <string name="ai_consent_insights">Comparisons the app works out from those same numbers: this week against last week and your 30-day average, how sleep, bedtime, load and steps go with Recovery and HRV, weekday patterns, your best and worst days, streaks, sleep debt, and each workout\'s effect on the next morning.</string>
     <string name="ai_consent_never">Never sent: your name, email, location or routes, the strap\'s ID or address, or raw heart rate readings.</string>
     <string name="ai_consent_third">DeepSeek is a separate company with its own terms and privacy policy, and it bills your key. The answer is general wellness guidance from your own numbers, not medical advice.</string>
     <string name="ai_consent_key">Your key stays on this phone, encrypted with the phone\'s key store. It is not in backups and it stays when you forget the strap.</string>
     <string name="ai_analysis_title">Analysis</string>
     <string name="ai_analyse_now">Analyse now</string>
-    <string name="ai_analysing">Analysing your data</string>
+    <string name="ai_analysing">Analysing your data…</string>
     <string name="ai_updated">Updated %1$s</string>
     <string name="ai_updated_earlier">From an earlier day, %1$s. Tap Analyse now for a fresh one.</string>
     <string name="ai_basis">From %1$s, %2$s and %3$s</string>
@@ -53,7 +54,7 @@
     <string name="ai_fail_bad_key">DeepSeek doesn\'t accept this key (error 401). Check it or replace it in the assistant\'s settings.</string>
     <string name="ai_fail_no_balance">The DeepSeek account has no balance (error 402). Top it up on DeepSeek\'s site.</string>
     <string name="ai_fail_rate_limit">Too many requests (error 429). Wait a minute and try again.</string>
-    <string name="ai_fail_timeout">DeepSeek didn\'t answer within 60 seconds. Try again.</string>
+    <string name="ai_fail_timeout">DeepSeek didn\'t answer in time. The analysis is long, so try again, or turn off deeper thinking.</string>
     <string name="ai_fail_malformed">The answer came back empty or unreadable. Try again.</string>
     <string name="ai_fail_server">DeepSeek is busy or down right now. Try again later.</string>
     <string name="ai_fail_rejected">DeepSeek refused the request (error %1$d).</string>
@@ -63,4 +64,13 @@
     <plurals name="ai_basis_days"><item quantity="one">%1$d day</item><item quantity="other">%1$d days</item></plurals>
     <plurals name="ai_basis_nights"><item quantity="one">%1$d night</item><item quantity="other">%1$d nights</item></plurals>
     <plurals name="ai_basis_workouts"><item quantity="one">%1$d workout</item><item quantity="other">%1$d workouts</item></plurals>
+    <string name="ai_analysing_note">This is a detailed analysis, so it can take a minute or two.</string>
+    <string name="ai_analysing_deep">Deeper thinking is on, so it can take up to four minutes.</string>
+    <string name="ai_deeper_title">Deeper thinking</string>
+    <string name="ai_deeper_note">Uses DeepSeek\'s reasoning model: a slower, more careful analysis (up to 4 minutes) that uses more of your balance.</string>
+    <string name="ai_deep_title">Detailed analysis</string>
+    <string name="ai_deep_toggle">Show or hide the detailed analysis</string>
+    <string name="ai_deep_toggle_section">Show or hide this section</string>
+    <string name="ai_deep_untitled">Details</string>
+    <plurals name="ai_deep_count"><item quantity="one">%1$d section</item><item quantity="other">%1$d sections</item></plurals>
 </resources>

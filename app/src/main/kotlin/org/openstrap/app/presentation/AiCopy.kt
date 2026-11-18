@@ -60,6 +60,11 @@ object AiCopy {
     /** Where the data goes, for the consent text. */
     fun consentWhere(strings: Strings = Strings.app): String = strings.format(R.string.ai_consent_where, AiClient.HOST)
 
+    /** A number (with its sign, decimals, colon, slash, range or percent) as a left-to-right run, so Arabic text around it can't turn it round. */
+    fun isolateNumbers(text: String): String = NUMBER.replace(text) { "\u2066${it.value}\u2069" }
+
+    private val NUMBER = Regex("[+\\-\u2212]?\\d+(?:[.,:/\\-\u2212]\\d+)*%?")
+
     /** The saved key's line: where it is kept and how it is shown. */
     fun keySaved(masked: String, strings: Strings = Strings.app): String = strings.format(R.string.ai_key_saved, masked)
 }

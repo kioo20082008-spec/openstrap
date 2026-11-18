@@ -76,4 +76,20 @@ class AiResultStoreTest {
         store.clear()
         assertNull(store.latest())
     }
+
+    @Test fun `an analysis with a detailed part is kept and read back whole`() = runBlocking {
+        val deep = listOf(AiDeepSection("النوم", "نص", listOf("6 ساعات")), AiDeepSection("التعافي", "نص ثان"))
+        val c = AiCached(LocalDate.of(2026, 11, 17), 1_000, AiAnswer("ملخص", listOf("أ"), listOf("ب"), listOf("ج"), "د", deep = deep))
+        store.save(c)
+        assertEquals(c, AiResultStore(file).latest())
+        assertEquals(deep, store.latest()!!.answer.deep)
+    }
+
+    @Test fun `a file kept before the detailed part existed still loads`() {
+        val old = """{"v":1,"entries":[{"day":"2026-11-16","at":5,"days":30,"nights":14,"workouts":9,"answer":"{\"summary\":\"قديم\",\"patterns\":[\"أ\"],\"doThis\":[\"ب\"],\"adjust\":[\"ج\"],\"outlook\":\"د\",\"partial\":false}"}]}"""
+        val read = AiResultStore.decode(old).single()
+        assertEquals("قديم", read.answer.summary)
+        assertTrue(read.answer.deep.isEmpty())
+        assertEquals(30, read.days)
+    }
 }

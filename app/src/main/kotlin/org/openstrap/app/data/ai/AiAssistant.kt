@@ -36,7 +36,7 @@ class AiAssistant(
         }
         if (!enough(input)) return AiResult.Failed(AiFailure.NoData)
         val payload = AiPayload.build(input)
-        return when (val reply = client.analyse(key, payload.json)) {
+        return when (val reply = client.analyse(key, payload.json, deeper = keys.deeper.first())) {
             is AiResult.Failed -> reply
             is AiResult.Ok -> {
                 val answer = AiAnswer.parse(reply.value) ?: return AiResult.Failed(AiFailure.Malformed)

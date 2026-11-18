@@ -57,8 +57,10 @@ class AiClientTest {
         assertFalse(http.calls.single().body!!.contains(key))
     }
 
-    @Test fun `the timeout is a minute`() {
-        assertEquals(60_000, AiClient.TIMEOUT_MS)
+    @Test fun `the timeout is two and a half minutes, four for the deeper thinking, one for a key check`() {
+        assertEquals(150_000, AiClient.TIMEOUT_MS)
+        assertEquals(240_000, AiClient.DEEP_TIMEOUT_MS)
+        assertEquals(60_000, AiClient.CHECK_TIMEOUT_MS)
         assertEquals("api.deepseek.com", AiClient.HOST)
     }
 
@@ -87,14 +89,56 @@ class AiClientTest {
         assertEquals(AiResult.Failed(AiFailure.Unknown), AiClient(Fake(IllegalStateException("boom"))).analyse(key, "{}"))
     }
 
-    @Test fun `an answer that takes over a minute is a timeout`() = runTest {
-        val slow = object : AiHttp {
-            override suspend fun call(url: String, key: String, body: String?, timeoutMillis: Int): AiReply {
-                delay(120_000)
-                return AiReply(200, "")
-            }
+    private class Slow(private val millis: Long, private val reply: AiReply) : AiHttp {
+        val timeouts = mutableListOf<Int>()
+
+        override suspend fun call(url: String, key: String, body: String?, timeoutMillis: Int): AiReply {
+            timeouts += timeoutMillis
+            delay(millis)
+            return reply
         }
-        assertEquals(AiResult.Failed(AiFailure.Timeout), AiClient(slow).analyse(key, "{}"))
+    }
+
+    @Test fun `an answer that takes over two and a half minutes is a timeout`() = runTest {
+        assertEquals(AiResult.Failed(AiFailure.Timeout), AiClient(Slow(160_000, AiReply(200, ""))).analyse(key, "{}"))
+        // A slow but in-time answer is fine, and the socket is told the same limit.
+        val fine = Slow(120_000, completion("{}"))
+        assertEquals(AiResult.Ok("{}"), AiClient(fine).analyse(key, "{}"))
+        assertEquals(listOf(150_000), fine.timeouts)
+    }
+
+    @Test fun `the deeper thinking is given four minutes`() = runTest {
+        val slow = Slow(200_000, completion("{}"))
+        assertEquals(AiResult.Ok("{}"), AiClient(slow).analyse(key, "{}", deeper = true))
+        assertEquals(listOf(240_000), slow.timeouts)
+        assertEquals(AiResult.Failed(AiFailure.Timeout), AiClient(Slow(250_000, completion("{}"))).analyse(key, "{}", deeper = true))
+        // The same wait on the chat model is too long.
+        assertEquals(AiResult.Failed(AiFailure.Timeout), AiClient(Slow(200_000, completion("{}"))).analyse(key, "{}"))
+    }
+
+    @Test fun `the deeper thinking asks the reasoning model, and falls back to the chat model when refused`() = runTest {
+        val ok = Fake(completion("{}"))
+        AiClient(ok).analyse(key, "{}", deeper = true)
+        assertEquals("deepseek-reasoner", JSONObject(ok.calls.single().body!!).getString("model"))
+        assertFalse(JSONObject(ok.calls.single().body!!).has("response_format"))
+        val refused = Fake(AiReply(400, "{}"), completion("{}"))
+        assertEquals(AiResult.Ok("{}"), AiClient(refused).analyse(key, "{}", deeper = true))
+        assertEquals(listOf("deepseek-reasoner", "deepseek-chat"), refused.calls.map { JSONObject(it.body!!).getString("model") })
+        // A wrong key or no balance is not retried, and the chat model's own refusal is not either.
+        val wrong = Fake(AiReply(401, "{}"))
+        assertEquals(AiResult.Failed(AiFailure.BadKey, 401), AiClient(wrong).analyse(key, "{}", deeper = true))
+        assertEquals(1, wrong.calls.size)
+        val chat = Fake(AiReply(400, "{}"))
+        assertEquals(AiResult.Failed(AiFailure.Rejected, 400), AiClient(chat).analyse(key, "{}"))
+        assertEquals(1, chat.calls.size)
+    }
+
+    @Test fun `the answer is the reply's content, not the reasoning before it`() {
+        val reply = JSONObject().put(
+            "choices",
+            org.json.JSONArray().put(JSONObject().put("message", JSONObject().put("reasoning_content", "تفكير طويل").put("content", """{"summary":"س"}"""))),
+        ).toString()
+        assertEquals("""{"summary":"س"}""", AiClient.content(reply))
     }
 
     @Test fun `a reply with no text in it is malformed`() = runTest {
