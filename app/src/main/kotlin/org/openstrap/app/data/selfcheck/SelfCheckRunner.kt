@@ -75,6 +75,23 @@ class SelfCheckRunner(
         return out
     }
 
+    /**
+     * The last [TRACE_DAYS] days' Energy inputs to [today], to be replayed under other tunings ([Replays]): what the AI body
+     * learning tries a proposal on. The replays are the same ones [run] makes; nothing is detected or changed here.
+     */
+    suspend fun replays(today: LocalDate, profile: UserProfile, zone: ZoneId, now: Long): Replays {
+        val inputs = LinkedHashMap<LocalDate, ChargeInputs>()
+        val falseSteps = HashMap<LocalDate, Int>()
+        for (back in (TRACE_DAYS - 1) downTo 0) {
+            currentCoroutineContext().ensureActive()
+            val date = today.minusDays(back.toLong())
+            val charge = catching { engine.replay(date, profile, zone, now) }.getOrNull()?.charge ?: continue
+            inputs[date] = charge
+            falseSteps[date] = falseStepsOf(catching { health.recovery(date, profile) }.getOrNull())
+        }
+        return Replays(inputs, falseSteps, today)
+    }
+
     private fun falseStepsOf(r: RecoveryResult?): Int = r?.activity?.falseSteps?.values?.sum() ?: 0
 
     companion object {

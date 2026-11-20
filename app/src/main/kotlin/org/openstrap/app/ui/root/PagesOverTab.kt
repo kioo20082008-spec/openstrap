@@ -260,6 +260,7 @@ private fun DataPage(
                 AiSettingsPage(
                     state, padding, onSaveKey = ai::saveKey, onClearSaveError = ai::clearSaveError, onTest = ai::test,
                     onDelete = ai::deleteKey, onEnabled = ai::setEnabled, onDeeper = ai::setDeeper, onOpenAnalysis = { open(Page.AiAnalysis) }, onBack = close,
+                    onOpenLearning = { open(Page.SelfCheck) },
                 )
             } else {
                 AiAnalysisPage(
@@ -271,7 +272,11 @@ private fun DataPage(
         Page.SelfCheck -> {
             val vm: SelfCheckViewModel = viewModel(factory = ViewModelFactories.selfCheck(container))
             val ui by vm.state.collectAsStateWithLifecycle()
-            SelfCheckPage(ui, padding, onOn = vm::setOn, onUndo = vm::undo, onRemove = vm::remove, onResetAll = vm::resetAll, onBack = close)
+            SelfCheckPage(
+                ui, padding, onOn = vm::setOn, onUndo = vm::undo, onRemove = vm::remove, onResetAll = vm::resetAll, onBack = close,
+                onAiOn = vm::setAiOn, onLearnNow = vm::learnNow, onApplyNeed = vm::applySleepNeed, onClearLearned = vm::clearLearned,
+                onOpenAssistant = { open(Page.AiSettings) },
+            )
         }
         else -> Unit
     }

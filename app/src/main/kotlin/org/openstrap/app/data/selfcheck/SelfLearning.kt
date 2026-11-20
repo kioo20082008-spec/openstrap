@@ -32,6 +32,15 @@ object SelfLearning {
     /** An incident is told only while its last evidence is no older than this many days. */
     const val NOTIFY_FRESH_DAYS = 1L
 
+    /**
+     * The check ids of what the AI body learning proposed ([org.openstrap.app.data.ailearn.AiLearning]) start with this:
+     * `ai.<knob>` for a proposal that was applied, `ai.no.<knob>` for one that was refused. They are told once a day by
+     * the AI learning's own notification, not by [nextNotice].
+     */
+    const val AI_PREFIX = "ai."
+
+    fun isAi(check: String): Boolean = check.startsWith(AI_PREFIX)
+
     enum class Status {
         /** Something was changed because of it. */
         Applied,
@@ -57,6 +66,8 @@ object SelfLearning {
         val status: Status,
         val changes: List<Change>,
         val notified: Boolean,
+        /** A line of words with the incident: the evidence the AI gave for a proposal ([isAi]); empty for the app's own checks. */
+        val note: String = "",
     ) {
         /** Still changing something on [today]: applied, and not yet faded away. */
         fun active(today: LocalDate): Boolean = status == Status.Applied && factor(last, today) > 0f
@@ -107,7 +118,14 @@ object SelfLearning {
      * incident of its check that is within [EPISODE_GAP_DAYS] of its day, or starts one. Only a Medium or High finding with
      * a change applies it; a Low one, or one with nothing to change, is recorded. An undone incident is not applied again.
      */
-    fun settle(state: State, decisions: List<Decision>, now: Long, today: LocalDate): State {
+    fun settle(state: State, decisions: List<Decision>, now: Long, today: LocalDate): State =
+        absorb(state, decisions).copy(lastRun = now, lastRunDay = today)
+
+    /**
+     * [state] with [decisions] taken in as [settle] does, but without touching the run line: the AI body learning logs its
+     * proposals this way, so its pass never counts as the self-check's own.
+     */
+    fun absorb(state: State, decisions: List<Decision>): State {
         var incidents = state.incidents
         var nextId = (incidents.maxOfOrNull { it.id } ?: 0) + 1
         for (d in decisions.sortedBy { it.finding.day }) {
@@ -119,6 +137,7 @@ object SelfLearning {
             if (at < 0) {
                 incidents = incidents + Incident(
                     nextId++, f.check, f.severity, f.day, f.day, f.nums, if (changes.isEmpty()) Status.Informed else Status.Applied, changes, notified = false,
+                    note = f.note,
                 )
                 continue
             }
@@ -129,6 +148,7 @@ object SelfLearning {
                 last = maxOf(old.last, f.day),
                 severity = maxOf(old.severity, f.severity),
                 nums = if (newest) f.nums else old.nums,
+                note = if (newest && f.note.isNotEmpty()) f.note else old.note,
                 status = when {
                     old.status == Status.Undone -> Status.Undone
                     changes.isNotEmpty() -> Status.Applied
@@ -138,7 +158,18 @@ object SelfLearning {
             )
             incidents = incidents.toMutableList().also { it[at] = merged }
         }
-        return state.copy(incidents = incidents.sortedByDescending { it.last }.take(KEEP), lastRun = now, lastRunDay = today)
+        return state.copy(incidents = capAi(incidents).sortedByDescending { it.last }.take(KEEP))
+    }
+
+    /** At most this many of what the AI body learning only noted (refused, offered, undone) are kept, the newest, so they never crowd out the self-check's own incidents. */
+    const val KEEP_AI_NOTES = 10
+
+    private fun capAi(list: List<Incident>): List<Incident> {
+        val notes = list.filter { isAi(it.check) && it.status != Status.Applied }
+            .sortedWith(compareByDescending<Incident> { it.last }.thenByDescending { it.id })
+        if (notes.size <= KEEP_AI_NOTES) return list
+        val drop = notes.drop(KEEP_AI_NOTES).mapTo(HashSet()) { it.id }
+        return list.filter { it.id !in drop }
     }
 
     /** Whether the heavy run is due at [now]: the first, the first of a day, or [RUN_EVERY_SECONDS] after the last; never twice within [MIN_GAP_SECONDS]. */
@@ -162,7 +193,7 @@ object SelfLearning {
     fun nextNotice(state: State, today: LocalDate, quiet: Boolean): Incident? {
         if (quiet || state.notifiedDays.count { it == today } >= MAX_PER_DAY) return null
         return state.incidents
-            .filter { !it.notified && it.last >= today.minusDays(NOTIFY_FRESH_DAYS) && worthTelling(it) }
+            .filter { !it.notified && !isAi(it.check) && it.last >= today.minusDays(NOTIFY_FRESH_DAYS) && worthTelling(it) }
             .maxWithOrNull(compareBy<Incident>({ it.severity }, { it.last }, { it.id }))
     }
 
@@ -190,6 +221,14 @@ object SelfLearning {
     fun resetAll(state: State): State =
         state.copy(incidents = state.incidents.map { if (it.status == Status.Applied) it.copy(status = Status.Undone) else it })
 
+    /** Takes back every AI-proposed change that was last applied on [day] (the notification's Undo); they stay listed as undone. */
+    fun undoAiOn(state: State, day: LocalDate): State = state.copy(
+        incidents = state.incidents.map { if (isAi(it.check) && it.status == Status.Applied && it.last == day) it.copy(status = Status.Undone) else it },
+    )
+
+    /** Removes everything the AI proposed, applied or not: "clear what it learned" leaves the published model and no trace of it. */
+    fun clearAi(state: State): State = state.copy(incidents = state.incidents.filterNot { isAi(it.check) })
+
     /** Removes incident [id] from the list; one still changing something is undone instead, so it stays until the evidence moves on. */
     fun dismiss(state: State, id: Int, today: LocalDate): State {
         val i = state.incidents.firstOrNull { it.id == id } ?: return state
@@ -212,9 +251,12 @@ object SelfLearning {
             append("inc").append(SEP).append(i.id).append(SEP).append(i.check).append(SEP).append(i.severity.name).append(SEP)
             append(i.first).append(SEP).append(i.last).append(SEP).append(i.status.name).append(SEP).append(if (i.notified) 1 else 0).append(SEP)
             append(i.nums.joinToString(",")).append(SEP)
-            append(i.changes.joinToString(",") { "${it.knob.key}=${it.to}" }).append('\n')
+            append(i.changes.joinToString(",") { "${it.knob.key}=${it.to}" }).append(SEP).append(oneLine(i.note)).append('\n')
         }
     }
+
+    /** [text] on one line with no separator in it, so it fits a stored line. */
+    private fun oneLine(text: String): String = text.map { if (it == SEP || it == '\n' || it == '\r') ' ' else it }.joinToString("").trim()
 
     /** The state [encode] wrote; empty for nothing, another version or text that makes no sense. A bad line is skipped. */
     fun decode(raw: String?): State {
@@ -239,6 +281,7 @@ object SelfLearning {
                             val v = kv.getOrNull(1)?.toFloatOrNull()
                             if (k != null && v != null) Change(k, k.snap(v)) else null
                         },
+                        note = p.getOrNull(10).orEmpty(),
                     )
                 }
             } catch (e: RuntimeException) {

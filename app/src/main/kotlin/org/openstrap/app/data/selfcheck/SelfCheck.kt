@@ -33,7 +33,8 @@ enum class Knob(
     val default: Float,
     val min: Float,
     val max: Float,
-    private val quantum: Double,
+    /** The grid the knob's value is snapped to. */
+    val quantum: Double,
     val soft: Float,
     val strong: Float,
 ) {
@@ -113,6 +114,8 @@ data class Finding(
     val day: LocalDate,
     val nums: List<Float>,
     val plan: Plan,
+    /** A line of words kept with the incident (the evidence the AI gave for a proposal); empty for the app's own checks. */
+    val note: String = "",
 )
 
 /** A plausibility check: one small class per rule, listed in [SelfChecks.all]. */

@@ -17,6 +17,8 @@ class AiAssistant(
     val results: AiResultStore,
     private val zone: () -> ZoneId = { ZoneId.systemDefault() },
     private val nowSeconds: () -> Long = { System.currentTimeMillis() / MILLIS },
+    /** The body profile the AI body learning keeps (its JSON), sent with the analysis so it is made for this body; null when there is none. */
+    private val profile: suspend () -> String? = { null },
 ) {
     /**
      * One analysis: switched on and a key saved, the numbers gathered, sent, the answer read and kept for today. A
@@ -35,7 +37,15 @@ class AiAssistant(
             return AiResult.Failed(AiFailure.NoData)
         }
         if (!enough(input)) return AiResult.Failed(AiFailure.NoData)
-        val payload = AiPayload.build(input)
+        // A profile that can't be read is no profile: the analysis goes ahead without it.
+        val body = try {
+            profile()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        }
+        val payload = AiPayload.build(input, body)
         return when (val reply = client.analyse(key, payload.json, deeper = keys.deeper.first())) {
             is AiResult.Failed -> reply
             is AiResult.Ok -> {

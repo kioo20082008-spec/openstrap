@@ -2,6 +2,7 @@ package org.openstrap.app.data.ai
 
 import org.json.JSONArray
 import org.json.JSONObject
+import org.openstrap.app.data.ailearn.BodyProfile
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
@@ -32,8 +33,8 @@ object AiPayload {
     private const val SPORT_CHARS = 24
 
     /** Every key that may appear anywhere in the JSON, so a test (and a reader) can see nothing else is sent. */
-    val KEYS: Set<String> = AiInsights.KEYS + setOf(
-        "v", "today", "weekday", "user", "targets", "now", "load_model", "baselines", "forecast", "days", "nights", "workouts",
+    val KEYS: Set<String> = AiInsights.KEYS + BodyProfile.KEYS + setOf(
+        "profile", "v", "today", "weekday", "user", "targets", "now", "load_model", "baselines", "forecast", "days", "nights", "workouts",
         "age", "sex", "sleep_need_min", "usual_bed", "usual_wake",
         "steps", "sleep_min", "active_hours", "kcal", "workouts_week",
         "recovery", "energy", "energy_wake", "strain", "load", "plan",
@@ -57,26 +58,39 @@ object AiPayload {
 
     private val shortDate = DateTimeFormatter.ofPattern("MM-dd")
 
-    fun build(input: AiInput): Built {
+    /**
+     * The payload for [input]. [profile] is the body profile the AI body learning keeps (its JSON, [BodyProfile]), sent whole so
+     * the analysis is made for this body; it counts on top of [MAX_BYTES] and is never trimmed.
+     */
+    fun build(input: AiInput, profile: String? = null): Built {
         val days = input.days.sortedBy { it.date }.takeLast(DAYS)
         val nights = input.nights.sortedBy { it.date }.takeLast(NIGHTS)
         val workouts = input.workouts.sortedBy { it.date }.takeLast(WORKOUTS)
         val insights = AiInsights.toJson(AiInsights.of(input))
+        val profileJson = profile?.let { runCatching { JSONObject(it) }.getOrNull() }
+        val limit = MAX_BYTES + (profile?.takeIf { profileJson != null }?.toByteArray(Charsets.UTF_8)?.size ?: 0)
         var last: Built? = null
         for ((d, n, w) in STEPS) {
-            val json = write(input, insights, days.takeLast(d), nights.takeLast(n), workouts.takeLast(w))
+            val json = write(input, insights, days.takeLast(d), nights.takeLast(n), workouts.takeLast(w), profileJson)
             val built = Built(json, json.toByteArray(Charsets.UTF_8).size, minOf(d, days.size), minOf(n, nights.size), minOf(w, workouts.size), false)
             last = built
-            if (built.bytes <= MAX_BYTES) {
+            if (built.bytes <= limit) {
                 return built.copy(trimmed = built.days < days.size || built.nights < nights.size || built.workouts < workouts.size)
             }
         }
         // Even three days over the cap (nothing but absurd input does that): send the targets and the forecast alone.
-        val json = write(input, insights, emptyList(), emptyList(), emptyList())
+        val json = write(input, insights, emptyList(), emptyList(), emptyList(), profileJson)
         return checkNotNull(last).copy(json = json, bytes = json.toByteArray(Charsets.UTF_8).size, days = 0, nights = 0, workouts = 0, trimmed = true)
     }
 
-    private fun write(input: AiInput, insights: JSONObject, days: List<AiDay>, nights: List<AiNight>, workouts: List<AiWorkout>): String {
+    private fun write(
+        input: AiInput,
+        insights: JSONObject,
+        days: List<AiDay>,
+        nights: List<AiNight>,
+        workouts: List<AiWorkout>,
+        profile: JSONObject?,
+    ): String {
         val root = JSONObject()
         root.put("v", VERSION)
         root.put("today", input.date.toString())
@@ -116,6 +130,7 @@ object AiPayload {
         root.put("baselines", baselines(input.days.sortedBy { it.date }.takeLast(DAYS)))
         root.put("forecast", forecast(AiForecast.of(input)))
         root.put("insights", insights)
+        profile?.let { root.put("profile", it) }
         root.put("days", JSONArray().apply {
             days.forEach { d ->
                 put(JSONObject().apply {

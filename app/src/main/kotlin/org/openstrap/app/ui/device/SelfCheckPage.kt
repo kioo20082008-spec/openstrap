@@ -38,7 +38,8 @@ import org.openstrap.app.ui.theme.MetricColors
 /**
  * The self-learning page, from You > App: a line on what it does, the master switch, what is in effect now, every
  * incident with what was seen and what was adjusted (Undo while it is at work, Remove after), and one button that takes
- * everything back. Numbers sit in the sentences, which come from [SelfCheckCopy] with the digits Western.
+ * everything back; then the AI body learning ([aiLearnItems]). Numbers sit in the sentences, which come from
+ * [SelfCheckCopy] with the digits Western.
  */
 @Composable
 fun SelfCheckPage(
@@ -49,10 +50,17 @@ fun SelfCheckPage(
     onRemove: (Int) -> Unit,
     onResetAll: () -> Unit,
     onBack: () -> Unit,
+    onAiOn: (Boolean) -> Unit = {},
+    onLearnNow: () -> Unit = {},
+    onApplyNeed: (Int) -> Unit = {},
+    onClearLearned: () -> Unit = {},
+    onOpenAssistant: () -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
     val lines = remember(ui) { if (ui.on) SelfCheckCopy.inEffect(SelfLearning.learned(ui.state, ui.today)) else emptyList() }
     val atWork = ui.state.incidents.any { it.active(ui.today) }
+    // What the AI proposed is listed with the AI learning, below; this list is the app's own checks.
+    val found = remember(ui) { ui.state.incidents.filterNot { SelfLearning.isAi(it.check) } }
     ScreenList(contentPadding, gutter = GlowLayout.Gutter) {
         item { RingsHeader(stringResource(R.string.selfcheck_title), onBack) }
         item {
@@ -84,13 +92,14 @@ fun SelfCheckPage(
             }
         }
         item { RingsSection(stringResource(R.string.selfcheck_section_found)) }
-        if (ui.state.incidents.isEmpty()) {
+        if (found.isEmpty()) {
             item {
                 RingsPanel { Text(stringResource(R.string.selfcheck_found_empty), color = AppColors.muted, style = GlowType.body) }
             }
         } else {
-            items(ui.state.incidents, key = { it.id }) { i -> Incident(i, ui.today, onUndo, onRemove) }
+            items(found, key = { it.id }) { i -> Incident(i, ui.today, onUndo, onRemove) }
         }
+        aiLearnItems(ui, onAiOn, onLearnNow, onApplyNeed, onClearLearned, onUndo, onRemove, onOpenAssistant)
     }
 }
 

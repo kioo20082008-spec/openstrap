@@ -2,7 +2,7 @@
 <resources>
     <string name="ai_title">Smart assistant</string>
     <string name="ai_row_no_key">Add your DeepSeek key</string>
-    <string name="ai_settings_intro">Bring your own DeepSeek key. When you ask, OpenStrap sends a summary of your recent data to DeepSeek and shows you its analysis and suggestions. Nothing is sent by itself.</string>
+    <string name="ai_settings_intro">Bring your own DeepSeek key. When you ask, OpenStrap sends a summary of your recent data to DeepSeek and shows you its analysis and suggestions. The only thing it sends by itself is the daily request of AI learning, which you can turn off.</string>
     <string name="ai_section_key">Your DeepSeek key</string>
     <string name="ai_key_hint">Paste your key here</string>
     <string name="ai_key_save">Save key</string>
@@ -20,7 +20,7 @@
     <string name="ai_open_analysis">Open the analysis</string>
     <string name="ai_open_analysis_note">Your last result, or a new one</string>
     <string name="ai_consent_title">What is sent, and where</string>
-    <string name="ai_consent_where">When you tap Analyse now, OpenStrap sends the data below to %1$s, with your own key. Nothing is sent before that, and nothing in the background.</string>
+    <string name="ai_consent_where">When you tap Analyse now, OpenStrap sends the data below to %1$s, with your own key. Apart from the daily request of AI learning (described further down), nothing is sent before that or in the background.</string>
     <string name="ai_consent_days">A summary of each of the last 30 days: sleep time and score, Recovery, HRV, resting heart rate, load and strain, steps (false steps removed) and Energy.</string>
     <string name="ai_consent_nights">The last 14 nights in detail: bed and wake times, sleep stages, wake-ups.</string>
     <string name="ai_consent_workouts">The last 14 workouts: sport, duration, average and highest heart rate, load, and how far the heart rate dropped after.</string>

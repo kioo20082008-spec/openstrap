@@ -27,6 +27,15 @@ data class AiDay(
     val steps: Int? = null,
     /** Energy (the 0 to 100 body battery) when the main sleep ended. */
     val energyAtWake: Int? = null,
+    /**
+     * For the AI body learning only ([org.openstrap.app.data.ailearn.LearnPayload]); the analysis's payload never writes them.
+     * When the night's sleep began, in minutes after 18:00, and when it ended, in minutes after midnight.
+     */
+    val bedMinutes: Int? = null,
+    val wakeMinutes: Int? = null,
+    /** The day's mean skin temperature and breathing rate, as the strap measured them. */
+    val skinTemp: Float? = null,
+    val breathRate: Float? = null,
 )
 
 /** One night in detail. Times are the phone's clock, as "HH:mm". */

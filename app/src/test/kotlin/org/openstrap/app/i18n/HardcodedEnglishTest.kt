@@ -100,6 +100,8 @@ class HardcodedEnglishTest {
             ("ble/BleScanner.kt" to "listOf") to "The names the official app accepts for the strap, matched in scans",
             ("ble/GattClient.kt" to "fail") to "Why a GATT call failed, for the diagnostics log. Callers show their own words",
             ("ble/GattClient.kt" to "failAny") to "Why the link failed, for the diagnostics log. Callers show their own words",
+            ("data/ai/AiPrompt.kt" to "appendLine") to "The model's instructions: Arabic that names the data's English keys, sent to DeepSeek and never shown",
+            ("data/ailearn/LearnPrompt.kt" to "appendLine") to "The body learning's instructions: Arabic that names the data's English keys, sent to DeepSeek and never shown",
             ("data/DetailRoutes.kt" to "") to "Health Connect detail route ids, read back by the app, never shown",
             ("data/db/DayKeyMigration.kt" to "") to "The migration's notes for the diagnostics log",
             ("device/HealthAlertNotifier.kt" to "") to "Names of the metric screens an alert opens, never shown",

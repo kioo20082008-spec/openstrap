@@ -179,13 +179,13 @@ data class AiAnswer(
             AiAnswer(plain = digits(text).take(MAX_PLAIN_CHARS).trim(), partial = true)
 
         /** The text inside a code fence when there is one (an unclosed fence loses only its opening line). */
-        private fun unfence(text: String): String {
+        internal fun unfence(text: String): String {
             fence.find(text)?.let { return it.groupValues[1].trim() }
             return text.replaceFirst(openFence, "").trim()
         }
 
         /** The first JSON object in [text] and whether it had to be closed ([repair]); null when there is none. */
-        private fun readObject(text: String): Pair<JSONObject, Boolean>? {
+        internal fun readObject(text: String): Pair<JSONObject, Boolean>? {
             val start = text.indexOf('{')
             if (start < 0) return null
             val candidate = text.substring(start)

@@ -40,18 +40,24 @@ class AiInputSource(
     private val zone: () -> ZoneId = { ZoneId.systemDefault() },
     private val nowSeconds: () -> Long = { System.currentTimeMillis() / MILLIS },
 ) {
+    /**
+     * The input for [historyDays] days to today: the 30 the analysis sends by default, or, for the AI body learning, the whole
+     * history up to [LEARN_DAYS] (Recovery and sleep scores only as far back as the weekly anchors reach; the rest from the
+     * daily summaries the database keeps). The nights and workouts are always the last 14 in detail.
+     */
     // The IO and CPU work is this function's; callers just wait.
     @Suppress("InjectDispatcher", "LongMethod")
-    suspend fun gather(): AiInput = withContext(Dispatchers.Default) {
+    suspend fun gather(historyDays: Int = AiPayload.DAYS): AiInput = withContext(Dispatchers.Default) {
         val z = zone()
         val today = Days.date(nowSeconds(), z)
         val p = profile.first()
         val g = goals.first()
-        val first = today.minusDays(AiPayload.DAYS - 1L)
+        val first = today.minusDays(historyDays - 1L)
         val window = DayWindow(Days.start(first, z), Days.end(today, z) - 1)
 
         // Recovery for today and each week back: each carries 7 days of Readiness, 67 of sleep scores and 30 of loads.
-        val anchors = (0 until ANCHORS).map { today.minusDays(it * WEEK) }
+        val anchorCount = if (historyDays <= AiPayload.DAYS) ANCHORS else (minOf(historyDays, RECOVERY_DAYS) + WEEK.toInt() - 1) / WEEK.toInt() + 1
+        val anchors = (0 until anchorCount).map { today.minusDays(it * WEEK) }
         val results: Map<LocalDate, RecoveryResult> = anchors.mapNotNull { d -> catching { health.recovery(d, p) }.getOrNull()?.let { d to it } }.toMap()
         val now = checkNotNull(results[today]) { "Recovery for today could not be worked out" }
         // Oldest first, so where two overlap the newest, with the freshest baselines, wins.
@@ -69,8 +75,12 @@ class AiInputSource(
         }.toMap()
         val resting = health.daily(DailyMetric.RestingHr, first, today).first().associate { it.date to it.value }
         val steps = health.daily(DailyMetric.Steps, first, today).first().associate { it.date to it.value.toInt() }
+        // Skin temperature and breathing are only for the AI body learning: the analysis never sends them.
+        val learning = historyDays > AiPayload.DAYS
+        val skin = if (learning) health.daily(DailyMetric.SkinTemperature, first, today).first().associate { it.date to it.value } else emptyMap()
+        val breath = if (learning) health.daily(DailyMetric.Breathing, first, today).first().associate { it.date to it.value } else emptyMap()
 
-        val days = (0 until AiPayload.DAYS).map { first.plusDays(it.toLong()) }.map { d ->
+        val days = (0 until historyDays).map { first.plusDays(it.toLong()) }.map { d ->
             val main = mains[d]
             // Today is still going: its load and steps are in `now`, so the day lists only the night that ended today.
             val dayLoad = loads[d]?.takeIf { d != today }
@@ -85,6 +95,10 @@ class AiInputSource(
                 strain = dayLoad?.let { Recovery.strain(it) },
                 steps = steps[d]?.takeIf { d != today },
                 energyAtWake = energyAtWake[d],
+                bedMinutes = main?.let { (minutesOfDay(it.start, z) - BED_FROM_MINUTES + MINUTES_A_DAY) % MINUTES_A_DAY },
+                wakeMinutes = main?.let { minutesOfDay(it.end, z) },
+                skinTemp = skin[d],
+                breathRate = breath[d],
             )
         }
         val nights = (0 until AiPayload.NIGHTS).map { today.minusDays(AiPayload.NIGHTS - 1L - it) }.mapNotNull { d ->
@@ -158,15 +172,24 @@ class AiInputSource(
 
     private fun clock(minutes: Int): String = java.time.LocalTime.of(minutes / MINUTES_AN_HOUR % HOURS_A_DAY, minutes % MINUTES_AN_HOUR).format(CLOCK)
 
-    private companion object {
-        const val MILLIS = 1000L
-        const val ANCHORS = 5
-        const val WEEK = 7L
-        const val SECONDS_A_MINUTE = 60L
-        const val MINUTES_AN_HOUR = 60
-        const val HOURS_A_DAY = 24
+    companion object {
+        /** The most history the AI body learning gathers: two years of days. */
+        const val LEARN_DAYS = 730
+        private const val MILLIS = 1000L
+        private const val ANCHORS = 5
+        private const val WEEK = 7L
+
+        /** How far back Recovery is worked out for the learning (weekly anchors), days. */
+        private const val RECOVERY_DAYS = 90
+
+        /** Bedtime is sent as minutes after 18:00, so a night that crosses midnight is one run of numbers. */
+        private const val BED_FROM_MINUTES = 18 * 60
+        private const val MINUTES_A_DAY = 24 * 60
+        private const val SECONDS_A_MINUTE = 60L
+        private const val MINUTES_AN_HOUR = 60
+        private const val HOURS_A_DAY = 24
 
         /** Local clock times as "23:40", with Western digits whatever the language. */
-        val CLOCK: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
+        private val CLOCK: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm", Locale.ROOT)
     }
 }

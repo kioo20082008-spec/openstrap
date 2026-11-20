@@ -44,9 +44,9 @@ internal object ViewModelFactories {
         initializer { AiViewModel(c.ai) }
     }
 
-    /** The self-learning page: the switch, the incidents and what is in effect now. */
+    /** The self-learning page: the switch, the incidents and what is in effect now, and the AI body learning. */
     fun selfCheck(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
-        initializer { SelfCheckViewModel(c.settings) }
+        initializer { SelfCheckViewModel(c.settings, c.aiLearning, c.ai.keys, c.appScope) }
     }
 
     /** The week report, worked out when its page opens. */

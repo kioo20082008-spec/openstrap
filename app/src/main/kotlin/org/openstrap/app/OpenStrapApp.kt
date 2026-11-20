@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.openstrap.app.ble.BleScanner
 import org.openstrap.app.data.HealthRepository
@@ -81,6 +82,8 @@ class AppContainer(val app: Application) {
         org.openstrap.app.data.ai.AiClient(),
         org.openstrap.app.data.ai.AiInputSource(health, workouts, settings.profile, settings.goals),
         org.openstrap.app.data.ai.AiResultStore(java.io.File(app.filesDir, "ai_analysis.json")),
+        // The body profile the AI learning keeps goes with an analysis, made for this body, only while the learning is on.
+        profile = { if (aiLearning.active.first()) settings.aiLearnProfile.first() else null },
     )
 
     /**
@@ -93,6 +96,22 @@ class AppContainer(val app: Application) {
         busy = { workout.state.value is org.openstrap.app.device.WorkoutState.Recording || strap.firmwareUpdating.value },
         quiet = { selfCheckNotifier.quiet(settings) },
         notify = selfCheckNotifier::show,
+    )
+
+    /**
+     * The AI body learning (docs/algorithms/self-check.md): once a day, after the first sync, the person's own DeepSeek key
+     * reads the history and keeps a small profile of this body. [org.openstrap.app.device.AiLearnWorker] asks it; it waits
+     * while a workout records or the strap's firmware installs.
+     */
+    private val aiLearnNotifier = org.openstrap.app.device.AiLearnNotifier(app)
+    // Typed on purpose: [ai] reads it in a lambda and it reads [ai]'s keys, so without a type Kotlin finds a recursive problem.
+    val aiLearning: org.openstrap.app.data.ailearn.AiLearningKeeper = org.openstrap.app.data.ailearn.AiLearningKeeper(
+        settings, ai.keys, org.openstrap.app.data.ai.AiClient(),
+        org.openstrap.app.data.ai.AiInputSource(health, workouts, settings.profile, settings.goals),
+        org.openstrap.app.data.selfcheck.SelfCheckRunner(health, database.healthDao()),
+        busy = { workout.state.value is org.openstrap.app.device.WorkoutState.Recording || strap.firmwareUpdating.value },
+        quiet = { selfCheckNotifier.quiet(settings) },
+        notify = aiLearnNotifier::show,
     )
 
     init {
@@ -156,6 +175,10 @@ class OpenStrapApp : Application(), androidx.work.Configuration.Provider {
             org.openstrap.app.device.CoachWorker.schedule(this@OpenStrapApp)
             // Looks for the first morning of the week, for the weekly recap (workouts spec 3.4).
             org.openstrap.app.device.WeeklyRecap.schedule(this@OpenStrapApp)
+        }
+        // The AI body learning's hourly look is scheduled while the learning is on, and cancelled while it is off.
+        container.appScope.launch {
+            org.openstrap.app.device.AiLearnWorker.follow(this@OpenStrapApp, container.aiLearning.active)
         }
     }
 }

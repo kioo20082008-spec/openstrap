@@ -74,6 +74,16 @@ class ForgetDeviceTest {
         assertEquals(false, SettingsKeys.AI_KEY in SettingsStore.STRAP_KEYS || SettingsKeys.AI_ENABLED in SettingsStore.STRAP_KEYS)
     }
 
+    @Test fun `forgetting the strap keeps the AI learning's profile and switch`() = runTest {
+        settings.setAiLearnOn(false)
+        settings.saveAiLearn("{\"v\":1}", org.openstrap.app.data.ailearn.AiLearnState(learned = listOf("x")))
+        settings.forgetDevice()
+        assertEquals(false, settings.aiLearnOn.first())
+        assertEquals("{\"v\":1}", settings.aiLearnProfile.first())
+        assertEquals(listOf("x"), settings.aiLearnState.first().learned)
+        assertEquals(false, listOf(SettingsKeys.AI_LEARN_ON, SettingsKeys.AI_LEARN_PROFILE, SettingsKeys.AI_LEARN_STATE).any { it in SettingsStore.STRAP_KEYS })
+    }
+
     @Test fun `a write to another setting doesn't re-emit a flow`() = runTest {
         val seen = Collections.synchronizedList(mutableListOf<Goals>())
         val job = scope.launch { settings.goals.collect { seen += it } }

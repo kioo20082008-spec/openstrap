@@ -679,6 +679,48 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         store.edit { it[aiDeep] = on }
     }
 
+    private val aiLearnOnKey = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.AI_LEARN_ON)
+    private val aiLearnProfileKey = stringPreferencesKey(SettingsKeys.AI_LEARN_PROFILE)
+    private val aiLearnStateKey = stringPreferencesKey(SettingsKeys.AI_LEARN_STATE)
+
+    /**
+     * The AI body learning's own switch (docs/algorithms/self-check.md): null until the person chooses, which reads as on while
+     * the assistant is switched on with a key saved, so it starts the day the assistant does and never before. It belongs to
+     * this phone with the key, so a backup leaves it out and forgetting the strap keeps it.
+     */
+    val aiLearnOn: Flow<Boolean?> = read { it[aiLearnOnKey] }
+
+    suspend fun setAiLearnOn(on: Boolean) {
+        store.edit { it[aiLearnOnKey] = on }
+    }
+
+    /**
+     * What the AI has learned about this body ([org.openstrap.app.data.ailearn.BodyProfile]'s JSON, at most 4 KB), null before
+     * the first day. The app's own memory, kept when the strap is forgotten (it is about the person, not the strap) and left
+     * out of the backup.
+     */
+    val aiLearnProfile: Flow<String?> = read { it[aiLearnProfileKey] }
+
+    /** When the AI learning last ran, how it failed and what it said it learned ([org.openstrap.app.data.ailearn.AiLearnState]). */
+    val aiLearnState: Flow<org.openstrap.app.data.ailearn.AiLearnState> =
+        read { org.openstrap.app.data.ailearn.AiLearnState.decode(it[aiLearnStateKey]) }
+
+    /** Keeps [profile] (null removes it) and [state] together, as one step, so a run never leaves the one without the other. */
+    suspend fun saveAiLearn(profile: String?, state: org.openstrap.app.data.ailearn.AiLearnState) {
+        store.edit { prefs ->
+            if (profile == null) prefs.remove(aiLearnProfileKey) else prefs[aiLearnProfileKey] = profile
+            prefs[aiLearnStateKey] = org.openstrap.app.data.ailearn.AiLearnState.encode(state)
+        }
+    }
+
+    /** Changes the learning's state alone as one step (a failed attempt, the day's notification going out). */
+    suspend fun updateAiLearnState(change: (org.openstrap.app.data.ailearn.AiLearnState) -> org.openstrap.app.data.ailearn.AiLearnState) {
+        store.edit { prefs ->
+            val next = change(org.openstrap.app.data.ailearn.AiLearnState.decode(prefs[aiLearnStateKey]))
+            prefs[aiLearnStateKey] = org.openstrap.app.data.ailearn.AiLearnState.encode(next)
+        }
+    }
+
     /**
      * The user's own DeepSeek key as sealed by [org.openstrap.app.data.ai.AiVault] (never the key itself), null before
      * one is saved. Kept when the strap is forgotten and left out of the settings backup.
@@ -980,6 +1022,9 @@ object SettingsKeys {
     const val AI_ENABLED = "ai_enabled"
     const val AI_KEY = "ai_key_sealed"
     const val AI_DEEPER = "ai_deeper"
+    const val AI_LEARN_ON = "ai_learn_on"
+    const val AI_LEARN_PROFILE = "ai_learn_profile"
+    const val AI_LEARN_STATE = "ai_learn_state"
 
     /** Before a type, the keys of [SettingsStore.lastSync]. */
     const val LAST_SYNC_PREFIX = "last_sync_"

@@ -146,15 +146,25 @@ class AiClient(private val http: AiHttp = UrlConnectionHttp(), private val base:
      * Sends [payload] (an [AiPayload] JSON) with [key] and gives the reply's text, to be read by [AiAnswer.parse]. With
      * [deeper] the reasoning model is asked, and if DeepSeek refuses that request (a 4xx) it is asked again on the chat model.
      */
-    suspend fun analyse(key: String, payload: String, deeper: Boolean = false): AiResult<String> {
-        val user = AiPrompt.userMessage(payload)
-        val first = ask(key, user, deeper)
-        if (deeper && first is AiResult.Failed && first.failure == AiFailure.Rejected) return ask(key, user, false)
+    suspend fun analyse(key: String, payload: String, deeper: Boolean = false): AiResult<String> =
+        askWithFallback(key, AiPrompt.system, AiPrompt.userMessage(payload), deeper)
+
+    /**
+     * The AI body learning's daily request (data/ailearn): [system] and [user] are its prompt ([org.openstrap.app.data.ailearn.LearnPrompt]),
+     * sent and answered exactly as [analyse] is, on the chat model, or on the reasoning model with [deeper]. The reply's text
+     * is read by [org.openstrap.app.data.ailearn.LearnAnswer.parse].
+     */
+    suspend fun learn(key: String, system: String, user: String, deeper: Boolean = false): AiResult<String> =
+        askWithFallback(key, system, user, deeper)
+
+    private suspend fun askWithFallback(key: String, system: String, user: String, deeper: Boolean): AiResult<String> {
+        val first = ask(key, system, user, deeper)
+        if (deeper && first is AiResult.Failed && first.failure == AiFailure.Rejected) return ask(key, system, user, false)
         return first
     }
 
-    private suspend fun ask(key: String, user: String, deeper: Boolean): AiResult<String> {
-        val body = requestBody(AiPrompt.system, user, deeper).toString()
+    private suspend fun ask(key: String, system: String, user: String, deeper: Boolean): AiResult<String> {
+        val body = requestBody(system, user, deeper).toString()
         return when (val r = send(base + CHAT, key, body, if (deeper) DEEP_TIMEOUT_MS else TIMEOUT_MS)) {
             is AiResult.Failed -> r
             is AiResult.Ok -> content(r.value)?.let { AiResult.Ok(it) } ?: AiResult.Failed(AiFailure.Malformed)

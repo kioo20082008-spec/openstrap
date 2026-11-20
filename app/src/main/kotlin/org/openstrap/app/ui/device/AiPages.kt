@@ -49,6 +49,7 @@ import org.openstrap.app.R
 import org.openstrap.app.data.ai.AiCached
 import org.openstrap.app.data.ai.AiDeepSection
 import org.openstrap.app.presentation.AiCopy
+import org.openstrap.app.presentation.AiLearnCopy
 import org.openstrap.app.ui.dashboard.ScreenList
 import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.glow.GlowType
@@ -78,6 +79,7 @@ fun AiSettingsPage(
     onDeeper: (Boolean) -> Unit,
     onOpenAnalysis: () -> Unit,
     onBack: () -> Unit,
+    onOpenLearning: () -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
     var typed by remember { mutableStateOf("") }
@@ -153,6 +155,10 @@ fun AiSettingsPage(
                     stringResource(R.string.ai_open_analysis), stringResource(R.string.ai_open_analysis_note), onClick = onOpenAnalysis,
                     below = true, icon = AppIcons.Brain02,
                 )
+                RingsRow(
+                    stringResource(R.string.ailearn_title), stringResource(R.string.ailearn_row_note), onClick = onOpenLearning,
+                    below = true, icon = AppIcons.Brain,
+                )
             }
         }
         item { RingsSection(stringResource(R.string.ai_consent_title)) }
@@ -172,6 +178,22 @@ fun AiSettingsPage(
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     lines.forEachIndexed { i, line ->
                         // The first line is the headline of the rest; the others are what is sent and not.
+                        if (i == 0) {
+                            Text(line, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Medium))
+                        } else {
+                            Bullet(line)
+                        }
+                    }
+                }
+            }
+        }
+        // The daily request of AI learning: what is sent, how much, where and what it may change.
+        item { RingsSection(stringResource(R.string.ailearn_consent_title)) }
+        item {
+            RingsPanel {
+                val lines = remember { AiLearnCopy.consentLines() }
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    lines.forEachIndexed { i, line ->
                         if (i == 0) {
                             Text(line, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Medium))
                         } else {

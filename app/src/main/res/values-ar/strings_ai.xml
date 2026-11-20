@@ -2,7 +2,7 @@
 <resources>
     <string name="ai_title">المساعد الذكي</string>
     <string name="ai_row_no_key">أضف مفتاح DeepSeek</string>
-    <string name="ai_settings_intro">استخدم مفتاح DeepSeek الخاص بك. عندما تطلب التحليل يرسل OpenStrap ملخصاً لبياناتك الأخيرة إلى DeepSeek ويعرض لك تحليله واقتراحاته. لا يُرسل شيء من تلقاء نفسه.</string>
+    <string name="ai_settings_intro">استخدم مفتاح DeepSeek الخاص بك. عندما تطلب التحليل يرسل OpenStrap ملخصاً لبياناتك الأخيرة إلى DeepSeek ويعرض لك تحليله واقتراحاته. والوحيد الذي يُرسل من تلقاء نفسه هو الطلب اليومي للتعلّم بالذكاء الاصطناعي، ويمكنك إيقافه.</string>
     <string name="ai_section_key">مفتاح DeepSeek</string>
     <string name="ai_key_hint">الصق مفتاحك هنا</string>
     <string name="ai_key_save">حفظ المفتاح</string>
@@ -20,7 +20,7 @@
     <string name="ai_open_analysis">افتح التحليل</string>
     <string name="ai_open_analysis_note">آخر نتيجة، أو تحليل جديد</string>
     <string name="ai_consent_title">ماذا يُرسل، وإلى أين</string>
-    <string name="ai_consent_where">عندما تضغط حلّل الحين يرسل OpenStrap البيانات التالية إلى ⁨%1$s⁩ بمفتاحك أنت. لا يُرسل شيء قبل ذلك، ولا شيء في الخلفية.</string>
+    <string name="ai_consent_where">عندما تضغط حلّل الحين يرسل OpenStrap البيانات التالية إلى ⁨%1$s⁩ بمفتاحك أنت. وفيما عدا الطلب اليومي للتعلّم بالذكاء الاصطناعي (المشروح أدناه)، لا يُرسل شيء قبل ذلك ولا في الخلفية.</string>
     <string name="ai_consent_days">ملخص لكل يوم من آخر 30 يوماً: مدة النوم ودرجته، والتعافي، وHRV، ونبض الراحة، والحمل والإجهاد، والخطوات (بعد حذف الخطوات الكاذبة)، والطاقة.</string>
     <string name="ai_consent_nights">آخر 14 ليلة بالتفصيل: وقت النوم والاستيقاظ، ومراحل النوم، ومرات الاستيقاظ.</string>
     <string name="ai_consent_workouts">آخر 14 تمريناً: نوع الرياضة، والمدة، ومتوسط النبض وأعلاه، والحمل، وهبوط النبض بعد التمرين.</string>

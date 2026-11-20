@@ -67,8 +67,9 @@ object SelfCheckCopy {
         }
     }
 
+    /** What an incident saw. One the AI body learning proposed ([SelfLearning.isAi]) is in [AiLearnCopy]'s words, with the evidence the AI gave. */
     fun seen(i: SelfLearning.Incident, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String =
-        seen(i.check, i.nums, locale, strings)
+        if (SelfLearning.isAi(i.check)) AiLearnCopy.seen(i, locale, strings) else seen(i.check, i.nums, locale, strings)
 
     /** One knob at [value], in words: "The drain of Energy while resting is scaled to 75%". */
     fun adjustment(knob: Knob, value: Float, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String {
