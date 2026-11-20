@@ -42,6 +42,7 @@ object SettingsBackup {
             TODAY_PINNED to Type.STRING,
             JOURNAL to Type.STRING,
             CHECK_INS to Type.STRING,
+            SELF_CHECK_ON to Type.BOOLEAN,
             CELEBRATE_GOAL to Type.BOOLEAN,
             WEEKLY_RECAP to Type.BOOLEAN,
             FIRST_SCORE_DAY to Type.LONG,

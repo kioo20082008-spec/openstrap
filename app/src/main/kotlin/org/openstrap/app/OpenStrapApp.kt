@@ -83,11 +83,25 @@ class AppContainer(val app: Application) {
         org.openstrap.app.data.ai.AiResultStore(java.io.File(app.filesDir, "ai_analysis.json")),
     )
 
+    /**
+     * The self-check (docs/algorithms/self-check.md): looks for readings that cannot be true, learns a bounded correction
+     * and says so. Waits while a workout records or the strap's firmware installs; the worker and new data wake it.
+     */
+    private val selfCheckNotifier = org.openstrap.app.device.SelfCheckNotifier(app)
+    val selfCheck = org.openstrap.app.data.selfcheck.SelfCheckKeeper(
+        database.healthDao(), settings, health, appScope,
+        busy = { workout.state.value is org.openstrap.app.device.WorkoutState.Recording || strap.firmwareUpdating.value },
+        quiet = { selfCheckNotifier.quiet(settings) },
+        notify = selfCheckNotifier::show,
+    )
+
     init {
         // The Recovery cache follows the data from here on.
         health.start(appScope, HealthRepository.recoveryInputs(database))
         // The user's own Energy and Readiness calibration, from the morning check-ins, follows from here on.
         org.openstrap.app.data.CalibrationKeeper(database.healthDao(), settings, health, appScope).start()
+        // What the app's own plausibility checks learned rides on top of it.
+        selfCheck.start()
     }
     /** The home screen widgets' refreshes. Built last: it watches the strap, the workout and settings. */
     val widgets = org.openstrap.app.widget.WidgetUpdater(

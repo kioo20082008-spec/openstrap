@@ -15,6 +15,7 @@ import org.openstrap.app.ui.dashboard.DayViewModel
 import org.openstrap.app.ui.dashboard.JournalViewModel
 import org.openstrap.app.ui.dashboard.WeeklyReportViewModel
 import org.openstrap.app.ui.device.AiViewModel
+import org.openstrap.app.ui.device.SelfCheckViewModel
 import org.openstrap.app.ui.device.DeviceViewModel
 import org.openstrap.app.ui.firmware.FirmwareViewModel
 import org.openstrap.app.ui.workout.WorkoutsViewModel
@@ -41,6 +42,11 @@ internal object ViewModelFactories {
     /** The smart assistant's settings page and Analysis screen, one view model for both. */
     fun ai(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
         initializer { AiViewModel(c.ai) }
+    }
+
+    /** The self-learning page: the switch, the incidents and what is in effect now. */
+    fun selfCheck(c: AppContainer): ViewModelProvider.Factory = viewModelFactory {
+        initializer { SelfCheckViewModel(c.settings) }
     }
 
     /** The week report, worked out when its page opens. */

@@ -17,7 +17,11 @@ import java.time.ZoneId
  */
 class CalibrationRunner(private val dao: HealthDao, private val engine: RecoveryEngine = RecoveryEngine(dao)) {
 
-    suspend fun run(today: LocalDate, profile: UserProfile, zone: ZoneId, nowSeconds: Long): CalibrationResult {
+    suspend fun run(
+        today: LocalDate, profile: UserProfile, zone: ZoneId, nowSeconds: Long,
+        /** The self-check's learned part of the tuning ([ChargeTuning.learnedPart]), which the Energy the user sees is run with. */
+        learned: ChargeTuning = ChargeTuning.Default,
+    ): CalibrationResult {
         val answers = dao.checkInsOnce(today.minusDays(REPLAY_DAYS - 1L), today)
             .filter { it.feeling in MorningFeel.MIN_RATING..MorningFeel.MAX_RATING }
             .sortedBy { it.day }
@@ -48,7 +52,7 @@ class CalibrationRunner(private val dao: HealthDao, private val engine: Recovery
                     days += ReadinessCalibration.Day(row.day, row.feeling, r.contributors.associate { it.factor to it.score }, r.strainAlert)
                 }
             }
-            if (wantEnergy) sample(row, replay.charge)?.let(samples::add)
+            if (wantEnergy) sample(row, replay.charge, learned)?.let(samples::add)
         }
         return CalibrationResult(today, EnergyCalibration.fit(samples), ReadinessCalibration.fit(days))
     }
@@ -57,10 +61,10 @@ class CalibrationRunner(private val dao: HealthDao, private val engine: Recovery
      * The Energy at wake the morning had under every tuning of [EnergyCalibration.GRID]. Null when the published run has no
      * Energy at wake worth comparing with: no sleep seen yet, or the strap off overnight (an estimated wake).
      */
-    private fun sample(row: CheckInRow, inputs: ChargeInputs): EnergyCalibration.Sample? {
+    private fun sample(row: CheckInRow, inputs: ChargeInputs, learned: ChargeTuning): EnergyCalibration.Sample? {
         val wake = EnergyCalibration.GRID.map { tuning ->
             val day = Recovery.charge(
-                inputs.minutes, inputs.params.copy(tuning = tuning), inputs.window, start = 50f,
+                inputs.minutes, inputs.params.copy(tuning = tuning.withLearned(learned)), inputs.window, start = 50f,
                 sampleSeconds = ONE_DAY, mainSleepEnd = inputs.mainSleepEnd,
             )
             if (tuning.isDefault && (!day.anchored || day.strapOffOvernight)) return null

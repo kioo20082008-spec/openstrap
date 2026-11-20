@@ -91,7 +91,7 @@ class SettingsBackupTest {
             "backup_folder", "backup_folder_name", "backup_last_done", "backup_failed", "backup_failed_at",
             "goal_moment_week", "recap_week", "rewards_started", "history_badges_waiting", "habit_age_seen", "habit_age_seen_day",
             "update_checked_at", "update_notified_tag", "update_installing_tag", "update_seen_tag",
-            "personal_calibration",
+            "personal_calibration", "self_check_state",
             // The smart assistant's switch and its sealed DeepSeek key belong to this phone, never to a backup.
             "ai_enabled", "ai_key_sealed", "ai_deeper",
         )

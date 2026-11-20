@@ -99,6 +99,11 @@ fun Recovery.charge(
     requireAnchor: Boolean = true,
 ): ChargeDay {
     val tuning = params.tuning
+    // The daytime resting heart rate reserve is measured against, with the self-check's offset ([ChargeTuning.restingOffset]).
+    val rest = chargeResting(params)
+    // The body-signal Alert's effect, as much of it as the self-check keeps ([ChargeTuning.alert]): 1 is the published one.
+    val alertRecharge = 1f - (1f - ALERT_RECHARGE) * tuning.alert
+    val alertDrain = 1f + (ALERT_DRAIN - 1f) * tuning.alert
     var c = start
     var epoc = 0f
     var carry = 0f
@@ -197,7 +202,7 @@ fun Recovery.charge(
         // stress exclusion around a workout breaks the run, as its reading doesn't count.
         stressRun = if (m.sleepStage == null && m.workout == null && m.stress != null && m.stress >= params.stressFrom) stressRun + 1 else 0
         val hr = m.hr
-        val x = hr?.let { hrr(it, params.restingHr, params.maxHr) }
+        val x = hr?.let { hrr(it, rest, params.maxHr) }
         while (si < signals.size && signals[si].first <= m.t) signal = signals[si++].second
         while (ri < references.size && references[ri].first <= m.t) nightRest = references[ri++].second ?: scoredNightRest
         while (hi < hrvScores.size && hrvScores[hi].first <= m.t) hrvFactor = hrvFactor(hrvScores[hi++].second)
@@ -223,7 +228,7 @@ fun Recovery.charge(
             x >= EXERCISE_HRR && effort -> {
                 state = State.Exercise
                 epoc += trimpMinute(x, params.female)
-                delta = -exerciseDrain(x, c, tuning.exercise)
+                delta = -exerciseDrain(x, c, tuning.exercise * tuning.active)
             }
 
             // After exercise the heart rate stays up while the body recovers; that isn't stress.
@@ -234,14 +239,14 @@ fun Recovery.charge(
 
             (x >= ACTIVITY_HRR && effort) || m.steps >= ACTIVE_STEPS -> {
                 state = State.Activity
-                delta = -exerciseDrain(x, c, tuning.exercise)
+                delta = -exerciseDrain(x, c, tuning.exercise * tuning.active)
             }
 
             // Inside the stress exclusion ([stressExcluded]) the strap's stress score is ignored, so a minute that
             // reaches here is never Stress or Relax. See [WORKOUT_REST_HRR] for the state it takes instead.
             m.workout == WorkoutPhase.Active && x >= WORKOUT_REST_HRR -> {
                 state = State.Activity
-                delta = -exerciseDrain(x, c, tuning.exercise)
+                delta = -exerciseDrain(x, c, tuning.exercise * tuning.active)
             }
 
             m.workout == WorkoutPhase.After && x >= WORKOUT_REST_HRR -> {
@@ -267,12 +272,12 @@ fun Recovery.charge(
 
             else -> {
                 state = State.Rest
-                delta = -REST_DRAIN * c
+                delta = -REST_DRAIN * tuning.rest * c
             }
         }
         // The share of a drain that is the base drain, for the split below; scaling keeps it.
         val baseShare = if (delta < 0) BASE_DRAIN / -delta else 0f
-        if (signal == BodySignals.State.Alert) delta *= if (delta > 0) ALERT_RECHARGE else ALERT_DRAIN
+        if (signal == BodySignals.State.Alert) delta *= if (delta > 0) alertRecharge else alertDrain
         // EPOC-like debt decays with a half-life of about 20 minutes once exercise stops.
         if (state != State.Exercise) epoc *= EPOC_DECAY
         carry *= CARRY_DECAY
@@ -370,13 +375,19 @@ fun Recovery.notWorn(minutes: List<Minute>): BooleanArray {
 
 /**
  * Minutes in a run of at least [SUSTAINED_EFFORT_MINUTES] consecutive awake minutes outside the stress exclusion at
- * or above [EXERCISE_HRR]: effort even without steps.
+ * or above [EXERCISE_HRR]: effort even without steps. The run may last at most [ChargeTuning.sustainedCap] minutes,
+ * [SUSTAINED_EFFORT_MAX_MINUTES] unless the self-check shortened it.
  */
-fun Recovery.sustainedEffort(minutes: List<Minute>, params: ChargeParams): BooleanArray =
-    sustainedRuns(minutes.map { it.t }) { k ->
+fun Recovery.sustainedEffort(minutes: List<Minute>, params: ChargeParams): BooleanArray {
+    val rest = chargeResting(params)
+    return sustainedRuns(minutes.map { it.t }, params.tuning.sustainedCap) { k ->
         val m = minutes[k]
-        m.sleepStage == null && m.workout == null && m.hr != null && hrr(m.hr, params.restingHr, params.maxHr) >= EXERCISE_HRR
+        m.sleepStage == null && m.workout == null && m.hr != null && hrr(m.hr, rest, params.maxHr) >= EXERCISE_HRR
     }
+}
+
+/** The resting heart rate Charge measures reserve against: [ChargeParams.restingHr] plus the self-check's offset. */
+fun Recovery.chargeResting(params: ChargeParams): Float = params.restingHr + params.tuning.restingOffset
 
 private fun List<Float>.median(): Float? = Stats.median(this)
 

@@ -361,6 +361,8 @@ The point where the strap's stress score starts to drain Energy.
 * **Drained:** split into exercise, stress and everyday living. In exercise and stress minutes, the basic 0.04 part (× 1.5 in Alert) goes to "living" and the rest to exercise or stress.
 * Nothing is shown until the simulation has seen at least one sleep, because without one the number would only reflect the starting guess.
 
+**Self-check.** Energy is also read back by the app's own plausibility checks (stuck at 0 or 100 for hours, a low wake after a long night, a drain the steps cannot explain, a long Alert run). A finding may move five bounded knobs of this section (the Alert's strength, the activity and rest drain, the sustained-effort cap and a resting heart rate offset), which fade back in 14 days. See [self-check.md](self-check.md).
+
 ---
 
 ## 8. Training load, Strain and fitness/fatigue

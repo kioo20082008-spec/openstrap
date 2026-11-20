@@ -418,6 +418,28 @@ class SettingsStore private constructor(private val store: DataStore<Preferences
         store.edit { it[calibrationKey] = result.encode() }
     }
 
+    private val selfCheckOnKey = androidx.datastore.preferences.core.booleanPreferencesKey(SettingsKeys.SELF_CHECK_ON)
+    private val selfCheckKey = stringPreferencesKey(SettingsKeys.SELF_CHECK_STATE)
+
+    /** The self-check (docs/algorithms/self-check.md): on by default. Off, nothing is checked, learned or told, and Energy is as published. */
+    val selfCheckOn: Flow<Boolean> = read { it[selfCheckOnKey] ?: true }
+
+    suspend fun setSelfCheckOn(on: Boolean) {
+        store.edit { it[selfCheckOnKey] = on }
+    }
+
+    /** What the self-check has seen and changed ([org.openstrap.app.data.selfcheck.SelfLearning]); the app's own memory, not a choice, so a backup leaves it out. */
+    val selfCheck: Flow<org.openstrap.app.data.selfcheck.SelfLearning.State> =
+        read { org.openstrap.app.data.selfcheck.SelfLearning.decode(it[selfCheckKey]) }
+
+    /** Changes the self-check's state as one step, so a run and a tap on Undo never overwrite each other. */
+    suspend fun updateSelfCheck(change: (org.openstrap.app.data.selfcheck.SelfLearning.State) -> org.openstrap.app.data.selfcheck.SelfLearning.State) {
+        store.edit { prefs ->
+            val next = change(org.openstrap.app.data.selfcheck.SelfLearning.decode(prefs[selfCheckKey]))
+            prefs[selfCheckKey] = org.openstrap.app.data.selfcheck.SelfLearning.encode(next)
+        }
+    }
+
     private val todayHidden = stringPreferencesKey(SettingsKeys.TODAY_HIDDEN)
     private val todayPinned = stringPreferencesKey(SettingsKeys.TODAY_PINNED)
 
@@ -911,6 +933,8 @@ object SettingsKeys {
     const val JOURNAL = "journal_tags"
     const val CHECK_INS = "morning_checkins"
     const val CALIBRATION = "personal_calibration"
+    const val SELF_CHECK_ON = "self_check_on"
+    const val SELF_CHECK_STATE = "self_check_state"
     const val TODAY_HIDDEN = "today_hidden"
     const val TODAY_PINNED = "today_pinned"
     const val CELEBRATE_GOAL = "celebrate_goal"

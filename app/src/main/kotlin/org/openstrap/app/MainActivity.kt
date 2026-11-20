@@ -209,6 +209,10 @@ class MainActivity : ComponentActivity() {
             intent.removeExtra(EXTRA_OPEN_UPDATES)
             navRequests.send(NavRequest.OpenUpdates)
         }
+        if (intent.getBooleanExtra(EXTRA_OPEN_SELF_CHECK, false)) {
+            intent.removeExtra(EXTRA_OPEN_SELF_CHECK)
+            navRequests.send(NavRequest.OpenSelfCheck)
+        }
         intent.getStringExtra(EXTRA_OPEN_METRIC)?.let { route ->
             val day = intent.getStringExtra(EXTRA_METRIC_DAY)?.let { runCatching { java.time.LocalDate.parse(it) }.getOrNull() }
             intent.removeExtra(EXTRA_OPEN_METRIC)
@@ -263,6 +267,9 @@ class MainActivity : ComponentActivity() {
 
         /** True opens the Updates page over the tab showing: an update notification's tap. */
         const val EXTRA_OPEN_UPDATES = "open_updates"
+
+        /** True opens the self-learning page over the tab showing: a self-check notification's tap. */
+        const val EXTRA_OPEN_SELF_CHECK = "open_self_check"
 
         /** Debug: a [StrapPreview] name ("stale", "stuck", "disconnected", "charging", "notpaired", "recoveryfail") to show, or "auto". */
         const val EXTRA_STRAP_STATE = "strap_state"

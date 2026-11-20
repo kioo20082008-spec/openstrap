@@ -513,7 +513,9 @@ object Recovery {
         val sleepHrvScore: List<Pair<Long, Int?>> = emptyList(),
         /**
          * The user's own multipliers on the sleep recharge, the exercise drain and the next-night carry-over, from
-         * [EnergyCalibration]. The default is 1 for each, which is the published constants.
+         * [EnergyCalibration], and the self-check's bounded ones (the Alert's strength, the activity and rest drain, the
+         * sustained-effort cap and the resting heart rate offset, docs/algorithms/self-check.md). The default is the
+         * published constants.
          */
         val tuning: ChargeTuning = ChargeTuning.Default,
     )

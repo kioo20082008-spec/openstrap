@@ -218,6 +218,11 @@
             </intent-filter>
         </receiver>
 
+        <!-- The Undo button of a self-check notification (device/SelfCheckReceiver.kt). -->
+        <receiver
+            android:name=".device.SelfCheckReceiver"
+            android:exported="false" />
+
         <!-- The widgets' moment and midnight alarms (WidgetUpdater). Not a widget. -->
         <receiver
             android:name=".widget.WidgetAlarmReceiver"

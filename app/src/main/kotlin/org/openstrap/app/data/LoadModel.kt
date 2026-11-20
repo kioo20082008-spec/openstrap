@@ -188,9 +188,10 @@ fun Recovery.moving(steps: Int?): Boolean = steps != null && steps in 1..MAX_MIN
  * Movement without steps, one rule for Charge ([sustainedEffort]) and daily load ([dailyLoad]): the minutes, at the
  * minute starts [times] (ascending), in a run of at least [SUSTAINED_EFFORT_MINUTES] back to back that are each
  * [hard] (awake, outside a workout and the minutes after it, at or above [EXERCISE_HRR] of reserve), and no longer than
- * [SUSTAINED_EFFORT_MAX_MINUTES]: a run that long is not unrecorded exercise.
+ * [maxMinutes] ([SUSTAINED_EFFORT_MAX_MINUTES] unless Energy's self-check shortened it): a run that long is not
+ * unrecorded exercise.
  */
-fun Recovery.sustainedRuns(times: List<Long>, hard: (Int) -> Boolean): BooleanArray {
+fun Recovery.sustainedRuns(times: List<Long>, maxMinutes: Int = SUSTAINED_EFFORT_MAX_MINUTES, hard: (Int) -> Boolean): BooleanArray {
     val out = BooleanArray(times.size)
     var i = 0
     while (i < times.size) {
@@ -200,7 +201,7 @@ fun Recovery.sustainedRuns(times: List<Long>, hard: (Int) -> Boolean): BooleanAr
         }
         var j = i + 1
         while (j < times.size && hard(j) && times[j] - times[j - 1] <= 60) j++
-        if (j - i in SUSTAINED_EFFORT_MINUTES..SUSTAINED_EFFORT_MAX_MINUTES) for (k in i until j) out[k] = true
+        if (j - i in SUSTAINED_EFFORT_MINUTES..maxMinutes) for (k in i until j) out[k] = true
         i = j
     }
     return out

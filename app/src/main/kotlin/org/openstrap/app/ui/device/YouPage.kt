@@ -33,6 +33,7 @@ import org.openstrap.app.data.settings.UserProfile
 import org.openstrap.app.health.HcAvailability
 import org.openstrap.app.i18n.Strings
 import org.openstrap.app.presentation.AiCopy
+import org.openstrap.app.presentation.SelfCheckCopy
 import org.openstrap.app.presentation.DayWords
 import org.openstrap.app.presentation.Units
 import java.util.concurrent.TimeUnit.MINUTES
@@ -154,6 +155,9 @@ fun YouPage(
     /** The smart assistant's key and switch, said on its row; the row opens its settings page. */
     aiState: AiKeyState = AiKeyState(enabled = false, hasKey = false, masked = ""),
     onAi: () -> Unit = {},
+    /** The self-check's switch ([org.openstrap.app.data.selfcheck.SelfLearning]), said on its row; the row opens its page. */
+    selfCheckOn: Boolean = true,
+    onSelfCheck: () -> Unit = {},
 ) {
     BackHandler(onBack = onBack)
     // The rings theme (T-You): sections named over flat cards of rows with a hairline between them, and the theme
@@ -209,8 +213,12 @@ fun YouPage(
         item {
             RingsRows {
                 RingsRow(
-                    stringResource(R.string.ai_title), AiCopy.rowSummary(aiState), onClick = onAi, below = true, divider = false,
+                    stringResource(R.string.ai_title), AiCopy.rowSummary(aiState), onClick = onAi, below = true,
                     selected = selected == PageRowKeys.AI,
+                )
+                RingsRow(
+                    stringResource(R.string.selfcheck_title), SelfCheckCopy.rowSummary(selfCheckOn), onClick = onSelfCheck, below = true, divider = false,
+                    selected = selected == PageRowKeys.SELF_CHECK,
                 )
             }
         }

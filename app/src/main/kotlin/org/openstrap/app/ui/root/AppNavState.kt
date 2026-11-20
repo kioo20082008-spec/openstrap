@@ -61,6 +61,7 @@ enum class Page(
     ZeppAccount(PageRowKeys.ZEPP_ACCOUNT),
     AiSettings(PageRowKeys.AI),
     AiAnalysis,
+    SelfCheck(PageRowKeys.SELF_CHECK),
 }
 
 /** Keeps the open pages across process death, as their names ("Strap,Alarms"). */
@@ -320,6 +321,7 @@ class AppNavState(initial: Snapshot = Snapshot()) {
             NavRequest.OpenStrap -> over(Page.Strap, listOf(Page.Strap), firmwareInstalling)
             NavRequest.OpenRecap -> over(Page.WeeklyRecap, listOf(Page.You, Page.GoalsAndBests, Page.WeeklyRecap), firmwareInstalling)
             NavRequest.OpenUpdates -> over(Page.Updates, listOf(Page.You, Page.Updates), firmwareInstalling)
+            NavRequest.OpenSelfCheck -> over(Page.SelfCheck, listOf(Page.You, Page.SelfCheck), firmwareInstalling)
             NavRequest.ShowWorkout -> Unit
         }
     }

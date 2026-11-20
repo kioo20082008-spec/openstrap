@@ -62,6 +62,8 @@ import org.openstrap.app.ui.dashboard.StrapView
 import org.openstrap.app.ui.device.AiAnalysisPage
 import org.openstrap.app.ui.device.AiSettingsPage
 import org.openstrap.app.ui.device.AiViewModel
+import org.openstrap.app.ui.device.SelfCheckPage
+import org.openstrap.app.ui.device.SelfCheckViewModel
 import org.openstrap.app.ui.device.BackupPage
 import org.openstrap.app.ui.device.DeletedSleepPage
 import org.openstrap.app.ui.device.DeviceScreen
@@ -266,6 +268,11 @@ private fun DataPage(
                 )
             }
         }
+        Page.SelfCheck -> {
+            val vm: SelfCheckViewModel = viewModel(factory = ViewModelFactories.selfCheck(container))
+            val ui by vm.state.collectAsStateWithLifecycle()
+            SelfCheckPage(ui, padding, onOn = vm::setOn, onUndo = vm::undo, onRemove = vm::remove, onResetAll = vm::resetAll, onBack = close)
+        }
         else -> Unit
     }
 }
@@ -305,6 +312,7 @@ private fun YouPageHost(
     val deletedSleep by hooks.dayVm.deletedSleep.collectAsStateWithLifecycle()
     val youMaxHr by hooks.workoutsVm.maxHeartRate.collectAsStateWithLifecycle()
     val aiState by container.ai.keys.state.collectAsStateWithLifecycle(initialValue = AiKeyState(enabled = false, hasKey = false, masked = ""))
+    val selfCheckOn by container.settings.selfCheckOn.collectAsStateWithLifecycle(initialValue = true)
     // Permissions can be taken back in Health Connect while away: the row says so on return.
     LifecycleResumeEffect(Unit) {
         deviceVm.checkAutoHealthConnect()
@@ -332,6 +340,8 @@ private fun YouPageHost(
         onDiagnostics = { open(Page.Diagnostics) },
         aiState = aiState,
         onAi = { open(Page.AiSettings) },
+        selfCheckOn = selfCheckOn,
+        onSelfCheck = { open(Page.SelfCheck) },
         onSampleData = if (SampleData.AVAILABLE) ({ deviceVm.loadSampleData() }) else null,
         onBack = onBack,
         selected = selected?.row,

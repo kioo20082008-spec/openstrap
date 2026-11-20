@@ -21,4 +21,5 @@ internal object PageRowKeys {
     const val FIRMWARE = "Firmware"
     const val ZEPP_ACCOUNT = "Zepp account"
     const val AI = "Smart assistant"
+    const val SELF_CHECK = "Self-learning"
 }

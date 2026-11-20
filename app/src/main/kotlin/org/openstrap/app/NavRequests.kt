@@ -35,6 +35,9 @@ sealed interface NavRequest {
     /** The Updates page: an update notification. */
     data object OpenUpdates : NavRequest
 
+    /** The self-learning page: a self-check notification. */
+    data object OpenSelfCheck : NavRequest
+
     /** The live workout screen, even when it was tucked away: the workout notification, the tile, the Start widget. */
     data object ShowWorkout : NavRequest
 }

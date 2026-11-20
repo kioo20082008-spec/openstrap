@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.first
 import org.openstrap.app.MainActivity
 import org.openstrap.app.OpenStrapApp
 import org.openstrap.app.R
+import org.openstrap.app.data.catching
 import org.openstrap.app.presentation.ChartPoint
 import org.openstrap.app.presentation.Coach
 import org.openstrap.app.i18n.Strings
@@ -31,6 +32,9 @@ class CoachWorker(context: Context, params: WorkerParameters) : CoroutineWorker(
     override suspend fun doWork(): Result {
         val app = applicationContext as OpenStrapApp
         val c = app.container
+        // The self-check's look, first: it has its own schedule (a heavy pass every few hours at most) and none of this
+        // worker's early exits should skip it.
+        catching { c.selfCheck.tick() }
         val zone = ZoneId.systemDefault()
         val now = Instant.now().epochSecond
         val today = LocalDate.now(zone)

@@ -91,6 +91,21 @@ class HealthRepository(
         if (changed) dataVersion.incrementAndGet()
     }
 
+    /**
+     * What the app's own plausibility checks learned (the self-check, docs/algorithms/self-check.md), as the part of Energy's
+     * tuning they own: the published values until something was applied. It rides on top of the calibration's tuning, and a
+     * change moves [dataVersion] for the same reason.
+     */
+    @Volatile var learnedTuning: ChargeTuning = ChargeTuning.Default
+        private set
+
+    fun applyLearned(next: ChargeTuning) {
+        val clean = next.learnedPart().clamped()
+        if (clean == learnedTuning) return
+        learnedTuning = clean
+        dataVersion.incrementAndGet()
+    }
+
     /** Moves whenever a table Recovery reads changes, so a cached Recovery is never older than the data under it. */
     private val dataVersion = AtomicLong()
 
@@ -205,7 +220,7 @@ class HealthRepository(
     private suspend fun computeRecovery(date: LocalDate, profile: UserProfile, now: Long): RecoveryResult {
         val personal = calibration
         val r = recoveryEngine.compute(
-            date, profile, now = now, tuning = personal?.tuning ?: ChargeTuning.Default, weights = personal?.weights ?: ReadinessWeights.Default,
+            date, profile, now = now, tuning = (personal?.tuning ?: ChargeTuning.Default).withLearned(learnedTuning), weights = personal?.weights ?: ReadinessWeights.Default,
         )
         r.tonight?.let { logNight(it) }
         val today = Instant.ofEpochSecond(now).atZone(ZoneId.systemDefault()).toLocalDate()

@@ -39,7 +39,7 @@ class CalibrationKeeper(
         val now = nowSeconds()
         val today = Instant.ofEpochSecond(now).atZone(zone).toLocalDate()
         if (!CalibrationResult.due(settings.calibration.first(), today)) return
-        settings.setCalibration(CalibrationRunner(dao).run(today, settings.profile.first(), zone, now))
+        settings.setCalibration(CalibrationRunner(dao).run(today, settings.profile.first(), zone, now, health.learnedTuning))
     }
 
     private companion object {
