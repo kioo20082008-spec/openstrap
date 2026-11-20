@@ -207,7 +207,7 @@ fun Recovery.charge(
         while (ri < references.size && references[ri].first <= m.t) nightRest = references[ri++].second ?: scoredNightRest
         while (hi < hrvScores.size && hrvScores[hi].first <= m.t) hrvFactor = hrvFactor(hrvScores[hi++].second)
         // Heart rate counts as effort outside workouts only while moving, or in a sustained run (see [ACTIVITY_HRR]).
-        val effort = m.workout != null || moving(m.steps) || sustained[i]
+        val effort = m.workout != null || (m.steps >= EFFORT_MIN_STEPS && moving(m.steps)) || sustained[i]
         val state: State
         var delta: Float
         when {

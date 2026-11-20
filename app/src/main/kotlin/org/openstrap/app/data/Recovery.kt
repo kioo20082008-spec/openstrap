@@ -671,6 +671,12 @@ object Recovery {
      * it is Stress if the stress score says so, else Rest.
      */
     const val ACTIVITY_HRR = 0.20f
+    /**
+     * Steps in a minute below which a raised heart rate is not effort: one or two steps a minute at a desk (a few
+     * steps to the kitchen, fidgeting) with a heart rate over 20 % of reserve were each counted as Activity and
+     * drained about 0.2 a minute, so 975 steps cost 51 points (2026-11). A slow stroll is about 40 steps a minute.
+     */
+    const val EFFORT_MIN_STEPS = 15
     const val EXERCISE_HRR = 0.30f
 
     /**
