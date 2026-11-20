@@ -606,6 +606,11 @@ object Recovery {
      * Shorter runs stay Stress or Rest.
      */
     const val SUSTAINED_EFFORT_MINUTES = 10
+    /**
+     * A run longer than this is not an unrecorded ride or row: hours of raised heart rate without steps is heat,
+     * caffeine, a fever or stress, and counting it as Exercise emptied a seated day with 975 steps by 16:30 (2026-11).
+     */
+    const val SUSTAINED_EFFORT_MAX_MINUTES = 90
 
     /**
      * Charge drained per minute per unit of heart-rate reserve (0..1) while exercising, on top of [BASE_DRAIN]. Linear
@@ -668,13 +673,14 @@ object Recovery {
 
     /**
      * In [BodySignals.State.Alert], recharge (sleep and Relax) is multiplied by [ALERT_RECHARGE] and every drain by
-     * [ALERT_DRAIN]: the ends of Zepp's health-alarm multipliers (native 03 §4.2). Zepp ramps them with how far over
-     * its one-day threshold the night is; OpenStrap's Alert already needs persistence or two signal families, so it
-     * takes the full effect. Watch doesn't change Charge: it is one signal for one night, shown in the app only and
+     * [ALERT_DRAIN]: halfway between no effect and the ends of Zepp's health-alarm multipliers (0.5 and 1.5, native 03
+     * §4.2). Zepp ramps them with how far over its one-day threshold the night is, and OpenStrap's Alert is a yes or
+     * no, so the full ends were too hard: a 10-hour night recharged only to 72 and the day emptied by 16:30
+     * (2026-11, from the owner's own day). The night's HRV and heart rate already lower its recharge by themselves. Watch doesn't change Charge: it is one signal for one night, shown in the app only and
      * leaving Readiness uncapped, and Zepp's multipliers just under its threshold are within 5 % of 1.
      */
-    const val ALERT_RECHARGE = 0.5f
-    const val ALERT_DRAIN = 1.5f
+    const val ALERT_RECHARGE = 0.75f
+    const val ALERT_DRAIN = 1.25f
 
     /** Charge's EPOC-like debt, and a workout's EPOC at rest ([WorkoutEffect]), are multiplied by this each minute (half-life ≈ 20 min). */
     const val EPOC_DECAY = 0.966f

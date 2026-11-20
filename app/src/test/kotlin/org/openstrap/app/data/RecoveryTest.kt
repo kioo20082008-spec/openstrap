@@ -415,6 +415,9 @@ class RecoveryTest {
         // Nine minutes is still short of the run.
         assertTrue(Recovery.sustainedEffort(run(9) { Minute(it * 60L, hardHr, 0, 70, null) }, params).none { it })
         assertTrue(Recovery.sustainedEffort(run(10) { Minute(it * 60L, hardHr, 0, 70, null) }, params).all { it })
+        // Hours of a raised heart rate without steps (heat, caffeine, a fever) is not an unrecorded workout.
+        assertTrue(Recovery.sustainedEffort(run(90) { Minute(it * 60L, hardHr, 0, 70, null) }, params).all { it })
+        assertTrue(Recovery.sustainedEffort(run(91) { Minute(it * 60L, hardHr, 0, 70, null) }, params).none { it })
     }
 
     @Test
@@ -529,15 +532,15 @@ class RecoveryTest {
         val night = run(450) { Minute(it * 60L, 54, 0, null, SleepStage.LIGHT) }
         val normalNight = Recovery.charge(night, withSignal(BodySignals.State.Normal), 0L..27_000L, start = 30f).latest!!
         val alertNight = Recovery.charge(night, withSignal(BodySignals.State.Alert), 0L..27_000L, start = 30f).latest!!
-        assertTrue("normal $normalNight alert $alertNight", alertNight < normalNight - 8f)
+        assertTrue("normal $normalNight alert $alertNight", alertNight < normalNight - 3f)
         assertTrue(alertNight > 30f)
         // The day after, still under the alert (it lasts until the next sleep): a 10-hour desk day with a 30-minute
-        // walk in it, from the same 80, drains about half as much again.
+        // walk in it, from the same 80, drains about a quarter more.
         val day = run(600) { Minute(it * 60L, if (it in 200 until 230) raisedHr else 66, if (it in 200 until 230) 110 else 0, 40, null) }
         val normalDrop = 80f - Recovery.charge(day, withSignal(BodySignals.State.Normal), 0L..36_000L, start = 80f, requireAnchor = false).latest!!
         val alert = Recovery.charge(day, withSignal(BodySignals.State.Alert), 0L..36_000L, start = 80f, requireAnchor = false)
         val alertDrop = 80f - alert.latest!!
-        assertTrue("normal $normalDrop alert $alertDrop", alertDrop in normalDrop * 1.3f..normalDrop * 1.5f)
+        assertTrue("normal $normalDrop alert $alertDrop", alertDrop in normalDrop * 1.12f..normalDrop * 1.35f)
         assertTrue(alert.drainedExercise > 0f)
         // Watch leaves Charge alone.
         assertEquals(normalNight, Recovery.charge(night, withSignal(BodySignals.State.Watch), 0L..27_000L, start = 30f).latest!!, 1e-4f)
