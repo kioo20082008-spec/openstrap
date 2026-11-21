@@ -158,12 +158,12 @@ private fun RecoveryDetail(
                             else -> stringResource(R.string.glow_recovery_scored_each_morning)
                         },
                     )
-                    if (score != null && ready != null) TabCopy.learning(ready.phase, ready.baselineNights)?.let { CaveatLine(it, color) }
+                    if (score != null && ready != null) TabCopy.learning(ready.phase, ready.baselineNights)?.let { CaveatLine(it, color, Modifier.padding(horizontal = GlowLayout.CardInset)) }
                 }
             }
             val all = ready?.contributors.orEmpty().sortedByDescending { it.factor.weight }
             if (all.isNotEmpty()) item {
-                ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_recovery_what_drove)) {
+                ListPanel(title = stringResource(R.string.glow_recovery_what_drove)) {
                     all.forEachIndexed { i, c ->
                         ContributorRow(
                             TabCopy.factorName(c.factor), MetricColors.readiness, TabCopy.contributorWord(c.score), c.score / 100f,
@@ -292,12 +292,12 @@ private fun ChargeDetail(
             Column {
                 DetailSentence(DetailCopy.charge(now, atWake, TabCopy.drainedAmount(c.drainedExercise + c.drainedStress + c.drainedLiving).toInt(), c.anchored, isToday, LocalTime.now().hour))
                 InfoCopy.chargeNotes(c).firstOrNull()?.let { note ->
-                    Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color) }
+                    Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color, Modifier.padding(horizontal = GlowLayout.CardInset)) }
                 }
             }
         }
         if (c != null && c.anchored && now != null) item {
-            ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_recovery_where_it_went)) {
+            ListPanel(title = stringResource(R.string.glow_recovery_where_it_went)) {
                 TabCopy.chargeRows(c.recharged, c.drainedExercise, c.drainedStress, c.drainedLiving).forEachIndexed { i, row ->
                     ListRow(row.name, color, row.value, row.status, divider = i > 0)
                 }

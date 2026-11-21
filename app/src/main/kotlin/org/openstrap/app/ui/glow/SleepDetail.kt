@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -37,6 +38,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -109,13 +111,13 @@ private fun Caption(text: String, modifier: Modifier = Modifier) =
 @Composable
 private fun ChartTitle(title: String, note: String?, modifier: Modifier = Modifier, scrubbed: DetailHeadline? = null) {
     Row(modifier.fillMaxWidth().padding(bottom = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(title, color = AppColors.ink, style = RingCardTitle, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
+        Text(title, color = AppColors.ink, style = RingCardTitle.atStart(), maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.weight(1f))
         // While the line is scrubbed, its reading takes the note's place, in white so it reads as the live value.
         if (scrubbed != null) Text(
             stringResource(R.string.glow_sleep_scrubbed, scrubbed.value.toString(), scrubbed.label), color = AppColors.ink,
-            style = GlowType.secondary, maxLines = 1,
+            style = GlowType.secondary, maxLines = 1, modifier = Modifier.padding(start = 8.dp),
         )
-        else if (note != null) Text(note, color = AppColors.muted, style = RingLabel)
+        else if (note != null) Text(note, Modifier.padding(start = 8.dp), color = AppColors.muted, style = RingLabel, maxLines = 1)
     }
 }
 
@@ -213,7 +215,7 @@ internal fun SleepScoreDetail(
                         val others = state.nights.takeLast(SleepHistory.WEEK_NIGHTS).filter { it.date != state.date }.mapNotNull { it.asleepSeconds }
                         Column {
                             DetailSentence(SleepCopy.night(Narrative.sleepHeadline(session, asleep), asleep, others))
-                            TabCopy.woke(session.wakeCount)?.let { Caption(it, Modifier.padding(top = 6.dp)) }
+                            TabCopy.woke(session.wakeCount)?.let { Caption(it, Modifier.padding(horizontal = GlowLayout.CardInset).padding(top = 6.dp)) }
                         }
                     }
                     // What shaped the score: its parts (time asleep against your need, staying asleep and regular
@@ -225,7 +227,7 @@ internal fun SleepScoreDetail(
                         ?: Narrative.sleepContributors(session, asleep, need, waso)
                     val factors = SleepCopy.factors(contributors, asleep, parts?.needMinutes ?: need, waso)
                     if (factors.isNotEmpty()) item {
-                        ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_sleep_what_shaped)) {
+                        ListPanel(title = stringResource(R.string.glow_sleep_what_shaped)) {
                             factors.forEachIndexed { i, f ->
                                 ContributorRow(f.name, color, f.word, f.fraction, offNormal = f.off, divider = i > 0, detail = f.detail, onClick = { info = true })
                             }
@@ -330,7 +332,7 @@ private fun DeleteSleepSheet(title: String, times: String, onDelete: () -> Unit,
 /** In a deleted night's place: No sleep recorded, which times were deleted and what Recovery does, and Restore. */
 @Composable
 private fun DeletedNight(text: String, onRestore: () -> Unit) {
-    OutlineCard(Modifier.padding(top = 8.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+    OutlineCard(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(SleepCopy.NO_SLEEP_TITLE, color = AppColors.ink, style = GlowType.cardTitle, maxLines = 1)
         Text(text, color = AppColors.ink.copy(alpha = 0.75f), style = GlowType.body)
         PageButton(
@@ -403,20 +405,30 @@ private fun StageBars(b: Summaries.SleepBreakdown, modifier: Modifier = Modifier
         org.openstrap.app.data.db.SleepStage.DEEP, org.openstrap.app.data.db.SleepStage.REM,
         org.openstrap.app.data.db.SleepStage.LIGHT, org.openstrap.app.data.db.SleepStage.AWAKE,
     )
+    // A name and a time keep their column's width as the font grows, so the bars of every row start and end together.
+    val slot = minOf(64.dp * LocalDensity.current.fontScale.coerceAtLeast(1f), StageSlotMax)
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         order.forEach { st ->
             val secs = b.byStage[st] ?: 0L
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary, maxLines = 1, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.widthIn(min = 64.dp, max = 96.dp))
+                // Aligned by the layout, not by the word: "REM" sits on the same edge as the Arabic names in an Arabic screen.
+                Text(
+                    SLEEP_NAMES[st].orEmpty(), color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.secondary.atStart(), maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, modifier = Modifier.widthIn(min = slot, max = StageSlotMax),
+                )
+                Spacer(Modifier.width(12.dp))
                 FillBar(secs.toFloat() / total, stageColor(st), Modifier.weight(1f).detailReveal(delayMs = 300, fromStart = true), height = 10.dp)
                 Text(
-                    Units.duration(secs), color = AppColors.ink, style = GlowType.secondary, maxLines = 1,
-                    modifier = Modifier.padding(start = 12.dp).widthIn(min = 64.dp), textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                    Units.duration(secs), color = AppColors.ink, style = GlowType.secondary.atEnd(), maxLines = 1,
+                    modifier = Modifier.padding(start = 12.dp).widthIn(min = slot),
                 )
             }
         }
     }
 }
+
+/** The most room a stage's name takes in the stage bars. */
+private val StageSlotMax = 96.dp
 
 /** A line of [points] over [window] in 5-minute steps; scrubbing puts the reading and its time in the headline. */
 @Composable

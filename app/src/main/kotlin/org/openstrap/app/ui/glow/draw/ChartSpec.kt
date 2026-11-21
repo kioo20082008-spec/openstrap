@@ -266,7 +266,9 @@ object HypnogramLook {
 
 /**
  * [stages] on [rows] rows (row 0 at the top, Awake), in a chart [width] by [height] px at [density]. [nameWidth] px
- * down the left holds the names, [axis] leaves room for times under it. Null with no stages.
+ * down the left holds the names, [axis] leaves room for times under it. Every band lies inside the plot, from
+ * [nameWidth] to [width]: a short stage keeps at least its height as width by moving in, not by sticking out. Null
+ * with no stages.
  */
 fun hypnogramGeometry(stages: List<GlowStage>, rows: Int, width: Float, height: Float, density: Float, nameWidth: Float, axis: Boolean): HypnogramGeometry? {
     if (stages.isEmpty()) return null
@@ -284,10 +286,14 @@ fun hypnogramGeometry(stages: List<GlowStage>, rows: Int, width: Float, height: 
         if (a.row != b.row) HypnogramJoin(Offset(xOf(b.from), yOf(a.row)), Offset(xOf(b.from), yOf(b.row))) else null
     }
     val bands = sorted.map { s ->
+        // A stage too short to see is as wide as it is high, but never past the plot: it keeps its start, and one that
+        // would run out of the end (a last short stage, an awake blip at the foot of the night) is drawn ending on it.
+        val width = (xOf(s.to) - xOf(s.from)).coerceAtLeast(pillH).coerceAtMost(w.coerceAtLeast(pillH))
+        val left = xOf(s.from).coerceIn(nameWidth, (nameWidth + w - width).coerceAtLeast(nameWidth))
         HypnogramBand(
             stage = s,
-            topLeft = Offset(xOf(s.from), yOf(s.row) - pillH / 2),
-            size = Size((xOf(s.to) - xOf(s.from)).coerceAtLeast(pillH), pillH),
+            topLeft = Offset(left, yOf(s.row) - pillH / 2),
+            size = Size(width, pillH),
             corner = pillH / 2,
             // Deeper rows brighter, so deep sleep stands out on the dark core.
             whiteAlpha = 0.55f + 0.45f * s.row / (rows - 1).coerceAtLeast(1),

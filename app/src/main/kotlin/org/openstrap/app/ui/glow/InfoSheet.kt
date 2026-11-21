@@ -63,17 +63,17 @@ fun InfoSheet(
         Column {
             Text(info.name, color = AppColors.ink, style = PageTitleStyle.copy(fontSize = 22.sp, lineHeight = 28.sp))
             Text(
-                info.meaning, color = AppColors.ink.copy(alpha = 0.86f), modifier = Modifier.padding(top = 8.dp),
-                style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp),
+                info.meaning, color = AppColors.ink.copy(alpha = 0.86f), modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp).atStart(),
             )
             // Some numbers have no scale to place them on (naps, breathing disturbances, whose only words are apnea bands).
             if (info.scale.isNotEmpty()) Scale(info.scale, color, here, Modifier.padding(top = 22.dp))
             if (hereLine != null) Text(
-                hereLine, color = AppColors.ink, style = GlowType.secondary,
-                modifier = Modifier.padding(top = if (info.scale.isEmpty()) 16.dp else 10.dp),
+                hereLine, color = AppColors.ink, style = GlowType.secondary.atStart(),
+                modifier = Modifier.fillMaxWidth().padding(top = if (info.scale.isEmpty()) 16.dp else 10.dp),
             )
             Column(
-                Modifier.padding(top = 24.dp).fillMaxWidth().background(AppColors.glass, RingDetailShape).padding(horizontal = 18.dp),
+                Modifier.padding(top = 24.dp).fillMaxWidth().background(AppColors.glass, RingDetailShape).padding(horizontal = GlowLayout.CardInset),
             ) {
                 val folds = rows ?: listOf(
                     stringResource(R.string.glow_info_how) to info.how,
@@ -142,12 +142,12 @@ private fun Fold(title: String, text: String, divider: Boolean = true) {
             Modifier.fillMaxWidth().detailPress(onClickLabel = clickLabel, scale = 0.98f) { open = !open }.padding(vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(title, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Bold), modifier = Modifier.weight(1f))
+            Text(title, color = AppColors.ink, style = GlowType.body.copy(fontWeight = FontWeight.Bold).atStart(), modifier = Modifier.weight(1f))
             Spacer(Modifier.size(12.dp))
             Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = 0.6f), modifier = Modifier.size(16.dp).rotate(turn))
         }
         AnimatedVisibility(open) {
-            Text(text, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary, modifier = Modifier.padding(bottom = 16.dp))
+            Text(text, color = AppColors.ink.copy(alpha = 0.8f), style = GlowType.secondary.atStart(), modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp))
         }
     }
 }

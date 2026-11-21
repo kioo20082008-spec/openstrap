@@ -182,7 +182,7 @@ private fun HeartPointsDetail(ctx: ActivityDetailContext) {
             if (total != null) item {
                 Column {
                     DetailSentence(ActivityCopy.heartPointsWeek(total))
-                    if (ctx.isToday) ActivityCopy.dropsOff(week.first(), Math.round(daily.first() ?: 0f))?.let { CaveatLine(it, color) }
+                    if (ctx.isToday) ActivityCopy.dropsOff(week.first(), Math.round(daily.first() ?: 0f))?.let { CaveatLine(it, color, Modifier.padding(horizontal = GlowLayout.CardInset)) }
                 }
             }
         } else {
@@ -374,7 +374,7 @@ private fun LoadDetail(ctx: ActivityDetailContext) {
         if (t != null && t.ctl > 0f) item {
             // On Week the balance is the headline's word already.
             val title = stringResource(R.string.glow_activity_this_week)
-            ListPanel(Modifier.padding(top = 8.dp), title = title, note = balance.takeIf { range != Range.Week }) {
+            ListPanel(title = title, note = balance.takeIf { range != Range.Week }) {
                 ListRow(
                     stringResource(R.string.glow_activity_your_usual), color, Math.round(t.ctl).toString(),
                     stringResource(R.string.glow_activity_your_usual_line), divider = false,
@@ -447,7 +447,7 @@ private fun Vo2Detail(ctx: ActivityDetailContext) {
     ) {
         if (latest != null || est != null) item { DetailSentence(ActivityCopy.vo2(latest != null)) }
         if (readings.isNotEmpty() || (latest != null && est != null)) item {
-            ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_activity_where_it_comes_from)) {
+            ListPanel(title = stringResource(R.string.glow_activity_where_it_comes_from)) {
                 var first = true
                 readings.take(5).forEach { (w, v) ->
                     val start = Instant.ofEpochSecond(w.shownStart).atZone(zone)
@@ -516,7 +516,7 @@ private fun RecoverDetail(ctx: ActivityDetailContext) {
         // Recovered says which workout under the word already.
         if (source != null && shown?.first != null && ended != null) item { DetailSentence(ActivityCopy.recover(source.sportName, ended)) }
         if (rated.isNotEmpty()) item {
-            ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_activity_recent_workouts)) {
+            ListPanel(title = stringResource(R.string.glow_activity_recent_workouts)) {
                 rated.take(5).forEachIndexed { i, w ->
                     val start = Instant.ofEpochSecond(w.shownStart).atZone(zone)
                     // Its own, not what earlier workouts left on top ([SummaryCopy.carriedOver]).
@@ -617,7 +617,7 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
     ) {
         if (e == null || active == null) {
             if (ctx.r != null) item {
-                ListPanel(Modifier.padding(top = 8.dp)) { PageRow(ADD_PROFILE, onClick = ctx.onEditProfile, divider = false) }
+                ListPanel { PageRow(ADD_PROFILE, onClick = ctx.onEditProfile, divider = false) }
             }
         } else if (range == Range.Day) {
             item {
@@ -631,14 +631,14 @@ private fun CaloriesDetail(ctx: ActivityDetailContext) {
                 Column {
                     DetailSentence(ActivityCopy.caloriesAtRest(Math.round(e.bmrKcal)))
                     InfoCopy.caloriesNotes(e).firstOrNull()?.let { note ->
-                        androidx.compose.foundation.layout.Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color) }
+                        androidx.compose.foundation.layout.Box(Modifier.detailPress(scale = 0.98f) { info = true }) { CaveatLine(note, color, Modifier.padding(horizontal = GlowLayout.CardInset)) }
                     }
                 }
             }
             item {
                 val zone = ZoneId.systemDefault()
                 val sources = remember(ctx.workouts, date, e) { CaloriesCopy.sources(ctx.workouts, date, e, e.bmrKcal / 1440f, zone) }
-                ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_activity_where_it_came_from)) {
+                ListPanel(title = stringResource(R.string.glow_activity_where_it_came_from)) {
                     sources.forEachIndexed { i, s ->
                         val start = s.workoutStart
                         if (start != null) ListRow(
@@ -934,7 +934,7 @@ internal fun WeekDetail(ctx: ActivityDetailContext) {
         // The steps against the week before are the headline's word already, so the sentence leaves them out.
         WeekStory.sentence(days, null, workoutsBefore)?.let { item { DetailSentence(it) } }
         item {
-            ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_activity_day_by_day)) {
+            ListPanel(title = stringResource(R.string.glow_activity_day_by_day)) {
                 WeekStory.rows(days).forEachIndexed { i, r ->
                     ListRow(r.title, MetricColors.steps, r.steps?.let { Units.count(it) }, r.line, divider = i > 0, dash = false)
                 }

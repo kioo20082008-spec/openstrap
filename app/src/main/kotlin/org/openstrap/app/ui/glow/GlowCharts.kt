@@ -47,6 +47,8 @@ import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -108,9 +110,13 @@ internal fun DrawScope.pillBar(color: Color, x: Float, pitch: Float, bottom: Flo
  * measuring in draw churned the measurer's small cache on every scrub frame.
  */
 
-/** A label measured once ([TextMeasurer.measure]) and drawn at [x], [align] of its width left of it, kept on the chart. */
+/**
+ * A label measured once ([TextMeasurer.measure]) and drawn at [x], [align] of its width left of it, kept on the chart. A
+ * label wider than the chart (a long Arabic band label on a narrow phone at a large font) starts at the left edge
+ * rather than failing on an empty range.
+ */
 private fun DrawScope.text(r: TextLayoutResult, x: Float, y: Float, align: Float = 0f) {
-    drawText(r, topLeft = Offset((x - r.size.width * align).coerceIn(0f, size.width - r.size.width), y))
+    drawText(r, topLeft = Offset((x - r.size.width * align).coerceIn(0f, (size.width - r.size.width).coerceAtLeast(0f)), y))
 }
 
 /** The average's label: the axis text a touch brighter. */
@@ -636,7 +642,11 @@ fun GlowHypnogram(
             val g = hypnogramGeometry(stages, rowNames.size, size.width, size.height, density, nameW, axis = labels.isNotEmpty())
                 ?: return@drawWithCache nothing()
             val h = g.plotBottom
-            val names = if (showNames) m.measureAll(rowNames) else emptyList()
+            // A name that doesn't fit its column ends in an ellipsis rather than running onto the plot.
+            val nameBox = (nameW - 6.dp.toPx()).toInt().coerceAtLeast(0)
+            val names = if (showNames) rowNames.map {
+                m.measure(it, axisText, overflow = TextOverflow.Ellipsis, softWrap = false, maxLines = 1, constraints = Constraints(maxWidth = nameBox))
+            } else emptyList()
             val axisLabels = m.measureAll(labels)
             onDrawBehind {
                 rowNames.indices.forEach { row ->

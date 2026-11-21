@@ -20,7 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +62,8 @@ object GlowLayout {
     /** From a card's edge to its content, on every side and every tier. */
     val CardInset = 16.dp
     val CardPadding = PaddingValues(CardInset)
+    /** The padding inside a row of pills (the day strip, the range pills), the same on both so their pills line up. */
+    val PillInset = 4.dp
     /** Above and below each list row; the panel adds the rest of [CardInset] at its top and bottom. */
     val RowPadding = 14.dp
     /** Inside a list: [CardInset] at the sides, and with the first and last row's [RowPadding] at the top and bottom. */
@@ -534,3 +541,30 @@ internal fun OutlineTag(text: String, modifier: Modifier = Modifier, onClick: ((
         color = AppColors.ink.copy(alpha = 0.85f), style = GlowType.caption.copy(fontWeight = androidx.compose.ui.text.font.FontWeight.Bold), maxLines = 1,
     )
 }
+
+/*
+ * Text that fills a slot (a weighted title, a label in a fixed-width column) is aligned by its own first strong letter,
+ * not by the layout: a Latin word such as "REM", "HRV" or "SpO2" in an Arabic screen would sit on the slot's left edge
+ * while the Arabic words beside it sit on its right. These two follow the layout instead: the edge the layout starts
+ * (right in Arabic) and the edge it ends (left in Arabic). Bidi order inside the text is untouched.
+ */
+
+/** The side of a slot a line of text starts on in this layout: right in RTL, left in LTR. */
+@Composable
+@ReadOnlyComposable
+internal fun layoutStart(): TextAlign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) TextAlign.Right else TextAlign.Left
+
+/** The side of a slot a line of text ends on in this layout: left in RTL, right in LTR. */
+@Composable
+@ReadOnlyComposable
+internal fun layoutEnd(): TextAlign = if (LocalLayoutDirection.current == LayoutDirection.Rtl) TextAlign.Left else TextAlign.Right
+
+/** [this] aligned to the layout's start, for text that fills its slot ([layoutStart]). */
+@Composable
+@ReadOnlyComposable
+internal fun TextStyle.atStart(): TextStyle = copy(textAlign = layoutStart())
+
+/** [this] aligned to the layout's end, for text that fills its slot ([layoutEnd]). */
+@Composable
+@ReadOnlyComposable
+internal fun TextStyle.atEnd(): TextStyle = copy(textAlign = layoutEnd())

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
@@ -149,16 +151,26 @@ internal fun DetailTemplate(
     val cascade = remember { DetailCascade() }
     CompositionLocalProvider(LocalGlowPaused provides { list.isScrollInProgress }, LocalCardsGrow provides false, LocalDetailCascade provides cascade) {
         ScreenList(contentPadding, list, gutter = gutter) {
-            item {
+            // Every block of the page (the hero, the figures, the strip, the range pills, the charts and lists) is its
+            // own item at the page's one gutter, so they share a left and a right edge and the list's 12 dp between them.
+            item(key = "hero") {
                 // The card tapped grows into this surface (spec 3.5).
                 // The metric's hue drifting faintly behind the hero, so the page breathes round its ring.
-                Box(Modifier.fillMaxWidth().detailSurface(hero = true, RingDetailShape).clip(RingDetailShape)) {
+                Box(Modifier.fillMaxWidth().detailSurface(hero = true, RingDetailShape).clip(RingDetailShape).background(AppColors.glass)) {
                 AmbientAura(color, Modifier.matchParentSize(), strength = 0.7f)
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    // The header's buttons sit the same distance from the card's edge on both sides: the back button's
+                    // circle and the (i)'s 32 dp circle inside its 44 dp box.
+                    Modifier.fillMaxWidth().padding(
+                        start = HeroSide, end = HeroSide - (InfoButtonTouch - InfoButtonSize) / 2, top = 4.dp, bottom = GlowLayout.CardInset,
+                    ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     val day = strip.firstOrNull { it.selected }?.date
                     PageHeader(
                         title, onBack, subtitle = day?.let(::dayName),
                         onTitle = if (siblings.size > 1) ({ switching = true }) else null,
+                        minHeight = HeroHeaderHeight,
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (heroSide != null) {
@@ -170,14 +182,14 @@ internal fun DetailTemplate(
                     }
                     // A scrub is read here, so only the hero follows the finger, not the whole detail (audit K4).
                     val shown = scrubbed() ?: headline
-                    HeroRing(shown, color, ringScale, icon, Modifier.padding(top = 10.dp))
+                    HeroRing(shown, color, ringScale, icon, Modifier.padding(top = 4.dp))
                     if (shown.word != null && shown.value != null) DetailStatusPill(shown.word, color, Modifier.padding(top = 14.dp))
-                    if (figures.isNotEmpty()) RingFiguresCard(figures, Modifier.padding(top = 18.dp))
-                    if (strip.isNotEmpty()) WeekStrip(strip, color, onDay, Modifier.padding(top = 10.dp).detailRise())
                 }
                 }
             }
-            if (ranges.size > 1) item {
+            if (figures.isNotEmpty()) item(key = "figures") { RingFiguresCard(figures) }
+            if (strip.isNotEmpty()) item(key = "strip") { WeekStrip(strip, color, onDay, Modifier.detailRise()) }
+            if (ranges.size > 1) item(key = "ranges") {
                 GlowSegments(ranges.map { it.label }, ranges.indexOf(range), { onRange(ranges[it]) }, Modifier.detailRise(), role = Role.Tab)
             }
             body()
@@ -200,13 +212,15 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
     }
     DetailRing(share, color, modifier, icon = icon) {
         if (v != null) {
+            // The ring's middle is a fixed size, so its number keeps its size at any font scale (a larger font would cut it).
+            val keep = 1f / LocalDensity.current.fontScale.coerceAtLeast(1f)
             val size = when {
-                v.length >= 8 -> 24.sp
-                v.length >= 6 -> 32.sp
-                v.length == 5 -> 40.sp
-                v.length == 4 -> 46.sp
-                else -> 54.sp
-            }
+                v.length >= 8 -> 24 * keep
+                v.length >= 6 -> 32 * keep
+                v.length == 5 -> 40 * keep
+                v.length == 4 -> 46 * keep
+                else -> 54 * keep
+            }.sp
             Text(detailCountUp(v), Modifier.detailNumber(v), color = AppColors.ink, style = ringFigure(size), maxLines = 1)
             if (shown.label.isNotEmpty()) Text(
                 shown.label, color = AppColors.muted, style = RingLabel, textAlign = TextAlign.Center, maxLines = 2,
@@ -225,22 +239,26 @@ private fun HeroRing(shown: DetailHeadline, color: Color, scale: Float?, icon: I
     }
 }
 
+/** The hero's header is this tall at least: the 44 dp back button with 6 dp round it. */
+private val HeroHeaderHeight = 56.dp
+/** From the hero card's edge to its header's buttons. */
+private val HeroSide = 12.dp
+
 /** The seven days on a solid card: each day's short name, a dot under days with data, the day shown on a filled pill. */
 @Composable
 private fun WeekStrip(days: List<DetailCopy.StripDay>, color: Color, onDay: (LocalDate) -> Unit, modifier: Modifier = Modifier) {
     Row(
-        modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(4.dp),
-        horizontalArrangement = Arrangement.spacedBy(1.dp),
+        modifier.fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(GlowLayout.PillInset),
     ) {
         days.forEach { d ->
             val show = stringResource(R.string.glow_metrics_show_day, d.label)
             Column(
-                Modifier.weight(1f).clip(RoundedCornerShape(16.dp))
+                Modifier.weight(1f).heightIn(min = 44.dp).clip(RoundedCornerShape(16.dp))
                     .background(if (d.selected) AppColors.ink else Color.Transparent)
                     .detailPress(onClickLabel = show, role = Role.Button, scale = 0.92f) { onDay(d.date) }
                     .padding(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(5.dp),
             ) {
                 // Arabic's short day names carry the article ("الأربعاء"): too wide for a seventh of the card, so it goes.
                 Text(
@@ -275,8 +293,8 @@ private fun SwitcherSheet(siblings: List<DetailSibling>, color: Color, onDismiss
 @Composable
 internal fun DetailSentence(text: String) {
     Text(
-        text, color = AppColors.ink.copy(alpha = 0.86f), style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp),
-        modifier = Modifier.padding(horizontal = 4.dp, vertical = 4.dp),
+        text, color = AppColors.ink.copy(alpha = 0.86f), style = GlowType.body.copy(fontSize = 16.sp, lineHeight = 25.sp).atStart(),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = GlowLayout.CardInset, vertical = 4.dp),
     )
 }
 
@@ -740,7 +758,7 @@ private fun RelatedList(related: List<Metric>, state: DayUiState, history: Daily
 /** The "Related" list at the foot of a detail: the details next to this one, each a row opening it. */
 @Composable
 internal fun RelatedPanel(content: @Composable ColumnScope.() -> Unit) =
-    ListPanel(Modifier.padding(top = 8.dp), title = stringResource(R.string.glow_metrics_related), content = content)
+    ListPanel(title = stringResource(R.string.glow_metrics_related), content = content)
 
 /** A score as a related row: its [value] and [word] beside its name and icon, opening its detail. */
 @Composable

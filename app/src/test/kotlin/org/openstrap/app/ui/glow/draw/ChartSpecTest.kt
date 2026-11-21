@@ -37,6 +37,21 @@ class ChartSpecTest {
         assertEquals(g.bands[0].size.height, g.bands[0].size.width, 1e-6f)
     }
 
+    @Test fun `no stage sticks out past the ends of the plot`() {
+        // A last stage too short to see, and a first one: both are as wide as they are high, and both inside the plot.
+        val nameWidth = 46f * density
+        val width = 300f * density
+        val stages = listOf(GlowStage(0f, 0.0005f, 2), GlowStage(0.0005f, 0.998f, 1), GlowStage(0.998f, 1f, 0))
+        val g = hypnogramGeometry(stages, 4, width, 130f * density, density, nameWidth, axis = true)!!
+        g.bands.forEach { b ->
+            assertTrue(b.topLeft.x >= nameWidth - 1e-3f)
+            assertTrue(b.topLeft.x + b.size.width <= width + 1e-3f)
+        }
+        listOf(g.bands.first(), g.bands.last()).forEach { assertEquals(it.size.height, it.size.width, 1e-3f) }
+        // The last one ends on the plot's end, it doesn't start later to stay put.
+        assertEquals(width, g.bands.last().topLeft.x + g.bands.last().size.width, 1e-3f)
+    }
+
     @Test fun `names and times take room off the plot`() {
         val g = hypnogramGeometry(listOf(GlowStage(0f, 1f, 0)), 4, 300f * density, 130f * density, density, 46f * density, axis = true)!!
         assertEquals(46f * density, g.gridX0, 0f)

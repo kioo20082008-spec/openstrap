@@ -158,6 +158,8 @@ fun RoundIconButton(
  * The one page header (spec 3.4), on every page over a tab, details included: the [BackButton] and the [title] in
  * Page title type, over the day it's about or a short note ([subtitle]) in Secondary when there is one, then optional
  * [trailing] content (Save, a detail's (i)). [onTitle] makes the title a button with a caret (a detail's switcher).
+ * The header is [minHeight] tall at least and grows with the text (a large font, a long subtitle), never clipping it or
+ * running over what's under it.
  */
 @Composable
 fun PageHeader(
@@ -166,10 +168,11 @@ fun PageHeader(
     backEnabled: Boolean = true,
     subtitle: String? = null,
     onTitle: (() -> Unit)? = null,
+    minHeight: Dp = PageHeaderHeight,
     trailing: (@Composable () -> Unit)? = null,
 ) {
     val switchLabel = stringResource(R.string.glow_page_switch)
-    Row(Modifier.fillMaxWidth().height(PageHeaderHeight), verticalAlignment = Alignment.CenterVertically) {
+    Row(Modifier.fillMaxWidth().heightIn(min = minHeight), verticalAlignment = Alignment.CenterVertically) {
         BackButton(onBack, backEnabled)
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
@@ -180,7 +183,7 @@ fun PageHeader(
             ) {
                 Text(title, color = AppColors.ink, style = PageTitleStyle, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
                 if (onTitle != null) {
-                    Spacer(Modifier.width(6.dp))
+                    Spacer(Modifier.width(8.dp))
                     Icon(AppIcons.CaretDown, null, tint = AppColors.ink.copy(alpha = GlowType.CAPTION_ALPHA), modifier = Modifier.size(16.dp))
                 }
             }
@@ -784,19 +787,20 @@ internal fun GlowSegments(
             .drawBehind {
                 val n = options.size
                 if (n == 0 || shown.value <= 0f) return@drawBehind
-                val pad = 4.dp.toPx()
+                val pad = GlowLayout.PillInset.toPx()
                 val slot = (size.width - 2 * pad) / n
                 val rtl = layoutDirection == androidx.compose.ui.unit.LayoutDirection.Rtl
                 val x = if (rtl) size.width - pad - slot * (at.value + 1f) else pad + slot * at.value
                 val h = size.height - 2 * pad
                 drawRoundRect(pill.copy(alpha = pill.alpha * shown.value), Offset(x, pad), Size(slot, h), CornerRadius(h / 2f))
             }
-            .padding(4.dp),
+            .padding(GlowLayout.PillInset),
     ) {
         options.forEachIndexed { i, label ->
             val on = i == selected
             Box(
-                Modifier.weight(1f).clip(CircleShape)
+                // 44 dp tall at least to tap, at any font size.
+                Modifier.weight(1f).heightIn(min = 44.dp).clip(CircleShape)
                     .pressClickable({ onSelect(i) }, CircleShape, scale = 0.97f)
                     .semantics { this.role = role; this.selected = on }
                     .padding(horizontal = 4.dp, vertical = 11.dp),

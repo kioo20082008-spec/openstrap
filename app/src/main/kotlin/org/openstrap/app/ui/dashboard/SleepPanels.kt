@@ -193,9 +193,11 @@ internal fun SleepWindows(
             }
             val y0 = yOf(span.first)
             val y1 = yOf(span.second)
+            // A short night is drawn at least as tall as it is wide, moved up to stay inside the plot rather than out of its foot.
+            val barH = (y1 - y0).coerceAtLeast(width)
             drawRoundRect(
                 if (last) AppColors.ink else MetricColors.sleepLight,
-                Offset(cx - width / 2, y0), Size(width, (y1 - y0).coerceAtLeast(width)), CornerRadius(width / 2),
+                Offset(cx - width / 2, y0.coerceAtMost((chartBottom - barH).coerceAtLeast(0f))), Size(width, barH), CornerRadius(width / 2),
             )
         }
     }

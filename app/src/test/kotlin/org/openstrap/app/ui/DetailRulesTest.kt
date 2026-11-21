@@ -7,6 +7,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 import org.openstrap.app.ui.glow.BackButtonSize
+import org.openstrap.app.ui.glow.GlowLayout
 import org.openstrap.app.ui.theme.ControlSurface
 import java.io.File
 
@@ -93,6 +94,31 @@ class DetailRulesTest {
                 .map { "$path:${lineOf(code, it.range.first)}  ${it.value}" }.toList()
         }
         if (found.isNotEmpty()) fail("Details take their controls and type from the design system:\n" + found.joinToString("\n"))
+    }
+
+    @Test fun `a detail's blocks share one gutter, one inset and one rhythm`() {
+        // The hero, the figures, the day strip and the range pills are items of the same list, so they share the page's
+        // gutter (one left and right edge) and its gap; no list adds a gap of its own on top.
+        val template = sources.getValue("glow/GlowMetricDetail.kt").substringAfter("fun DetailTemplate(").substringBefore("\n}\n")
+        listOf("hero", "figures", "strip", "ranges").forEach { key ->
+            assertTrue("the template's $key is an item of its own", "item(key = \"$key\")" in template)
+        }
+        DETAILS.forEach { path ->
+            val code = sources.getValue(path)
+            assertTrue("$path leaves the gap between blocks to the list", !Regex("""ListPanel\(Modifier\.padding\(top""").containsMatchIn(code))
+        }
+        // Cards take the one inset, 16 dp, on every side; the day strip and the range pills the same pill inset.
+        assertTrue("DetailCard pads by CardInset", "GlowLayout.CardPadding" in sources.getValue("glow/RingsDetailParts.kt").substringAfter("internal fun DetailCard("))
+        assertEquals(16.dp, GlowLayout.CardInset)
+        assertTrue("the strip and the pills share an inset", "GlowLayout.PillInset" in sources.getValue("glow/GlowMetricDetail.kt") && "GlowLayout.PillInset" in sources.getValue("glow/PageParts.kt"))
+    }
+
+    @Test fun `words in a slot follow the layout, not their own first letter`() {
+        // "REM", "HRV" and "SpO2" in an Arabic screen: the stage bars' names and a card's title are aligned by the layout.
+        val bars = sources.getValue("glow/SleepDetail.kt").substringAfter("private fun StageBars(").substringBefore("\n}\n")
+        assertTrue("the stage names follow the layout", "GlowType.secondary.atStart()" in bars && "GlowType.secondary.atEnd()" in bars)
+        assertTrue("a card's title follows the layout", "RingCardTitle.atStart()" in sources.getValue("glow/RingsDetailParts.kt"))
+        assertTrue("a sentence follows the layout", "atStart()" in sources.getValue("glow/GlowMetricDetail.kt").substringAfter("fun DetailSentence(").substringBefore("\n}\n"))
     }
 
     private companion object {

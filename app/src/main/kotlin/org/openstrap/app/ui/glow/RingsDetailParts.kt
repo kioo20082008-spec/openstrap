@@ -191,21 +191,23 @@ internal fun DetailStatusPill(word: String, hue: Color, modifier: Modifier = Mod
 
 /**
  * The card of a detail's key figures (T-Detail): side by side, each its label over the figure in bold, a hairline
- * between them. A figure without a value shows [missing] dimmed.
+ * between them. A figure without a value shows [missing] dimmed. A block of its own on the page, so it spans the page's
+ * width like every card; its figures share the whole width, each centred in its own share.
  */
 @Composable
 internal fun RingFiguresCard(figures: List<Pair<String?, String>>, modifier: Modifier = Modifier, missing: String = "–") {
     if (figures.isEmpty()) return
     Row(
-        modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).height(IntrinsicSize.Min).padding(vertical = 14.dp),
+        modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).height(IntrinsicSize.Min)
+            .padding(vertical = GlowLayout.CardInset),
     ) {
         figures.forEachIndexed { i, (value, label) ->
             if (i > 0) Box(Modifier.width(1.dp).fillMaxHeight().background(AppColors.hairline))
-            Column(Modifier.weight(1f).padding(horizontal = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(Modifier.weight(1f).padding(horizontal = GlowLayout.CardInset / 2), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(label, color = AppColors.muted, style = RingLabel, maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
                 Text(
                     value ?: missing, color = if (value != null) AppColors.ink else AppColors.ink.copy(alpha = 0.3f),
-                    style = ringFigure(20.sp), maxLines = 1, textAlign = TextAlign.Center,
+                    style = ringFigure(20.sp), maxLines = 1, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center,
                 )
             }
         }
@@ -214,7 +216,8 @@ internal fun RingFiguresCard(figures: List<Pair<String?, String>>, modifier: Mod
 
 /**
  * A solid card for a detail's chart or block (T-Detail): [title] in bold at its top with an optional [note] at its
- * end, then [content].
+ * end, then [content]. [GlowLayout.CardInset] on every side, as every card and list on the page, so a chart's ends,
+ * a list's rows and a sentence under them share one left and one right edge.
  */
 @Composable
 internal fun DetailCard(
@@ -225,12 +228,12 @@ internal fun DetailCard(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Column(
-        modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(start = 18.dp, end = 18.dp, top = 16.dp, bottom = 14.dp),
+        modifier.detailRise().fillMaxWidth().clip(RingDetailShape).background(AppColors.glass).padding(GlowLayout.CardPadding),
         verticalArrangement = Arrangement.spacedBy(spacing),
     ) {
         if (title != null || note != null) Row(Modifier.fillMaxWidth().padding(bottom = (12.dp - spacing).coerceAtLeast(0.dp)), verticalAlignment = Alignment.CenterVertically) {
-            Text(title.orEmpty(), Modifier.weight(1f), color = AppColors.ink, style = RingCardTitle, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            if (note != null) Text(note, color = AppColors.muted, style = RingLabel, maxLines = 1)
+            Text(title.orEmpty(), Modifier.weight(1f), color = AppColors.ink, style = RingCardTitle.atStart(), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            if (note != null) Text(note, Modifier.padding(start = 8.dp), color = AppColors.muted, style = RingLabel, maxLines = 1)
         }
         content()
     }
