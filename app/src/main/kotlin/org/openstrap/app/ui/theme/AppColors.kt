@@ -153,18 +153,17 @@ object AppColors {
 
     private val NavyPage = Color(0xFF14213D)
 
-    /** The original: a deep navy sky with cream ink. */
+    /** The vessel design's navy: a deep sky from #111A36 to #090D1C with cream ink; cards are faint glass, rows hairlines. */
     private val Navy = ThemeColors(
         light = false,
-        // The rings design: a flat near-black page, no glow or grain, solid charcoal cards without an edge.
-        skyTop = Color(0xFF0A0A0C), skyMid = Color(0xFF0A0A0C), skyLow = Color(0xFF0A0A0C),
-        glow = 0f, grain = 0f,
-        page = Color(0xFF0A0A0C), stage = Color.Black,
-        ink = Color.White, mutedAlpha = 0.6f, onInk = Color.Black,
-        glass = Color(0xFF17171B), hairline = Color.White.copy(alpha = 0.04f), list = Color(0xFF17171B),
-        control = Color(0xFF222228), raised = Color(0xFF2B2B31),
-        nav = Color(0xFF17171B).copy(alpha = 0.94f), sheet = Color(0xFF17171B).copy(alpha = 0.92f),
-        scrim = Color.Black.copy(alpha = 0.55f), ring = Color.White.copy(alpha = 0.25f),
+        skyTop = Color(0xFF111A36), skyMid = Color(0xFF0B1124), skyLow = Color(0xFF090D1C),
+        glow = 1f, grain = 0f,
+        page = Color(0xFF090D1C), stage = Color(0xFF070A16),
+        ink = Color(0xFFF4EDE0), mutedAlpha = 0.6f, onInk = NavyPage,
+        glass = Color.White.copy(alpha = 0.055f), hairline = Color(0xFFF4EDE0).copy(alpha = 0.11f), list = Color.White.copy(alpha = 0.05f),
+        control = Color(0xFF1A1F31), raised = Color(0xFF232C4A),
+        nav = Color(0xFF141A2E).copy(alpha = 0.94f), sheet = Color(0xFF151D38).copy(alpha = 0.96f),
+        scrim = Color(0xFF03050C).copy(alpha = 0.62f), ring = Color.White.copy(alpha = 0.25f),
     )
 
     /** True black for OLED screens: the glow held low, less grain, near-white ink. */
