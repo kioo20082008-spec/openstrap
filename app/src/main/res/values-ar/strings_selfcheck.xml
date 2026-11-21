@@ -46,4 +46,11 @@
     <string name="selfcheck_seen_calories">سعرات اليوم، ⁨%1$s⁩ سعرة، تبدو خارج المعقول لنشاطك.</string>
     <string name="selfcheck_seen_strap_gaps">لم يسجّل السوار نبضاً مدة ⁨%1$s⁩ تقريباً في ⁨%2$s⁩ دون سبب واضح.</string>
     <string name="selfcheck_seen_battery">بطارية السوار عند ⁨%1$s⁩.</string>
+    <string name="selfcheck_tab_checks">فحص القراءات</string>
+    <string name="selfcheck_tab_ai">تعلّم الجسم</string>
+    <string name="selfcheck_how">كيف يشتغل</string>
+    <string name="selfcheck_show">عرض</string>
+    <string name="selfcheck_hide">إخفاء</string>
+    <string name="selfcheck_show_all">عرض الكل</string>
+    <string name="selfcheck_show_less">عرض أقل</string>
 </resources>

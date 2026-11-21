@@ -57,15 +57,11 @@ fun LazyListScope.aiLearnItems(
     onUndo: (Int) -> Unit,
     onRemove: (Int) -> Unit,
     onOpenAssistant: () -> Unit,
+    open: Int,
+    onToggle: (Int) -> Unit,
 ) {
     val ai = ui.ai
     val proposals = ui.state.incidents.filter { SelfLearning.isAi(it.check) }
-    item { RingsSection(stringResource(R.string.ailearn_title)) }
-    item {
-        RingsPanel {
-            Text(stringResource(R.string.ailearn_explain), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
-        }
-    }
     item {
         RingsRows {
             RingsSwitchRow(
@@ -83,16 +79,32 @@ fun LazyListScope.aiLearnItems(
         }
     }
     item { Status(ai, onLearnNow) }
+    item { FoldRow(R.string.selfcheck_how, open and Fold.AiExplain != 0) { onToggle(Fold.AiExplain) } }
+    if (open and Fold.AiExplain != 0) {
+        item {
+            RingsPanel {
+                Text(stringResource(R.string.ailearn_explain), color = AppColors.ink.copy(alpha = GlowType.SECONDARY_ALPHA), style = GlowType.body)
+            }
+        }
+    }
     item { RingsSection(stringResource(R.string.ailearn_section_today)) }
     item { LearnedToday(ai, ui.today) }
     ai.offeredNeed(ui.today)?.let { minutes -> item { NeedOffer(minutes, ai.sleepNeedSetting, onApplyNeed) } }
-    item { RingsSection(stringResource(R.string.ailearn_section_profile)) }
-    profileItems(ai.profile)
+    item { FoldRow(R.string.ailearn_section_profile, open and Fold.Profile != 0) { onToggle(Fold.Profile) } }
+    if (open and Fold.Profile != 0) profileItems(ai.profile)
     item { RingsSection(stringResource(R.string.ailearn_section_changes)) }
     if (proposals.isEmpty()) {
         item { RingsPanel { Text(stringResource(R.string.ailearn_changes_empty), color = AppColors.muted, style = GlowType.body) } }
     } else {
-        items(proposals, key = { it.id }) { i -> ProposalCard(i, ui.today, onUndo, onRemove) }
+        val shown = if (open and Fold.AllChanges != 0) proposals else proposals.take(FOUND_PREVIEW)
+        items(shown, key = { it.id }) { i -> ProposalCard(i, ui.today, onUndo, onRemove) }
+        if (proposals.size > FOUND_PREVIEW) {
+            item {
+                FoldRow(
+                    if (open and Fold.AllChanges != 0) R.string.selfcheck_show_less else R.string.selfcheck_show_all, false, proposals.size.toString(),
+                ) { onToggle(Fold.AllChanges) }
+            }
+        }
     }
     if (ai.profile != null || proposals.isNotEmpty() || ai.state.lastOkAt > 0) {
         item {
@@ -102,14 +114,16 @@ fun LazyListScope.aiLearnItems(
             }
         }
     }
-    item { RingsSection(stringResource(R.string.ailearn_consent_title)) }
-    item {
-        RingsPanel {
-            val lines = remember { AiLearnCopy.consentLines() }
-            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                lines.forEachIndexed { index, line ->
-                    // The first line is the headline of the rest; the others are what is sent, how much and what may change.
-                    if (index == 0) Text(line, color = AppColors.ink, style = GlowType.body) else Bullet(line)
+    item { FoldRow(R.string.ailearn_consent_title, open and Fold.Consent != 0) { onToggle(Fold.Consent) } }
+    if (open and Fold.Consent != 0) {
+        item {
+            RingsPanel {
+                val lines = remember { AiLearnCopy.consentLines() }
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    lines.forEachIndexed { index, line ->
+                        // The first line is the headline of the rest; the others are what is sent, how much and what may change.
+                        if (index == 0) Text(line, color = AppColors.ink, style = GlowType.body) else Bullet(line)
+                    }
                 }
             }
         }

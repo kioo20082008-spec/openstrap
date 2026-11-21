@@ -46,4 +46,11 @@
     <string name="selfcheck_seen_calories">Calories for the day, %1$s kcal, look out of range for your activity.</string>
     <string name="selfcheck_seen_strap_gaps">The strap had no heart rate for about %1$s on %2$s, with no reason found.</string>
     <string name="selfcheck_seen_battery">The strap battery is at %1$s.</string>
+    <string name="selfcheck_tab_checks">Readings check</string>
+    <string name="selfcheck_tab_ai">Body learning</string>
+    <string name="selfcheck_how">How it works</string>
+    <string name="selfcheck_show">Show</string>
+    <string name="selfcheck_hide">Hide</string>
+    <string name="selfcheck_show_all">Show all</string>
+    <string name="selfcheck_show_less">Show less</string>
 </resources>
