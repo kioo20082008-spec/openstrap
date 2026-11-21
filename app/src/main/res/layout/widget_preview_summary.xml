@@ -1,47 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- The summary widget in the launcher's picker on Android 12 and later (widgets spec 6.4): the title and the three numbers. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<!--
+  The summary widget in the launcher's picker on Android 12 and later (widgets spec 6.4): the fill look as the picker's
+  preview image draws it (widget_preview_summary, from the approved mockup), scaled into the cell. Android 15 and later
+  show the generated preview from the real layout instead (WidgetUpdater.publishPreviews).
+-->
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_preview_bg_summary"
-    android:orientation="vertical"
-    android:padding="20dp"
-    tools:ignore="HardcodedText">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/widget_summary_name"
-        android:textSize="17sp"
-        android:textColor="#FFFFFFFF"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="1" />
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="77"
-        android:textSize="24sp"
-        android:textColor="#FFFF5C39"
-        android:fontFamily="sans-serif-black"
-        android:maxLines="1" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="66"
-        android:textSize="24sp"
-        android:textColor="#FFC8FF3D"
-        android:fontFamily="sans-serif-black"
-        android:maxLines="1" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="75"
-        android:textSize="24sp"
-        android:textColor="#FF8B7BFF"
-        android:fontFamily="sans-serif-black"
-        android:maxLines="1" />
-</LinearLayout>
+    android:src="@drawable/widget_preview_summary"
+    android:scaleType="fitCenter"
+    android:adjustViewBounds="true"
+    android:contentDescription="@string/widget_summary_name" />

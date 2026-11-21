@@ -29,6 +29,8 @@
     <string name="system_widget_steps_today">today</string>
     <!-- Steps: the goal, at the top right. -->
     <string name="system_widget_steps_goal">Goal <xliff:g id="goal" example="10,000">%1$s</xliff:g></string>
+    <!-- Steps: the share of the goal under the title, with the goal itself, "7% of 8,000". -->
+    <string name="system_widget_steps_of_goal"><xliff:g id="percent" example="7">%1$d</xliff:g>%% of <xliff:g id="goal" example="8,000">%2$s</xliff:g></string>
     <!-- Steps: how many are left to the goal, "1,568 to go". -->
     <string name="system_widget_steps_to_go"><xliff:g id="steps" example="1,568">%1$s</xliff:g> to go</string>
     <!-- Steps: past the goal, in place of what's to go. -->

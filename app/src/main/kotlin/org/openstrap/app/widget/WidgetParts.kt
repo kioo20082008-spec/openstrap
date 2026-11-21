@@ -280,7 +280,7 @@ internal fun EdgeWidget(
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
 ) = CardWidget(
     open, bitmapExtra, sidePadding, showStatus,
-    { w, h, corner, density -> flatBackground(w, h, corner, density, ink) }, content,
+    { f, corner -> flatBackground(f.drawWidth, f.drawHeight, corner, f.density, ink) }, content,
 )
 
 /**
@@ -291,18 +291,33 @@ internal fun EdgeWidget(
 internal fun GlowWidget(
     style: GlowStyle, open: Intent, bitmapExtra: Double, showStatus: Boolean = true, hue: Color = RingWidget.Energy,
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
-) = CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { w, h, corner, density -> flatBackground(w, h, corner, density, hue) }, content)
+) = CardWidget(open, bitmapExtra, WidgetSizes.PADDING_DP, showStatus, { f, corner -> flatBackground(f.drawWidth, f.drawHeight, corner, f.density, hue) }, content)
 
 /**
- * A widget card with [background] (dp width, dp height, dp corner, px per dp) behind: what [EdgeWidget] and [GlowWidget]
- * share. The frame carries the strap status line ([LocalStatusLine]) unless [showStatus] is false (while a workout
- * records, spec 5).
+ * A widget in the «fill» look ([FillContent], [SummaryWidget]): the same card, tap and status line as [EdgeWidget], its
+ * [background] drawn from the frame (the liquid stands where the frame's layout leaves room for it), the content
+ * [sidePadding] in from the sides, [topPadding] from the top and [bottomPadding] from the bottom.
+ */
+@Composable
+internal fun FillCardWidget(
+    open: Intent, bitmapExtra: Double, sidePadding: Float, topPadding: Float, bottomPadding: Float,
+    background: (WidgetFrame, Float) -> Bitmap,
+    content: @Composable ColumnScope.(WidgetFrame) -> Unit,
+) = CardWidget(open, bitmapExtra, sidePadding, true, background, content, topPadding, bottomPadding, statusSide = sidePadding)
+
+/**
+ * A widget card with [background] (the frame, its dp corner) behind: what [EdgeWidget], [GlowWidget] and
+ * [FillCardWidget] share. The frame carries the strap status line ([LocalStatusLine]) unless [showStatus] is false
+ * (while a workout records, spec 5). The status button's tap target sits [statusSide] in from the side.
  */
 @Composable
 private fun CardWidget(
     open: Intent, bitmapExtra: Double, sidePadding: Float, showStatus: Boolean,
-    background: (Float, Float, Float, Float) -> Bitmap,
+    background: (WidgetFrame, Float) -> Bitmap,
     content: @Composable ColumnScope.(WidgetFrame) -> Unit,
+    topPadding: Float = WidgetSizes.PADDING_DP,
+    bottomPadding: Float = WidgetSizes.PADDING_DP,
+    statusSide: Float = WidgetSizes.PADDING_DP,
 ) {
     val context = LocalContext.current
     val size = LocalSize.current
@@ -321,32 +336,32 @@ private fun CardWidget(
         GlanceModifier.fillMaxSize()
             .appWidgetBackground()
             .cornerRadius(corner.dp)
-            .background(ImageProvider(background(w, h, corner, density)), ContentScale.FillBounds)
+            .background(ImageProvider(background(frame, corner)), ContentScale.FillBounds)
             .clickable(actionStartActivity(open)),
     ) {
         Column(
-            GlanceModifier.fillMaxSize().padding(horizontal = sidePadding.dp, vertical = WidgetSizes.PADDING_DP.dp),
+            GlanceModifier.fillMaxSize().padding(start = sidePadding.dp, end = sidePadding.dp, top = topPadding.dp, bottom = bottomPadding.dp),
             horizontalAlignment = if (WidgetRtl) Alignment.End else Alignment.Start,
         ) { content(frame) }
-        frame.spot.line?.let { StatusTapTarget(it, frame.spot.top) }
+        frame.spot.line?.let { StatusTapTarget(it, frame.spot.top, topPadding, statusSide) }
     }
 }
 
 /**
  * The status button's tap (spec 5), [StatusButton.TOUCH_DP] square over the circle whose top is [top] dp below the
- * content's: over the content rather than in it, so the title row counts only the circle. Not paired or a low battery
- * opens the Strap page, a stale sync syncs in place ([SyncNowAction]); while it syncs there's no target and a tap is
- * the widget's own.
+ * content's, which starts [padTop] dp down and [padSide] dp in: over the content rather than in it, so the title row
+ * counts only the circle. Not paired or a low battery opens the Strap page, a stale sync syncs in place
+ * ([SyncNowAction]); while it syncs there's no target and a tap is the widget's own.
  */
 @Composable
-private fun StatusTapTarget(line: StatusLine, top: Float) {
+private fun StatusTapTarget(line: StatusLine, top: Float, padTop: Float = WidgetSizes.PADDING_DP, padSide: Float = WidgetSizes.PADDING_DP) {
     val action = statusAction(line.status) ?: return
     val reach = (StatusButton.TOUCH_DP - StatusButton.SIZE_DP) / 2
     // Over the button wherever the row put it: at the start in Arabic.
     Box(GlanceModifier.fillMaxSize(), contentAlignment = if (WidgetRtl) Alignment.TopStart else Alignment.TopEnd) {
         Box(
-            if (WidgetRtl) GlanceModifier.padding(top = (WidgetSizes.PADDING_DP + top - reach).coerceAtLeast(0f).dp, start = (WidgetSizes.PADDING_DP - reach).dp)
-            else GlanceModifier.padding(top = (WidgetSizes.PADDING_DP + top - reach).coerceAtLeast(0f).dp, end = (WidgetSizes.PADDING_DP - reach).dp),
+            if (WidgetRtl) GlanceModifier.padding(top = (padTop + top - reach).coerceAtLeast(0f).dp, start = (padSide - reach).coerceAtLeast(0f).dp)
+            else GlanceModifier.padding(top = (padTop + top - reach).coerceAtLeast(0f).dp, end = (padSide - reach).coerceAtLeast(0f).dp),
         ) {
             Box(
                 GlanceModifier.size(StatusButton.TOUCH_DP.dp).clickable(action).semantics { contentDescription = line.full },
@@ -357,7 +372,7 @@ private fun StatusTapTarget(line: StatusLine, top: Float) {
 
 /** What tapping the status does: the Strap page, a sync, or nothing while it syncs. */
 @Composable
-private fun statusAction(status: StrapStatus): Action? {
+internal fun statusAction(status: StrapStatus): Action? {
     val context = LocalContext.current
     return when (status) {
         StrapStatus.NotPaired, is StrapStatus.LowBattery -> actionStartActivity(openStrap(context))
@@ -460,7 +475,7 @@ private val StatusWords = TextStyle(color = ColorProvider(MetricColors.warn), fo
  * battery in amber. Its tap, read out as the whole line, is [StatusTapTarget]'s (while it syncs, the spinner reads it).
  */
 @Composable
-private fun StatusButtonView(line: StatusLine, f: WidgetFrame) {
+internal fun StatusButtonView(line: StatusLine, f: WidgetFrame) {
     val status = line.status
     val size = GlanceModifier.size(StatusButton.SIZE_DP.dp)
     if (status == StrapStatus.Syncing) {
@@ -599,11 +614,26 @@ internal object WidgetHost {
     }
 }
 
-/** The app's fonts for widgets, which Glance can't use as text: Alexandria, extra bold for numbers (the rings theme). */
+/**
+ * The app's fonts for widgets, which Glance can't use as text: Alexandria, extra bold for numbers (the rings theme),
+ * and Inter, which the fill look's light numbers are drawn in ([FillNumeral]).
+ */
 internal object WidgetFonts {
     @Volatile private var number: android.graphics.Typeface? = null
     @Volatile private var bold: android.graphics.Typeface? = null
+    @Volatile private var medium: android.graphics.Typeface? = null
     @Volatile private var regular: android.graphics.Typeface? = null
+    @Volatile private var inter: android.graphics.Typeface? = null
+
+    /** Inter, a variable font: the paint picks its weight ([android.graphics.Paint.setFontVariationSettings]). */
+    fun inter(c: Context): android.graphics.Typeface = inter ?: (
+        androidx.core.content.res.ResourcesCompat.getFont(c, R.font.inter) ?: android.graphics.Typeface.DEFAULT
+        ).also { inter = it }
+
+    /** Alexandria Medium, the fill look's line under the title. */
+    fun medium(c: Context): android.graphics.Typeface = medium ?: (
+        androidx.core.content.res.ResourcesCompat.getFont(c, R.font.alexandria_medium) ?: android.graphics.Typeface.DEFAULT
+        ).also { medium = it }
 
     fun number(c: Context): android.graphics.Typeface = number ?: (
         androidx.core.content.res.ResourcesCompat.getFont(c, R.font.alexandria_extrabold) ?: android.graphics.Typeface.DEFAULT_BOLD
@@ -626,13 +656,19 @@ private fun renderNumber(context: Context, text: String, w: Float, h: Float): Bi
     return renderToBitmap(w, h) { c -> c.drawText(text, if (WidgetRtl) w - drawn else 0f, h, paint) }
 }
 
-/** [text] drawn in the app's Alexandria at [sp], as an image: Glance offers only the system's fonts for its own text. */
+/**
+ * [text] drawn in the app's Alexandria at [sp], as an image: Glance offers only the system's fonts for its own text.
+ * Bold when [strong], else Medium when [medium], else Regular.
+ */
 @Composable
-internal fun FontText(text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier, maxWidthDp: Float = 220f) {
+internal fun FontText(
+    text: String, sp: Float, color: Color, strong: Boolean = false, modifier: GlanceModifier = GlanceModifier, maxWidthDp: Float = 220f,
+    medium: Boolean = false,
+) {
     val context = LocalContext.current
     val d = context.resources.displayMetrics.density
     val paint = android.text.TextPaint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
-        typeface = WidgetFonts.text(context, strong)
+        typeface = if (medium && !strong) WidgetFonts.medium(context) else WidgetFonts.text(context, strong)
         textSize = sp * context.resources.configuration.fontScale * d
         this.color = color.toArgb()
     }

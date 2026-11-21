@@ -2,48 +2,36 @@ package org.openstrap.app.widget
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Paint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceModifier
-import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
-import androidx.glance.layout.ColumnScope
-import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
-import androidx.glance.layout.width
 import androidx.glance.text.Text
 import org.openstrap.app.R
 import org.openstrap.app.data.DayWindow
 import org.openstrap.app.data.DetailRoutes
 import org.openstrap.app.data.Summaries
 import org.openstrap.app.data.WidgetKind
-import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.GlowMood
 import org.openstrap.app.ui.glow.draw.WeekBarsLook
-import org.openstrap.app.ui.glow.draw.drawGhostLine
 import org.openstrap.app.ui.glow.draw.drawPillBar
-import org.openstrap.app.ui.glow.draw.ghostLineGeometry
 import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.weekBars
 import org.openstrap.app.ui.glow.draw.weekStub
-import org.openstrap.app.ui.glow.draw.edgeLight
-import org.openstrap.app.ui.theme.AppIcons
 
 /**
  * The Steps widget (widgets spec 3.3): today's steps against the goal, glanceable all day. The Wide adds what's to go
- * and the day so far as the Steps card's line, the Large this week day by day. An edge card lit from the bottom, a
- * value, in Steps' lime and the moment's mood, as Today's Steps card. The whole widget opens the Steps detail.
+ * at the end of the row, the Large this week day by day, in the fill look ([FillContent]). The whole widget opens the
+ * Steps detail.
  */
 class StepsWidget : LoadingWidget<StepsWidget.Shown>(WidgetKind.Steps) {
     override fun shown(data: WidgetData, context: Context): Shown = load(data)
@@ -86,29 +74,30 @@ class StepsWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Steps' hue in the rings theme. */
+/** Steps' hue, as the app's. */
 private val Ink = RingWidget.Steps
 
 /**
- * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the share of the goal, and
- * Steps' one ring filled toward the goal with the steps in the middle ([RingContent]). The Wide adds what's to go
- * beside the ring; the Large this week under it.
+ * The widget at the size Glance lays out, in the fill look: Steps' card with blue liquid as high as the share of the
+ * goal, the title and the share with the goal at the top ("7% of 8,000"), the steps at the bottom end
+ * ([FillContent]). The Wide adds what's to go at the end of the row; the Large this week under it.
  */
 @Composable
 private fun StepsContent(data: StepsWidget.Shown) {
     val m = data.model
     val open = openMetric(LocalContext.current, DetailRoutes.STEPS, m.date)
-    EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Progress), Ink, data.mood, open, BITMAP_EXTRA) { frame ->
-        val small = frame.bucket == WidgetSizes.Small
-        val number = if (small) m.smallText else m.stepsText
-        val lines = listOf(RingLine(m.toGo))
-        if (frame.bucket != WidgetSizes.Large) {
-            RingContent(m.title, m.goalNote, m.share, RingWidget.Muted, Ink, m.progress, number, m.description, AppIcons.SneakerMoveFill, frame, lines)
-        } else {
-            val week = StepsLayout.week(m.weekLine, frame.contentWidth, frame.fontScale, m.week.size)
-            RingContent(m.title, m.goalNote, m.share, RingWidget.Muted, Ink, m.progress, number, m.description, AppIcons.SneakerMoveFill, frame, lines, week.height) {
-                WeekRow(m, week, frame.density)
-            }
+    val level = FillLevel.steps(m.steps, m.goal)
+    val status = m.status.ifEmpty { m.share }
+    val lines = listOf(RingLine(m.toGo))
+    FillWidget(FillMetric.Steps, level, open, BITMAP_EXTRA, plan = { f ->
+        val week = if (f.bucket == WidgetSizes.Large) StepsLayout.week(m.weekLine, f.contentWidth, f.fontScale, m.week.size) else null
+        // Past the goal the line says "Goal met" already, so what's to go has nothing to add.
+        fillPlan(f, m.title, null, status, if (m.goalMet) emptyList() else lines, week?.height)
+    }) { frame, p ->
+        val number = if (frame.bucket == WidgetSizes.Small) m.smallText else m.stepsText
+        if (p == null) return@FillWidget
+        FillContent(FillMetric.Steps, p, frame, m.title, level, number, null, m.description) {
+            WeekRow(m, StepsLayout.week(m.weekLine, frame.contentWidth, frame.fontScale, m.week.size), frame.density)
         }
     }
 }

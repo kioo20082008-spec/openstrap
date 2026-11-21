@@ -1,42 +1,18 @@
 package org.openstrap.app.widget
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Paint
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.unit.dp
-import androidx.glance.GlanceModifier
-import androidx.glance.Image
-import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Column
-import androidx.glance.layout.ColumnScope
-import androidx.glance.layout.ContentScale
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
-import androidx.glance.layout.width
-import androidx.glance.text.Text
 import org.openstrap.app.data.DetailRoutes
 import org.openstrap.app.data.WidgetKind
-import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.GlowMood
-import org.openstrap.app.ui.glow.draw.edgeLight
-import org.openstrap.app.ui.glow.draw.renderToBitmap
-import org.openstrap.app.ui.theme.AppIcons
 import java.time.LocalDate
 
 /**
  * The Energy widget (widgets spec 3.6): Energy now, the body battery Recovery works out minute by minute, with a
- * battery bar; the Wide adds Energy at waking, the Large what the day recharged and drained. An edge card whose light
- * fills across to the level, in Energy's ink and the moment's mood, as Today's Energy card. The whole widget opens
- * the Energy detail.
+ * liquid as high as the level ([FillContent]); the Wide adds Energy at waking, the Large what the day recharged and
+ * drained. The whole widget opens the Energy detail.
  */
 class EnergyWidget : LoadingWidget<EnergyWidget.Shown>(WidgetKind.Energy) {
     override fun shown(data: WidgetData, context: Context): Shown = load(data)
@@ -71,25 +47,27 @@ class EnergyWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Energy's ink, as Today's Energy card and the Energy detail. */
-private val Ink = RingWidget.Energy
-
 /**
- * The widget at the size Glance lays out, in the rings theme: the flat card, the title and "left", and Energy's one
- * ring filled to the level with the number in the middle ([RingContent]). The Wide adds Energy at waking beside the
- * ring; the Large what the day recharged and drained too.
+ * The widget at the size Glance lays out, in the fill look: Energy's card with its liquid as high as the level, the
+ * title and "left" at the top, the number at the bottom end ([FillContent]). The Wide adds Energy at waking at the end
+ * of the row; the Large what the day recharged and drained under it.
  */
 @Composable
 private fun EnergyContent(data: EnergyWidget.Shown) {
     val m = data.model
     val open = openMetric(LocalContext.current, DetailRoutes.ENERGY, m.date)
-    EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Level), Ink, data.mood, open, BITMAP_EXTRA, level = m.level) { frame ->
-        if (m.now == null) WaitingContent(m.title, m.waiting, frame)
+    val level = FillLevel.percent(m.now)
+    FillWidget(FillMetric.Energy, level, open, BITMAP_EXTRA, plan = { f ->
+        if (m.now == null) null
         else {
             val lines = listOfNotNull(m.waking?.let { RingLine(it) }) +
-                (if (frame.bucket == WidgetSizes.Large) m.figures.map { RingLine(it.label, it.value) } else emptyList())
-            RingContent(m.title, null, m.word, RingWidget.Muted, Ink, m.level, m.number, m.description, AppIcons.Lightning, frame, lines)
+                (if (f.bucket == WidgetSizes.Large) m.figures.map { RingLine(it.label, it.value) } else emptyList())
+            fillPlan(f, m.title, null, m.word, lines, null)
         }
+    }) { frame, p ->
+        val number = m.number
+        if (number == null || p == null) WaitingContent(m.title, m.waiting, frame)
+        else FillContent(FillMetric.Energy, p, frame, m.title, level, number, "%", m.description)
     }
 }
 

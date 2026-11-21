@@ -84,6 +84,8 @@ data class SleepWidgetModel(
     val stages: List<SleepStageRow>,
     /** In place of the night, in Secondary: "After your first night" and the like. */
     val waiting: String?,
+    /** Time asleep alone, "8 h 11", for the fill look's line under the title and the summary. */
+    val asleepTime: String? = null,
 ) {
     /** What TalkBack reads for the dotted number: "Sleep score 82, good". */
     val scoreDescription: String?
@@ -148,6 +150,7 @@ data class SleepWidgetModel(
                 legend = totals.map { (stage, seconds) -> SleepLegendItem(stage, TabCopy.stageTotal(stage, seconds)) },
                 stages = stageRows(totals),
                 waiting = null,
+                asleepTime = Units.duration(n.asleepSeconds),
             )
         }
     }

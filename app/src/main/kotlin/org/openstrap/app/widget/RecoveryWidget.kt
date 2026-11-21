@@ -4,39 +4,21 @@ import org.openstrap.app.R
 import org.openstrap.app.data.DetailRoutes
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceModifier
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
 import androidx.glance.appwidget.GlanceAppWidget
-import androidx.glance.layout.Alignment
-import androidx.compose.ui.graphics.Color
-import androidx.glance.layout.Column
-import androidx.glance.layout.ColumnScope
-import androidx.glance.layout.Row
-import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxWidth
-import androidx.glance.layout.height
-import androidx.glance.layout.width
-import androidx.glance.text.Text
 import org.openstrap.app.data.WidgetKind
-import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.glow.draw.EdgeStatus
 import org.openstrap.app.ui.glow.draw.GlowMood
 import org.openstrap.app.ui.glow.draw.WeekBarsLook
 import org.openstrap.app.ui.glow.draw.drawWeekBars
 import org.openstrap.app.ui.glow.draw.renderToBitmap
 import org.openstrap.app.ui.glow.draw.weekBars
-import org.openstrap.app.ui.glow.draw.edgeLight
-import org.openstrap.app.ui.theme.AppIcons
 import java.time.LocalDate
 
 /**
  * The Recovery widget (widgets spec 3.4): this morning's score and word in the same spot every day, with what's
- * behind it on the Wide and the sentence and the last seven days on the Large. An edge card lit from the left, about
- * earlier, in Recovery's ink and the moment's mood, as Today's Recovery card after the morning. The whole widget opens
- * the Recovery screen.
+ * behind it on the Wide and the last seven days on the Large, in the fill look: lime liquid as high as the score
+ * ([FillContent]). The whole widget opens the Recovery screen.
  */
 class RecoveryWidget : LoadingWidget<RecoveryWidget.Shown>(WidgetKind.Recovery) {
     override fun shown(data: WidgetData, context: Context): Shown = load(data)
@@ -71,48 +53,35 @@ class RecoveryWidgetReceiver : PlacedWidgetReceiver() {
 /* Layout                                                                                            */
 /* ------------------------------------------------------------------------------------------------ */
 
-/** Recovery's hue in the rings theme. */
+/** Recovery's hue, as the app's. */
 private val Ink = RingWidget.Recovery
 
 /**
- * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the word, and Recovery's one
- * ring with the score in the middle ([RingContent]). The Wide adds the three figures beside the ring; the Large the
- * sentence and the last seven days under it. Any size the launcher gives lands on one of the three ([WidgetSizes.bucket]).
+ * The widget at the size Glance lays out, in the fill look: Recovery's card with lime liquid as high as the score,
+ * the title and the word at the top, the score at the bottom end ([FillContent]). The Wide adds the note and the
+ * figures at the end of the rows; the Large the last seven days under them. Any size the launcher gives lands on one
+ * of the three ([WidgetSizes.bucket]).
  */
 @Composable
 private fun RecoveryContent(data: RecoveryWidget.Shown) {
     val model = data.model
     val open = openMetric(LocalContext.current, DetailRoutes.RECOVERY, model.date)
-    EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Earlier), Ink, data.mood, open, BITMAP_EXTRA) { frame ->
-        if (model.score == null) WaitingContent(model.title, model.waiting, frame) else RingsContent(model, frame)
-    }
-}
-
-/** The ring layout at [f]'s size, the Large with the sentence and the week under the ring. */
-@Composable
-private fun ColumnScope.RingsContent(m: RecoveryWidgetModel, f: WidgetFrame) {
-    val share = (m.score?.toIntOrNull() ?: 0) / 100f
-    val lines = m.figures.map { RingLine(it.label, it.value) }
-    if (f.bucket != WidgetSizes.Large) {
-        RingContent(m.title, m.note, m.word, Ink, Ink, share, m.score, m.scoreDescription, AppIcons.HeartFill, f, lines)
-        return
-    }
-    val sentenceLines = m.sentence?.let { WidgetText.lines(it, WidgetText.SECONDARY_SP, f.contentWidth, f.fontScale).coerceAtMost(2) } ?: 0
-    val sentenceH = sentenceLines * WidgetText.line(WidgetText.SECONDARY_SP, f.fontScale)
-    val week = m.week.isNotEmpty()
-    val weekH = if (week) WeekBarsLook.HEIGHT_DP + 4f + WidgetText.line(WidgetText.CAPTION_SP, f.fontScale) else 0f
-    val belowH = sentenceH + weekH + (if (sentenceLines > 0 && week) RingWidget.BELOW_GAP_DP else 0f)
-    RingContent(m.title, m.note, m.word, Ink, Ink, share, m.score, m.scoreDescription, AppIcons.HeartFill, f, lines, belowH) {
-        // One child of the card's column: Glance drops a column's children past ten.
-        Column(GlanceModifier.fillMaxWidth()) {
-            if (sentenceLines > 0) m.sentence?.let { Text(it, style = WidgetType.secondary, maxLines = sentenceLines) }
-            if (week) {
-                if (sentenceLines > 0) Spacer(GlanceModifier.height(RingWidget.BELOW_GAP_DP.dp))
-                Week(m.week, WeekBarsLook.column(m.week.size, f.contentWidth), f.density)
-            }
+    val level = FillLevel.percent(model.score?.toIntOrNull())
+    val lines = model.figures.map { RingLine(it.label, it.value) }
+    val week = model.week.isNotEmpty()
+    FillWidget(FillMetric.Recovery, level, open, BITMAP_EXTRA, plan = { f ->
+        if (model.score == null) null
+        else fillPlan(f, model.title, model.note, model.word, lines, if (week && f.bucket == WidgetSizes.Large) weekHeight(f) else null)
+    }) { frame, p ->
+        if (model.score == null || p == null) WaitingContent(model.title, model.waiting, frame)
+        else FillContent(FillMetric.Recovery, p, frame, model.title, level, model.score, "%", model.scoreDescription) {
+            Week(model.week, WeekBarsLook.column(model.week.size, frame.contentWidth), frame.density)
         }
     }
 }
+
+/** The week's height: its bars and the letters under them. */
+private fun weekHeight(f: WidgetFrame): Float = WeekBarsLook.HEIGHT_DP + 4f + WidgetText.line(WidgetText.CAPTION_SP, f.fontScale)
 
 /** The last seven days as solid bars, the day shown in Recovery's ink, each day's letter under its bar. */
 @Composable

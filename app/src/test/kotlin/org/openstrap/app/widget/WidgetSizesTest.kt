@@ -35,7 +35,7 @@ class WidgetSizesTest {
         val all = providers()
         assertTrue("no widget providers in res/xml", all.containsKey("widget_recovery.xml"))
         // Each widget built so far, so a provider dropped by mistake fails here too.
-        listOf("moment", "recovery", "steps", "sleep", "start", "energy").map { "widget_$it.xml" }.forEach {
+        listOf("moment", "recovery", "steps", "sleep", "start", "energy", "summary").map { "widget_$it.xml" }.forEach {
             assertTrue("$it missing from res/xml", all.containsKey(it))
         }
         val wrong = mutableListOf<String>()
@@ -81,9 +81,23 @@ class WidgetSizesTest {
         }
         // Each widget's receiver has its picker name.
         val manifest = File(root, "AndroidManifest.xml").readText()
-        listOf("moment", "recovery", "steps", "sleep", "start", "energy").forEach {
+        listOf("moment", "recovery", "steps", "sleep", "start", "energy", "summary").forEach {
             assertTrue("widget_${it}_name not the receiver's label", "@string/widget_${it}_name" in manifest)
             assertTrue("widget_${it}_name missing", "name=\"widget_${it}_name\"" in strings)
+        }
+    }
+
+    @Test fun `the fill widgets' picker previews show the fill look's image`() {
+        listOf("energy", "recovery", "sleep", "steps", "summary").forEach { k ->
+            val layout = File(root, "res/layout/widget_preview_$k.xml").readText()
+            assertTrue("widget_preview_$k.xml doesn't show its preview image", "@drawable/widget_preview_$k\"" in layout)
+            val png = File(root, "res/drawable-nodpi/widget_preview_$k.png")
+            assertTrue("widget_preview_$k.png missing", png.isFile)
+            // A PNG's width and height, big endian at 16 and 20: big enough for a 2 x 2 cell at 3x.
+            val head = png.readBytes().copyOfRange(16, 24)
+            val w = head.copyOfRange(0, 4).fold(0) { a, b -> a shl 8 or (b.toInt() and 0xFF) }
+            val h = head.copyOfRange(4, 8).fold(0) { a, b -> a shl 8 or (b.toInt() and 0xFF) }
+            assertTrue("widget_preview_$k.png is $w x $h", w >= 450 && h >= 450)
         }
     }
 

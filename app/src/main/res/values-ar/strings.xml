@@ -17,7 +17,7 @@
     <string name="widget_start_name">ابدأ تمريناً</string>
     <string name="widget_start_description">ابدأ رياضتك المعتادة بلمسة واحدة</string>
     <string name="widget_summary_name">ملخص اليوم</string>
-    <string name="widget_summary_description">الطاقة والاستشفاء والنوم في ثلاث حلقات</string>
+    <string name="widget_summary_description">الطاقة والاستشفاء والنوم جنباً إلى جنب</string>
     <string name="widget_energy_name">الطاقة</string>
     <string name="widget_energy_description">طاقتك الآن وما غيّرها اليوم</string>
 </resources>

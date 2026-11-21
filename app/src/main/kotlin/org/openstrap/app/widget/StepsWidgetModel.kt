@@ -68,6 +68,8 @@ data class StepsWidgetModel(
     val week: List<StepsWeekDay>,
     /** "Goal met 2 of 6 days". */
     val weekLine: String,
+    /** The fill look's line under the title: the share of the goal with the goal, "7% of 8,000", or "Goal met". */
+    val status: String = "",
 ) {
     val goalMet: Boolean get() = steps >= goal
 
@@ -116,6 +118,7 @@ data class StepsWidgetModel(
                 lineMax = maxOf(goal.toFloat(), steps.toFloat(), line.filterNotNull().maxOrNull() ?: 0f),
                 week = week,
                 weekLine = weekLine(met, counted.size, strings),
+                status = ofGoal(steps, goal, locale, strings),
             )
         }
 
@@ -142,6 +145,11 @@ data class StepsWidgetModel(
                 }
             }
         }
+
+        /** "7% of 8,000", the share cut down as Today's card cuts it, or "Goal met" from the goal on. */
+        fun ofGoal(steps: Int, goal: Int, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String =
+            if (steps >= goal) strings.get(R.string.system_widget_steps_goal_met)
+            else strings.format(R.string.system_widget_steps_of_goal, steps * 100 / goal.coerceAtLeast(1), Units.count(goal.toLong(), locale))
 
         /** "1,568 to go", or "Goal met" from the goal on. */
         fun toGo(steps: Int, goal: Int, locale: Locale = Locale.getDefault(), strings: Strings = Strings.app): String =

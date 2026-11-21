@@ -11,6 +11,7 @@
     <string name="system_widget_since">منذ ⁨%1$s⁩</string>
     <string name="system_widget_steps_today">اليوم</string>
     <string name="system_widget_steps_goal">الهدف ⁨%1$s⁩</string>
+    <string name="system_widget_steps_of_goal">⁨%1$d%%⁩ من ⁨%2$s⁩</string>
     <string name="system_widget_steps_to_go">باقي ⁨%1$s⁩</string>
     <string name="system_widget_steps_goal_met">تحقق الهدف</string>
     <string name="system_widget_steps_week">تحقق الهدف ⁨%1$d⁩ من ⁨%2$s⁩</string>

@@ -1,55 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  The Steps widget in the launcher's picker on Android 12 and later (widgets spec 6.4), a Small with the mockups'
-  sample: 8,432 today, the bar at 84% of the goal. The share's words are left out: One UI's picker shows it in a
-  cell about 136 x 150 dp, too short for them. RemoteViews' own views only, so the number is plain text where the widget
-  draws dots. Android 15 and later show the generated preview from the real layout instead
-  (WidgetUpdater.publishPreviews).
+  The steps widget in the launcher's picker on Android 12 and later (widgets spec 6.4): the fill look as the picker's
+  preview image draws it (widget_preview_steps, from the approved mockup), scaled into the cell. Android 15 and later
+  show the generated preview from the real layout instead (WidgetUpdater.publishPreviews).
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/widget_preview_bg_steps"
-    android:orientation="vertical"
-    android:padding="20dp"
-    tools:ignore="HardcodedText">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/widget_steps_name"
-        android:textSize="17sp"
-        android:textColor="#FFFFFFFF"
-        android:fontFamily="sans-serif-medium"
-        android:maxLines="1"
-        android:includeFontPadding="true" />
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="8,432"
-        android:textSize="34sp"
-        android:textColor="#FFFFFFFF"
-        android:fontFamily="sans-serif-black"
-        android:maxLines="1"
-        android:includeFontPadding="true" />
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="today"
-        android:textSize="15sp"
-        android:textColor="#FFA7A7B0"
-        android:maxLines="1"
-        android:includeFontPadding="true" />
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:layout_marginTop="6dp"
-        android:max="100"
-        android:progress="84"
-        android:progressDrawable="@drawable/widget_preview_goal" />
-</LinearLayout>
+    android:src="@drawable/widget_preview_steps"
+    android:scaleType="fitCenter"
+    android:adjustViewBounds="true"
+    android:contentDescription="@string/widget_steps_name" />

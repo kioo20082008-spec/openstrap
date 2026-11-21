@@ -17,7 +17,6 @@ import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.ColumnScope
 import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
@@ -33,20 +32,14 @@ import java.time.ZoneId
 import org.openstrap.app.R
 import org.openstrap.app.data.DetailRoutes
 import org.openstrap.app.data.WidgetKind
-import org.openstrap.app.ui.glow.draw.EdgeKind
-import org.openstrap.app.ui.glow.draw.EdgeStatus
-import org.openstrap.app.ui.glow.draw.GlowMood
 import org.openstrap.app.ui.glow.draw.drawStageBar
 import org.openstrap.app.ui.glow.draw.renderToBitmap
-import org.openstrap.app.ui.glow.draw.edgeLight
 import org.openstrap.app.ui.glow.draw.stageColor
-import org.openstrap.app.ui.theme.AppIcons
 
 /**
  * The Sleep widget (widgets spec 3.2): last night's score, time asleep and stages, as the Sleep tab's hero tells them.
  * The Wide adds bedtime to waking and the stage legend, the Large the tab's sentence, how often you woke and the
- * time in each stage. An edge card lit from the top like a night sky, in Sleep's ink and always the night mood,
- * as the Sleep tab. The whole widget opens the Sleep score's detail for that night.
+ * time in each stage, in the fill look ([FillContent]). The whole widget opens the Sleep score's detail for that night.
  */
 class SleepWidget : LoadingWidget<SleepWidgetModel>(WidgetKind.Sleep) {
     override fun shown(data: WidgetData, context: Context): SleepWidgetModel = load(data)
@@ -85,50 +78,34 @@ private val Ink = RingWidget.Sleep
 private val LegendStyle = WidgetType.caption.copy(color = ColorProvider(RingWidget.Muted))
 
 /**
- * The widget at the size Glance lays out, in the rings theme: the flat card, the title and the score's word, and
- * Sleep's one ring with the score in the middle ([RingContent]). The Wide adds time asleep and how often you woke beside
- * the ring with the stage bar under it; the Large the time in each stage. A night opens its Sleep score; while waiting,
- * the Sleep screen.
+ * The widget at the size Glance lays out, in the fill look: Sleep's card with violet liquid as high as the score, the
+ * title and the word with time asleep at the top ("Fair · 8 h 11"), the score at the bottom end ([FillContent]). The
+ * Wide adds bedtime to waking and how often you woke, and the stage bar under them; the Large the time in each stage.
+ * A night opens its Sleep score; while waiting, the Sleep screen.
  */
 @Composable
 private fun SleepContent(m: SleepWidgetModel) {
     val context = LocalContext.current
     val open = if (m.date != null) openMetric(context, DetailRoutes.SLEEP_SCORE, m.date) else openMetric(context, DetailRoutes.SLEEP, null)
-    EdgeWidget(edgeLight(EdgeStatus.Usual, EdgeKind.Sleep), Ink, GlowMood.Night, open, BITMAP_EXTRA) { frame ->
-        if (m.waiting != null) WaitingContent(m.title, m.waiting, frame) else RingsContent(m, frame)
+    val level = FillLevel.percent(m.score?.toIntOrNull())
+    val status = listOfNotNull(m.word, m.asleepTime ?: m.asleep).joinToString(" · ").ifEmpty { null }
+    val lines = listOfNotNull(m.woke?.let { RingLine(it) })
+    FillWidget(FillMetric.Sleep, level, open, BITMAP_EXTRA, plan = { f ->
+        if (m.waiting != null) null else fillPlan(f, m.title, m.note, status, lines, belowHeight(m, f))
+    }) { frame, p ->
+        if (m.waiting != null || p == null) WaitingContent(m.title, m.waiting, frame)
+        else FillContent(FillMetric.Sleep, p, frame, m.title, level, m.score ?: "–", null, m.scoreDescription) {
+            if (frame.bucket == WidgetSizes.Large && m.stages.isNotEmpty()) StageRows(m.stages, frame) else StageBar(m, SleepLayout.BAR_DP, frame)
+        }
     }
 }
 
-/** The ring layout at [f]'s size. */
-@Composable
-private fun ColumnScope.RingsContent(m: SleepWidgetModel, f: WidgetFrame) {
-    val share = (m.score?.toIntOrNull() ?: 0) / 100f
-    val number = m.score ?: "–"
-    val lines = listOfNotNull(m.asleep?.let { RingLine(it) }, m.woke?.let { RingLine(it) })
-    when (f.bucket) {
-        WidgetSizes.Small -> {
-            // The word with time asleep, "Fair · 8 h 26", as the mockup's.
-            val word = listOfNotNull(m.word, m.asleep).joinToString(" · ").ifEmpty { null }
-            RingContent(m.title, null, word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f)
-        }
-        WidgetSizes.Wide -> if (m.totals.isEmpty()) {
-            RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines)
-        } else {
-            RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines, SleepLayout.BAR_DP) {
-                StageBar(m, SleepLayout.BAR_DP, f)
-            }
-        }
-        else -> when {
-            m.stages.isNotEmpty() -> RingContent(
-                m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines,
-                SleepLayout.stagesHeight(m.stages.size, f.fontScale),
-            ) { StageRows(m.stages, f) }
-            m.totals.isNotEmpty() -> RingContent(
-                m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines, SleepLayout.BAR_DP,
-            ) { StageBar(m, SleepLayout.BAR_DP, f) }
-            else -> RingContent(m.title, m.note, m.word, RingWidget.SleepText, Ink, share, number, m.scoreDescription, AppIcons.MoonFill, f, lines)
-        }
-    }
+/** What goes under the rows: the Large's time in each stage, else the stage bar on the Wide and Large; none on a Small. */
+private fun belowHeight(m: SleepWidgetModel, f: WidgetFrame): Float? = when {
+    f.bucket == WidgetSizes.Small -> null
+    f.bucket == WidgetSizes.Large && m.stages.isNotEmpty() -> SleepLayout.stagesHeight(m.stages.size, f.fontScale)
+    m.totals.isNotEmpty() -> SleepLayout.BAR_DP
+    else -> null
 }
 
 /** The stage bar, 8 dp, with its legend under it on [legendRows] rows (none at 0). */
